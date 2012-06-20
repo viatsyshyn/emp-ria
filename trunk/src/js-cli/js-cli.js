@@ -25,6 +25,13 @@ try {
 
       return (fileObj.getAbsolutePath() + "").replace(/\\/g, "/");
     }
+    
+    function fileExists(fileObj) {
+      if (typeof fileObj === "string")
+        fileObj = new java.io.File(fileObj);
+
+      return fileObj.exists();
+    }
 
     Env.RhinoRoot = absPath(args.shift());
     Env.IncludePath.unshift(Env.RhinoRoot + '/library');
@@ -37,7 +44,7 @@ try {
         if (arg == '--include') {
             var includePath = args.shift();
             for each(var path in includePath.split(';').reverse()) {
-                Env.IncludePath.unshift(absPath(Env.CurrentDirectory + '/' + path));
+                Env.IncludePath.unshift(absPath(fileExists(path) ? path : Env.CurrentDirectory + '/' + path));
             }
             continue;
         }
@@ -47,7 +54,7 @@ try {
     } while (true);
 
     var appModule = args.shift();
-    Env.load(Env.CurrentDirectory + '/' + appModule);
+    Env.load(fileExists(appModule) ? appModule : Env.CurrentDirectory + '/' + appModule);
     
     if (this['main'] === undefined) 
       throw Error('main() not found in "' + appModule + '"');
