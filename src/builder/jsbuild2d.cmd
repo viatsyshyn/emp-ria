@@ -1,0 +1,1 @@
+CALL %~dp0..\js-cli\bin\js-cli-debug.cmd --include %~dp0 %~dp0jsbuild2.js %*
