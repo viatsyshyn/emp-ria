@@ -1,0 +1,1 @@
+@java -classpath %~dp0js.jar; org.mozilla.javascript.tools.debugger.Main %~dp0..\js-cli.js %~dp0..\ %CD% %*
