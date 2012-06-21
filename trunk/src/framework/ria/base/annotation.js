@@ -1,4 +1,4 @@
-(function () {
+(function (ria) {
     "use strict";
 
     function inheritFrom(superClass) {
@@ -92,9 +92,7 @@
 
     Object.freeze(AnnotationDescriptor);
 
-    hwa.__API.AnnotationDescriptor = AnnotationDescriptor;
+    ria.__API.AnnotationDescriptor = AnnotationDescriptor;
 
-    hwa.__API.Annotation = AnnotationDescriptor.build([Annotation]);
-
-    hwa.__API.Override = AnnotationDescriptor.build([function Override() {}]);
-})();
+    ria.__API.Annotation = AnnotationDescriptor.build([Annotation]);
+})(ria);
