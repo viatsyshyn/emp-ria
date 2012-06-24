@@ -9,6 +9,13 @@ EXCEPTION('NotImplementedException', [
     }
 ]);
 
+/** @class NotImplementedException */
+EXCEPTION('NotSuchMethodException', [
+    PUBLIC, function __constructor() {
+        BASE('Not implemented yet');
+    }
+]);
+
 /** @class RuntimeException */
 EXCEPTION('RuntimeException', [
     [String],

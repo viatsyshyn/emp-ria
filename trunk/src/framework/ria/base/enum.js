@@ -1,26 +1,21 @@
-(function () {
+(function (__API) {
     "use strict";
 
     function Enum() {}
 
     Enum.prototype = {
-        toString: {
-            value: function toString() {
-                return '[' + this.key + '#' + this.valueOf() + ' ' + this.constructor.getName() + ']';
-            },
-            writable: false,
-            configurable: false,
-            enumerable: true
+        toString: function toString() {
+            return '[' + this.key + '#' + this.valueOf() + ' ' + this.constructor.getName() + ']';
         }
     };
 
     function fromValue(value) {
         var statics = this;
-        for(var k in statics) {
-            if (statics.hasOwnProperty(k)
-                    && statics[k] instanceof statics
-                    && statics[k].valueOf() === value)
+        for(var k in statics) { //noinspection JSUnfilteredForInLoop
+            if (statics.hasOwnProperty(k) && (statics[k] instanceof statics) && statics[k].valueOf() === value) {
+                //noinspection JSUnfilteredForInLoop
                 return statics[k];
+            }
         }
 
         return undefined;
@@ -80,42 +75,17 @@
                 var v = new enumClassValue();
 
                 Object.defineProperties(v, {
-                    __IDENTIFIER__: {
-                        value: [name, k].join('#'),
-                        writable: false,
-                        configurable: false,
-                        enumerable: false
-                    },
-                    key: {
-                        value: k,
-                        writable: false,
-                        configurable: false,
-                        enumerable: false
-                    },
-                    valueOf: {
-                        value: getValueOfFunc(values[k]),
-                        writable: false,
-                        configurable: false,
-                        enumerable: false
-                    }
+                    __IDENTIFIER__: { value: [name, k].join('#'), writable: false, configurable: false, enumerable: false },
+                    key: { value: k, writable: false, configurable: false, enumerable: false},
+                    valueOf: { value: getValueOfFunc(values[k]), writable: false, configurable: false, enumerable: false }
                 });
 
-                Object.defineProperty(enumClass, k, {
-                    value: v,
-                    writable: false,
-                    configurable: false,
-                    enumerable: true
-                });
+                Object.defineProperty(enumClass, k, { value: v,writable: false, configurable: false, enumerable: true });
             }
         }
 
         Object.defineProperties(enumClass, {
-            fromValue: {
-                value: fromValue,
-                writable: false,
-                configurable: false,
-                enumerable: true
-            }
+            fromValue: { value: fromValue, writable: false, configurable: false, enumerable: true }
         });
 
         return enumClass;
@@ -125,7 +95,10 @@
         return value instanceof Enum || value.__enumDescriptor instanceof EnumDescriptor;
     }
 
-    hwa.__API.buildEnum = buildEnum;
-    hwa.__API.isEnum = isEnum;
-    hwa.__API.AbstractEnum = Enum;
-})();
+    /** @class ria.__API.buildEnum */
+    __API.buildEnum = buildEnum;
+    /** @class ria.__API.isEnum */
+    __API.isEnum = isEnum;
+    /** @class ria.__API.AbstractEnum */
+    __API.AbstractEnum = Enum;
+})(ria.__API);
