@@ -33,14 +33,6 @@
         });
 
     /**
-     * @see Function.prototype.hasVarArgs
-     */
-    Function.prototype.hasVarArgs
-        || (Function.prototype.hasVarArgs = function hasVarArgs() {
-            return this.getParameters().pop() == 'var_args';
-        });
-
-    /**
      * @see Function.prototype.getRequiredParametersCount
      */
     Function.prototype.getRequiredParametersCount
@@ -57,8 +49,4 @@
             var braceStart = body.indexOf('{');
             return body.substring(braceStart);
         });
-
-    Array.isArray = Array.isArray || function (value) {
-        return Object.prototype.toString.call(value) === '[object Array]';
-    };
 })();

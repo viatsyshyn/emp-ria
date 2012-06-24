@@ -1,9 +1,10 @@
-(function () {
+(function (__API) {
     "use strict";
 
-    var Modifiers = hwa.__API.Modifiers;
+    var Modifiers = __API.Modifiers;
     // declared to create Exception itself
-    hwa.__API.Exception = hwa.__API.ClassDescriptor.build([Modifiers.ABSTRACT, 'Exception', [
+    /** @class ria.__API.Exception */
+    __API.Exception = hwa.__API.ClassDescriptor.build([Modifiers.ABSTRACT, 'Exception', [
         [String],
         Modifiers.PUBLIC, function __constructor(message) {
             this.__constructor(message, null);
@@ -32,4 +33,4 @@
             return s;
         }
     ]]);
-})();
+})(ria.__API);
