@@ -1,7 +1,21 @@
-(function () {
+(function (__API, ria) {
     "use strict";
 
-    var VAR_ARGS_NAME = 'var_args';
+    var Modifiers = __API.buildEnum('Modifiers', {
+        VOID: 0,
+        PUBLIC: 1,
+        PROTECTED: 2,
+        PRIVATE: 3,
+        ABSTRACT: 4,
+        STATIC: 5,
+        SELF: 6
+    }),
+
+     Visibility = __API.buildEnum('Visibility', {
+        Public: 1,
+        Protected: 2,
+        Private: 3
+    });
 
     /**
      * @constructor
@@ -26,11 +40,11 @@
     }
 
     MethodDescriptor.prototype.postProcessSELF = function (ctor) {
-        if (this.retType == Modifiers.SELF)
+        if (this.retType === Modifiers.SELF)
             this.retType = ctor;
 
-        var hints = this.argsInfo;
-        var j = hints.length;
+        var hints = this.argsInfo,
+            j = hints.length;
         for(;j > 0; j--) {
             if(hints[j - 1] == Modifiers.SELF)
                 hints[j - 1] = ctor;
@@ -42,7 +56,7 @@
     MethodDescriptor.prototype.getMethodShortSignature = function () {
         var args = [].slice.call(this.body.getParameters());
         for(var i = 0; i < args.length; i++) {
-            args[i] = args[i] === VAR_ARGS_NAME ? args[i] : hwa.__API.getIdentifierOfType(this.argsInfo[i]);
+            args[i] = __API.getIdentifierOfType(this.argsInfo[i]);
         }
 
         return args.join(', ');
@@ -51,9 +65,7 @@
     MethodDescriptor.prototype.getMethodFullSignature = function (includeNames) {
         var args = this.body.getParameters();
         for(var i = 0; i < args.length; i++)
-            args[i] = (args[i] === VAR_ARGS_NAME
-                    ? '' : hwa.__API.getIdentifierOfType(this.argsInfo[i]) + (includeNames === true ? ' ' : ''))
-                + (includeNames === true ? args[i] : '');
+            args[i] = __API.getIdentifierOfType(this.argsInfo[i]) + (includeNames === true ? ' ' + args[i] : '');
 
         return    ['', 'public ', 'protected ', 'private '][this.visibility.valueOf()]
                 + ['', 'static '][this.isStatic ? 1 : 0]
@@ -105,22 +117,6 @@
     Object.freeze(PropertyDescriptor);
 
     hwa.__API.PropertyDescriptor = PropertyDescriptor;
-
-    var Modifiers = hwa.__API.Modifiers = hwa.__API.buildEnum('Modifiers', {
-        VOID: 0,
-        PUBLIC: 1,
-        PROTECTED: 2,
-        PRIVATE: 3,
-        ABSTRACT: 4,
-        STATIC: 5,
-        SELF: 6
-    });
-
-    var Visibility = hwa.__API.Visibility = hwa.__API.buildEnum('Visibility', {
-        Public: 1,
-        Protected: 2,
-        Private: 3
-    });
 
     var AnnotationDescriptor = hwa.__API.AnnotationDescriptor;
 
@@ -261,4 +257,4 @@
     };
 
     Object.freeze(hwa.__API.parser);
-})();
+})(ria.__API, ria);

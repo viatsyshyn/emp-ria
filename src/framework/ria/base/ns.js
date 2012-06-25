@@ -5,7 +5,7 @@
 
     function addNamespaceMeta(nsObj, name, root) {
         ria.defineConst(nsObj, {
-            __IDENTIFIER__: (root.__IDENTIFIER__ ? [root.__IDENTIFIER__, name].join('.') : name),
+            __IDENTIFIER__: (root.__IDENTIFIER__ ? root.__IDENTIFIER__ + '.' + name : name),
             toString: toString
         })
     }
