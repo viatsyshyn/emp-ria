@@ -1,8 +1,8 @@
 
-(function () {
+(function (__API, ria) {
     "use strict";
 
-    var CLASS = ria.__API.ClassDescriptor.build;
+    var CLASS = __API.ClassDescriptor.build;
 
     TestCase("ClassTestCase").prototype = {
         setUp: function(){},
@@ -10,7 +10,7 @@
         testDeclaration: function () {
             var TestClass = CLASS('TestClass', [
                 function $() {},
-                function $nameCtor() {},
+                function $namedCtor() {},
 
                 function publicMember() {},
                 function protectedMember_() {},
@@ -23,7 +23,7 @@
 
             assertFunction(TestClass);
             assertEquals(ria.getConstructorOf(TestClass), TestClass);
-            assertFunction(TestClass.$nameCtor);
+            assertFunction(TestClass.$namedCtor);
             assertFunction(TestClass.staticMember);
 
             var instance;
@@ -41,4 +41,4 @@
             assertUndefined(instance.setProtectedField_);
         }
     }
-})();
+})(ria.__API, ria);
