@@ -8,7 +8,7 @@
  */
 
 
-(function () {
+(function (__API, ria) {
     "use strict";
 
     function getProtoOf(v) {
@@ -23,26 +23,25 @@
         this.clazz = clazz;
     }
 
-    ArrayOfDescriptor.isArrayOfDescriptor = function (ds) {
+    /** @class ArrayOfDescriptor.isArrayOfDescriptor */
+    ria.defineConst(ArrayOfDescriptor, 'isArrayOfDescriptor', function (ds) {
         return ds instanceof ArrayOfDescriptor;
-    };
+    });
 
-    ArrayOfDescriptor.prototype['toString'] = function () {
-        return 'Array<' + getIdentifierOfType(this.clazz) + '>';
-    };
-
-    ArrayOfDescriptor.prototype['valueOf'] = function () {
-        return this.clazz;
-    };
+    ria.defineConst(ArrayOfDescriptor.prototype, {
+        toString: function () { return 'Array<' + getIdentifierOfType(this.clazz) + '>'; },
+        valueOf: function () { return this.clazz; }
+    });
 
     Object.freeze(ArrayOfDescriptor);
 
-    hwa.__API.ArrayOfDescriptor = ArrayOfDescriptor;
+    /** @class ria.__API.ArrayOfDescriptor */
+    ria.defineConst(__API, 'ArrayOfDescriptor', ArrayOfDescriptor);
 
     function getIdentifierOfType(type) {
         if (type === undefined) return 'void';
-        if (type === hwa.__API.Modifiers.SELF) return 'SELF';
-        if (type === null) return 'Object';
+        if (type === __API.Modifiers.SELF) return 'SELF';
+        if (type === null) return '*';
         if (type === Function) return 'Function';
         if (type === Number) return 'Number';
         if (type === Boolean) return 'Boolean';
@@ -77,17 +76,20 @@
 
         if (Array.isArray(value)) return 'Array';
 
-        if (hwa.__API.isIdentifier(value))
+        if (__API.isIdentifier(value))
             return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';
 
-        if (hwa.__API.isEnum(value))
+        if (__API.isEnum(value))
             return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';
 
-        if (value instanceof hwa.__API.Class)
+        if (value instanceof __API.Class)
             return getConstructorOf(value).__IDENTIFIER__ || 'Class';
 
-        if (value instanceof Object && getConstructorOf(value))
-            return getConstructorOf(value).getName() || 'Object';
+        if (value instanceof Object) {
+            var ctor = getConstructorOf(value);
+            if (ctor)
+                return ctor.getName() || 'Object';
+        }
 
         return 'Object';
     }
@@ -104,11 +106,11 @@
     }
 
     function isCustomType(type) {
-        return hwa.__API.ClassDescriptor.isClassConstructor(type)
-            || hwa.__API.InterfaceDescriptor.isInterfaceProxy(type)
-            || hwa.__API.isEnum(type)
-            || hwa.__API.isIdentifier(type)
-            || hwa.__API.ArrayOfDescriptor.isArrayOfDescriptor(type);
+        return __API.ClassDescriptor.isClassConstructor(type)
+            || __API.InterfaceDescriptor.isInterfaceProxy(type)
+            || __API.isEnum(type)
+            || __API.isIdentifier(type)
+            || ArrayOfDescriptor.isArrayOfDescriptor(type);
     }
 
     function isImportedType(type) {
@@ -120,12 +122,12 @@
     }
 
     function castAs(instance, to) {
-        if (hwa.__API.ClassDescriptor.isClassConstructor(to) && instance instanceof hwa.__API.Class) {
+        if (__API.ClassDescriptor.isClassConstructor(to) && instance instanceof __API.Class) {
             var scopes = instance.__scopesStack;
             if (Array.isArray(scopes) && scopes.length > 0 && scopes[0] instanceof to)
                 return to.__classDescriptor.queryClassProxy(scopes
                     , getConstructorOf(scopes[0]).__classDescriptor
-                    , hwa.__API.Visibility.Public, 0);
+                    , __API.Visibility.Public, 0);
         }
 
         return null;
@@ -139,14 +141,26 @@
         return casted;
     }
 
-    hwa.__API.getProtoOf = getProtoOf;
-    hwa.__API.getConstructorOf = getConstructorOf;
-    hwa.__API.getIdentifierOfType = getIdentifierOfType;
-    hwa.__API.getIdentifierOfValue = getIdentifierOfValue;
-    hwa.__API.isBuildInType = isBuildInType;
-    hwa.__API.isCustomType = isCustomType;
-    hwa.__API.isImportedType = isImportedType;
-    hwa.__API.isType = isType;
-    hwa.__API.castAs = castAs;
-    hwa.__API.castTo = castTo;
-})();
+    ria.defineConst(__API, {
+        /** @class ria.__API.getProtoOf */
+        getProtoOf: getProtoOf,
+        /** @class ria.__API.getConstructorOf */
+        getConstructorOf: getConstructorOf,
+        /** @class ria.__API.getIdentifierOfType */
+        getIdentifierOfType: getIdentifierOfType,
+        /** @class ria.__API.getIdentifierOfValue */
+        getIdentifierOfValue: getIdentifierOfValue,
+        /** @class ria.__API.isBuildInType */
+        isBuildInType: isBuildInType,
+        /** @class ria.__API.isCustomType */
+        isCustomType: isCustomType,
+        /** @class ria.__API.isImportedType */
+        isImportedType: isImportedType,
+        /** @class ria.__API.isType */
+        isType: isType,
+        /** @class ria.__API.castAs */
+        castAs: castAs,
+        /** @class ria.__API.castTo */
+        castTo: castTo
+    });
+})(ria.__API, ria);
