@@ -8,10 +8,11 @@
         PRIVATE: 3,
         ABSTRACT: 4,
         STATIC: 5,
-        SELF: 6
+        SELF: 6,
+        OVERRIDE: 7
     }),
 
-     Visibility = __API.buildEnum('Visibility', {
+    Visibility = __API.buildEnum('Visibility', {
         Public: 1,
         Protected: 2,
         Private: 3
