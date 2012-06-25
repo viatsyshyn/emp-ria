@@ -1,4 +1,4 @@
-(function (__API) {
+(function (__API, ria) {
     "use strict";
 
     function Enum() {}
@@ -34,17 +34,6 @@
         return (new Function ('return function ' + name + '() {}'))();
     }
 
-    function inheritFrom(superClass) {
-        function InheritanceProxyClass() {}
-        InheritanceProxyClass.prototype = superClass.prototype;
-        return new InheritanceProxyClass();
-    }
-
-    function extend(subClass, superClass) {
-        subClass.prototype = inheritFrom(superClass);
-        subClass.prototype.constructor = subClass;
-    }
-
     function getValueOfFunc(value) {
         return function valueOf() { return value; };
     }
@@ -54,21 +43,14 @@
         this.values = values;
     }
 
-    /**
-     * DEFINE
-     * @class {Enum}
-     * @public
-     * @param {String} name
-     * @param {Object} values
-     */
     function buildEnum(name, values) {
         var enumClass = createEnumConstructor(name);
-        extend(enumClass, Enum);
+        ria.extend(enumClass, Enum);
 
         enumClass.__enumDescriptor = new EnumDescriptor(name, values);
 
         var enumClassValue = createNamedEmptyFunction(name);
-        extend(enumClassValue, enumClass);
+        ria.extend(enumClassValue, enumClass);
 
         for(var k in values) {
             if (values.hasOwnProperty(k)) {
@@ -95,10 +77,13 @@
         return value instanceof Enum || value.__enumDescriptor instanceof EnumDescriptor;
     }
 
-    /** @class ria.__API.buildEnum */
-    __API.buildEnum = buildEnum;
-    /** @class ria.__API.isEnum */
-    __API.isEnum = isEnum;
-    /** @class ria.__API.AbstractEnum */
-    __API.AbstractEnum = Enum;
-})(ria.__API);
+    ria.defineConst(__API, {
+        /** @class ria.__API.buildEnum */
+        buildEnum: buildEnum,
+        /** @class ria.__API.isEnum */
+        isEnum: isEnum,
+        /** @class ria.__API.AbstractEnum */
+        AbstractEnum: Enum
+    })
+
+})(ria.__API, ria);

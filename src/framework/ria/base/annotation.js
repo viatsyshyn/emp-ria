@@ -1,16 +1,5 @@
-(function (ria) {
+(function (__API, ria) {
     "use strict";
-
-    function inheritFrom(superClass) {
-        function InheritanceProxyClass() {}
-        InheritanceProxyClass.prototype = superClass.prototype;
-        return new InheritanceProxyClass();
-    }
-
-    function extend(subClass, superClass) {
-        subClass.prototype = inheritFrom(superClass);
-        subClass.prototype.constructor = subClass;
-    }
 
     function Annotation() {}
 
@@ -22,7 +11,7 @@
 
     function createAnnotationConstructor (name) {
         var f = (new Function('return function ' + name + '() {}'))();
-        extend(f, Annotation);
+        ria.extend(f, Annotation);
         return f;
     }
 
@@ -92,7 +81,11 @@
 
     Object.freeze(AnnotationDescriptor);
 
-    ria.__API.AnnotationDescriptor = AnnotationDescriptor;
+    ria.defineConst(__API, {
+        /** @class ria.__API.AnnotationDescriptor */
+        AnnotationDescriptor: AnnotationDescriptor,
+        /** @class ria.__API.Annotation */
+        Annotation: AnnotationDescriptor.build([Annotation])
+    })
 
-    ria.__API.Annotation = AnnotationDescriptor.build([Annotation]);
-})(ria);
+})(ria.__API, ria);

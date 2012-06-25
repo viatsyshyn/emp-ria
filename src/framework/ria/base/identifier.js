@@ -1,24 +1,13 @@
-(function () {
+(function (__API, ria) {
     "use strict";
 
     function Identifier() {}
 
-    Object.defineProperty(Identifier.prototype, 'toString', {
-        value: function toString() {
-            return '[' + this.constructor.getName() + '#' + this.value + ']';
-        },
-        writable: false,
-        configurable: false,
-        enumerable: true
-    });
-
-    Object.defineProperty(Identifier.prototype, 'valueOf', {
-        value: function valueOf() {
-            return this.value;
-        },
-        writable: false,
-        configurable: false,
-        enumerable: true
+    ria.defineConst(Identifier.prototype, {
+        /** @see Identifier.prototype.toString */
+        toString: function toString() { return '[' + this.constructor.getName() + '#' + this.value + ']'; },
+        /** @see Identifier.prototype.valueOf */
+        valueOf: function valueOf() { return this.value; }
     });
 
     function fromValue(value) {
@@ -45,17 +34,6 @@
         return (new Function ('return function ' + name + '(value) { this.value = value; }'))();
     }
 
-    function inheritFrom(superClass) {
-        function InheritanceProxyClass() {}
-        InheritanceProxyClass.prototype = superClass.prototype;
-        return new InheritanceProxyClass();
-    }
-
-    function extend(subClass, superClass) {
-        subClass.prototype = inheritFrom(superClass);
-        subClass.prototype.constructor = subClass;
-    }
-
     function getValueOfFunc(value) {
         return function valueOf() { return value; };
     }
@@ -64,21 +42,14 @@
         this.name = name;
     }
 
-    /**
-     * DEFINE
-     * @class {Identifier}
-     * @public
-     * @param {String} name
-     * @param {Object} values
-     */
     function buildIdentifier(name) {
         var identifierClass = createEnumConstructor(name);
-        extend(identifierClass, Identifier);
+        ria.extend(identifierClass, Identifier);
 
         identifierClass.__identifierDescriptor = new IdentifierDescriptor(name);
 
         var identifierValueClass = createNamedEmptyFunction(name);
-        extend(identifierValueClass, identifierClass);
+        ria.extend(identifierValueClass, identifierClass);
 
         Object.defineProperties(identifierClass, {
             fromValue: {
@@ -108,6 +79,11 @@
         return value instanceof Identifier || value.__identifierDescriptor instanceof IdentifierDescriptor;
     }
 
-    hwa.__API.buildIdentifier = buildIdentifier;
-    hwa.__API.isIdentifier = isIdentifier;
-})();
+    ria.defineConst(__API, {
+        /** @class ria.__API.buildIdentifier */
+        buildIdentifier: buildIdentifier,
+        /** @class ria.__API.isIdentifier */
+        isIdentifier: isIdentifier
+    })
+
+})(ria.__API, ria);

@@ -5,10 +5,8 @@
  * @date: 21.06.12
  */
 
-(function (ria, global) {
+(function (__API, ria, global) {
     "use strict";
-
-    ria.__API.transports = ria.__API.transports || {};
 
     function ScriptTagTransport(src, callback) {
         var script_tag = document.createElement('script');
@@ -27,24 +25,18 @@
         document.getElementsByTagName('head')[0].appendChild(script_tag);
     }
 
-    /** @class ria.__API.transports.ScriptTagTransport */
-    ria.__API.transports.ScriptTagTransport = ScriptTagTransport;
-
     var new_xhr = ria.__EMPTY;
+    //noinspection JSUnresolvedVariable
     if (global.XMLHttpRequest) {
-        new_xhr = function () {
-            try { return  new XMLHttpRequest(); } catch (e){}
-        };
-    } else if (global.ActiveXObject) {
-        try {
-            new ActiveXObject('Msxml2.XMLHTTP');
-            new_xhr = function () {
-                try { return new ActiveXObject('Msxml2.XMLHTTP'); } catch (e){}
-            };
-        } catch (e){
-            new_xhr = function () {
-                try { return new ActiveXObject('Microsoft.XMLHTTP'); } catch (e){}
-            };
+        new_xhr = function () { try { return  new XMLHttpRequest(); } catch (e){} }
+    } else { //noinspection JSUnresolvedVariable
+        if (global.ActiveXObject) {
+            try {
+                new ActiveXObject('Msxml2.XMLHTTP');
+                new_xhr = function () { try { return new ActiveXObject('Msxml2.XMLHTTP'); } catch (e){} }
+            } catch (e){
+                new_xhr = function () { try { return new ActiveXObject('Microsoft.XMLHTTP'); } catch (e){} }
+            }
         }
     }
 
@@ -70,7 +62,14 @@
         xhr = null;
     }
 
-    /** @class ria.__API.transports.AjaxTransport */
-    ria.__API.transports.AjaxTransport = AjaxTransport;
+    /** @class ria.__API.transports */
+    ria.defineConst(__API, 'transports', {});
 
-})(ria, ria.global);
+    ria.defineConst(__API.transports, {
+        /** @class ria.__API.transports.ScriptTagTransport */
+        ScriptTagTransport: ScriptTagTransport,
+        /** @class ria.__API.transports.AjaxTransport */
+        AjaxTransport: AjaxTransport
+    })
+
+})(ria.__API, ria, ria.global);

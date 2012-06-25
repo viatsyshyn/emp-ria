@@ -34,7 +34,7 @@ var ria = window.ria || {};
     isBrowser && (function () {
         function onLoaded() {
             isPageReady = true;
-            checkReady();
+            ready();
         }
 
         // Cleanup functions for the document ready method
@@ -82,39 +82,66 @@ var ria = window.ria || {};
     })();
     /* END OF PORTED BLOCK */
 
-    function checkReady() {
-        if (isPageReady && (!ria.__API._loader || ria.__API._loader.isReady)) {
-            while(readyCallbacks.length > 0)
-                readyCallbacks.shift().call(global);
+    function ready(callback$) {
+        if (typeof callback$ === 'function') readyCallbacks.push(callback$);
+
+        while(readyCallbacks.length > 0 && isPageReady && (!ria.__API._loader || ria.__API._loader.isReady))
+            readyCallbacks.pop().call(global);
+    }
+
+    function defineConst(obj, key$, props) {
+        if (props !== undefined) {
+            Object.defineProperty(obj, key$, { value: props, writable: false, configurable: false, enumerable: false });
+            return
         }
+
+        for(var key in key$) if (key$.hasOwnProperty(key))
+            defineConst(obj, key, key$[key]);
     }
 
-    function ready(callback) {
-        readyCallbacks.push(callback);
-        checkReady();
+    function defineMutable(obj, key$, props) {
+        if (props !== undefined) {
+            Object.defineProperty(obj, key$, { value: props, writable: true, configurable: false, enumerable: false });
+            return
+        }
+
+        for(var key in key$) if (key$.hasOwnProperty(key))
+            defineMutable(obj, key, key$[key]);
     }
 
-    Object.defineProperties(ria, {
+    defineConst(ria, {
         /** @class ria.__API */
-        __API: { value: {}, writable: false, configurable: false, enumerable: false },
-
+        __API: {},
         /** @class ria.global */
-        global : { value: global, writable: false, configurable: false, enumerable: false },
-
+        global: global,
         /** @class ria.__EMPTY */
-        __EMPTY: { value: function () {}, writable: false, configurable: false, enumerable: false },
-
+        __EMPTY: function () {},
         /** @class ria.isBrowser */
-        isBrowser: { value: isBrowser, writable: false, configurable: false, enumerable: false },
-
+        isBrowser: isBrowser,
         /** @class ria.isWebWorker */
-        isWebWorker: { value: isWorker, writable: false, configurable: false, enumerable: false },
-
-        /** @class ria.BASE_MODULE_URL */
-        BASE_MODULE_URL: { value: BASE_MODULE_URL, writable: true, configurable: false, enumerable: false },
-
+        isWebWorker: isWorker,
         /** @class ria.ready */
-        ready: { value: ready, writable: false, configurable: false, enumerable: false }
+        ready: ready,
+        /** @class ria.defineConst */
+        defineConst: defineConst,
+        /** @class ria.defineMutable */
+        defineMutable: defineMutable,
+        /** @class ria.inheritFrom */
+        inheritFrom: function (superClass) {
+            function InheritanceProxyClass() {}
+            InheritanceProxyClass.prototype = superClass.prototype;
+            return new InheritanceProxyClass();
+        },
+        /** @class ria.extend */
+        extend: function (subClass, superClass) {
+            subClass.prototype = ria.inheritFrom(superClass);
+            subClass.prototype.constructor = subClass;
+        }
+    });
+
+    defineMutable(ria, {
+        /** @class ria.BASE_MODULE_URL */
+        BASE_MODULE_URL: BASE_MODULE_URL
     });
 
 })(ria, window || this || {});
