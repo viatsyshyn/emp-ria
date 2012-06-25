@@ -25,30 +25,32 @@
         document.getElementsByTagName('head')[0].appendChild(script_tag);
     }
 
-    var new_xhr = ria.__EMPTY;
-    //noinspection JSUnresolvedVariable
-    if (global.XMLHttpRequest) {
-        new_xhr = function () { try { return  new XMLHttpRequest(); } catch (e){} }
-    } else { //noinspection JSUnresolvedVariable
-        if (global.ActiveXObject) {
-            try {
-                new ActiveXObject('Msxml2.XMLHTTP');
-                new_xhr = function () { try { return new ActiveXObject('Msxml2.XMLHTTP'); } catch (e){} }
-            } catch (e){
-                new_xhr = function () { try { return new ActiveXObject('Microsoft.XMLHTTP'); } catch (e){} }
-            }
-        }
-    }
+    var new_xhr = (function () {
+        //noinspection JSUnresolvedVariable
+        if (global.XMLHttpRequest)
+            return function () { try { return  new XMLHttpRequest(); } catch (e){} };
 
-    function AjaxTransport(src, callback) {
+        //noinspection JSUnresolvedVariable
+        if (!global.ActiveXObject)
+            return ria.__EMPTY;
+
+        try {
+            new ActiveXObject('Msxml2.XMLHTTP');
+            return function () { try { return new ActiveXObject('Msxml2.XMLHTTP'); } catch (e){} }
+        } catch (e){
+            return function () { try { return new ActiveXObject('Microsoft.XMLHTTP'); } catch (e){} }
+        }
+    })();
+
+    function AjaxTransport(src, callback, body$, method$) {
         var xhr = new_xhr();
         if (!xhr)
             throw Error('Ajax not enabled');
 
         /** @this XMLHttpRequest */
         xhr.onreadystatechange = function () { (this.readyState == 4) && callback(this.status == 200, this.responseText, this); };
-        xhr.open("GET", src, true);
-        xhr.send(null);
+        xhr.open(method$ ? method$ : body$ ? "POST" : "GET", src, true);
+        xhr.send(body$ || null);
         xhr = null;
     }
 
