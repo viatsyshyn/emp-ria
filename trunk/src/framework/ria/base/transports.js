@@ -18,7 +18,7 @@
                 || this.readyState == "loaded"
                 || this.readyState == "complete") {
 
-                callback(true, script_tag.innerText);
+                callback(true, script_tag.innerText, script_tag);
             }
         };
 
@@ -42,23 +42,13 @@
 
     function AjaxTransport(src, callback) {
         var xhr = new_xhr();
-
-        if (xhr) {
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    if (this.status == 200) {
-                        callback(true, this.responseText, this);
-                    } else {
-                        callback(false, this.status, this);
-                    }
-                }
-            };
-            xhr.open("GET", src, true);
-            xhr.send(null);
-        } else {
+        if (!xhr)
             throw Error('Ajax not enabled');
-        }
 
+        /** @this XMLHttpRequest */
+        xhr.onreadystatechange = function () { (this.readyState == 4) && callback(this.status == 200, this.responseText, this); };
+        xhr.open("GET", src, true);
+        xhr.send(null);
         xhr = null;
     }
 
