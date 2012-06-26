@@ -9,7 +9,8 @@
         ABSTRACT: 4,
         STATIC: 5,
         SELF: 6,
-        OVERRIDE: 7
+        OVERRIDE: 7,
+        REINTRODUCE: 8
     }),
 
     Visibility = __API.buildEnum('Visibility', {
