@@ -117,4 +117,4 @@
             }, InvalidClassDeclarationException)
         }
     }
-})(ria.__API, ria);
+})//(ria.__API, ria);
