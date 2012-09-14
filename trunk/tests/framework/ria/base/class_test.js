@@ -1,120 +1,36 @@
-
-(function (__API, ria) {
+(function (ria) {
     "use strict";
 
-    var CLASS = __API.ClassDescriptor.build,
-        EXTENDS,
-        STATIC,
-        OVERRIDE,
-        ABSTRACT,
-        REINTRODUCE; // TODO assign value
-
     TestCase("ClassTestCase").prototype = {
-        setUp: function(){},
+        setUp: function(){
+            function Clazz() { ria.__API.init(this, Clazz, Clazz.prototype.$, arguments) }
+            ria.__API.clazz(Clazz, 'TestInterface', null, [], []);
+            Clazz.prototype.$ = function () {};
+            ria.__API.ctor(Clazz, Clazz.prototype.$, [], [], []);
+            Clazz.prototype.compare = function () {};
+            ria.__API.method(Clazz, Clazz.prototype.compare, 'compare', Boolean, [String, String], ['_1', '_2'], []);
+            ria.__API.compile(Clazz);
 
-        testDeclaration: function () {
-            var TestClass = CLASS('TestClass', [
-                function $() {},
-                function $namedCtor() {},
-
-                function publicMember() {},
-                function protectedMember_() {},
-
-                'publicField',
-                'protectedField_',
-
-                STATIC, function staticMember() {}
-            ]);
-
-            assertFunction(TestClass);
-            assertEquals(ria.getConstructorOf(TestClass), TestClass);
-            assertFunction(TestClass.$namedCtor);
-            assertFunction(TestClass.staticMember);
-
-            var instance;
-            assertNoException(function () {
-                instance = new TestClass();
-            });
-
-            assertFunction(instance.publicMember);
-            assertUndefined(instance.protectedMember_);
-
-            assertFunction(instance.getPublicField);
-            assertFunction(instance.setPublicField);
-
-            assertUndefined(instance.getProtectedField_);
-            assertUndefined(instance.setProtectedField_);
+            this.Clazz = Clazz;
         },
 
-        testDublicateMethods: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    function publicMember() {},
-                    function publicMember(a, b) {}
-                ])
-            }, MethodRedeclaredException)
+        testCreate: function () {
+            var Clazz = this.Clazz;
+
+            assertFunction(Clazz);
+            assertNotUndefined(Clazz.__META);
         },
 
-        testDublicateStaticMethods: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    STATIC, function staticMember() {},
-                    STATIC, function staticMember(a, b) {}
-                ])
-            }, MethodRedeclaredException)
-        },
-
-        testDublicateCtors: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    function $() {},
-                    function $(a, b) {}
-                ])
-            }, MethodRedeclaredException)
-        },
-
-        testDublicateNamedCtors: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    function $namedCtor() {},
-                    function $namedCtor(a, b) {}
-                ])
-            }, MethodRedeclaredException)
-        },
-
-        testDublicateMember: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    String, 'publicMember',
-                    Number, 'publicMember'
-                ])
-            }, MethodRedeclaredException)
-        },
-
-        testPrivateStaticMethod: function () {
-            assertException(function () {
-                CLASS('TestClass', [
-                    STATIC, function staticMember_() {}
-                ])
-            }, InvalidClassDeclarationException)
-        },
-
-        testOverride: function () {
-            var BaseClass = CLASS('BaseClass', [
-                function publicMethod() {}
-            ]);
+        testUsage: function() {
+            var Clazz = this.Clazz;
 
             assertNoException(function () {
-                CLASS('TestClass', EXTENDS(BaseClass), [
-                    OVERRIDE, function publicMethod() {}
-                ])
+                new Clazz();
             });
 
             assertException(function () {
-                CLASS('TestClass', EXTENDS(BaseClass), [
-                    function publicMethod() {}
-                ])
-            }, InvalidClassDeclarationException)
+                new Clazz(5);
+            }, ria.__API.InvalidArgumentException);
         }
     }
-})//(ria.__API, ria);
+})(ria);
