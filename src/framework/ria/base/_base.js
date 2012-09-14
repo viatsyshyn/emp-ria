@@ -138,6 +138,7 @@ ria.__API = {};
 
     ClassDescriptor.prototype.addProperty = function (name, ret, anns) {};
     ClassDescriptor.prototype.addMethod = function (impl, name, ret, argsTypes, argsNames, anns) {};
+    ClassDescriptor.prototype.setCtor = function (impl, argsTypes, argsNames, anns) {};
 
     /**
      * @param {TypeOf(Class)} clazz
@@ -182,6 +183,20 @@ ria.__API = {};
             throw Error();
 
         clazz.__META.addMethod(impl, name, ret_, argsTypes_, argsNames_, anns_);
+    };
+
+    /**
+     * @param {Class} clazz
+     * @param {Function} impl
+     * @param {ANY[]} [argsTypes_]
+     * @param {String[]} [argsNames_]
+     * @param {Annotation[]} [anns_]
+     */
+    ria.__API.ctor = function (clazz, impl, argsTypes_, argsNames_, anns_) {
+        if (!(clazz.__META instanceof ClassDescriptor))
+            throw Error();
+
+        clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
     };
 
     /**
