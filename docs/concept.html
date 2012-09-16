@@ -303,7 +303,7 @@ NAMESPACE('empx.domx', function () {
       <td><pre><code class="javascript">empx.domx.MyEnum = function () {
   var values = {};
   function MyEnum(raw) {
-    return values.hasOwnProperty(raw) ? values[raw] : undefined;
+    return values[raw];
   }
   function MyEnumImpl(raw) {
     this.valueOf = function () { return raw; }
