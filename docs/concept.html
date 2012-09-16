@@ -32,6 +32,7 @@
   <li>Interfaces</li>
   <li>Annotations</li>
   <li>Exceptions</li>
+  <li>Enumerations &amp; Identifiers</li>
   <li>Classes with:
     <ul>
       <li>Public properties /w protected fields</li>
@@ -291,6 +292,31 @@ NAMESPACE('empx.domx', function () {
   }
 }</code></pre></td>
   </tr>
+
+  <tr valign="top">
+      <td><strong>Enumeration</strong></td>
+      <td><pre><code class="javascript">ENUM(
+  'MyEnum', {
+    Value1: 1,
+    Value2: '2'
+  });</code></pre></td>
+      <td><pre><code class="javascript">empx.domx.MyEnum = function () {
+  var values = {};
+  function MyEnum(raw) {
+    return values.hasOwnProperty(raw) ? values[raw] : undefined;
+  }
+  function MyEnumImpl(raw) {
+    this.valueOf = function () { return raw; }
+  }
+  ria.__API.extend(MyEnumImpl, MyEnum);
+  values[1] = MyEnum.Value1 = new MyEnumImpl(1);
+  values['2'] = MyEnum.Value2 = new MyEnumImpl('2');
+  return MyEnum;
+}();</code></pre></td>
+      <td></td>
+  </tr>
+
+
 <!--
   <tr valign="top">
     <td><strong></strong></td>
