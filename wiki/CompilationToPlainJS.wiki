@@ -2,7 +2,7 @@
 
 = Introduction =
 
-All EMP Ria.js syntax sugar can compiled to plain JS
+All EMP Ria.js syntax sugar can compile to plain JS
 
 = Samples =
 
