@@ -179,12 +179,8 @@ ENUM(
 {{{
 empx.domx.MyEnum = function () {
   var values = {};
-  function MyEnum(raw) {
-    return values[raw];
-  }
-  function MyEnumImpl(raw) {
-    this.valueOf = function () { return raw; }
-  }
+  function MyEnum(raw) { return values[raw];}
+  function MyEnumImpl(raw) { this.valueOf = function () { return raw; } }
   ria.__API.extend(MyEnumImpl, MyEnum);
   values[1] = MyEnum.Value1 = new MyEnumImpl(1);
   values['2'] = MyEnum.Value2 = new MyEnumImpl('2');
