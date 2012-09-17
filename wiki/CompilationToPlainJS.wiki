@@ -79,11 +79,11 @@ INTERFACE('StringNumberComparatorIfc', [
 </td>
 <td>
 {{{
-empx.domx.StringNumberComparatorIfc = function (__API) {
-  var StringNumberComparatorIfc = __API.ifc('empx.domx.StringNumberComparatorIfc');
-  __API.method(StringNumberComparatorIfc, null, 'compare', Boolean, [String, Number], ['s', 'n']);
+empx.domx.StringNumberComparatorIfc = function () {
+  var StringNumberComparatorIfc = ria.__API.ifc('empx.domx.StringNumberComparatorIfc');
+  ria.__API.method(StringNumberComparatorIfc, null, 'compare', Boolean, [String, Number], ['s', 'n']);
   return StringNumberComparatorIfc;
-}(ria.__API);
+}();
 }}}
 </td>
 </tr>
@@ -114,7 +114,7 @@ CLASS(
 
 
   [String, Number],
-  Booleam, function compare(x, y) { 
+  Boolean, function compare(x, y) { 
     return x === String(y) 
   },
 
@@ -127,27 +127,27 @@ CLASS(
 </td>
 <td>
 {{{
-empx.domx.BaseComparatorImpl = function (__API) {
-  function BaseComparatorImpl() { return __API.init(this, BaseComparatorImpl
+empx.domx.BaseComparatorImpl = function () {
+  function BaseComparatorImpl() { return ria.__API.init(this, BaseComparatorImpl
       , BaseComparatorImpl.prototype.$, arguments); };
-  __API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
+  ria.__API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
     , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
 
-  __API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
+  ria.__API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
   BaseComparatorImpl.prototype.getMyProp = function () { return this.myProp; };
-  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
       , 'getMyProp', String, [], []); /* default getter */
   BaseComparatorImpl.prototype.setMyProp = function (value) { this.myProp = value; };
-  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
       , 'setMyProp', __API.Void, [String], ['value']); /* default setter */
 
   BaseComparatorImpl.prototype.$ = function () {
     empx.domx.BaseClass.prototype.$.call(this, 5);
   };
-  __API.ctor(BaseComparatorImpl, BaseComparatorImpl.prototype.$, [], []);
+  ria.__API.ctor(BaseComparatorImpl, BaseComparatorImpl.prototype.$, [], []);
 
   BaseComparatorImpl.prototype.compare = function (x, y) { return x === String(y) };
-  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
       , 'compare', Booleam, [String, Number], ['x', 'y']);
 
 
@@ -155,9 +155,9 @@ empx.domx.BaseComparatorImpl = function (__API) {
     empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
   };
 
-  __API.compile(MyClass);
+  ria.__API.compile(MyClass);
   return MyClass;
-}(ria.__API);
+}();
 }}}
 </td>
 </tr>
