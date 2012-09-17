@@ -1,0 +1,48 @@
+#summary Compilation to plain JS
+
+= Introduction =
+
+All EMP Ria.js syntax sugar can compiled to plain JS
+
+= Samples =
+
+<table>
+<tr>
+<td> *Namespaces* </td>
+<td> 
+{{{ 
+NAMESPACE('empx.domx', function () {"use strict";
+  // all following declarations are here
+});
+}}} 
+</td>
+<td> 
+{{{ 
+empx = empx || {}; empx.domx = empx.domx || {}; (function (__API) {
+  // declarations here
+})(ria._API);
+}}}
+</td>
+</tr>
+
+<tr>
+<td>
+*Delegates*
+</td>
+<td>
+{{{
+DELEGATE(
+  [String, Number], 
+  Boolean, function StringNumberComparator(s, n) {}); 
+}}}
+</td>
+<td>
+{{{
+empx.domx.StringNumberComparator = 
+  ria.__API.delegate('empx.domx.StringNumberComparator'
+        , Boolean, [String, Number], ['s', 'n']);
+}}}
+</td>
+</tr>
+
+</table>
