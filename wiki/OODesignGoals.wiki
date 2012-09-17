@@ -1,0 +1,90 @@
+= OO Design Goals =
+
+  * Namespaces
+  * Delegates
+  * Interfaces
+  * Annotations
+  * Exceptions
+  * Enumerations & Identifiers
+  * Classes with:
+    * Public properties /w protected fields
+    * Public getters & setters
+    * Public/protected methods
+    * Reflection of public members
+    * Optional type hinting for checked mode
+
+
+= Sample =
+
+{{{
+REQUIRE('empx.domx.BaseClass');
+ASSET('my.json'); // available via ASSET('my.json') after all dependencies are ready
+ASSET('my.css'); // add to head
+ASSET('my.png', true); // skip embedding in build, load at runtime
+
+NAMESPACE('empx.domx', function () {
+  "use strict";
+  // all following declarations are here
+
+  // Delegates allow to specify function signature, can be used to validate callbacks
+  DELEGATE(
+    [String, Number], 
+    Boolean, function StringNumberComparator(s, n) {});
+
+  var d = empx.domx.StringNumberComparator(function (s, n) { return s === String(n); });
+
+  d('2', 2); // ok
+  d(2, true); // fails with InvalidArguments exception
+
+  // Annotation can decorate classes and public members, available via reflection
+  ANNOTATION(
+    [Boolean, Number],
+    function BaseAnnotation(s, n_) {}); // n_ is optional
+
+  // Interfaces ensures class implements all methods with correct signature
+  INTERFACE(
+    'StringNumberComparatorIfc', [
+      [String, Number],
+      Boolean, function compare(s, n) {}
+    ]);
+
+  // annonimous interface implementation
+  var impl = empx.domx.StringNumberComparatorIfc([
+    [String, Number],
+    Boolean, function compare(s, n) { return s === String(n); }  
+  ]);
+
+  impl.compare('2', 2); // returns true
+
+  CLASS(
+    [empx.domx.BaseAnnotation(true, 5)],
+    'BaseComparatorImpl',
+        EXTENDS(empx.domx.BaseClass), 
+        IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
+
+      // public property
+      // Note: propety name can only be valid JS variable name (excluding reserved words like for, class, etc)
+      [empx.domx.BaseAnnotation(false)],
+      String, 'myProp',
+
+      // constructor with optional argument a_
+      function $(a_) {
+        BASE(a_ !== undefined ? a : 5);
+      },
+
+      // public method
+      [String, Number],
+      Booleam, function compare(x, y) { 
+        return x === String(y);
+      },
+
+      // protected method, should use OVERRIDE to state that we intesionaly override method
+      [empx.domx.StringNumberComparator],
+      OVERRIDE, VOID, function protectedMember_(cmp) {
+        BASE(this.myProp);
+      }
+    ]);
+
+  var instance = empx.domx.BaseComparatorImpl(1); // works without new
+});
+}}}
