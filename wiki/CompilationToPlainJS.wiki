@@ -45,4 +45,153 @@ empx.domx.StringNumberComparator =
 </td>
 </tr>
 
+<tr>
+<td>
+*Annotations*
+</td>
+<td>
+{{{
+ANNOTATION(
+  [Boolean, Number],
+  function BaseAnnotation(s, n_) {});
+}}}
+</td>
+<td>
+{{{
+empx.domx.BaseAnnotation = ria.__API.annotation('empx.domx.BaseAnnotation'
+      , [Boolean, Number]
+      , ['s', 'n_']);
+}}}
+</td>
+</tr>
+
+<tr>
+<td>
+*Interfaces*
+</td>
+<td>
+{{{
+INTERFACE('StringNumberComparatorIfc', [
+  [String, Number],
+  Boolean, function compare(s, n) {}
+]);
+}}}
+</td>
+<td>
+{{{
+empx.domx.StringNumberComparatorIfc = function (__API) {
+  var StringNumberComparatorIfc = __API.ifc('empx.domx.StringNumberComparatorIfc');
+  __API.method(StringNumberComparatorIfc, null, 'compare', Boolean, [String, Number], ['s', 'n']);
+  return StringNumberComparatorIfc;
+}(ria.__API);
+}}}
+</td>
+</tr>
+
+<tr>
+<td>
+*Classes*
+</td>
+<td>
+{{{
+CLASS(
+  [empx.domx.BaseAnnotation(true, 5)],
+  'BaseComparatorImpl',
+      EXTENDS(empx.domx.BaseClass), 
+      IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
+
+  [empx.domx.BaseAnnotation(false)],
+  String, 'myProp',
+
+
+
+
+
+
+  function $() {
+    BASE(5);
+  },
+
+
+  [String, Number],
+  Booleam, function compare(x, y) { 
+    return x === String(y) 
+  },
+
+  VOID, function protectedMember_() {
+    BASE(this.myProp + 5);
+  }
+
+]);
+}}}
+</td>
+<td>
+{{{
+empx.domx.BaseComparatorImpl = function (__API) {
+  function BaseComparatorImpl() { return __API.init(this, BaseComparatorImpl
+      , BaseComparatorImpl.prototype.$, arguments); };
+  __API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
+    , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
+
+  __API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
+  BaseComparatorImpl.prototype.getMyProp = function () { return this.myProp; };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
+      , 'getMyProp', String, [], []); /* default getter */
+  BaseComparatorImpl.prototype.setMyProp = function (value) { this.myProp = value; };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
+      , 'setMyProp', __API.Void, [String], ['value']); /* default setter */
+
+  BaseComparatorImpl.prototype.$ = function () {
+    empx.domx.BaseClass.prototype.$.call(this, 5);
+  };
+  __API.ctor(BaseComparatorImpl, BaseComparatorImpl.prototype.$, [], []);
+
+  BaseComparatorImpl.prototype.compare = function (x, y) { return x === String(y) };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
+      , 'compare', Booleam, [String, Number], ['x', 'y']);
+
+
+  BaseComparatorImpl.prototype.protectedMember_ = function () {
+    empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
+  };
+
+  __API.compile(MyClass);
+  return MyClass;
+}(ria.__API);
+}}}
+</td>
+</tr>
+
+<tr>
+<td>
+*Enumeration*
+</td>
+<td>
+{{{
+ENUM(
+  'MyEnum', {
+    Value1: 1,
+    Value2: '2'
+  });
+}}}
+</td>
+<td>
+{{{
+empx.domx.MyEnum = function () {
+  var values = {};
+  function MyEnum(raw) {
+    return values[raw];
+  }
+  function MyEnumImpl(raw) {
+    this.valueOf = function () { return raw; }
+  }
+  ria.__API.extend(MyEnumImpl, MyEnum);
+  values[1] = MyEnum.Value1 = new MyEnumImpl(1);
+  values['2'] = MyEnum.Value2 = new MyEnumImpl('2');
+  return MyEnum;
+}();
+}}}
+</td>
+</tr>
+
 </table>
