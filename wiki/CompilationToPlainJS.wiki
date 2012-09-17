@@ -7,7 +7,7 @@ All EMP Ria.js syntax sugar can compiled to plain JS
 = Samples =
 
 <table>
-<tr>
+<tr valign="top">
 <td> *Namespaces* </td>
 <td> 
 {{{ 
@@ -25,7 +25,7 @@ empx = empx || {}; empx.domx = empx.domx || {}; (function (__API) {
 </td>
 </tr>
 
-<tr>
+<tr valign="top">
 <td>
 *Delegates*
 </td>
@@ -45,7 +45,7 @@ empx.domx.StringNumberComparator =
 </td>
 </tr>
 
-<tr>
+<tr valign="top">
 <td>
 *Annotations*
 </td>
@@ -65,7 +65,7 @@ empx.domx.BaseAnnotation = ria.__API.annotation('empx.domx.BaseAnnotation'
 </td>
 </tr>
 
-<tr>
+<tr valign="top">
 <td>
 *Interfaces*
 </td>
@@ -88,7 +88,7 @@ empx.domx.StringNumberComparatorIfc = function (__API) {
 </td>
 </tr>
 
-<tr>
+<tr valign="top">
 <td>
 *Classes*
 </td>
@@ -162,7 +162,7 @@ empx.domx.BaseComparatorImpl = function (__API) {
 </td>
 </tr>
 
-<tr>
+<tr valign="top">
 <td>
 *Enumeration*
 </td>
