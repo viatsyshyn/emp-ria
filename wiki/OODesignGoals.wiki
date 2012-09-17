@@ -1,4 +1,4 @@
-# OO Design Goals
+#summary OO Design Goals
 
 = OO Design Goals =
 
