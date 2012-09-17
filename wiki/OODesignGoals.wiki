@@ -1,3 +1,5 @@
+# OO Design Goals
+
 = OO Design Goals =
 
   * Namespaces
