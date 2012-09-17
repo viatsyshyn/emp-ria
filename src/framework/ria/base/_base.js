@@ -196,7 +196,7 @@ ria.__CFG = {
     };
 
     /**
-     * @param {TypeOf(CLass)} clazz
+     * @param {TypeOf(Class)} clazz
      * @param {String} name
      * @param {ANY} [ret_]
      * @param {AnnotationProxy[]} [anns_]
