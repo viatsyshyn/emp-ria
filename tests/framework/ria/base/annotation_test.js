@@ -18,8 +18,15 @@
             assertNoException(function () { a(true,2); });
 
             assertException(function () { a('2'); }, 'Error');
-
             assertException(function () { a(true, 5, null); }, 'Error');
+
+            assertTrue(ria.__API.isAnnotation(a));
+            assertTrue(ria.__API.isAnnotation(a(true)));
+
+            var instance = a(true, 2);
+
+            assertEquals(true, instance.x);
+            assertEquals(2, instance.y_);
         }
     }
 })(ria);

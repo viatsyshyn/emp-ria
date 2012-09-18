@@ -16,43 +16,6 @@ ria.__API = ria.__API || {};
 
     /**
      * @param {String} name
-     * @param {Array} argsTypes
-     * @param {String[]} argsNames
-     * @constructor
-     */
-    function AnnotationDescriptor(name, argsTypes, argsNames) {
-        this.name = name;
-        this.argsNames = argsNames;
-        this.argsTypes = argsTypes;
-
-        //#ifdef DEBUG
-            Object.freeze(this);
-        //#endif
-    }
-
-    /**
-     * @param {String} name
-     * @param {Array} [argsTypes_]
-     * @param {String[]} [argsNames_]
-     * @return {Function}
-     */
-    ria.__API.annotation = function(name, argsTypes_, argsNames_) {
-
-
-        function AnnotationProxy() {
-
-        }
-
-        AnnotationProxy.__META = new AnnotationDescriptor(name, argsTypes_, argsNames_);
-
-        //#ifdef DEBUG
-            Object.freeze(AnnotationProxy);
-        //#endif
-        return AnnotationProxy;
-    };
-
-    /**
-     * @param {String} name
      * @constructor
      */
     function InterfaceDescriptor(name) {
@@ -85,7 +48,9 @@ ria.__API = ria.__API || {};
     function ClassDescriptor(name, base, ifcs, anns) {
         this.name = name;
         this.base = base;
+        //noinspection JSUnusedGlobalSymbols
         this.ifcs = ifcs;
+        //noinspection JSUnusedGlobalSymbols
         this.anns = anns;
     }
 
@@ -108,7 +73,7 @@ ria.__API = ria.__API || {};
      * @param {TypeOf(Class)} clazz
      * @param {String} name
      * @param {*} [ret_]
-     * @param {AnnotationProxy[]} [anns_]
+     * @param {*[]} [anns_]
      */
     ria.__API.property = function (clazz, name, ret_, anns_) {
         if (!(clazz.__META instanceof ClassDescriptor))
@@ -118,7 +83,7 @@ ria.__API = ria.__API || {};
     };
 
     /**
-     * @param {Class|Interface} clazz
+     * @param {Class|*} clazz
      * @param {Function} impl
      * @param {String} name
      * @param {*} [ret_]
@@ -169,13 +134,21 @@ ria.__API = ria.__API || {};
             publicInstance.__PROTECTED = instance;
         //#endif
 
-        for(var k in instance) if (typeof instance[k] === 'function' ) {
-            var fn = instance[k].bind(instance);
-            instance[k] = fn;
-            //#ifdef DEBUG
-                Object.defineProperty(instance, k, { writable : false });
-                publicInstance[k] = fn;
-            //#endif
+
+        for(var k in instance) {
+            //noinspection JSUnfilteredForInLoop
+            if (typeof instance[k] === 'function' ) {
+                //noinspection JSUnfilteredForInLoop
+                var fn = instance[k].bind(instance);
+                //noinspection JSUnfilteredForInLoop
+                instance[k] = fn;
+                //#ifdef DEBUG
+                    //noinspection JSUnfilteredForInLoop
+                    Object.defineProperty(instance, k, { writable : false });
+                    //noinspection JSUnfilteredForInLoop
+                    publicInstance[k] = fn;
+                //#endif
+            }
         }
 
         var res = ctor.apply(instance, args);
