@@ -18,13 +18,9 @@
             ria.__API.method(i, null, 'compare', Boolean, [String, String], ['_1', '_2'], []);
             ria.__API.compile(i);
 
-            assertNoException(function () {
-                i();
-            });
+            assertNoException(function () { i(); });
 
-            assertException(function () {
-                i();
-            }, ria.__API.InvalidArgumentException);
+            assertException(function () { i(); }, 'Error');
         }
     }
 })(ria);

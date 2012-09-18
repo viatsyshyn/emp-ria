@@ -14,18 +14,12 @@
         testUsage: function() {
             var a = ria.__API.annotation('TestAnnotation', [Boolean, Number], ['x', 'y_']);
 
-            assertNoException(function () {
-                a(true);
-                a(true,2);
-            });
+            assertNoException(function () { a(true); });
+            assertNoException(function () { a(true,2); });
 
-            assertException(function () {
-                a('2');
-            }, ria.__API.InvalidArgumentException);
+            assertException(function () { a('2'); }, 'Error');
 
-            assertException(function () {
-                a(true, 5, null);
-            }, ria.__API.InvalidArgumentException);
+            assertException(function () { a(true, 5, null); }, 'Error');
         }
     }
 })(ria);

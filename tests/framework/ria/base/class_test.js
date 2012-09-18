@@ -24,13 +24,9 @@
         testUsage: function() {
             var Clazz = this.Clazz;
 
-            assertNoException(function () {
-                new Clazz();
-            });
+            assertNoException(function () { new Clazz(); });
 
-            assertException(function () {
-                new Clazz(5);
-            }, ria.__API.InvalidArgumentException);
+            assertException(function () { new Clazz(5); }, 'Error');
         },
 
         testMethodSelfBind: function () {
