@@ -12,7 +12,7 @@ ria.__API = ria.__API || {};
 (function () {
     /**
      * @param {*} value
-     * @param {Function} type
+     * @param {*} type
      * @return {Boolean}
      */
     function checkTypeHint(value, type) {
@@ -23,14 +23,14 @@ ria.__API = ria.__API || {};
             return true;
 
         switch (typeof value) {
-            case 'number': return type == Number;
-            case 'string': return type == String;
-            case 'boolean': return type == Boolean;
+            case 'number': return type === Number;
+            case 'string': return type === String;
+            case 'boolean': return type === Boolean;
             default:
-                if ( value == Boolean
-                  || value == String
-                  || value == Number
-                  || value == RegExp ) {
+                if ( value === Boolean
+                  || value === String
+                  || value === Number
+                  || value === RegExp ) {
                     return value == type;
                 }
 
@@ -120,12 +120,12 @@ ria.__API = ria.__API || {};
     /**
      * Ensure argument is of correct types
      * @param {String} name
-     * @param {Function|Function[]} type
+     * @param {Array} type
      * @param {*} value
      */
     ria.__API.checkArg = function (name, type, value) {
         //#ifdef DEBUG
-            var isOptional = /^.+\_$/.test(name);
+            var isOptional = /^.+_$/.test(name);
             if (isOptional && value === undefined)
                 return;
 
@@ -150,7 +150,7 @@ ria.__API = ria.__API || {};
     /**
      * Ensure arguments are of correct types
      * @param {String[]} names
-     * @param {Function[]} types
+     * @param {Array} types
      * @param {Array}values
      */
     ria.__API.checkArgs = function (names, types, values) {
