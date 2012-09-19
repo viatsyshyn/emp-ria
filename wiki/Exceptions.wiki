@@ -1,0 +1,33 @@
+
+= Introduction =
+
+TODO add introduction to Exceptions concept
+
+
+= Declaration =
+
+{{{
+EXCEPTION(
+  'MyException', EXTENDS(MyBaseException), [
+    function $(msg, e_) {
+      BASE(msg, e_);
+    }
+  ]);
+}}}
+
+= Implementation =
+
+{{{
+window.MyException = function () {
+  function MyException(msg, e_) {
+    ria.__API.init(this, MyException, MyException.prototype.$, arguments);
+  }
+  ria.__API.exception(MyException, 'MyException');
+
+  MyException.prototype.$ = function (msg, e_) {
+    MyBaseException.prototype.$.call(this, msg, e_);
+  };  
+
+  return MyException;
+}();
+}}}
