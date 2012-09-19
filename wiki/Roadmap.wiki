@@ -12,7 +12,7 @@ Add your content here.
 
 == Implement ==
 
-  * [Exception]
+  * [Exceptions]
   * [Delegates]
   * [Annotations]
   * [Interfaces]
