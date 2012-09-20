@@ -59,6 +59,7 @@ window.MyException = function () {
   function MyException(msg, e_) {
     ria.__API.init(this, MyException, MyException.prototype.$, arguments);
   }
+  ria.__API.meta(MyException, 'MyException');
 
   MyException.prototype.$ = function (msg, e_) {
     MyBaseException.prototype.$.call(this, msg, e_);
