@@ -18,6 +18,7 @@ DELEGATE(
 {{{
 var wrapper = Comparator(function (_1, _2) { return _1 === _2; });
 wrapper('1', '2');
+}}}
 
 {{{
 CLASS(
