@@ -41,6 +41,12 @@ CLASS(
 
 var arr = Array();
 arr.sort(cmp);
+
+arr.sort(MyComparatorIfc(
+  [String, String],
+  Boolean, function compare(_1, _2) {
+    return _1 === _2;
+  }));
 }}}
 
 = Low Level API =
