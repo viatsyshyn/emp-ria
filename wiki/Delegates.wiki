@@ -47,4 +47,9 @@ var cmps = new Comparators();
 instance.sort(cmps.stringCmp);
 }}}
 
-= Plain JS equivalent =
+= Low Level API =
+
+{{{
+window.Comparator = ria.__API.delegate('Comparator'
+    , Boolean, [String, String], ['s1', 's2']);
+}}}
