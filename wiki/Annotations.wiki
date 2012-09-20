@@ -30,7 +30,7 @@ CLASS(
  
     [BaseAnnotation(true, 2)],
     function publicMethod() {}
-  ]
+  ]);
 }}}
 
 = Low Level API =
