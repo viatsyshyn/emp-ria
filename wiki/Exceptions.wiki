@@ -14,14 +14,50 @@ EXCEPTION(
   ]);
 }}}
 
+= Usage =
+
+{{{
+var e = new MyException('Trouble is here');
+var e2 = new MyException('Trouble is in inner', e);
+throw e2;
+}}}
+
 = Implementation =
 
 {{{
+window.Exception = function () {
+  function Exception(msg, inner_) {
+    ria.__API.init(this, MyException, MyException.prototype.$, arguments);
+  };
+ 
+  Exception.prototype.$ = function (msg, inner_) {
+    //#ifdef DEBUG
+      ria.__API.checkArgs(['msg', 'inner_'], [String, Exception], arguments);
+    //#endif
+    this.msg = Error(msg);
+    this.inner_ = inner_;
+  };
+
+  Exception.prototype.toString = function () {
+    var msg = this.msg.stack ? this.msg.stack : this.msg.toString();
+
+    if (this.inner_) {
+      msg += '\nCaused by: ';
+      if (this.inner_ instanceof Error && this.inner_.stack) {
+        msg += this.inner_.stack;
+      } else {
+        msg += this.inner_.toString();
+      }
+    }
+    
+    return msg;
+  };
+}();
+
 window.MyException = function () {
   function MyException(msg, e_) {
     ria.__API.init(this, MyException, MyException.prototype.$, arguments);
   }
-  ria.__API.exception(MyException, 'MyException', MyBaseException);
 
   MyException.prototype.$ = function (msg, e_) {
     MyBaseException.prototype.$.call(this, msg, e_);
