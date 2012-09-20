@@ -1,0 +1,52 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Identifiers are like typedef is C++. It wraps primitive value (e.g. Number, String, Boolean). It's used type hinting.
+
+
+= Declaration =
+
+{{{
+IDENTIFIER('CardValue');
+}}}
+
+= Usage =
+
+{{{
+CLASS(
+  'Card', [
+     CardValue, 'value',
+
+     [CardValue],
+     function $(value) {
+       this.value = value;
+     }
+  ]);
+
+var card6 = Card(CardValue(6));
+var cardAce = Card(CardValue('A'));
+var card7 = Card(7); // throws exception 'cause primitives should be casted explisitly
+
+CardValue('A').valueOf() === 'A'; // true
+}}}
+
+= Low Level API =
+
+{{{
+CardValue = function () {
+  function CardValueImpl(value) {
+    this.valueOf = function () { return value; };
+    //#ifdef DEBUG
+      Object.freeze(this);
+    //#endif
+  };
+  function CardValue(value) {
+    //#ifdef DEBUG
+      ria.__API.checkArg('value', [String, Number, Boolean], value);
+    //#endif
+    return new CardValueImpl(value);
+  }
+  return CardValue;
+}();
+}}}
