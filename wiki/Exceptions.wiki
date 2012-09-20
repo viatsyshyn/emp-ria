@@ -22,7 +22,7 @@ var e2 = new MyException('Trouble is in inner', e);
 throw e2;
 }}}
 
-= Implementation =
+= Low Level API=
 
 {{{
 window.Exception = function () {
