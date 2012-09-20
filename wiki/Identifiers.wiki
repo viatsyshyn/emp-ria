@@ -41,11 +41,12 @@ CardValue = function () {
       Object.freeze(this);
     //#endif
   };
+  var values = {};
   function CardValue(value) {
     //#ifdef DEBUG
       ria.__API.checkArg('value', [String, Number, Boolean], value);
     //#endif
-    return new CardValueImpl(value);
+    return values.hasOwnProperty(value) ? values[value] : (values[value] = new CardValueImpl(value));
   }
   return CardValue;
 }();
