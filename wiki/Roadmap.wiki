@@ -21,7 +21,5 @@ Add your content here.
   * [Classes]
   * [Enumerations]
   * [Identifiers]
-  * [TypeHints]
-  *
 
 == Fix ==
