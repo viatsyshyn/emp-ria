@@ -1,0 +1,53 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+From Wikipedia, the free encyclopedia
+
+    In computer programming, an enumerated type (also called enumeration or enum, or factor in the R programming language, and a categorical variable in statistics) is a data type consisting of a set of named values called elements, members or enumerators of the type. The enumerator names are usually identifiers that behave as constants in the language. A variable that has been declared as having an enumerated type can be assigned any of the enumerators as a value. In other words, an enumerated type has values which are different from each other, and which can be compared and assigned, but which do not have any particular concrete representation in the computer's memory; compilers and interpreters can represent them arbitrarily
+
+Enumerations represents set of predefined values and are used in type hinting.
+
+= Declaration =
+
+{{{
+ENUM(
+  'Suit', {
+    CLUB: 1, 
+    DIAMOND: 2, 
+    HEART: 3, 
+    SPADE: 4
+  });
+}}}
+
+= Usage = 
+
+{{{
+CLASS(
+  'Card', [
+    Suit, 'suit',
+
+    [Suit],
+    function $(suit) {
+      this.suit = suit;
+    }
+  ]);
+
+var instance = Card(Suit.CLUB);
+}}}
+
+= Low Level API =
+
+{{{
+Suit = function () {
+  var values = {};
+  function Suit(raw) { return values[raw];}
+  function SuitImpl(raw) { this.valueOf = function () { return raw; } }
+  ria.__API.extend(SuitImpl, Suit);
+  values[1] = Suit.CLUB = new SuitImpl(1);
+  values[2] = Suit.DIAMOND = new SuitImpl(2);
+  values[3] = Suit.HEART = new SuitImpl(3);
+  values[4] = Suit.SPADE = new SuitImpl(4);
+  return Suit;
+}();
+}}}
