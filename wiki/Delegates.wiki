@@ -34,4 +34,17 @@ instance.sort(function (_1, _2) { return _1 === _2; });
 instance.sort(Comparator(function (_1, _2) { return _1 === _2; }));
 }}}
 
+{{{
+CLASS(
+  'Comparators', [
+    [String, String],
+    Boolean, function stringCmp(_1, _2) { return _1 === _2; }
+  ]);
+
+var instance = new Array();
+var cmps = new Comparators();
+
+instance.sort(cmps.stringCmp);
+}}}
+
 = Plain JS equivalent =
