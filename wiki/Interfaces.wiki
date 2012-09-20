@@ -1,0 +1,54 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+From Wikipedia, the free encyclopedia:
+    An interface in the Java programming language is an abstract type that is used to specify an interface (in the generic sense of the term) that classes must implement. Interfaces are declared using the interface keyword, and may only contain method signature and constant declarations (variable declarations that are declared to be both static and final). An interface may never contain method definitions.
+
+In EMP Ria interfaces can contain only methods declarations, all methods bodies are ignored.
+
+= Declaration =
+
+{{{
+INTERFACE(
+  'MyComparatorIfc', [
+    [String, String],
+    Boolean, function compare(_1, _2) {}
+  ]);
+}}}
+
+= Usage =
+
+{{{
+CLASS(
+  'MyComparator', IMPLEMENTS(MyComparatorIfc), [
+    [String, String],
+    Boolean, function compare(_1, _2) {
+      return _1 === _2;
+    }
+  ]);
+
+var cmp = MyComparator();
+cmp.compare('1', '2'); // false
+
+CLASS(
+  'Array', [
+    [MyComparatorIfc],
+    function sort(cmp) {
+      // implementation
+    }
+  ]);
+
+var arr = Array();
+arr.sort(cmp);
+}}}
+
+= Low Level API =
+
+{{{
+MyComparatorIfc = function () {
+  var MyComparatorIfc = ria.__API.ifc('MyComparatorIfc');
+  ria.__API.method(MyComparatorIfc, null, 'compare', Boolean, [String, Number], ['_1', '_2']);
+  return MyComparatorIfc;
+}();
+}}}
