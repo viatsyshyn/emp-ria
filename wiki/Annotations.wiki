@@ -33,7 +33,7 @@ CLASS(
   ]
 }}}
 
-= Plaint JS implementation =
+= Low Level API =
 
 {{{
 BaseAnnotation = ria.__API.annotation('BaseAnnotation'
