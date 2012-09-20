@@ -33,7 +33,7 @@ window.Exception = function () {
   Exception.prototype.$ = function (msg, inner_) {
     //#ifdef DEBUG
       ria.__API.checkArg('msg', String, msg);
-      ria.__API.checkArg('inner_'], [Error, Exception], inner_ || null);
+      ria.__API.checkArg('inner_', [Error, Exception], inner_ || null);
     //#endif
     this.msg = Error(msg);
     this.inner_ = inner_;
