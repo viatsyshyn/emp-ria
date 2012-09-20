@@ -1,0 +1,36 @@
+#summary Delegates
+
+= Introduction =
+
+Delegates are type hinting mechanism used to ensure callback contract.
+
+
+= Declaration =
+
+{{{
+DELEGATE(
+  [String, String],
+  Boolean, function Comparator(s1, s2) {});
+}}}
+
+= Usage =
+
+{{{
+var wrapper = Comparator(function (_1, _2) { return _1 === _2; });
+wrapper('1', '2');
+
+{{{
+CLASS(
+  'Array', [
+    [Comparator]
+    VOID, function sort(cmp) {
+      // implemention
+    }
+  ]);
+
+var instance = new Array();
+instance.sort(function (_1, _2) { return _1 === _2; });
+instance.sort(Comparator(function (_1, _2) { return _1 === _2; }));
+}}}
+
+= Plain JS equivalent =
