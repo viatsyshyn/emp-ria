@@ -84,3 +84,72 @@ CLASS(
 }}}
 
 Class, its constructor, properties and public methods can be annotated.  All [Annotations] and their parameters can be reflected, as well as properties, constructor and public members.
+
+= Usage =
+
+{{{
+CLASS(
+  [empx.domx.BaseAnnotation(true, 5)],
+  'BaseComparatorImpl',
+      EXTENDS(empx.domx.BaseClass), 
+      IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
+
+    [empx.domx.BaseAnnotation(false)],
+    String, 'myProp',
+
+    function $() {
+      BASE(5);
+    },
+
+    [String, Number],
+    Boolean, function compare(x, y) { 
+      return x === String(y) 
+    },
+
+    VOID, function protectedMember_() {
+      BASE(this.myProp + 5);
+    }
+  ]);
+
+var instance = BaseComparatorImpl();
+instance.compare('1', 1); // true
+
+instance.setMyProp(2);
+instance.getMyProp(); // 2
+}}}
+
+= Low Level API =
+
+{{{
+empx.domx.BaseComparatorImpl = function () {
+  function BaseComparatorImpl() { return ria.__API.init(this, BaseComparatorImpl
+      , BaseComparatorImpl.prototype.$, arguments); };
+  ria.__API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
+    , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
+
+  ria.__API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
+  BaseComparatorImpl.prototype.getMyProp = function () { return this.myProp; };
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
+      , 'getMyProp', String, [], []); /* default getter */
+  BaseComparatorImpl.prototype.setMyProp = function (value) { this.myProp = value; };
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
+      , 'setMyProp', __API.Void, [String], ['value']); /* default setter */
+
+  BaseComparatorImpl.prototype.$ = function () {
+    empx.domx.BaseClass.prototype.$.call(this, 5);
+  };
+  ria.__API.ctor(BaseComparatorImpl, BaseComparatorImpl.prototype.$, [], []);
+
+  BaseComparatorImpl.prototype.compare = function (x, y) { return x === String(y) };
+  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
+      , 'compare', Booleam, [String, Number], ['x', 'y']);
+
+
+  BaseComparatorImpl.prototype.protectedMember_ = function () {
+    empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
+  };
+
+  ria.__API.compile(MyClass);
+  return MyClass;
+}();
+}}}
