@@ -35,7 +35,7 @@ CLASS(
   ]);
 }}}
 
-Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name and can NOT end with *`_`*. Getter name is constructed by capitalizing field name and prefix *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefix *_set_*. If classes contains no explicit declaration of getter or setter or both, defaults are added implicitly.
+Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name and can NOT start with *_$_* or end with *`_`*. Getter name is constructed by capitalizing field name and prefix *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefix *_set_*. If classes contains no explicit declaration of getter or setter or both, defaults are added implicitly.
 
 {{{
 CLASS(
