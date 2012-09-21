@@ -8,36 +8,69 @@ Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy decl
 
 {{{
 CLASS(
-  // Classes can be annotated
-  [MyAnnotation]
-  'MyClass', EXTENDS(MyBaseClass), IMPLEMENTS(MyIfc), [
-    // contains public properties (ONLY public)
-    String, 'value', 
-
-    // contains public ctor
-    [String]
-    function $(value) {
-      BASE();
-    },
-
-    VOID, function publicMember() {
-    },
-
-    VOID, function protectedMember_() {
-    }
+  'MyClass', EXTENDS(MyBaseClass), [
   ]);
 }}}
 
 Class may be extended from other classes. All classes extend base class called Class implicitly.
 
+{{{
+CLASS(
+  'MyClass', IMPLEMENTS(MyIfc), [
+  ]);
+}}}
+
 Class may implement interfaces. This ensures that all methods declared in interface are implemented in class. Also instance of a class is also implicit instance on interface, so it can pass type hint.
 
-Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name. Getter name is constructed by capitalizing field name and prefix 'is' in case of Boolean properties or 'get' otherwise. Setter name is constructed by capitalizing field name and prefix 'set'. 
+{{{
+CLASS(
+  'MyClass', [
+    // contains public properties (ONLY public)
+    String, 'value', 
 
-Class may have explicit constructor (method named '$'). Constructors does not return result and their return type is omitted and defaults to VOID. If constructor returns any thing exception is raised. Constructor body should have call to constructor of base class. If base class has parameterless constructor or all parameters are optional then base constructor is called implicitly before first statement of constructor. It's a good practice to put explicit base constructor call as first statement of constructor declaration. Constructors are always public.
+    [String]
+    function setValue(value) {
+      this.value = value;
+    }
+  ]);
+}}}
 
-Class may contain public and protected method. Methods are considered protected if method name ends with '_'. Method name can NOT start with '$'. Methods have return and it can be type hinted or VOID or anything (if type hint is omitted). Also method may have arguments. Argument is considered optional if it's name ends with '_'. Variable arguments count is not supported. It's recommended to pass variable arguments as last optional array argument (it also can be type hinted).
+Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name. Getter name is constructed by capitalizing field name and prefix *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefix *_set_*. If classes contains no explicit declaration of getter or setter or both, defaults are added implicitly.
 
-All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with FINAL. To make system more error prune, it is required to mark any explicit methods override with OVERRIDE. If OVERRIDE is omitted warning will be raised. Methods can be marked with ABSTRACT if its override in descendant classes id required. Abstract methods can still have body and is callable from overrides via BASE(). Abstract methods do not make class abstract.
+{{{
+CLASS(
+  'MyClass', EXTENDS(MyBaseClass), IMPLEMENTS(MyIfc), [
+    // contains public ctor
+    [String]
+    function $(value) {
+      BASE();
+    }
+  ]);
+}}}
 
-Classes can be marked as ABSTRACT if it's direct instantiation is forbidden or FINAL if it can not be extended. Class can not be marked as ABSTRACT and FINAL at the same time.
+Class may have explicit constructor (method named *$*). Constructors does not return result and their return type is omitted and defaults to *VOID*. If constructor returns any thing exception is raised. Constructor body should have call to constructor of base class. If base class has parameterless constructor or all parameters are optional then base constructor is called implicitly before first statement of constructor. It's a good practice to put explicit base constructor call as first statement of constructor declaration. Constructors are always public. If constructor has parameters with same name (excluding suffix *_`_`_*) as it's own property name value of parameter is set to property via setter.
+
+Protected fields are not type hinted and can contain anything. Fields are introduced only in constructor. If unknown field is assigned in method exception is raised. Fields of properties are introduces implicitly.
+
+{{{
+CLASS(
+  'MyClass', [
+    VOID, function publicMember() {
+    },
+
+    ABSTRACT, VOID, function protectedMember_() {
+    }
+  ]);
+}}}
+
+Class may contain public and protected method. Methods are considered protected if method name ends with _`_`_. Method name can NOT start with *$*. Methods have return and it can be type hinted or *VOID* or anything (if type hint is omitted). Also method may have arguments. Argument is considered optional if it's name ends with *_`_`_*. Variable arguments count is not supported. It's recommended to pass variable arguments as last optional array argument (it also can be type hinted).
+
+All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit methods override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised. Methods can be marked with *ABSTRACT* if its override in descendant classes id required. Abstract methods can still have body and is callable from overrides via BASE(). Abstract methods do not make class abstract.
+
+{{{
+CLASS(
+  ABSTRACT, 'MyClass', [
+  ]);
+}}}
+
+Classes can be marked as *ABSTRACT* if it's direct instantiation is forbidden or *FINAL* if it can not be extended. Class can not be marked as *ABSTRACT* and *FINAL* at the same time.
