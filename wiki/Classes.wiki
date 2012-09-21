@@ -148,8 +148,8 @@ empx.domx.BaseComparatorImpl = function () {
     empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
   };
   //#ifdef DEBUG
-      ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.protectedMember_
-      , 'protectedMember_', ria.__API.Void, [], []);
+    ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.protectedMember_
+        , 'protectedMember_', ria.__API.Void, [], []);
   //#endif
 
 
