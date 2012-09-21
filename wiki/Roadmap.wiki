@@ -6,9 +6,7 @@
   * #2. Syntax, Dependencies, Reflection
   * #3. Compilation and GCC optimizations
   * #4. MVC, HAML Templates, JSON Serialization
-
-Add your content here.
-
+  * #5. XMPP,...
 
 = Milestone #1. Low-level API =
 
