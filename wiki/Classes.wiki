@@ -20,7 +20,7 @@ CLASS(
   ]);
 }}}
 
-Class may implement interfaces. This ensures that all methods declared in interface are implemented in class. Also instance of a class is also implicit instance on interface, so it can pass type hint.
+Class may implement [interfaces]. This ensures that all methods declared in interface are implemented in class. Also instance of a class is also implicit instance on interface, so it can pass type hint.
 
 {{{
 CLASS(
@@ -74,3 +74,13 @@ CLASS(
 }}}
 
 Classes can be marked as *ABSTRACT* if it's direct instantiation is forbidden or *FINAL* if it can not be extended. Class can not be marked as *ABSTRACT* and *FINAL* at the same time.
+
+{{{
+CLASS(
+  // Classes can be annotated
+  [MyAnnotation]
+  'MyClass', [    
+  ]);
+}}}
+
+Class, its constructor, properties and public methods can be annotated. More about [Annotations]. All annotations and their parameters can be reflected.
