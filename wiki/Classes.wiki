@@ -65,7 +65,7 @@ CLASS(
 
 Class may contain public and protected method. Methods are considered protected if method name ends with _`_`_. Method name can NOT start with *$*. Methods have return and it can be type hinted or *VOID* or anything (if type hint is omitted). Also method may have arguments. Argument is considered optional if it's name ends with *_`_`_*. Variable arguments count is not supported. It's recommended to pass variable arguments as last optional array argument (it also can be type hinted).
 
-All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit methods override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised. Methods can be marked with *ABSTRACT* if its override in descendant classes id required. Abstract methods can still have body and is callable from overrides via BASE(). Abstract methods do not make class abstract.
+All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit methods override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised and call to BASE is prohibited. Methods can be marked with *ABSTRACT* if its override in descendant classes id required. Abstract methods can still have body and is callable from overrides via BASE(). Abstract methods do not make class abstract.
 
 {{{
 CLASS(
