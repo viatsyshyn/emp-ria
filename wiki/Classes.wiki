@@ -20,7 +20,7 @@ CLASS(
   ]);
 }}}
 
-Class may implement [interfaces]. This ensures that all methods declared in interface are implemented in class. Also instance of a class is also implicit instance on interface, so it can pass type hint.
+Class may implement [Interfaces]. This ensures that all methods declared in interface are implemented in class. Also instance of a class is also implicit instance on interface, so it can pass type hint.
 
 {{{
 CLASS(
