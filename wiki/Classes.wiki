@@ -144,10 +144,14 @@ empx.domx.BaseComparatorImpl = function () {
   ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
       , 'compare', Booleam, [String, Number], ['x', 'y']);
 
-
   BaseComparatorImpl.prototype.protectedMember_ = function () {
     empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
   };
+  //#ifdef DEBUG
+      ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.protectedMember_
+      , 'protectedMember_', ria.__API.Void, [], []);
+  //#endif
+
 
   ria.__API.compile(MyClass);
   return MyClass;
