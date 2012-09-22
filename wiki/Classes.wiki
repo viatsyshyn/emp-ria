@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hints are completely optional, but is very welcome, as in empowers classes a lot. 
+Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hints are completely optional, but is very welcome, as it empowers classes a lot. 
 
 = Declaration =
 
@@ -35,7 +35,7 @@ CLASS(
   ]);
 }}}
 
-Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name and can NOT start with *_$_* or end with *`_`*. Getter name is constructed by capitalizing field name and prefix *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefix *_set_*. If class contains no explicit declaration of getter or setter or both, defaults are added implicitly.
+Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name and can NOT start with *_$_* or end with *`_`*. Getter name is constructed by capitalizing field name and prefixing with *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefixig with *_set_*. If class contains no explicit declaration of getter or setter or both, defaults are added implicitly.
 
 {{{
 CLASS(
@@ -65,7 +65,7 @@ CLASS(
 
 Class may contain public and protected method. Methods are considered protected if method name ends with _`_`_ and public otherwise. Method name can NOT start with *$*. Methods have return and it can be type hinted or *VOID* or anything (if type hint is omitted). Also method may have arguments. Argument is considered optional if it's name ends with *_`_`_*. Variable arguments are NOT supported. It's recommended to pass variable arguments as last optional array argument (it also can be type hinted).
 
-All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit method's override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised and call to BASE is prohibited. Methods can be marked with *ABSTRACT* if its override in descendant classes is required. Abstract methods can still have body and are callable from overrides via BASE(). Abstract methods do not make class abstract.
+All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit method's override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised and call to BASE is prohibited. Methods can be marked with *ABSTRACT* if its override in descendant classes is required. Abstract methods can still have body and are callable like normal methods and from overrides via BASE(). Abstract methods do not make class abstract.
 
 {{{
 CLASS(
