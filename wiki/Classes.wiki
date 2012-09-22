@@ -1,4 +1,3 @@
-
 = Introduction =
 
 Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hinting is completely optional, but is very welcome, as it empowers classes a lot. 
@@ -19,7 +18,7 @@ CLASS(
   ]);
 }}}
 
-Class may implement [Interfaces]. This ensures that all methods declared in interface are implemented in class. Also instance of a class is implicit instance on interface, so it can pass type hint.
+Class may implement [Interfaces]. This ensures that all methods declared in interface are implemented in class. Also instance of a class is implicit instance on interface, so it can pass type hint. Rules of method implementation are similar to method override rules.
 
 {{{
 CLASS(
@@ -65,6 +64,8 @@ CLASS(
 Class may contain public and protected method. Methods are considered protected if method name ends with _`_`_ and public otherwise. Method name can NOT start with *$*. Methods have return and it can be type hinted or *VOID* or anything (if type hint is omitted). Also method may have arguments. Argument is considered optional if it's name ends with *_`_`_*. Variable arguments are NOT supported. It's recommended to pass variable arguments as last optional array argument (it also can be type hinted).
 
 All methods of class are considered virtual. This means that any descendant class can override any method. To prevent override methods can be marked with *FINAL*. To make system more error prune, it is required to mark any explicit method's override with *OVERRIDE*. If *OVERRIDE* is omitted warning will be raised and call to BASE is prohibited. Methods can be marked with *ABSTRACT* if its override in descendant classes is required. Abstract methods can still have body and are callable like normal methods and from overrides via BASE(). Abstract methods do not make class abstract.
+
+When method overrides base method, it may introduce additional optional parameters in the end of parameters list. Also it may wide type hint of base method. For example, if type hint was String, descendant implementation may change it to Any, in case of classes override may change type hint to base class of class declared in type hint of base implementation.
 
 {{{
 CLASS(
