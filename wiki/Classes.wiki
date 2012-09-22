@@ -1,8 +1,7 @@
-#summary One-sentence summary of this page.
 
 = Introduction =
 
-Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hints are completely optional, but is very welcome, as it empowers classes a lot. 
+Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hinting is completely optional, but is very welcome, as it empowers classes a lot. 
 
 = Declaration =
 
