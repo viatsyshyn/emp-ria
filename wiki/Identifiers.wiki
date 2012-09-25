@@ -49,8 +49,9 @@ CardValue = function () {
     //#endif
     return values.hasOwnProperty(value) ? values[value] : (values[value] = new CardValueImpl(value));
   }
-  ria.__API.meta(CardValue, 'CardValue');
   ria.__API.extend(CardValueImpl, CardValue);
+
+  ria.__API.identifier(CardValue, 'CardValue');
   return CardValue;
 }();
 }}}
