@@ -35,13 +35,6 @@ CardValue('A').valueOf() === 'A'; // true
 
 {{{
 CardValue = function () {
-  function CardValueImpl(value) {
-    this.valueOf = function () { return value; };
-    this.toString = function toString() { return '[CardValue#' + value + ']'; };
-    //#ifdef DEBUG
-      Object.freeze(this);
-    //#endif
-  };
   var values = {};
   function CardValue(value) {
     //#ifdef DEBUG
@@ -49,9 +42,16 @@ CardValue = function () {
     //#endif
     return values.hasOwnProperty(value) ? values[value] : (values[value] = new CardValueImpl(value));
   }
-  ria.__API.extend(CardValueImpl, CardValue);
-
   ria.__API.identifier(CardValue, 'CardValue');
+
+  function CardValueImpl(value) {
+    this.valueOf = function () { return value; };
+    this.toString = function toString() { return '[CardValue#' + value + ']'; };
+    //#ifdef DEBUG
+      Object.freeze(this);
+    //#endif
+  };
+  ria.__API.extend(CardValueImpl, CardValue);
   return CardValue;
 }();
 }}}
