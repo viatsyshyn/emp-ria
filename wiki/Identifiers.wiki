@@ -37,6 +37,7 @@ CardValue('A').valueOf() === 'A'; // true
 CardValue = function () {
   function CardValueImpl(value) {
     this.valueOf = function () { return value; };
+    this.toString = function toString() { return '[CardValue#' + value + ']'; };
     //#ifdef DEBUG
       Object.freeze(this);
     //#endif
