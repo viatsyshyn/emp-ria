@@ -13,9 +13,9 @@
 == Implement ==
 
   * [Exceptions]
-  * [Delegates]
-  * [Annotations]
-  * [Interfaces]
+  * ~~[Delegates]~~
+  * ~~[Annotations]~~
+  * [Interfaces] 
   * [Classes]
   * [Enumerations]
   * [Identifiers]
