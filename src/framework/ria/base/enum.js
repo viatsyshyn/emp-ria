@@ -25,19 +25,6 @@ ria.__API = ria.__API || {};
     ria.__API.EnumDescriptor = EnumDescriptor;
 
     /**
-     * @param {EnumDescriptor} meta
-     * @constructor
-     */
-    function EnumInstance(meta) {
-
-        this.__META = meta;
-
-        //#ifdef DEBUG
-        Object.freeze(this);
-        //#endif
-    }
-
-    /**
      * @param {Class} enumClass
      * @param {String} name
      * @return {Function}
