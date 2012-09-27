@@ -20,6 +20,7 @@
 
             assertFunction(Suit);
             assertNotUndefined(Suit.__META);
+            assertInstanceOf(ria.__API.EnumDescriptor, Suit.__META);
             assertTrue(ria.__API.isEnum(Suit));
             assertFalse(ria.__API.isEnum(Number));
         },

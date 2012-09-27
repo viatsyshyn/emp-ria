@@ -28,6 +28,7 @@
 
             assertFunction(CardValue);
             assertNotUndefined(CardValue.__META);
+            assertInstanceOf(ria.__API.IdentifierDescriptor, CardValue.__META);
             assertTrue(ria.__API.isIdentifier(CardValue));
             assertFalse(ria.__API.isIdentifier(Number));
         },
@@ -49,7 +50,7 @@
                     //#ifdef DEBUG
                     Object.freeze(this);
                     //#endif
-                };
+                }
                 ria.__API.extend(CardValueImpl, CardValue);
                 return CardValue;
             }();
@@ -70,7 +71,7 @@
                     //#ifdef DEBUG
                     Object.freeze(this);
                     //#endif
-                };
+                }
                 ria.__API.extend(MoneyValueImpl, MoneyValue);
                 return MoneyValue;
             }();
