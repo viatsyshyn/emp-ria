@@ -52,6 +52,12 @@ CardValue = function () {
     //#endif
   };
   ria.__API.extend(CardValueImpl, CardValue);
+
+  //#ifdef DEBUG
+    Object.freeze(CardValue);
+    Object.freeze(CardValueImpl);
+  //#endif
+
   return CardValue;
 }();
 }}}
