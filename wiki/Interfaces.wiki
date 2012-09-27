@@ -17,6 +17,8 @@ INTERFACE(
   ]);
 }}}
 
+Interface can contain only definition of public members. Suffix *`_`* is forbidden as well as prefix *$*.
+
 = Usage =
 
 {{{
