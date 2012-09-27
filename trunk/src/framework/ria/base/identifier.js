@@ -35,11 +35,6 @@ ria.__API = ria.__API || {};
      */
     ria.__API.identifier = function (identifierClass, name) {
         identifierClass.__META = new IdentifierDescriptor(identifierClass, name);
-
-        //#ifdef DEBUG
-            Object.freeze(identifierClass);
-        //#endif
-        return identifierClass;
     };
 
     ria.__API.isIdentifier = function (value) {
