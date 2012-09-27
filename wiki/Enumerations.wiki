@@ -49,6 +49,10 @@ Suit = function () {
   values[2] = Suit.DIAMOND = new SuitImpl(2);
   values[3] = Suit.HEART = new SuitImpl(3);
   values[4] = Suit.SPADE = new SuitImpl(4);
+  //#ifdef DEBUG
+    Object.freeze(Suit);
+    Object.freeze(values);
+  //#endif
   return Suit;
 }();
 }}}
