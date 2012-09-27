@@ -31,7 +31,6 @@ ria.__API = ria.__API || {};
      */
     ria.__API.enum = function (enumClass, name) {
         enumClass.__META = new EnumDescriptor(enumClass, name);
-        return enumClass;
     };
 
     ria.__API.isEnum = function (value) {
