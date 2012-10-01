@@ -17,7 +17,7 @@ INTERFACE(
   ]);
 }}}
 
-Interface can contain only definition of public members. Suffix *`_`* is forbidden as well as prefix *$*. Properties as forbidden. Annotations are forbidden.
+Interface can contain only definition of public members. Suffix *`_`* is forbidden as well as prefix *$*. Properties are forbidden. Annotations are forbidden.
 
 = Usage =
 
