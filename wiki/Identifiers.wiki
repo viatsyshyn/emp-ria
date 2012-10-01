@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Identifiers are like typedef is C++. It wraps primitive value (e.g. Number, String, Boolean). It's used type hinting.
+Identifiers are like C++ typedef's . It wraps primitive value (e.g. Number, String, Boolean). It's used for type hinting.
 
 
 = Declaration =
@@ -26,7 +26,7 @@ CLASS(
 
 var card6 = Card(CardValue(6));
 var cardAce = Card(CardValue('A'));
-var card7 = Card(7); // throws exception 'cause primitives should be casted explisitly
+var card7 = Card(7); // throws exception 'cause primitives should be casted explicitly
 
 CardValue('A').valueOf() === 'A'; // true
 }}}
