@@ -1,6 +1,6 @@
 = Introduction =
 
-Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerfull type hinting. Type hinting is completely optional, but is very welcome, as it empowers classes a lot. 
+Classes are the core of EMP Ria. The main goals of EMP Ria classes are easy declaration and powerful type hinting. Type hinting is completely optional, but is very welcome, as it empowers classes a lot. 
 
 = Declaration =
 
@@ -48,7 +48,7 @@ CLASS(
 
 Class may have explicit constructor (method named *$*). Constructors are always public. Constructors do not return result and their return type is omitted and defaults to *VOID*. If constructor returns anything exception is raised. Constructor body should have call to constructor of base class. If constructor has no explicit call to base constructor and base class has parameterless constructor or all parameters are optional then base constructor is called implicitly before first statement of constructor. If constructor has no explicit call to base constructor and implicit call of base class constructor is impossible exception is raised. It's a good practice to put explicit base constructor call as a first statement of constructor declaration. If constructor has parameters with same name (excluding suffix *_`_`_*) as it's own property value of parameter is set to property via setter.
 
-Protected fields are not type hinted and can contain anything. Fields are introduced only in constructor. If unknown field is assigned in method exception is raised. Fields of properties are introduces implicitly.
+Protected fields are not type hinted and can contain anything. Fields are introduced only in constructor. If unknown field is assigned in method exception is raised. Fields of properties are introduced implicitly.
 
 {{{
 CLASS(
