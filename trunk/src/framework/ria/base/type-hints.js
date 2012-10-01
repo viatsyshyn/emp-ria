@@ -10,6 +10,8 @@ ria = ria || {};
 ria.__API = ria.__API || {};
 
 (function () {
+    "use strict";
+
     /**
      * @param {*} value
      * @param {*} type
@@ -181,5 +183,36 @@ ria.__API = ria.__API || {};
                 throw Error('Expected return of ' + getIdentifierOfType(type) + ' but got ' + getIdentifierOfValue(value));
         //#endif
     };
+
+    /**
+     * @param {ria.__API.MethodDescriptor} meta
+     * @param {Object} instance
+     * @param {Function} body
+     * @return {Function}
+     */
+    ria.__API.getTypeHintDecorator = function (meta, instance, body) {
+        //#ifdef DEBUG
+            ria.__API.checkArg('meta', [ria.__API.MethodDescriptor], meta);
+        //#endif
+
+        var f_ = function TypeHintDecorator() {
+            var args = [].slice.call(arguments);
+            //#ifdef DEBUG
+                ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
+            //#endif
+            var res = body.apply(instance, args);
+            //#ifdef DEBUG
+                ria.__API.checkReturn(meta.ret, res);
+            //#endif
+            return res;
+        };
+
+        f_.__META = meta;
+        //#ifdef DEBUG
+            Object.freeze(f_);
+        //#endif
+
+        return f_;
+    }
 
 })();
