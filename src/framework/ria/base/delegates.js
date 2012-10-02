@@ -30,6 +30,10 @@ ria.__API = ria.__API || {};
         //#endif
     }
 
+    MethodDescriptor.prototype.isProtected = function () {
+        return /^.+_$/.test(this.name);
+    };
+
     ria.__API.MethodDescriptor = MethodDescriptor;
 
     /**

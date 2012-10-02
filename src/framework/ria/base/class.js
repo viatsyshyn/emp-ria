@@ -110,8 +110,8 @@ ria.__API = ria.__API || {};
         if ((!instance instanceof clazz))
             instance = ria.__API.getInstanceOf(clazz);
 
+        var publicInstance = instance;
         //#ifdef DEBUG
-            var publicInstance = instance;
             instance = ria.__API.getInstanceOf(clazz);
             publicInstance.__PROTECTED = instance;
         //#endif
@@ -122,8 +122,9 @@ ria.__API = ria.__API || {};
                 instance[k] = f_.bind(instance);
                 //#ifdef DEBUG
                     instance[k] = ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
-                    Object.defineProperty(instance, k, { writable : false });
-                    publicInstance[k] = ria.__API.getTypeHintDecorator(f_.__META, publicInstance, f_);
+                    Object.defineProperty(instance, k, { writable : false, configurable: false });
+                    // maybe throw Exception on call
+                    publicInstance[k] = f_.__META.isProtected() ? undefined : ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
                 //#endif
             }
         }
@@ -135,16 +136,16 @@ ria.__API = ria.__API || {};
             ctor = ria.__API.getTypeHintDecorator(ctor.__META, instance, ctor);
         //#endif
 
-        var res = ctor.apply(instance, args);
-        if (res !== undefined)
-            throw Error();
+        // TODO: set fields of properties with null
+
+        ctor.apply(instance, args);
 
         //#ifdef DEBUG
             Object.seal(instance);
             Object.freeze(publicInstance);
         //#endif
 
-        return instance;
+        return publicInstance;
     };
 
     ria.__API.compile = function(clazz) {
