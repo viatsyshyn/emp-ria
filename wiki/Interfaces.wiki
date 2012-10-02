@@ -54,9 +54,7 @@ arr.sort(MyComparatorIfc(
 = Low Level API =
 
 {{{
-MyComparatorIfc = function () {
-  var MyComparatorIfc = ria.__API.ifc('MyComparatorIfc');
-  ria.__API.method(MyComparatorIfc, null, 'compare', Boolean, [String, Number], ['_1', '_2']);
-  return MyComparatorIfc;
-}();
+MyComparatorIfc = ria.__API.ifc('MyComparatorIfc', [
+  ['compare', Boolean, [String, Number], ['_1', '_2']]
+]);
 }}}
