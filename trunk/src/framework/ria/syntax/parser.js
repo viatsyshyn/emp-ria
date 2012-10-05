@@ -106,7 +106,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             isStatic: false,
             isAbstract: false
         };
-        parseModifiers(args, flags);
+        ria.__SYNTAX.parseModifiers(args, flags);
         var annotations = parseAnnotations(args);
         return new PropertyDescriptor(name, type, annotations, flags);
     };
