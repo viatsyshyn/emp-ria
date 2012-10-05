@@ -16,7 +16,7 @@
   * ~~[Delegates]~~
   * ~~[Annotations]~~
   * [Interfaces] 
-  * [Classes]
+  * ~~[Classes]~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
 
