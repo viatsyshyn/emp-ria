@@ -50,7 +50,7 @@ NAMESPACE('empx.domx', function () {
       Boolean, function compare(s, n) {}
     ]);
 
-  // annonimous interface implementation
+  // anonymous interface implementation
   var impl = empx.domx.StringNumberComparatorIfc([
     [String, Number],
     Boolean, function compare(s, n) { return s === String(n); }  
@@ -65,7 +65,7 @@ NAMESPACE('empx.domx', function () {
         IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
 
       // public property
-      // Note: propety name can only be valid JS variable name (excluding reserved words like for, class, etc)
+      // Note: property name can only be valid JS variable name (excluding reserved words like for, class, etc)
       [empx.domx.BaseAnnotation(false)],
       String, 'myProp',
 
@@ -80,7 +80,7 @@ NAMESPACE('empx.domx', function () {
         return x === String(y);
       },
 
-      // protected method, should use OVERRIDE to state that we intesionaly override method
+      // protected method, should use OVERRIDE to state that we intensionaly override method
       [empx.domx.StringNumberComparator],
       OVERRIDE, VOID, function protectedMember_(cmp) {
         BASE(this.myProp);
