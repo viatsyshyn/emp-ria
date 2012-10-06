@@ -13,7 +13,7 @@ ria.__API = ria.__API || {};
     "use strict";
 
     /**
-     * @param {Class} enumClass
+     * @param {Function} enumClass
      * @param {String} name
      * @constructor
      */
@@ -25,9 +25,8 @@ ria.__API = ria.__API || {};
     ria.__API.EnumDescriptor = EnumDescriptor;
 
     /**
-     * @param {Class} enumClass
+     * @param {Function} enumClass
      * @param {String} name
-     * @return {Function}
      */
     ria.__API.enum = function (enumClass, name) {
         enumClass.__META = new EnumDescriptor(enumClass, name);

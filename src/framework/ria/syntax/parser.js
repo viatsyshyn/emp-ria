@@ -35,6 +35,24 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.Modifiers = Modifiers;
 
+    ria.__SYNTAX.parseModifiers = function (args, flags) {
+        while (args.length > 0) {
+            var modifier = args.pop();
+            if ((!modifier instanceof Modifiers)) {
+                args.push(modifier);
+                break;
+            }
+
+            switch(modifier) {
+                case Modifiers.ABSTRACT: flags.isAbstract = true; break;
+                case Modifiers.FINAL: flags.isFinal = true; break;
+                case Modifiers.OVERRIDE: flags.isOverride = true; break;
+            }
+        }
+    };
+
+    ria.__SYNTAX.parseAnnotations = function (def) {};
+
     function MethodDescriptor(name, argsNames, argsTypes, retType, flags, body, annotations) {
         this.name = name;
         this.argsNames = argsNames;
@@ -52,7 +70,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             isPublic: false,
             isAbstract: false,
             isOverride: false,
-            isFinal: false,
+            isFinal: false
         };
 
         var body = args.pop();
@@ -99,9 +117,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new MethodDescriptor(name, argsNames, argsHints, retType, flags, body, annotations);
     };
 
-    ria.__SYNTAX.parseMembers = function (def) {};
+    function PropertyDescriptor(name, type, annotations, flags) {
+        this.name = name;
+        this.type = type;
+        this.annotations = annotations;
+        this.flags = flags;
+    }
 
-    ria.__SYNTAX.parseProperty = function (def) {
+    ria.__SYNTAX.PropertyDescriptor = PropertyDescriptor;
+
+    ria.__SYNTAX.parseProperty = function (args) {
         var name = args.pop();
         var type = args.pop();
         if (type === undefined)
@@ -111,16 +136,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Expected property type before property name');
         }
 
-        var flags = {
-            isStatic: false,
-            isAbstract: false
-        };
+        var flags = {};
         ria.__SYNTAX.parseModifiers(args, flags);
-        var annotations = parseAnnotations(args);
+        var annotations = ria.__SYNTAX.parseAnnotations(args);
         return new PropertyDescriptor(name, type, annotations, flags);
     };
 
-    ria.__SYNTAX.parseAnnotations = function (def) {};
+    ria.__SYNTAX.parseMembers = function (def) {};
 
-    ria.__SYNTAX.parseModifiers = function (def) {};
+
 })();
