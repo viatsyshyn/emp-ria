@@ -21,3 +21,21 @@
   * ~~[Identifiers]~~
 
 == Fix ==
+
+= Milestone #2. =
+
+== Syntax ==
+
+  * [Exceptions]
+  * [Delegates]
+  * [Annotations]
+  * [Interfaces] 
+  * [Classes]
+  * [Enumerations]
+  * [Identifiers]
+
+== Dependencies ==
+
+== Reflection ==
+  * [Interfaces] 
+  * [Classes]
