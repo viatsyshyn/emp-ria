@@ -35,15 +35,24 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.Modifiers = Modifiers;
 
-    function MethodDescriptor(name, argsNames, argsTypes, retType, modifiers, body, annotation) {
+    function MethodDescriptor(name, argsNames, argsTypes, retType, flags, body, annotations) {
+        this.name = name;
+        this.argsNames = argsNames;
+        this.argsTypes = argsTypes;
+        this.retType = retType;
+        this.body = body;
+        this.annotations = annotations;
+        this.flags = flags;
     }
 
     ria.__SYNTAX.MethodDescriptor = MethodDescriptor;
 
     ria.__SYNTAX.parseMethod = function (args) {
         var flags = {
-            isStatic: false,
-            isAbstract: false
+            isPublic: false,
+            isAbstract: false,
+            isOverride: false,
+            isFinal: false,
         };
 
         var body = args.pop();
