@@ -19,6 +19,8 @@
   * ~~[Classes]~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
+  * [ArrayOf]
+  * [ClassOf]
 
 == Fix ==
 
