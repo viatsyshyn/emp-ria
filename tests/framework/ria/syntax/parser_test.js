@@ -53,7 +53,6 @@
             assertTrue(ria.__API.isAnnotation(result.annotations[0]));
 
             assertObject(result.flags);
-            assertFalse(result.flags.isPublic);
             assertTrue(result.flags.isAbstract);
             assertTrue(result.flags.isOverride);
             assertTrue(result.flags.isFinal);
@@ -90,6 +89,8 @@
                         [MyAnnotation],
                         Function, 'delegate',
 
+                        function $() {},
+
                         [MyAnnotation],
                         [String, Number, Boolean],
                         FINAL, VOID, function protected_(a, b, c) {}
@@ -98,10 +99,11 @@
             });
 
             assertArray(result);
-            assertEquals(2, result.length);
+            assertEquals(3, result.length);
 
             assertInstanceOf(ria.__SYNTAX.PropertyDescriptor, result[0]);
             assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result[1]);
+            assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result[2]);
         },
 
         testParseMembersErrorDetection: function () {
@@ -151,6 +153,56 @@
                     ]);
                 }
             }, 'Error');
+        },
+
+        testParseClass: function () {
+            var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
+
+            //noinspection WithStatementJS
+            with(ria.__SYNTAX.Modifiers) { //noinspection WithStatementJS
+                with(ria.__SYNTAX) {
+                    var result = ria.__SYNTAX.parseClass(
+                        [MyAnnotation],
+                        ABSTRACT, FINAL, OVERRIDE, 'MyClass', [
+                            String, 'member',
+
+                            function $() {},
+
+                            [MyAnnotation],
+                            [String, String],
+                            ABSTRACT, FINAL, OVERRIDE, Boolean, function compare(_1, _2) {
+                                return _1 === _2;
+                            }
+                        ]);
+                }
+            }
+
+            assertNotUndefined(result);
+            assertInstanceOf(ria.__SYNTAX.ClassDescriptor, result);
+
+            assertEquals('MyClass', result.name);
+            assertEquals(ria.__API.Class, result.base);
+
+            assertArray(result.ifcs);
+            assertEquals(0, result.ifcs.length);
+
+            assertObject(result.flags);
+            assertTrue(result.flags.isAbstract);
+            assertTrue(result.flags.isFinal);
+            assertTrue(result.flags.isOverride);
+
+            assertArray(result.annotations);
+            assertEquals(1, result.annotations.length);
+            assertTrue(ria.__API.isAnnotation(result.annotations[0]));
+
+            assertArray(result.properties);
+            assertEquals(1, result.properties.length);
+            assertInstanceOf(ria.__SYNTAX.PropertyDescriptor, result.properties[0]);
+
+            assertArray(result.methods);
+            assertEquals(2, result.methods.length);
+            assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result.methods[0]);
+            assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result.methods[1]);
         }
     };
 
