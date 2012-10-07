@@ -38,7 +38,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.parseModifiers = function (args, flags) {
         while (args.length > 0) {
             var modifier = args.pop();
-            if ((!modifier instanceof Modifiers)) {
+            if (!(modifier instanceof Modifiers)) {
                 args.push(modifier);
                 break;
             }
@@ -51,7 +51,22 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
     };
 
-    ria.__SYNTAX.parseAnnotations = function (def) {};
+    ria.__SYNTAX.parseAnnotations = function (args) {
+        var annotations = [];
+        while(args.length > 0) {
+            var a = args.pop();
+            if (!Array.isArray(a) || a.length != 1 || a[0] == undefined || !ria.__API.isAnnotation(a[0]))
+                throw Error('Annotation expected, eg [SomeAnnotation] or [SomeAnnotationWithParams("some values here")], or check if annotation is loaded');
+
+            var annotation = a[0];
+            if (typeof annotation === 'function')
+                annotation = annotation();
+
+            annotations.push(annotation);
+        }
+
+        return annotations;
+    };
 
     function MethodDescriptor(name, argsNames, argsTypes, retType, flags, body, annotations) {
         this.name = name;
@@ -99,7 +114,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if (args.length) {
             argsHints = args.pop();
-            if (!Array.isArray(argsHints) || (argsHints.length == 1 && AnnotationDescriptor.isAnnotation(argsHints[0]))) {
+            if (!Array.isArray(argsHints) || (argsHints.length == 1 && ria.__API.isAnnotation(argsHints[0]))) {
                 args.push(argsHints);
                 argsHints = [];
             }
@@ -142,7 +157,34 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new PropertyDescriptor(name, type, annotations, flags);
     };
 
-    ria.__SYNTAX.parseMembers = function (def) {};
+    ria.__SYNTAX.parseMembers = function (args) {
+        var members = [];
+        var end = 0;
+        while (args.length > 0 && end < args.length) {
+            var arg = args[end];
+
+            if (arg === undefined) {
+                throw Error('Unexpected [undefined], please check if type is defined or comma is present before [');
+            }
+
+            if (typeof arg === 'string') {
+                members.push(ria.__SYNTAX.parseProperty(args.splice(0, end + 1)));
+                end = 0;
+            }
+
+            if (typeof arg === 'function' && !ria.__API.isType(arg)) {
+                members.push(ria.__SYNTAX.parseMethod(args.splice(0, end + 1)));
+                end = 0;
+            }
+
+            end ++;
+        }
+
+        if (args.length != 0)
+            throw Error('Incomplete member declaration');
+
+        return members;
+    };
 
 
 })();

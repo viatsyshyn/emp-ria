@@ -101,13 +101,13 @@ ria.__API = ria.__API || {};
 
         if (Array.isArray(value)) return 'Array';
 
-        /*if (__API.isIdentifier(value))
+        if (ria.__API.isIdentifier(value))
             return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';
 
-        if (__API.isEnum(value))
+        if (ria.__API.isEnum(value))
             return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';
 
-        if (value instanceof __API.Class)
+        /*if (value instanceof __API.Class)
             return getConstructorOf(value).__IDENTIFIER__ || 'Class';*/
 
         if (value instanceof Object) {
@@ -118,6 +118,43 @@ ria.__API = ria.__API || {};
 
         return 'Object';
     }
+
+    function isBuildInType(type) {
+        return type === Function
+            || type === String
+            || type === Boolean
+            || type === Number
+            || type === RegExp
+            || type === Object
+            || type === Array
+            || type === Date
+    }
+
+    ria.__API.isBuildInType = isBuildInType;
+
+    function isCustomType(type) {
+        return false
+            //|| ria.__API.ClassDescriptor.isClassConstructor(type)
+            //|| ria.__API.InterfaceDescriptor.isInterfaceProxy(type)
+            || ria.__API.isEnum(type)
+            || ria.__API.isIdentifier(type)
+            //|| ArrayOfDescriptor.isArrayOfDescriptor(type)
+            ;
+    }
+
+    ria.__API.isCustomType = isCustomType;
+
+    function isImportedType(type) {
+        return false;
+    }
+
+    ria.__API.isImportedType = isImportedType;
+
+    function isType(type) {
+        return isBuildInType(type) || isCustomType(type) || isImportedType(type);
+    }
+
+    ria.__API.isType = isType;
 
     /**
      * Ensure argument is of correct types
