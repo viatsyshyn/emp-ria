@@ -35,7 +35,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.Modifiers = Modifiers;
 
-    ria.__SYNTAX.parseModifiers = function (args, flags) {
+    /**
+     * @param {Array} args
+     * @return {Object}
+     */
+    ria.__SYNTAX.parseModifiers = function (args) {
+        var flags = {
+            isAbstract: false,
+            isFinal: false,
+            isOverride: false
+        };
         while (args.length > 0) {
             var modifier = args.pop();
             if (!(modifier instanceof Modifiers)) {
@@ -49,6 +58,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 case Modifiers.OVERRIDE: flags.isOverride = true; break;
             }
         }
+        return flags;
     };
 
     ria.__SYNTAX.parseAnnotations = function (args) {
@@ -81,13 +91,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.MethodDescriptor = MethodDescriptor;
 
     ria.__SYNTAX.parseMethod = function (args) {
-        var flags = {
-            isPublic: false,
-            isAbstract: false,
-            isOverride: false,
-            isFinal: false
-        };
-
         var body = args.pop();
         var name = parseName(body);
         var argsNames = getParameters(body);
@@ -110,7 +113,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 retType = undefined;
         }
 
-        ria.__SYNTAX.parseModifiers(args, flags);
+        var flags = ria.__SYNTAX.parseModifiers(args);
 
         if (args.length) {
             argsHints = args.pop();
@@ -151,8 +154,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Expected property type before property name');
         }
 
-        var flags = {};
-        ria.__SYNTAX.parseModifiers(args, flags);
+        var flags = ria.__SYNTAX.parseModifiers(args);
         var annotations = ria.__SYNTAX.parseAnnotations(args);
         return new PropertyDescriptor(name, type, annotations, flags);
     };
@@ -170,11 +172,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if (typeof arg === 'string') {
                 members.push(ria.__SYNTAX.parseProperty(args.splice(0, end + 1)));
                 end = 0;
+                continue;
             }
 
             if (typeof arg === 'function' && !ria.__API.isType(arg)) {
                 members.push(ria.__SYNTAX.parseMethod(args.splice(0, end + 1)));
                 end = 0;
+                continue;
             }
 
             end ++;
@@ -186,5 +190,109 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return members;
     };
 
+    /**
+     * @param {ria.__API.ClassDescriptor} base
+     * @constructor
+     */
+    function ExtendsDescriptor(base) {
+        this.base = base;
+    }
+
+    ria.__SYNTAX.ExtendsDescriptor = ExtendsDescriptor;
+
+    ria.__SYNTAX.EXTENDS = function (base) {
+        if (base === undefined)
+            throw Error('Class expected, but got undefined. Check if it is defined already');
+
+        if ((base.__META instanceof ria.__API.ClassDescriptor))
+            throw Error('Class expected, but got ' + ria.__API.getIdentifierOfType(base));
+
+        return new ExtendsDescriptor(base.__META);
+    };
+
+    /**
+     * @param {ria.__API.InterfaceDescriptor[]} ifcs
+     * @constructor
+     */
+    function ImplementsDescriptor(ifcs) {
+        this.ifcs = ifcs;
+    }
+
+    ria.__SYNTAX.ImplementsDescriptor = ImplementsDescriptor;
+
+    ria.__SYNTAX.IMPLEMENTS = function () {
+        var ifcs = [].slice.call(arguments);
+
+        if (ifcs.length < 1)
+            throw Error('Interfaces expected, but got nothing');
+
+        for(var index = 0; index < ifcs.length; index++) {
+            var ifc = ifcs[index];
+
+            if (ifcs === undefined)
+                throw Error('Interface expected, but got undefined. Check if it is defined already');
+
+            if ((ifcs.__META instanceof ria.__API.InterfaceDescriptor))
+                throw Error('Interface expected, but got ' + ria.__API.getIdentifierOfType(base));
+        }
+
+        return new ImplementsDescriptor(ifcs);
+    };
+
+    /**
+     * @param {String} name
+     * @param {ClassDescriptor} base
+     * @param {InterfaceDescriptor[]} ifcs
+     * @param {Object} flags
+     * @param {AnnotationInstance[]} annotations
+     * @param {PropertyDescriptor[]} properties
+     * @param {MethodDescriptor[]} methods
+     * @constructor
+     */
+    function ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods) {
+        this.name = name;
+        this.base = base;
+        this.ifcs = ifcs;
+        this.flags = flags;
+        this.annotations = annotations;
+        this.properties = properties;
+        this.methods = methods;
+    }
+
+    ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
+
+    /**
+     * @returns {ClassDescriptor}
+     */
+    ria.__SYNTAX.parseClass = function () {
+        var args = [].slice.call(arguments);
+
+        var ifcs = [];
+        var body = args.pop();
+
+        var ifcs_ = args.pop();
+        if (ifcs_ instanceof ImplementsDescriptor) {
+            ifcs = ifcs_.ifcs;
+        } else {
+            args.push(ifcs_);
+        }
+
+        var base = ria.__API.Class;
+        var base_ = args.pop();
+        if (base_ instanceof ExtendsDescriptor) {
+            base = base_.base;
+        } else {
+            args.push(base_);
+        }
+
+        var name = args.pop();
+        var flags = ria.__SYNTAX.parseModifiers(args);
+        var annotations = ria.__SYNTAX.parseAnnotations(args);
+        var members = ria.__SYNTAX.parseMembers(body);
+        var properties = members.filter(function (_1) {return _1 instanceof ria.__SYNTAX.PropertyDescriptor; });
+        var methods = members.filter(function (_1) {return _1 instanceof ria.__SYNTAX.MethodDescriptor; });
+
+        return new ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods);
+    };
 
 })();

@@ -33,6 +33,7 @@ ria.__API = ria.__API || {};
     ria.__API.AnnotationDescriptor = AnnotationDescriptor;
 
     /**
+     * @class AnnotationInstance
      * @param {Object} args
      * @param {AnnotationDescriptor} meta
      * @constructor
@@ -58,6 +59,10 @@ ria.__API = ria.__API || {};
      */
     ria.__API.annotation = function(name, argsTypes_, argsNames_) {
 
+        /**
+         * @return {AnnotationInstance}
+         * @constructor
+         */
         function AnnotationProxy() {
             var args = [].slice.call(arguments);
             //#ifdef DEBUG

@@ -153,4 +153,29 @@ ria.__API = ria.__API || {};
             Object.freeze(clazz);
         //#endif
     };
+
+    ria.__API.Class = (function () {
+        function Class() { ria.__API.init(this, Class, Class.prototype.$, arguments); }
+        ria.__API.clazz(Class, 'Class', null, [], []);
+
+        Class.prototype.$ = function () {
+            this.hashCode = Math.random().toString(36);
+            //#ifdef DEBUG
+                Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
+            //#endif
+        };
+        ria.__API.ctor(Class, Class.prototype.$, [], [], []);
+
+        Class.prototype.getClass = function () { return ria.__API.getConstructorOf(this); };
+        ria.__API.method(Class, Class.prototype.getClass, 'getClass', Function, [], [], []);
+
+        Class.prototype.getHashCode = function () { return this.hashCode; };
+        ria.__API.method(Class, Class.prototype.getHashCode, 'getHashCode', String, [], [], []);
+
+        Class.prototype.equals = function (other) { return this.getHashCode() === other.getHasCode(); };
+        ria.__API.method(Class, Class.prototype.equals, 'equals', Boolean, [Class], ['other'], []);
+
+        ria.__API.compile(Class);
+        return Class;
+    })
 })();
