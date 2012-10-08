@@ -7,11 +7,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     /**
-     * @param {String} ns
-     * @param {String} def
+     * @param {String} name
      * @return {Function}
      */
-    ria.__SYNTAX.buildIdentifier = function (ns, def) {
+    ria.__SYNTAX.buildIdentifier = function (name) {
         var values = {};
         function IdentifierValue(value) {
             //#ifdef DEBUG
@@ -19,11 +18,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             //#endif
             return values.hasOwnProperty(value) ? values[value] : (values[value] = new IdentifierValueImpl(value));
         }
-        ria.__API.identifier(IdentifierValue, def);
+        ria.__API.identifier(IdentifierValue, name);
 
         function IdentifierValueImpl(value) {
             this.valueOf = function () { return value; };
-            this.toString = function toString() { return '[' + def + '#' + value + ']'; };
+            this.toString = function toString() { return '[' + name + '#' + value + ']'; };
             //#ifdef DEBUG
             Object.freeze(this);
             //#endif
@@ -41,7 +40,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.IDENTIFIER = function (n) {
         var name = ria.__SYNTAX.getFullName(n);
-        var delegate = ria.__SYNTAX.buildIdentifier(name, n);
+        var delegate = ria.__SYNTAX.buildIdentifier(name);
         ria.__SYNTAX.define(name, delegate);
     };
 })();
