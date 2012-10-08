@@ -10,9 +10,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return ns ? ns + '.' + name : name;
     }
 
-    function ensurePath(path) {
+    function setPath(path, value) {
         var p = path.split(/\./);
         var root = window;
+        var name = p.pop();
 
         while (p.length) {
             var n = p.shift();
@@ -21,6 +22,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
             root = root[n];
         }
+
+        Object.defineProperty(root, name, { writable: false, configurable: false, value: value });
     }
 
     ria.__SYNTAX.getFullName = function (name) {
@@ -28,7 +31,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     ria.__SYNTAX.define = function (name, def) {
-        // TODO: define object in ns
+        setPath(name, def);
     };
 
     var CurrentNamespace = null;
@@ -40,8 +43,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.NS = function (name, callback) {
         var old = CurrentNamespace;
-        //noinspection JSUnusedAssignment
         CurrentNamespace = name;
+        setPath(CurrentNamespace, {});
         callback();
         CurrentNamespace = old;
     }
