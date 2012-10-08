@@ -146,6 +146,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.parseProperty = function (args) {
         var name = args.pop();
+
+        // TODO: validate property name
+
         var type = args.pop();
         if (type === undefined)
             throw Error('Expected type or class for property "' + name + '", but got undefined');
@@ -207,7 +210,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (!(base.__META instanceof ria.__API.ClassDescriptor))
             throw Error('Class expected, but got ' + ria.__API.getIdentifierOfType(base));
 
-        return new ExtendsDescriptor(base.__META);
+        return new ExtendsDescriptor(base);
     };
 
     /**
