@@ -81,7 +81,7 @@ ria.__API = ria.__API || {};
     };
 
     /**
-     * @param {Class} clazz
+     * @param {Function} clazz
      * @param {Function} impl
      * @param {Array} [argsTypes_]
      * @param {String[]} [argsNames_]
