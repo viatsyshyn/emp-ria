@@ -6,18 +6,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
-    ria.__SYNTAX.buildNs = function (ns, name) {
-        return ns ? ns + '.' + name : name;
-    };
-
-    ria.__SYNTAX.getFullName = function (name) {
-        return name;
-    };
-
-    ria.__SYNTAX.define = function (name, def) {
-        // TODO: define object in ns
-    };
-
     /**
      * @param {String} name
      * @param {ClassDescriptor} def
