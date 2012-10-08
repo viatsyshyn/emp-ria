@@ -11,8 +11,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @param {MethodDescriptor} def
      * @return {Function}
      */
-    ria.__SYNTAX.buildDelegate = function (ns, def) {
-        return ria.__API.delegate(def.name, def.ret, def.argsTypes, def.argsNames);
+    ria.__SYNTAX.buildDelegate = function (name, def) {
+        // TODO: throw Error if annotations are set
+        // TODO: throw Error if has OVERRIDE, ABSTRACT, FINAL
+        // TODO: warn if has body
+        return ria.__API.delegate(name, def.ret, def.argsTypes, def.argsNames);
     };
 
     ria.__SYNTAX.DELEGATE = function () {
