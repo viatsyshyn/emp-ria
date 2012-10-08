@@ -204,7 +204,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (base === undefined)
             throw Error('Class expected, but got undefined. Check if it is defined already');
 
-        if ((base.__META instanceof ria.__API.ClassDescriptor))
+        if (!(base.__META instanceof ria.__API.ClassDescriptor))
             throw Error('Class expected, but got ' + ria.__API.getIdentifierOfType(base));
 
         return new ExtendsDescriptor(base.__META);
@@ -229,11 +229,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         for(var index = 0; index < ifcs.length; index++) {
             var ifc = ifcs[index];
 
-            if (ifcs === undefined)
+            if (ifc === undefined)
                 throw Error('Interface expected, but got undefined. Check if it is defined already');
 
-            if ((ifcs.__META instanceof ria.__API.InterfaceDescriptor))
-                throw Error('Interface expected, but got ' + ria.__API.getIdentifierOfType(base));
+            if (!(ifc.__META instanceof ria.__API.InterfaceDescriptor))
+                throw Error('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
         }
 
         return new ImplementsDescriptor(ifcs);
@@ -267,9 +267,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.parseClass = function () {
         var args = [].slice.call(arguments);
 
-        var ifcs = [];
         var body = args.pop();
 
+        var ifcs = [];
         var ifcs_ = args.pop();
         if (ifcs_ instanceof ImplementsDescriptor) {
             ifcs = ifcs_.ifcs;
