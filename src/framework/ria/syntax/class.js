@@ -10,12 +10,20 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return ns ? ns + '.' + name : name;
     };
 
+    ria.__SYNTAX.getFullName = function (name) {
+        return name;
+    };
+
+    ria.__SYNTAX.define = function (name, def) {
+        // TODO: define object in ns
+    };
+
     /**
-     * @param {String} ns
+     * @param {String} name
      * @param {ClassDescriptor} def
      * @return {Function}
      */
-    ria.__SYNTAX.buildClass = function (ns, def) {
+    ria.__SYNTAX.buildClass = function (name, def) {
 
         // TODO: validate class flags
         // TODO: validate no duplicate methods, ctors, properties
@@ -28,7 +36,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         function ClassProxy() {
             return ria.__API.init(this, ClassProxy, ClassProxy.prototype.$, arguments);
         }
-        ria.__API.clazz(ClassProxy, ria.__SYNTAX.buildNs(ns, def.name), def.base, def.ifcs, def.annotations);
+        ria.__API.clazz(ClassProxy, name, def.base, def.ifcs, def.annotations);
 
         this.properties
             .filter(function (_1) { return _1.name == '$'})
@@ -63,5 +71,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__API.compile(ClassProxy);
 
         return ClassProxy;
+    };
+
+    ria.__SYNTAX.CLASS = function () {
+        var def = ria.__SYNTAX.parseClass([].slice.call(arguments));
+        var name = ria.__SYNTAX.getFullName(def.name);
+        var clazz = ria.__SYNTAX.buildClass(name, def);
+        ria.__SYNTAX.define(name, clazz);
     }
 })();
