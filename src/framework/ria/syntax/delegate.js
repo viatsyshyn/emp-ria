@@ -12,8 +12,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {Function}
      */
     ria.__SYNTAX.buildDelegate = function (name, def) {
-        // TODO: throw Error if annotations are set
-        // TODO: throw Error if has OVERRIDE, ABSTRACT, FINAL
+        if(def.annotations.length)
+            throw Error('Annotations are not supported in delegates');
+
+        if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
+            throw Error('Modifiers are not supported in delegates');
         // TODO: warn if has body
         return ria.__API.delegate(name, def.ret, def.argsTypes, def.argsNames);
     };
