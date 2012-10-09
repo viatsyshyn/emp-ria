@@ -56,4 +56,12 @@ ria.__API = ria.__API || {};
         //#endif
         return DelegateProxy;
     };
+
+    /**
+     * @param {Function} delegate
+     * @return {Boolean}
+     */
+    ria.__API.isDelegate = function (delegate) {
+        return delegate.__META instanceof MethodDescriptor;
+    };
 })();
