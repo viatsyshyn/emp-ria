@@ -31,7 +31,7 @@
 
             assertException(function() {
                 ria.__SYNTAX.buildDelegate('Compare', descriptor);
-            }, Error);
+            }, 'Error');
         },
 
         testBuildDelegateWithFINAL: function () {
@@ -43,7 +43,7 @@
 
             assertException(function() {
                 ria.__SYNTAX.buildDelegate('Compare', descriptor);
-            }, Error);
+            }, 'Error');
         },
 
         testBuildDelegateWithAbstract: function () {
@@ -55,7 +55,7 @@
 
             assertException(function() {
                 ria.__SYNTAX.buildDelegate('Compare', descriptor);
-            }, Error);
+            }, 'Error');
         },
 
         testBuildDelegateWithOverride: function () {
@@ -67,7 +67,7 @@
 
             assertException(function() {
                 ria.__SYNTAX.buildDelegate('Compare', descriptor);
-            }, Error);
+            }, 'Error');
         }
     };
 
