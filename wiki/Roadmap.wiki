@@ -29,12 +29,12 @@
 == Syntax ==
 
   * [Exceptions]
-  * [Delegates]
+  * ~~[Delegates]~~
   * [Annotations]
   * [Interfaces] 
   * [Classes]
   * [Enumerations]
-  * [Identifiers]
+  * ~~[Identifiers]~~
 
 == Dependencies ==
 
