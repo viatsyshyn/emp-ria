@@ -41,3 +41,5 @@
 == Reflection ==
   * [Interfaces] 
   * [Classes]
+  * Methods
+  * Properties
