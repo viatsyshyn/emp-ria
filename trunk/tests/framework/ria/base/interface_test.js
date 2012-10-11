@@ -5,20 +5,14 @@
         setUp: function(){},
 
         testCreate: function () {
-            var i = ria.__API.ifc('TestInterface');
-            ria.__API.method(i, null, 'compare', Boolean, [String, String], ['_1', '_2'], []);
-            ria.__API.compile(i);
+            var i = ria.__API.ifc('TestInterface', ['compare', Boolean, [String, String], ['_1', '_2']]);
 
             assertFunction(i);
             assertNotUndefined(i.__META);
         },
 
         testUsage: function() {
-            var i = ria.__API.ifc('TestInterface');
-            ria.__API.method(i, null, 'compare', Boolean, [String, String], ['_1', '_2'], []);
-            ria.__API.compile(i);
-
-            assertNoException(function () { i(); });
+            var i = ria.__API.ifc('TestInterface', ['compare', Boolean, [String, String], ['_1', '_2']]);
 
             assertException(function () { i(); }, 'Error');
         }
