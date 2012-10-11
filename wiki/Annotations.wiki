@@ -25,7 +25,7 @@ CLASS(
     [BaseAnnotation(true, 1)],
     'publicMember',
 
-    [BaseAnnotation(false)] 
+    [BaseAnnotation(false)],
     function $() { }
  
     [BaseAnnotation(true, 2)],
