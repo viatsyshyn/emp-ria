@@ -31,4 +31,8 @@ ria.__API = ria.__API || {};
         return InterfaceProxy;
     };
 
+    ria.__API.isInterface = function (ifc) {
+        return ifc.__META instanceof InterfaceDescriptor;
+    }
+
 })();
