@@ -101,11 +101,13 @@ ria.__API = ria.__API || {};
 
         if (Array.isArray(value)) return 'Array';
 
-        if (ria.__API.isIdentifier(value))
-            return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';
+        // TODO: fix this
+        /*if (ria.__API.isIdentifier(value))
+            return ria.__API.getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';*/
 
-        if (ria.__API.isEnum(value))
-            return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';
+        // TODO: fix this
+        /*if (ria.__API.isEnum(value))
+            return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';*/
 
         /*if (value instanceof __API.Class)
             return getConstructorOf(value).__IDENTIFIER__ || 'Class';*/
@@ -113,7 +115,7 @@ ria.__API = ria.__API || {};
         if (value instanceof Object) {
             var ctor = ria.__API.getConstructorOf(value);
             if (ctor)
-                return ctor.getName() || 'Object';
+                return ctor.name || 'Constructor';
         }
 
         return 'Object';

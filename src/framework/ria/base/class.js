@@ -38,6 +38,8 @@ ria.__API = ria.__API || {};
      */
     ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_) {
         clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
+        if (base_)
+            ria.__API.extend(clazz, base_);
     };
 
     /**
@@ -63,11 +65,6 @@ ria.__API = ria.__API || {};
      * @param {Annotation[]} [anns_]
      */
     ria.__API.method = function (clazz, impl, name, ret_, argsTypes_, argsNames_, anns_) {
-        if (clazz.__META instanceof ria.__API.InterfaceDescriptor) {
-            clazz.__META.addMethod(null, name, ret_, argsTypes_, argsNames_, anns_);
-            return;
-        }
-
         if (!(clazz.__META instanceof ria.__API.ClassDescriptor))
             throw Error();
 

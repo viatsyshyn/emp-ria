@@ -19,6 +19,7 @@
 
             assertFunction(Clazz);
             assertNotUndefined(Clazz.__META);
+            assertInstanceOf(ria.__API.ClassDescriptor, Clazz.__META);
         },
 
         testUsage: function() {
@@ -49,9 +50,29 @@
             assertEquals(method('1', '2'), false);
         },
 
-        testProtectedVisibility: function () {},
+        testProtectedVisibility: function () {
+            fail();
+        },
 
         testClassExtending: function () {
+
+            var BaseClazz = this.Clazz;
+
+            function ChildClazz() { return ria.__API.init(this, ChildClazz, ChildClazz.prototype.$, arguments) }
+            ria.__API.clazz(ChildClazz, 'ChildClazz', BaseClazz, [], []);
+            ChildClazz.prototype.$ = function () { BaseClazz.prototype.$.call(this); };
+            ria.__API.ctor(ChildClazz, ChildClazz.prototype.$, [], [], []);
+            ria.__API.compile(ChildClazz);
+
+            assertInstanceOf(ria.__API.ClassDescriptor, ChildClazz.__META);
+
+            var instance = new ChildClazz();
+
+            assertObject(instance);
+            assertInstanceOf(ChildClazz, instance);
+            assertInstanceOf(BaseClazz, instance);
+            assertFunction(instance.compare);
+
             // TODO: check for parent members, check visibility
         },
 
@@ -59,6 +80,7 @@
             // TODO: check __PROTECTED is instance of same class
             // TODO: check __PROTECTED contains all same public members
             // TODO: check __PROTECTED has all fields initialized
+            fail();
         }
     }
 })(ria);
