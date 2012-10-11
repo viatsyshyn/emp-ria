@@ -14,7 +14,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.buildClass = function (name, def) {
 
         // TODO: validate class flags
-        // TODO: validate no duplicate methods, ctors, properties
+        // TODO: validate no duplicate members
         // TODO: validate properties
         // TODO: validate methods
         // TODO: validate methods overrides
@@ -26,7 +26,15 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
         ria.__API.clazz(ClassProxy, name, def.base, def.ifcs, def.annotations);
 
-        this.properties
+        def.properties.forEach(
+            /**
+             * @param {PropertyDescriptor} property
+             */
+            function (property) {
+                ria.__API.property(ClassProxy, property.name, property.type, property.annotations);
+            });
+
+        def.methods
             .filter(function (_1) { return _1.name == '$'})
             .forEach(
             /**
@@ -37,15 +45,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, method.argsTypes, method.argsNames);
             });
 
-        this.properties.forEach(
-            /**
-             * @param {PropertyDescriptor} property
-             */
-            function (property) {
-                ria.__API.property(ClassProxy, property.name, property.type, property.annotations);
-            });
-
-        this.properties
+        def.methods
             .filter(function (_1) { return _1.name != '$'})
             .forEach(
             /**
