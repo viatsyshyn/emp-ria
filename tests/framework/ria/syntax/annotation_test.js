@@ -92,6 +92,18 @@
             assertException(function() {
                 ria.__SYNTAX.buildAnnotation('Compare', annotation);
             }, 'Error');
+        },
+
+        testBuildAnnotationWithSelf: function () {
+
+            var annotation = ria.__SYNTAX.parseMethod([
+                [String, String],
+                ria.__SYNTAX.Modifiers.SELF, function compare(_1, _2) {}
+            ]);
+
+            assertException(function() {
+                ria.__SYNTAX.buildAnnotation('Compare', annotation);
+            }, 'Error');
         }
     };
 

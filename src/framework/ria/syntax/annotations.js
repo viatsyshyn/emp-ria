@@ -15,10 +15,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.annotations.length)
             throw Error('Annotations are not supported in annotations');
 
+        for(var flag in def.flags)
+        def.flags
         if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
             throw Error('Modifiers are not supported in annotations');
 
-        if(def.retType)
+        if(def.retType !== null)
             throw Error('Return type is not supported in annotations');
         // TODO: warn if has body
         return ria.__API.annotation(name, def.argsTypes, def.argsNames);
