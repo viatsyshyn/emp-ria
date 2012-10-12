@@ -14,6 +14,10 @@ EXCEPTION(
   ]);
 }}}
 
+Exceptions are like classes, but they all extend basic Exception. Exception does not extend Class.
+
+Exceptions can not be marked as Abstract and may not contain abstract methods.
+
 = Usage =
 
 {{{
