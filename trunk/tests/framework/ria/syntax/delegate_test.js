@@ -68,6 +68,27 @@
             assertException(function() {
                 ria.__SYNTAX.buildDelegate('Compare', descriptor);
             }, 'Error');
+        },
+
+        testBuildAnnotationWithSelf: function () {
+
+            var descriptor = ria.__SYNTAX.parseMethod([
+                [String, String],
+                ria.__SYNTAX.Modifiers.SELF, function compare(_1, _2) {}
+            ]);
+
+            assertException(function() {
+                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+            }, 'Error');
+
+            var descriptor2 = ria.__SYNTAX.parseMethod([
+                [String, ria.__SYNTAX.Modifiers.SELF],
+                Boolean,function compare2(_1, _2) {}
+            ]);
+
+            assertException(function() {
+                ria.__SYNTAX.buildDelegate('Compare2', descriptor2);
+            }, 'Error');
         }
     };
 

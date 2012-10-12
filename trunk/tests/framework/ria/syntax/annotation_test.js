@@ -104,6 +104,15 @@
             assertException(function() {
                 ria.__SYNTAX.buildAnnotation('Compare', annotation);
             }, 'Error');
+
+            var annotation2 = ria.__SYNTAX.parseMethod([
+                [String, ria.__SYNTAX.Modifiers.SELF],
+                function compare2(_1, _2) {}
+            ]);
+
+            assertException(function() {
+                ria.__SYNTAX.buildAnnotation('Compare2', annotation2);
+            }, 'Error');
         }
     };
 

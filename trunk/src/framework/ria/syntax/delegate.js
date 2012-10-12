@@ -17,6 +17,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
             throw Error('Modifiers are not supported in delegates');
+
+        def.argsTypes.forEach(function(type){
+            if(type == ria.__SYNTAX.Modifiers.SELF)
+                throw Error('Argument type can\'t be SELF in delegates');
+        });
+
+        if(def.retType == ria.__SYNTAX.Modifiers.SELF)
+            throw Error('Return type can\'t be SELF in delegates');
         // TODO: warn if has body
         return ria.__API.delegate(name, def.ret, def.argsTypes, def.argsNames);
     };
