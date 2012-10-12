@@ -20,6 +20,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if(def.retType !== null)
             throw Error('Return type is not supported in annotations');
+
+        def.argsTypes.forEach(function(type){
+            if(type == ria.__SYNTAX.Modifiers.SELF)
+                throw Error('Argument type can\'t be SELF in annotations');
+        });
         // TODO: warn if has body
         return ria.__API.annotation(name, def.argsTypes, def.argsNames);
     };
