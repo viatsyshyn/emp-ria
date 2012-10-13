@@ -21,11 +21,36 @@ ria.__API = ria.__API || {};
         this.ifcs = ifcs;
         //noinspection JSUnusedGlobalSymbols
         this.anns = anns;
+        this.properties = {};
+        this.methods = {};
+        this.ctor = null;
     }
 
-    ClassDescriptor.prototype.addProperty = function (name, ret, anns) {};
-    ClassDescriptor.prototype.addMethod = function (impl, name, ret, argsTypes, argsNames, anns) {};
-    ClassDescriptor.prototype.setCtor = function (impl, argsTypes, argsNames, anns) {};
+    ClassDescriptor.prototype.addProperty = function (name, ret, anns, setter, getter) {
+        this.properties[name] = {
+            retType: ret,
+            annotations: anns,
+            setter: setter,
+            getter: getter
+        };
+    };
+    ClassDescriptor.prototype.addMethod = function (impl, name, ret, argsTypes, argsNames, anns) {
+        this.methods[name] = {
+            impl: impl,
+            retType: ret,
+            argsNames: argsNames,
+            argsTypes:argsTypes,
+            annotations: anns
+        };
+    };
+    ClassDescriptor.prototype.setCtor = function (impl, argsTypes, argsNames, anns) {
+        this.ctor = {
+            impl: impl,
+            argsNames: argsNames,
+            argsTypes:argsTypes,
+            annotations: anns
+        }
+    };
 
     ria.__API.ClassDescriptor = ClassDescriptor;
 
@@ -37,6 +62,8 @@ ria.__API = ria.__API || {};
      * @param {Annotation[]} [anns_]
      */
     ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_) {
+        ria.__API.checkArg('clazz', [Function], clazz);
+
         clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
         if (base_)
             ria.__API.extend(clazz, base_);
@@ -48,11 +75,12 @@ ria.__API = ria.__API || {};
      * @param {*} [ret_]
      * @param {*[]} [anns_]
      */
-    ria.__API.property = function (clazz, name, ret_, anns_) {
-        if (!(clazz.__META instanceof ClassDescriptor))
-            throw Error();
+    ria.__API.property = function (clazz, name, ret_, anns_, getter, setter) {
+        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
-        clazz.__META.addProperty(name, ret_, anns_);
+        getter.__META = new ria.__API.MethodDescriptor('', ret_, [], []);
+        setter.__META = new ria.__API.MethodDescriptor('', ria.__SYNTAX.Modifiers.VOID, [ret_], ['value']);
+        clazz.__META.addProperty(name, ret_, anns_, getter, setter);
     };
 
     /**
@@ -65,8 +93,7 @@ ria.__API = ria.__API || {};
      * @param {Annotation[]} [anns_]
      */
     ria.__API.method = function (clazz, impl, name, ret_, argsTypes_, argsNames_, anns_) {
-        if (!(clazz.__META instanceof ria.__API.ClassDescriptor))
-            throw Error();
+        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         clazz.__META.addMethod(impl, name, ret_, argsTypes_, argsNames_, anns_);
 
@@ -85,8 +112,7 @@ ria.__API = ria.__API || {};
      * @param {Annotation[]} [anns_]
      */
     ria.__API.ctor = function (clazz, impl, argsTypes_, argsNames_, anns_) {
-        if (!(clazz.__META instanceof ClassDescriptor))
-            throw Error();
+        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
 
@@ -115,13 +141,14 @@ ria.__API = ria.__API || {};
 
         for(var k in instance) {
             var f_ = instance[k];
-            if (typeof f_ === 'function' && f_ !== ctor) {
+            if (typeof f_ === 'function' && f_ !== ctor && k !== 'constructor') {
                 instance[k] = f_.bind(instance);
                 //#ifdef DEBUG
-                    instance[k] = ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
-                    Object.defineProperty(instance, k, { writable : false, configurable: false });
-                    // maybe throw Exception on call
-                    publicInstance[k] = f_.__META.isProtected() ? undefined : ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
+                    if (f_.__META) {
+                        var fn = ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
+                        Object.defineProperty(instance, k, { writable : false, configurable: false, value: fn });
+                        publicInstance[k] = !f_.__META.isProtected() ? fn : undefined; // TODO: maybe throw Exception on call
+                    }
                 //#endif
             }
         }
@@ -146,6 +173,7 @@ ria.__API = ria.__API || {};
     };
 
     ria.__API.compile = function(clazz) {
+        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
         //#ifdef DEBUG
             Object.freeze(clazz);
         //#endif

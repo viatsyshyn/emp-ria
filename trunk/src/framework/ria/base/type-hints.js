@@ -85,7 +85,7 @@ ria.__API = ria.__API || {};
         if (isImportedType(type))
             return type.__IDENTIFIER__;*/
 
-        return 'UnknownType';
+        return type.name || 'UnknownType';
     }
 
     function getIdentifierOfValue(value) {
