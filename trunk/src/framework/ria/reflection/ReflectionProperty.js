@@ -6,7 +6,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionProperty */
     CLASS(
-        'ReflectionProperty', EXTENDS(ria.reflection.Reflector), [
+        FINAL, 'ReflectionProperty', EXTENDS(ria.reflection.Reflector), [
             READONLY, Function, 'clazz',
             READONLY, String, 'name',
 

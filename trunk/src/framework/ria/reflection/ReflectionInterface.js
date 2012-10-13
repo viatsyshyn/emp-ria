@@ -6,7 +6,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionInterface */
     CLASS(
-        'ReflectionInterface', EXTENDS(ria.reflection.Reflector), [
+        FINAL, 'ReflectionInterface', EXTENDS(ria.reflection.Reflector), [
             READONLY, Function, 'ifc',
 
             function $(ifc) {
