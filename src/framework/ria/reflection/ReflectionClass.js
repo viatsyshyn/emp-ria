@@ -6,7 +6,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionClass */
     CLASS(
-        'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
+        FINAL, 'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
             READONLY, Function, 'clazz',
 
             function $(clazz) {
