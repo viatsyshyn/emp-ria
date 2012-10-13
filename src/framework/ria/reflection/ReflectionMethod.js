@@ -27,7 +27,14 @@ NS('ria.reflection', function () {
             Array, function getArguments() { return this.method.argsNames;},
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
 
-            function invokeOn(instance, args) {}
+            function invokeOn(instance, args) {
+                ria.__API.checkArg('instance', [this.clazz], instance);
+                ria.__API.checkArgs(this.method.argsNames, this.method.argsTypes, args);
+                //#ifdef DEBUG
+                    instance = instance.__PROTECTED || instance;
+                //#endif
+                this.method.impl.apply(instance, args);
+            }
         ]);
 });
 

@@ -22,8 +22,22 @@ NS('ria.reflection', function () {
             Array, function getAnnotations() { return this.property.annotations; },
             Object, function getType() { return this.property.type; },
 
-            function invokeGetterOn(instance) {},
-            VOID, function invokeSetterOn(instance, value) {}
+            function invokeGetterOn(instance) {
+                ria.__API.checkArg('instance', [this.clazz], instance);
+                //#ifdef DEBUG
+                    instance = instance.__PROTECTED || instance;
+                //#endif
+                this.method.getter.call(instance);
+            },
+
+            VOID, function invokeSetterOn(instance, value) {
+                ria.__API.checkArg('instance', [this.clazz], instance);
+                ria.__API.checkArg('value', [this.property.type], value);
+                //#ifdef DEBUG
+                    instance = instance.__PROTECTED || instance;
+                //#endif
+                this.method.setter.call(instance, value);
+            }
         ]);
 });
 

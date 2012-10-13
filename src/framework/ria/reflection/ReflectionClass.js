@@ -38,6 +38,8 @@ NS('ria.reflection', function () {
             Boolean, function hasMethod(name) {},
 
             [Array],
-            Class, function instantiate(args) {}
+            Class, function instantiate(args) {
+                return ria.__API.init(null, this.clazz, this.clazz.__META.ctor.impl, args);
+            }
         ]);
 });
