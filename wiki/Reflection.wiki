@@ -1,0 +1,52 @@
+#summary Reflections
+
+= Introduction =
+
+From Wikipedia:
+
+  In computer science, reflection is the ability of a computer program to examine (see type introspection) and modify the structure and behavior (specifically the values, meta-data, properties and functions) of an object at runtime.[1]
+
+In Ria.js reflections are read-only and work over Runtime Type Information (RTTI) of public members of classes and interfaces.
+
+= Details =
+
+There are four base reflection classes in _ria.reflection_ namespace:
+
+ * ReflectionClass
+ * ReflectionInterface
+ * ReflectionMethod
+ * ReflectionProperty
+
+Theese classes allow access to RTTI information, instatiation of classes, invokation of methods, invokation of getter/setter of properties.
+
+= Why is this needed anyway? =
+
+At runtime code maybe minified and optimized, so name of methods, properties, fields, classes and interfaces, function arguments will be changed. So simple calling `instance[methodName](1, 2, 3)` will fail. Here reflections step in as they access classes meta data and can access members by their name and invoke them
+
+{{{
+var instance = SomeClass();
+var ref = ria.reflection.ReflactionMethod(SomeClass, methodName);
+ref.invokeOn(instance, [1,2,3]);
+}}}
+
+Same is true about properties
+
+{{{
+var instance = SomeClass();
+instance['setMyProp'](1); // fails setMyProp is not a function
+
+var ref = ria.reflection.ReflactionProperty(SomeClass, 'myProp');
+ref.invokeSetterOn(instance, 1);
+}}}
+
+Also annotations can be read at runtime as well
+
+{{{
+var instance = SomeClass();
+var ref = ria.reflection.ReflactionClass(SomeClass);
+if (ref.hetAnnotation(MyInvokeMyMethodAnnotation)) {
+  var a = ref.getAnnotation(MyInvokeMyMethodAnnotation)[0];
+  var ref2 = ria.reflection.ReflactionMethod(SomeClass, a.name);
+  ref2.invokeOn(instance, a.args_ || []);
+}
+}}}
