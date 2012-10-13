@@ -11,7 +11,14 @@ ria.__API = ria.__API || {};
      */
     function InterfaceDescriptor(name, methods) {
         this.name = name;
-        this.methods = methods;
+        this.methods = {};
+        methods.forEach(function (method) {
+            this.methods[method[0]] = {
+                retType: method[1],
+                argsNames: method[2],
+                argsTypes: method[3]
+            }
+        }.bind(this));
     }
 
     ria.__API.InterfaceDescriptor = InterfaceDescriptor;

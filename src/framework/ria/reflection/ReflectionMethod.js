@@ -23,9 +23,9 @@ NS('ria.reflection', function () {
             Boolean, function isOverride() { return this.method.flags.isOverride; },
 
             Array, function getAnnotations() { return this.method.annotations; },
-            Object, function getReturnType(name) { return this.method.retType; },
+            Object, function getReturnType() { return this.method.retType; },
             Array, function getArguments() { return this.method.argsNames;},
-            Array, function getArgumentsTypes(name) { return this.method.argsTypes;},
+            Array, function getArgumentsTypes() { return this.method.argsTypes;},
 
             function invokeOn(instance, args) {}
         ]);
