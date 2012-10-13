@@ -14,7 +14,7 @@ Generic class
 {{{
 CLASS(
   TEMPLATE('T'),
-  'MyGenericClass', EXTENDS(MyBase, T), [
+  'MyGenericClass', EXTENDS(MyBase, T, Number), [ // MyBase<T1,T2> is generic also, we specialize it with our T and Number
     T, 'param',
     [T],
     function $(param) {},
@@ -22,4 +22,18 @@ CLASS(
     [T, T],
     T, function add(_1, _2) { return _1 + _2; }
   ]);
+}}}
+
+Instantiation
+
+{{{
+var instance = MyGenericClass(Number, 1); // Number is specialization of T
+}}}
+
+TODO: required a good syntax for specialization of templates in type hints
+
+{{{
+DELEGATE(
+  [String, Number],
+  MyGenericClass<Boolean>, function cmp(_1, _2) {});
 }}}
