@@ -30,9 +30,9 @@
 
   * [Exceptions]
   * ~~[Delegates]~~
-  * [Annotations]
+  * ~~[Annotations]~~
   * [Interfaces] 
-  * [Classes]
+  * ~~[Classes]~~
   * [Enumerations]
   * ~~[Identifiers]~~
 
