@@ -19,7 +19,7 @@ There are four base reflection classes in _ria.reflection_ namespace:
 
 Theese classes allow access to RTTI information, instatiation of classes, invokation of methods, invokation of getter/setter of properties.
 
-= Why is this needed anyway? =
+= Why is this required anyway? =
 
 At runtime code maybe minified and optimized, so name of methods, properties, fields, classes and interfaces, function arguments will be changed. So simple calling `instance[methodName](1, 2, 3)` will fail. Here reflections step in as they access classes meta data and can access members by their name and invoke them
 
