@@ -39,7 +39,7 @@
 == Dependencies ==
 
 == Reflection ==
-Wiki page [Reflections]
+Wiki page [Reflection]
   * [Interfaces] 
   * [Classes]
   * Methods
