@@ -31,7 +31,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              * @param {PropertyDescriptor} property
              */
             function (property) {
-                ria.__API.property(ClassProxy, property.name, property.type, property.annotations);
+                // TODO: pass getter & setter
+                ria.__API.property(ClassProxy, property.name, property.type, property.annotations, null, null);
             });
 
         def.methods
