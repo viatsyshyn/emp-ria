@@ -20,7 +20,7 @@ NS('ria.reflection', function () {
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
 
             Array, function getAnnotations() { return this.property.annotations; },
-            Object, function getType(name) { return this.property.type;},
+            Object, function getType() { return this.property.type; },
 
             function invokeGetterOn(instance) {},
             VOID, function invokeSetterOn(instance, value) {}
