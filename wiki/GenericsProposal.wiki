@@ -13,7 +13,7 @@ Generic class
 
 {{{
 CLASS(
-  TEMPLATE('T'),
+  GENERIC('T'),
   'MyGenericClass', EXTENDS(MyBase, T, Number), [ // MyBase<T1,T2> is generic also, we specialize it with our T and Number
     T, 'param',
     [T],
@@ -30,7 +30,7 @@ Instantiation
 var instance = MyGenericClass(Number, 1); // Number is specialization of T
 }}}
 
-TODO: required a good syntax for specialization of templates in type hints
+TODO: required a good syntax for specialization of generics in type hints
 
 {{{
 DELEGATE(
