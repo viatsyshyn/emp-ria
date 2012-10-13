@@ -44,7 +44,7 @@ Also annotations can be read at runtime as well
 {{{
 var instance = SomeClass();
 var ref = ria.reflection.ReflactionClass(SomeClass);
-if (ref.hetAnnotation(MyInvokeMyMethodAnnotation)) {
+if (ref.hasAnnotation(MyInvokeMyMethodAnnotation)) {
   var a = ref.getAnnotation(MyInvokeMyMethodAnnotation)[0];
   var ref2 = ria.reflection.ReflactionMethod(SomeClass, a.name);
   ref2.invokeOn(instance, a.args_ || []);
