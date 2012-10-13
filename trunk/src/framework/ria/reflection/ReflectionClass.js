@@ -7,9 +7,11 @@ NS('ria.reflection', function () {
     /** @class ria.reflection.ReflectionClass */
     CLASS(
         'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
-            READONLY, ClassOf(Class), 'clazz',
+            READONLY, Function, 'clazz',
 
-            function $(clazz) {},
+            function $(clazz) {
+                ria.__API.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+            },
 
             String, function getName() { return this.clazz.__META.name; },
 
@@ -17,14 +19,17 @@ NS('ria.reflection', function () {
             Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
             Array, function getAnnotations() { return this.clazz.__META.annotations; },
-            Object, function getBaseClass() {  },
-            Array, function getInterfaces() { },
-            Array, function getProperties() { },
-            Object, function getCtor() { },
-            Array, function getMethods() { },
-            Array, function getChildren() { },
+            Function, function getBaseClass() { return this.clazz.__META.base; },
+            ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs; },
+            ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
+            ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
+            ArrayOf(Function), function getChildren() { }, // TODO: fast way to get children
 
-            Boolean, function annotatedWith(ann) {},
+            Object, function getCtorAnnotations() { return this.clazz.__META.ctor.annotations; },
+            Object, function getCtorArguments() { return this.clazz.__META.ctor.argsNames; },
+            Object, function getCtorArgumentsTypes() { return this.clazz.__META.ctor.argsTypes; },
+
+            Boolean, function isAnnotatedWith(ann) {},
             Boolean, function extendsClass(parent) {},
             Boolean, function implementsIfc(parent) {},
             [String],
