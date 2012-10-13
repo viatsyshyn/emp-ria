@@ -127,13 +127,11 @@ empx.domx.BaseComparatorImpl = function () {
   ria.__API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
     , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
 
-  ria.__API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
   BaseComparatorImpl.prototype.getMyProp = function () { return this.myProp; };
-  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
-      , 'getMyProp', String, [], []); /* default getter */
   BaseComparatorImpl.prototype.setMyProp = function (value) { this.myProp = value; };
-  ria.__API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
-      , 'setMyProp', __API.Void, [String], ['value']); /* default setter */
+  ria.__API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]
+      , BaseComparatorImpl.prototype.getMyProp
+      , BaseComparatorImpl.prototype.setMyProp);
 
   BaseComparatorImpl.prototype.$ = function () {
     empx.domx.BaseClass.prototype.$.call(this, 5);
