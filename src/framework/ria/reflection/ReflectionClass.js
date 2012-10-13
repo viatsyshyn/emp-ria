@@ -33,9 +33,9 @@ NS('ria.reflection', function () {
             Boolean, function extendsClass(parent) {},
             Boolean, function implementsIfc(parent) {},
             [String],
-            Boolean, function hasProperty(name) {},
+            Boolean, function hasProperty(name) { return this.clazz.__META.properties.hasOwnProperty(name); },
             [String],
-            Boolean, function hasMethod(name) {},
+            Boolean, function hasMethod(name) { return this.clazz.__META.methods.hasOwnProperty(name); },
 
             [Array],
             Class, function instantiate(args) {
