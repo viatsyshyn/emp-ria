@@ -19,7 +19,7 @@ DELEGATE(
   Boolean, function Comparator(_1, _2) {});
 
 INTERFACE(
-  GENERIC('T'),
+  GENERIC('T', EXTENDS(MyBaseParam)),
   'MyIfc', [
      T, 'param' // not a property, but a shortcut ?
   ]);
