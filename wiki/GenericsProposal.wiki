@@ -18,9 +18,16 @@ DELEGATE(
   [T, T],
   Boolean, function Comparator(_1, _2) {});
 
+INTERFACE(
+  GENERIC('T'),
+  'MyIfc', [
+     T, 'param' // not a property, but a shortcut ?
+  ]);
+
 CLASS(
   GENERIC('T'),
-  'MyGenericClass', EXTENDS(MyBase, T, Number), [ // MyBase<T1,T2> is generic also, we specialize it with our T and Number
+  'MyGenericClass', EXTENDS(SPECIFY(MyBase, T, Number)), // MyBase<T1,T2> is generic also
+      IMPLEMENTS(SPECIFY(MyIfc, T)), [ 
     T, 'param',
     [T],
     function $(param) {},
@@ -28,7 +35,7 @@ CLASS(
     [T, T],
     T, function add(_1, _2) { return _1 + _2; },
 
-    Comparator<T>, 'comparator'
+    SPECIFY(Comparator, T), 'comparator'
   ]);
 }}}
 
