@@ -26,16 +26,19 @@ INTERFACE(
 
 CLASS(
   GENERIC('T'),
-  'MyGenericClass', EXTENDS(SPECIFY(MyBase, T, Number)), // MyBase<T1,T2> is generic also
+  'MyGenericClass', 
+      EXTENDS(SPECIFY(MyBase, T, Number)), // MyBase<T1,T2> is generic also
       IMPLEMENTS(SPECIFY(MyIfc, T)), [ 
+
     T, 'param',
+
     [T],
     function $(param) {},
 
     [T, T],
     T, function add(_1, _2) { return _1 + _2; },
 
-    SPECIFY(Comparator, T), 'comparator'
+    READONLY, SPECIFY(Comparator, T), 'comparator'
   ]);
 }}}
 
