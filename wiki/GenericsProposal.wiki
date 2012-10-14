@@ -45,4 +45,5 @@ Instantiation
 
 {{{
 var instance = MyGenericClass(Number, 1); // Number is specialization of T
+var instance2 = SPECIFY(MyGenericClass, Number)(1); // same as abow
 }}}
