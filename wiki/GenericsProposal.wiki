@@ -47,3 +47,5 @@ Instantiation
 var instance = MyGenericClass(1); // Generalized version, equivalent to specification with Object
 var instance2 = SPECIFY(MyGenericClass, Number)(1); // specified with Number
 }}}
+
+Generics typing is check only in DEBUG mode. Generics typing is available via reflection
