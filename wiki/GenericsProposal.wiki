@@ -44,6 +44,6 @@ TODO: required a good syntax for specialization of generics in type hints
 Instantiation
 
 {{{
-var instance = MyGenericClass(Number, 1); // Number is specification of T
+var instance = MyGenericClass(1); // Generalized version, equivalent to specification with Object
 var instance2 = SPECIFY(MyGenericClass, Number)(1); // same as abow
 }}}
