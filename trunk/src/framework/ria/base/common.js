@@ -25,7 +25,7 @@ ria.__API = ria.__API || {};
     };
 
     /**
-     * Returns constructor of given obnject
+     * Returns constructor of given object
      * @param {Object} v
      * @return {Function}
      */
