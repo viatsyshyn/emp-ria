@@ -64,17 +64,17 @@ var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS('IFuture'), [
     [ITask],
     function $(task) {},
 
-    function populate(data) {},
-    function fail(exception) {}
+    VOID, function populate(data) {},
+    VOID, function fail(exception) {}
   ]);
 
 CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
-     ABSTRACT, IFuture, function run() {},
-     VOID, function cancel() {},
+    ABSTRACT, IFuture, function run() {},
+    VOID, function cancel() {},
 
-     function $() {
-       this.promise = new FutureImpl();
-     }
+    function $() {
+      this.promise = new FutureImpl();
+    }
   ]);
 
 }}}
