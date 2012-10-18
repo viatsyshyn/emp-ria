@@ -54,18 +54,18 @@ IFuture is a core interface, which defines that future may transform propagated 
 
 var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS('IFuture'), [
     [DataTransformer]
-     SELF, function transform(transformation) {},
-     [DataHandler],
-     SELF, function chain(callback) {},
-     [ErrorHandler],
-     SELF, function error(errback) {},
-     VOID, function cancel() {},
+    SELF, function transform(transformation) {},
+    [DataHandler],
+    SELF, function chain(callback) {},
+    [ErrorHandler],
+    SELF, function error(errback) {},
+    VOID, function cancel() {},
 
-     [ITask],
-     function $(task) {},
+    [ITask],
+    function $(task) {},
 
-     function populate(data) {},
-     function fail(exception) {}
+    function populate(data) {},
+    function fail(exception) {}
   ]);
 
 CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
@@ -89,7 +89,7 @@ AjaxTask('GET', '/service', {p: 1, r: 2})
   .run()
   .chain(doSomething)
   .transform(transformData)
-  .error(handleError)
   .chain(doSomethingElse)
+  .error(handleError)
 
 }}}
