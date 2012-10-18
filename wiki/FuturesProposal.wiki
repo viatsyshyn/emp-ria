@@ -1,0 +1,92 @@
+#summary Futures/Promises proposal
+
+= Introduction =
+
+Add your content here.
+
+
+= Details =
+
+This library is based on CommonJS Promises/A proposal.
+
+Main components are:
+  
+  * IFuture
+  * ITask
+
+{{{
+
+DELEGATE(
+  [Object],
+  Object, function DataTransformer(data) {});
+
+DELEGATE(
+  [Object],
+  ITask, function DataHandler(data) {});
+
+DELEGATE(
+  [Exception],
+  Boolean, function ErrorHandler(exception) {});
+
+INTERFACE(
+  'IFuture', [
+     [DataTransformer]
+     SELF, function transform(transformation) {},
+     [DataHandler],
+     SELF, function chain(callback) {},
+     [ErrorHandler],
+     SELF, function error(errback) {},
+     VOID, function cancel() {}
+  ]);
+
+INTERFACE(
+  'ITask', [
+     IFuture, function run() {},
+     VOID, function cancel() {}
+  ]);
+}}}
+
+IFuture is a core interface, which defines that future may transform propagated data or chain other task based on propagated data or handle propagated exception.
+
+== Basic Implementation ==
+
+{{{
+
+var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS('IFuture'), [
+    [DataTransformer]
+     SELF, function transform(transformation) {},
+     [DataHandler],
+     SELF, function chain(callback) {},
+     [ErrorHandler],
+     SELF, function error(errback) {},
+     VOID, function cancel() {},
+
+     [ITask],
+     function $(task) {},
+
+     function populate(data) {},
+     function fail(exception) {}
+  ]);
+
+CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
+     ABSTRACT, IFuture, function run() {},
+     VOID, function cancel() {},
+  ]);
+
+== Usages ==
+
+{{{
+CLASS('AjaxTask', EXTENDS(AbstractTask), [
+    function $(method, url, data) {}
+
+    function run() {},
+    function cancel() {}
+  ]);
+
+AjaxTask('GET', '/service', {p: 1, r: 2})
+  .run()
+  .chain(doSomething)
+  .transform(transformData)
+  .error(handleError)
+  .chain(doSomethingElse)
+}}}
