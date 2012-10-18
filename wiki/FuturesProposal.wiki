@@ -89,4 +89,5 @@ AjaxTask('GET', '/service', {p: 1, r: 2})
   .transform(transformData)
   .error(handleError)
   .chain(doSomethingElse)
+
 }}}
