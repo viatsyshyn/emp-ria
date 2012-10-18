@@ -71,6 +71,10 @@ var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS('IFuture'), [
 CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
      ABSTRACT, IFuture, function run() {},
      VOID, function cancel() {},
+
+     function $() {
+       this.promise = new FutureImpl();
+     }
   ]);
 
 }}}
@@ -79,10 +83,25 @@ CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
 
 {{{
 CLASS('AjaxTask', EXTENDS(AbstractTask), [
-    function $(method, url, data) {}
+    function $(method, url, data) {
+      this.xhr = new XmlHttpRequest();
+      this.xhr.onreadystatechange = this.stateChange_;
+    },
 
-    function run() {},
-    function cancel() {}
+    function stateChange_() {
+      if (this.xhr.state == 4 && this.xhr.status == 200) {
+        this.promise.propagate(JSON.parse(this.xhr.responseText);
+      }
+    },
+ 
+    function run() {
+      this.xhr.send();
+      return this.promise;
+    },
+
+    function cancel() {
+      this.xhr.abort();
+    }
   ]);
 
 AjaxTask('GET', '/service', {p: 1, r: 2})
