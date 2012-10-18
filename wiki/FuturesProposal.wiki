@@ -22,7 +22,7 @@ DELEGATE(
 
 DELEGATE(
   [Object],
-  ITask, function DataHandler(data) {});
+  IFuture, function DataHandler(data) {});
 
 DELEGATE(
   [Exception],
