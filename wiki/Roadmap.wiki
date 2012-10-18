@@ -32,8 +32,23 @@
   * ~~[Delegates]~~
   * ~~[Annotations]~~
   * [Interfaces] 
-  * ~~[Classes]~~
-  * [Enumerations]
+  * [Classes]
+  ** EXTENDS
+  ** IMPLEMENTS
+  ** ABSTRACT class
+  ** FINAL class
+  ** ~~ctor~~
+  *** BASE
+  ** Methods
+  *** ABSTRACT
+  *** OVERRIDE
+  *** FINAL
+  *** BASE
+  ** Properties
+  *** READONLY
+  *** FINAL
+  *** ABSTRACT 
+  * ~~[Enumerations]~~
   * ~~[Identifiers]~~
 
 == Dependencies ==
