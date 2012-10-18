@@ -2,7 +2,7 @@
 
 = Milestones =
 
-  * #1. Low-level API
+  * ~~#1. Low-level API~~
   * #2. Syntax, Dependencies, Reflection
   * #3. Compilation and GCC optimizations
   * #4. Promises, AJAX, MVC, DOM, HAML Templates, JSON Serialization
@@ -33,21 +33,21 @@
   * ~~[Annotations]~~
   * [Interfaces] 
   * [Classes]
-  # EXTENDS
-  # IMPLEMENTS
-  # ABSTRACT class
-  # FINAL class
-  # ~~ctor~~
-  ## BASE
-  # Methods
-  ## ABSTRACT
-  ## OVERRIDE
-  ## FINAL
-  ## BASE
-  # Properties
-  ## READONLY
-  ## FINAL
-  ## ABSTRACT 
+    * EXTENDS
+    * IMPLEMENTS
+    * ABSTRACT class
+    * FINAL class
+    * ~~ctor~~
+      * BASE
+    * Methods
+      * ABSTRACT
+      * OVERRIDE
+      * FINAL
+      * BASE
+    * Properties
+      * READONLY
+      * FINAL
+      * ABSTRACT 
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
 
