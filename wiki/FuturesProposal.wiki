@@ -73,6 +73,8 @@ CLASS(ABSTRACT, 'AbstractTask', IMPLEMENTS(ITask), [
      VOID, function cancel() {},
   ]);
 
+}}}
+
 == Usages ==
 
 {{{
