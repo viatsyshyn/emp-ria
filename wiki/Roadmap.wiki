@@ -54,6 +54,7 @@
       * SELF
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
+  * Proxy interface impls in DEBUG (to protect implementation)
 
 == Dependencies ==
 
