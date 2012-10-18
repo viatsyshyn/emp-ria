@@ -2,7 +2,9 @@
 
 = Introduction =
 
-Add your content here.
+From Wikipedia, the free encyclopedia:
+
+    In computer science, future, promise, and delay refer to constructs used for synchronizing in some concurrent programming languages. They describe an object that acts as a proxy for a result that is initially unknown, usually because the computation of its value is yet incomplete.
 
 
 = Details =
