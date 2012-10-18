@@ -115,5 +115,5 @@ AjaxTask('GET', '/service', {p: 1, r: 2})
 
 == TODO ==
 
-* Think about default error handling
-* Think about break mechanism
+  * Think about default error handling
+  * Think about break mechanism
