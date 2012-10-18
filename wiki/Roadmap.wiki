@@ -31,10 +31,10 @@
   * [Exceptions]
   * ~~[Delegates]~~
   * ~~[Annotations]~~
-  * [Interfaces] 
+  * ~~[Interfaces]~~ 
   * [Classes]
-    * EXTENDS
-    * IMPLEMENTS
+    * ~~EXTENDS~~
+    * ~~IMPLEMENTS~~
     * ABSTRACT class
     * FINAL class
     * ~~ctor~~
