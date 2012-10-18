@@ -32,11 +32,13 @@
   * ~~[Delegates]~~
   * ~~[Annotations]~~
   * ~~[Interfaces]~~ 
+    * SELF
   * [Classes]
     * ~~EXTENDS~~
     * ~~IMPLEMENTS~~
     * ABSTRACT class
     * FINAL class
+    * Private Classes
     * ~~ctor~~
       * BASE
     * Methods
@@ -44,10 +46,12 @@
       * OVERRIDE
       * FINAL
       * BASE
+      * SELF
     * Properties
       * READONLY
       * FINAL
       * ABSTRACT 
+      * SELF
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
 
