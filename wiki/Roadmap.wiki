@@ -33,21 +33,21 @@
   * ~~[Annotations]~~
   * [Interfaces] 
   * [Classes]
-  ** EXTENDS
-  ** IMPLEMENTS
-  ** ABSTRACT class
-  ** FINAL class
-  ** ~~ctor~~
-  *** BASE
-  ** Methods
-  *** ABSTRACT
-  *** OVERRIDE
-  *** FINAL
-  *** BASE
-  ** Properties
-  *** READONLY
-  *** FINAL
-  *** ABSTRACT 
+  # EXTENDS
+  # IMPLEMENTS
+  # ABSTRACT class
+  # FINAL class
+  # ~~ctor~~
+  ## BASE
+  # Methods
+  ## ABSTRACT
+  ## OVERRIDE
+  ## FINAL
+  ## BASE
+  # Properties
+  ## READONLY
+  ## FINAL
+  ## ABSTRACT 
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
 
@@ -63,7 +63,7 @@ Wiki page [DependencySystem]
 
 Wiki page [Reflection]
 
-  * [Interfaces] 
-  * [Classes]
-  * Methods
-  * Properties
+  * ~~[Interfaces]~~, Tests 
+  * ~~[Classes]~~, Tests
+  * ~~Methods~~, Tests
+  * ~~Properties~~, Tests
