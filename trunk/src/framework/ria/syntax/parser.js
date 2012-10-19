@@ -27,6 +27,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         Modifiers.VOID = new ModifiersImpl(3);
         Modifiers.SELF = new ModifiersImpl(4);
         Modifiers.FINAL = new ModifiersImpl(5);
+        Modifiers.READONLY = new ModifiersImpl(6);
         //#ifdef DEBUG
         Object.freeze(Modifiers);
         //#endif
@@ -56,6 +57,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 case Modifiers.ABSTRACT: flags.isAbstract = true; break;
                 case Modifiers.FINAL: flags.isFinal = true; break;
                 case Modifiers.OVERRIDE: flags.isOverride = true; break;
+                case Modifiers.READONLY: flags.isReadonly = true; break;
             }
         }
         return flags;
