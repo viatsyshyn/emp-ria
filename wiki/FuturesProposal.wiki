@@ -28,7 +28,7 @@ DELEGATE(
 
 DELEGATE(
   [Object],
-  ITask, function DataHandler(data) {}); // may be should return IFuture
+  IFuture, function DataHandler(data) {});
 
 DELEGATE(
   [Exception],
