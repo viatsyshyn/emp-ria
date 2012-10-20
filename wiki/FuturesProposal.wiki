@@ -63,7 +63,7 @@ INTERFACE(
 
 INTERFACE(
   'ITask', [
-     IFuture, function run() {}x
+     IFuture, function run() {}
   ]);
 }}}
 
@@ -137,13 +137,13 @@ CLASS('AjaxTask', EXTENDS(AbstractTask), [
 AjaxTask('GET', '/service', {p: 1, r: 2})
   .run()
   // try {
-  .progress(doUpdateProgressBar)
-  .done(doSomethingWithResults)
-  .chain(doTaskBasedOnPreviousData)
+    .progress(doUpdateProgressBar)
+    .done(doSomethingWithResults)
+    .chain(doTaskBasedOnPreviousData)
   // } catch (e) {
-  .error(doHandleError)
+    .error(doHandleError)
   // } finally {
-  .complete(doCleanupRequest)
+    .complete(doCleanupRequest)
   // }
 
 }}}
