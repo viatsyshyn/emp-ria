@@ -20,11 +20,15 @@ Main components are:
 
 DELEGATE(
   [Object],
+  VOID, function ProgressHandler(data) {});
+
+DELEGATE(
+  [Object],
   Object, function DataTransformer(data) {});
 
 DELEGATE(
   [Object],
-  IFuture, function DataHandler(data) {});
+  ITask, function DataHandler(data) {}); // may be should return IFuture
 
 DELEGATE(
   [Exception],
@@ -32,13 +36,24 @@ DELEGATE(
 
 INTERFACE(
   'IFuture', [
-     [DataTransformer]
-     SELF, function transform(transformation) {},
      [DataHandler],
      SELF, function chain(callback) {},
+     [DataTransformer],
+     SELF, function done(callback) {},
      [ErrorHandler],
      SELF, function error(errback) {},
+     [ProgressHandler],
+     SELF, function progress(progback) {},
+     SELF, function complete(callback) {},
      VOID, function cancel() {}
+  ]);
+
+INTERFACE(
+  'IFutureCompleter', [
+     VOID, function resolve(data) {},
+     VOID, function notify(data) {},
+     [Exception],
+     VOID, function fail(exception) {}
   ]);
 
 INTERFACE(
@@ -54,19 +69,22 @@ IFuture is a core interface, which defines that future may transform propagated 
 
 {{{
 
-var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS('IFuture'), [
-    [DataTransformer]
-    SELF, function transform(transformation) {},
+var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS(IFuture, IFutureCompleter), [
+    [ProgressHandler]
+    SELF, function progress(progback) {},
     [DataHandler],
     SELF, function chain(callback) {},
     [ErrorHandler],
     SELF, function error(errback) {},
+    SELF, function complete(callback) {},
     VOID, function cancel() {},
 
     [ITask],
     function $(task) {},
 
-    VOID, function populate(data) {},
+    // IFutureCompleter
+    VOID, function resolve(data) {},
+    VOID, function notify(data) {},
     VOID, function fail(exception) {}
   ]);
 
@@ -108,14 +126,18 @@ CLASS('AjaxTask', EXTENDS(AbstractTask), [
 
 AjaxTask('GET', '/service', {p: 1, r: 2})
   .run()
-  .chain(doSomething)
-  .transform(transformData)
-  .chain(doSomethingElse)
-  .error(handleError)
+  // try {
+  .progress(doUpdateProgressBar)
+  .done(doSomethingWithResults)
+  .chain(doTaskBasedOnPrevoiusData)
+  // } catch (e) {
+  .error(doHandleError)
+  // } finally {
+  .complete(doCleanupRequest)
+  // }
 
 }}}
 
 == TODO ==
 
   * Think about default error handling
-  * Think about break mechanism
