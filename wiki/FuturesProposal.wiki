@@ -69,6 +69,8 @@ INTERFACE(
 
 IFuture is a core interface, which defines that future may transform propagated data or chain other task based on propagated data or handle propagated exception.
 
+If exception was not handled it should be thrown to global scope
+
 == Basic Implementation ==
 
 {{{
@@ -149,5 +151,3 @@ AjaxTask('GET', '/service', {p: 1, r: 2})
 }}}
 
 == TODO ==
-
-  * Think about default error handling
