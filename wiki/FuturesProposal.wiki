@@ -129,7 +129,7 @@ AjaxTask('GET', '/service', {p: 1, r: 2})
   // try {
   .progress(doUpdateProgressBar)
   .done(doSomethingWithResults)
-  .chain(doTaskBasedOnPrevoiusData)
+  .chain(doTaskBasedOnPreviousData)
   // } catch (e) {
   .error(doHandleError)
   // } finally {
