@@ -87,7 +87,7 @@ var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS(IFuture, IFutureComplete
     VOID, function cancel() {},
 
     [ICancelable],
-    function $(task) {},
+    function $(cancelable) {}, // Future or Task
 
     // IFutureCompleter
     VOID, function resolve(data) {},
