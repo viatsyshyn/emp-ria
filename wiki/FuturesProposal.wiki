@@ -121,8 +121,18 @@ CLASS('AjaxTask', EXTENDS(AbstractTask), [
     },
 
     function stateChange_() {
-      if (this.xhr.state == 4 && this.xhr.status == 200) {
-        this.promise.propagate(JSON.parse(this.xhr.responseText);
+      if (this.xhr.state == 4) {
+        if (this.xhr.status == 200) {
+          try {
+            this.promise.resolve(JSON.parse(this.xhr.responseText);
+          } catch (e) {
+            this.promise.fail(Exception('JSON parse error', e));
+          }
+        } else {
+          this.promise.fail(Exception('XHR failed, status code: ' + this.xhr.status));
+        }
+      } else {
+        this.promise.progress(this.xhr.state);
       }
     },
  
