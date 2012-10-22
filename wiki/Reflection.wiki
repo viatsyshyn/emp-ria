@@ -17,7 +17,7 @@ There are four base reflection classes in _ria.reflection_ namespace:
  * ReflectionMethod
  * ReflectionProperty
 
-Theese classes allow access to RTTI information, instatiation of classes, invokation of methods, invokation of getter/setter of properties.
+Theese classes allow access to RTTI information, instantiation of classes, invokation of methods, invokation of getter/setter of properties.
 
 = Why is this required anyway? =
 
@@ -25,7 +25,7 @@ At runtime code maybe minified and optimized, so name of methods, properties, fi
 
 {{{
 var instance = SomeClass();
-var ref = ria.reflection.ReflactionMethod(SomeClass, methodName);
+var ref = ria.reflection.ReflectionMethod(SomeClass, methodName);
 ref.invokeOn(instance, [1,2,3]);
 }}}
 
@@ -35,7 +35,7 @@ Same is true about properties
 var instance = SomeClass();
 instance['setMyProp'](1); // fails setMyProp is not a function
 
-var ref = ria.reflection.ReflactionProperty(SomeClass, 'myProp');
+var ref = ria.reflection.ReflectionProperty(SomeClass, 'myProp');
 ref.invokeSetterOn(instance, 1);
 }}}
 
@@ -43,10 +43,10 @@ Also annotations can be read at runtime as well
 
 {{{
 var instance = SomeClass();
-var ref = ria.reflection.ReflactionClass(SomeClass);
+var ref = ria.reflection.ReflectionClass(SomeClass);
 if (ref.hasAnnotation(MyInvokeMyMethodAnnotation)) {
   var a = ref.getAnnotation(MyInvokeMyMethodAnnotation)[0];
-  var ref2 = ria.reflection.ReflactionMethod(SomeClass, a.name);
+  var ref2 = ria.reflection.ReflectionMethod(SomeClass, a.name);
   ref2.invokeOn(instance, a.args_ || []);
 }
 }}}
