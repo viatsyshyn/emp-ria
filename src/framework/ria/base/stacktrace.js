@@ -60,7 +60,7 @@ ria.__API = ria.__API || {};
      * Just include it on page
      * @return {Function}
      */
-    function getPintStackTraceWrapper() {
+    function getPrintStackTraceWrapper() {
         "use strict";
         return function (e) {
             window.printStackTrace({
@@ -74,5 +74,5 @@ ria.__API = ria.__API || {};
      * @param {Error} e
      * @return {Array}
      */
-    ria.__API.getStackTrace = window.printStackTrace ? getPintStackTraceWrapper() : getStackTrace;
+    ria.__API.getStackTrace = window.printStackTrace ? getPrintStackTraceWrapper() : getStackTrace;
 })();
