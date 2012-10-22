@@ -4,7 +4,7 @@ Ria.js asks developers to use one source file for one entity. This makes it easi
 
 = Details =
 
-Ria.js dependency system works around enteties and files.
+Ria.js dependency system works around entities and files.
 
 {{{
 REQUIRE('empx.domx.MyAnnotation');
@@ -18,7 +18,7 @@ NS('my.ns', function () {
 });
 }}}
 
-All this files are fetched asynchronious and only when all is ready NS callback will be called.
+All this files are fetched asynchronyous and only when all is ready NS callback will be called.
 
 `REQUIRE()` loads entities mapping entity name to file path, eg empx.domx.MyAnnotation is mapped empx/domx/MyAnnotation.js, after module is loaded and ready then it's checked if empx.domx.MyAnnotation is defined. If so dependency is considered resolved. If all dependencies are resolved module is considered loaded and NS callbacks are called. If all callbacks execute successfully then module is considered ready.
 
