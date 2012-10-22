@@ -8,7 +8,7 @@
 
 var ria = {};
 
-/** @namespace ria.__CFG */
+/** @class ria.__CFG */
 ria.__CFG = {
 //#ifdef DEBUG
     prettyStackTraces: true,
