@@ -13,15 +13,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.buildException = function (name, def) {
 
-        function ClassProxy() {
-            return ria.__API.init(this, ClassProxy, ClassProxy.prototype.$, arguments);
-        }
-        ria.__API.clazz(ClassProxy, name, def.base, def.ifcs, def.annotations);
+        if(def.annotations.length)
+            throw Error('Annotations are not supported in delegates');
 
+        if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
+            throw Error('Modifiers are not supported in delegates');
 
-        ria.__API.compile(ClassProxy);
-
-        return ClassProxy;
+        return ria.__SYNTAX.buildClass(name, def);
     };
 
     ria.__SYNTAX.EXCEPTION = function () {
