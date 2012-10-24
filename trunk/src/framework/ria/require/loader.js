@@ -35,8 +35,15 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         });
 
         return {
-            done:  [].push.bind(callbacks),
-            error: [].push.bind(errbacks)
+            done: function (callback) {
+                callbacks.push(callback);
+                return this;
+            },
+
+            error: function (errback) {
+                errbacks.push(errback);
+                return this;
+            }
         }
     }
 
