@@ -88,6 +88,8 @@ ria.__API = ria.__API || {};
         return type.name || 'UnknownType';
     }
 
+    ria.__API.getIdentifierOfType = getIdentifierOfType;
+
     function getIdentifierOfValue(value) {
         if (value === undefined || value === null)
             return 'void';
@@ -120,6 +122,8 @@ ria.__API = ria.__API || {};
 
         return 'Object';
     }
+
+    ria.__API.getIdentifierOfValue = getIdentifierOfValue;
 
     function isBuildInType(type) {
         return type === Function

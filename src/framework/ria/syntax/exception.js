@@ -5,6 +5,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
     "use strict";
+    ria.__SYNTAX.parseException = function () {
+        var def = ria.__SYNTAX.parseClass.apply(null, arguments);
+        def.base = ria.__API.Exception;
+        return def;
+    };
 
     /**
      * @param {String} name
@@ -23,8 +28,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     ria.__SYNTAX.EXCEPTION = function () {
-        var def = ria.__SYNTAX.parseClass([].slice.call(arguments));
-        def.base = ria.__API.Exception;
+        var def = ria.__SYNTAX.parseException([].slice.call(arguments));
         var name = ria.__SYNTAX.getFullName(def.name);
         var exception = ria.__SYNTAX.buildException(name, def);
         ria.__SYNTAX.define(name, exception);
