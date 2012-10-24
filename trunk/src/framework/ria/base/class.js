@@ -79,7 +79,8 @@ ria.__API = ria.__API || {};
         ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         getter.__META = new ria.__API.MethodDescriptor('', ret_, [], []);
-        setter.__META = new ria.__API.MethodDescriptor('', ria.__SYNTAX.Modifiers.VOID, [ret_], ['value']);
+        if (setter)
+            setter.__META = new ria.__API.MethodDescriptor('', ria.__SYNTAX.Modifiers.VOID, [ret_], ['value']);
         clazz.__META.addProperty(name, ret_, anns_, getter, setter);
     };
 

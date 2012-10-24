@@ -137,12 +137,24 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new MethodDescriptor(name, argsNames, argsHints, retType, flags, body, annotations);
     };
 
+    function capitalize(str) {
+        return str.replace(/\w/,function (_1){ return _1.toUpperCase(); });
+    }
+
     function PropertyDescriptor(name, type, annotations, flags) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
         this.flags = flags;
     }
+
+    PropertyDescriptor.prototype.getGetterName = function () {
+        return ((this.type === Boolean) ? 'is' : 'get') + capitalize(this.name);
+    };
+
+    PropertyDescriptor.prototype.getSetterName = function () {
+        return 'set' + capitalize(this.name);
+    };
 
     ria.__SYNTAX.PropertyDescriptor = PropertyDescriptor;
 
@@ -165,6 +177,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     ria.__SYNTAX.parseMembers = function (args) {
+        args = [].slice.call(args);
         var members = [];
         var end = 0;
         while (args.length > 0 && end < args.length) {
