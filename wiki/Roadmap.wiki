@@ -48,7 +48,7 @@
       * BASE
       * SELF
     * Properties
-      * READONLY
+      * ~~READONLY~~
       * FINAL
       * ABSTRACT 
       * SELF
