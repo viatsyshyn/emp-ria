@@ -30,8 +30,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         // TODO: validate properties
         // TODO: validate methods
         // TODO: validate methods overrides
-        // TODO: ensure ctor
-        // TODO: ensure getters/setters
 
         function ClassProxy() {
             return ria.__API.init(this, ClassProxy, ClassProxy.prototype.$, arguments);
