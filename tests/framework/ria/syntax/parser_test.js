@@ -161,7 +161,7 @@
             //noinspection WithStatementJS
             with(ria.__SYNTAX.Modifiers) { //noinspection WithStatementJS
                 with(ria.__SYNTAX) {
-                    var result = ria.__SYNTAX.parseClass(
+                    var result = ria.__SYNTAX.parseClass([
                         [MyAnnotation],
                         ABSTRACT, FINAL, OVERRIDE, 'MyClass', [
                             String, 'member',
@@ -173,7 +173,7 @@
                             ABSTRACT, FINAL, OVERRIDE, Boolean, function compare(_1, _2) {
                                 return _1 === _2;
                             }
-                        ]);
+                        ]]);
                 }
             }
 

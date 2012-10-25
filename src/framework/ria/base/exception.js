@@ -4,6 +4,7 @@ ria.__API = ria.__API || {};
 
 (function () {
 
+    /** @class ria.__API.Exception */
     ria.__API.Exception = (function () {
         "use strict";
         function Exception() { ria.__API.init(this, Exception, Exception.prototype.$, arguments); }

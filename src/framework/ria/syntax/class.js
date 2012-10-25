@@ -19,12 +19,21 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     /**
+     * @param {Array} args
+     * @return {ClassDescriptor}
+     */
+    ria.__SYNTAX.parseClass = function (args) {
+        return ria.__SYNTAX.parseClassDef(args, ria.__API.Class);
+    };
+
+    /**
      * @param {String} name
      * @param {ClassDescriptor} def
      * @return {Function}
      */
     ria.__SYNTAX.buildClass = function (name, def) {
 
+        // TODO: validate if base is descendant on Class
         // TODO: validate class flags
         // TODO: validate no duplicate members
         // TODO: validate properties
