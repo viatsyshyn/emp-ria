@@ -313,4 +313,20 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods);
     };
 
+    /**
+     * @param {ClassDescriptor} object
+     * @param {ClassDescriptor} constructor
+     * @returns {Boolean}
+     */
+    ria.__SYNTAX.isInstanceOf = function(object, constructor){
+        var o = object;
+        while (o.__proto__ != null) {
+            if (o.__proto__ === constructor.prototype)
+                return true;
+            o = o.__proto__;
+        }
+        return false;
+    }
+
+
 })();

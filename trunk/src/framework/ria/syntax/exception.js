@@ -11,7 +11,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.parseException = function (args) {
         var def = ria.__SYNTAX.parseClassDef(args, ria.__API.Exception);
-        def.base = ria.__API.Exception;
         return def;
     };
 
@@ -27,6 +26,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
             throw Error('Modifiers are not supported in delegates');
+
+        if(!ria.__SYNTAX.isInstanceOf(def.base ,ria.__API.Exception))
+            throw Error('Errors can extend only from other exceptions');
 
         return ria.__SYNTAX.buildClass(name, def);
     };
