@@ -5,8 +5,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
     "use strict";
-    ria.__SYNTAX.parseException = function () {
-        var def = ria.__SYNTAX.parseClass.apply(null, arguments);
+    /**
+     * @param {Array} args
+     * @return {ClassDescriptor}
+     */
+    ria.__SYNTAX.parseException = function (args) {
+        var def = ria.__SYNTAX.parseClassDef(args, ria.__API.Exception);
         def.base = ria.__API.Exception;
         return def;
     };

@@ -280,11 +280,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
 
     /**
+     * @param {Array} args
+     * @param {Function} base
      * @returns {ClassDescriptor}
      */
-    ria.__SYNTAX.parseClass = function () {
-        var args = [].slice.call(arguments);
-
+    ria.__SYNTAX.parseClassDef = function (args, base) {
         var body = args.pop();
 
         var ifcs = [];
@@ -295,7 +295,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             args.push(ifcs_);
         }
 
-        var base = ria.__API.Class;
+        var base = base;
         var base_ = args.pop();
         if (base_ instanceof ExtendsDescriptor) {
             base = base_.base;

@@ -4,7 +4,7 @@
     TestCase("ExceptionTestCase").prototype = {
         testBuildException: function () {
 
-            var MyExceptionDef = ria.__SYNTAX.parseException(
+            var MyExceptionDef = ria.__SYNTAX.parseException([
                 'MyException', [
                     String, 'member',
 
@@ -14,7 +14,7 @@
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;
                     }
-                ]);
+                ]]);
 
             var MyException;
             assertNoException(function () {
@@ -27,20 +27,20 @@
         },
 
         testBaseException: function () {
-            var baseExceptionDef = ria.__SYNTAX.parseException(
+            var baseExceptionDef = ria.__SYNTAX.parseException([
                 'BaseException', [
                     function $() {}
-                ]);
+                ]]);
 
             var BaseException;
             assertNoException(function () {
                 BaseException = ria.__SYNTAX.buildException('MyException', baseExceptionDef);
             });
 
-            var childExceptionDef = ria.__SYNTAX.parseException(
+            var childExceptionDef = ria.__SYNTAX.parseException([
                 'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [
                     function $() {}
-                ]);
+                ]]);
 
             var ChildException;
             assertNoException(function () {
@@ -55,17 +55,17 @@
         },
 
         testBadExtending: function () {
-            var baseClassDef = ria.__SYNTAX.parseException(
+            var baseClassDef = ria.__SYNTAX.parseClass([
                 'BaseClass', [
                     function $() {}
-                ]);
+                ]]);
 
             var BaseClass;
             assertNoException(function () {
-                BaseClass = ria.__SYNTAX.buildException('BaseClass', baseClassDef);
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
             });
 
-            var childExceptionDef = ria.__SYNTAX.parseException(
+            var childExceptionDef = ria.__SYNTAX.parseException([
                 'MyException', ria.__SYNTAX.EXTENDS(BaseClass), [
                     function $() {},
 
@@ -73,7 +73,7 @@
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;
                     }
-                ]);
+                ]]);
 
             assertException('Expects invalid parent error.', function () {
                 ria.__SYNTAX.buildException('MyException', childExceptionDef);

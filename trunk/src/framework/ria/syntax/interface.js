@@ -51,7 +51,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     ria.__SYNTAX.INTERFACE = function () {
-        var def = ria.__SYNTAX.parseClass([].slice.call(arguments));
+        var def = ria.__SYNTAX.parseClassDef([].slice.call(arguments), null);
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.buildInterface(name, def);
         ria.__SYNTAX.define(name, clazz);
