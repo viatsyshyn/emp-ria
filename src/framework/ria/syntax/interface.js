@@ -13,8 +13,15 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.buildInterface = function (name, def) {
 
-        // TODO: throw Error if any flags
-        // TODO: throw Error if any annotations;
+        // throw Error if any flags
+        ria.__SYNTAX.Assert(!def.flags.isFinal,    'Can NOT be marked with FINAL');
+        ria.__SYNTAX.Assert(!def.flags.isAbstract, 'Can NOT be marked with ABSTRACT');
+        ria.__SYNTAX.Assert(!def.flags.isOverride, 'Can NOT be marked with OVERRIDE');
+        ria.__SYNTAX.Assert(!def.flags.isReadonly, 'Can NOT be marked with READONLY');
+
+        // throw Error if any annotations;
+        ria.__SYNTAX.Assert(def.annotations.length == 0, 'Can NOT be marked with FINAL');
+
         // TODO: validate no duplicate members
         // TODO: throw Error if any properties
         // TODO: throw Error if any ctors
