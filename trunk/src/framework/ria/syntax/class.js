@@ -77,12 +77,44 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, argsTypes, argsNames);
         processedMethods.push('$');
 
+        def.base.__META.methods.forEach(function(baseMethod){
+            var childMethod = def.methods[baseMethod.name];
+            if(baseMethod.isFinal){
+                if(childMethod){
+                    throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
+                }
+            }else{
+                if(baseMethod.isAbstract){
+                    if(!childMethod){
+                        throw Error('The abstract method ' + baseMethod.name + ' have to be overriden in' + def.name + ' class');
+                    }
+                }else{
+                    if(childMethod && !childMethod.isOverride){
+                        throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                    }
+                }
+            }
+        });
+
         def.methods
             .forEach(
             /**
              * @param {MethodDescriptor} method
              */
             function (method) {
+                if(method.isOverride){
+                    var base = def.base, haveBaseMethod = false;
+                    while(base && base.__META){
+                        if(base.__META.methods[method.name])
+                            haveBaseMethod = true
+                        base = base.__META.base;
+                    }
+                    if(!haveBaseMethod){
+                        throw Error('There is no ' + method.name + ' method in base classes of' + def.name + ' class');
+                    }
+                }
+                if(method.retType == ria.__SYNTAX.Modifiers.SELF)
+                    method.retType == ClassProxy;
                 if (processedMethods.indexOf(method.name) < 0) {
                     var impl = ClassProxy.prototype[method.name] = method.body;
                     ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
