@@ -43,7 +43,7 @@
                         return 3 * a;
                     },
 
-                    Boolean, function isMyComputerOn() {
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     }
                 ]]);
