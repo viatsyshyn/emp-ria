@@ -19,6 +19,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     /**
+     * @param {ClassDescriptor} def
+     * @param {String} name
+     * @return {MethodDescriptor}
+     */
+    function findParentMethod(def, name){
+        var base = def.base && def.base.__SYNTAX_META;
+        var baseMethod;
+        while(base){
+            base.methods.forEach(function(method){
+                if(method.name == name)
+                    baseMethod = method;
+            });
+            if(baseMethod)
+                break;
+        }
+        return baseMethod;
+    }
+
+    /**
      * @param {Array} args
      * @return {ClassDescriptor}
      */
@@ -77,25 +96,34 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, argsTypes, argsNames);
         processedMethods.push('$');
 
-        if(def.base.__META){
-            for(var baseMethod in def.base.__META.methods){
-                var childMethod = def.methods[baseMethod.name];
-                if(baseMethod.flags.isFinal){
-                    if(childMethod){
-                        throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
-                    }
-                }else{
-                    if(baseMethod.flags.isAbstract){
-                        if(!childMethod){
-                            throw Error('The abstract method ' + baseMethod.name + ' have to be overriden in' + def.name + ' class');
+        if(def.base.__SYNTAX_META){
+            def.base.__SYNTAX_META.methods.forEach(function(baseMethod){
+                if(baseMethod.name != "$"){
+                    var childMethod;
+                    def.methods.forEach(function(method){
+                        if(method.name == baseMethod.name)
+                            childMethod = method;
+                    });
+                    if(baseMethod.flags.isFinal){
+                        if(childMethod){
+                            throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
                         }
                     }else{
-                        if(childMethod && !childMethod.flags.isOverride){
-                            throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                        if(baseMethod.flags.isAbstract){
+                            if(!childMethod){
+                                throw Error('The abstract method ' + baseMethod.name+ ' have to be overriden in ' + def.name + ' class');
+                            }
+                            if(!childMethod.flags.isOverride){
+                                throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                            }
+                        }else{
+                            if(childMethod && !childMethod.flags.isOverride){
+                                throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                            }
                         }
                     }
                 }
-            }
+            });
         }
 
         def.methods
@@ -105,14 +133,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              */
             function (method) {
                 if(method.flags.isOverride){
-                    var base = def.base, haveBaseMethod = false;
-                    while(base && base.__META){
-                        if(base.__META.methods[method.name])
-                            haveBaseMethod = true;
-                        base = base.__META.base;
-                    }
-                    if(!haveBaseMethod){
+                    if(!findParentMethod(def, method.name)){
                         throw Error('There is no ' + method.name + ' method in base classes of' + def.name + ' class');
+                    }
+                }
+                if(method.flags.isAbstract){
+                    if(findParentMethod(def, method.name)){
+                        throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
                     }
                 }
                 if(method.retType == ria.__SYNTAX.Modifiers.SELF)
@@ -128,6 +155,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 }
             });
 
+        ClassProxy.__SYNTAX_META = def;
         ria.__API.compile(ClassProxy);
 
         return ClassProxy;
