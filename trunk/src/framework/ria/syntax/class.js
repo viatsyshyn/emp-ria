@@ -33,6 +33,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             });
             if(baseMethod)
                 break;
+            base = base.base && base.base.__SYNTAX_META;
         }
         return baseMethod;
     }
@@ -132,15 +133,19 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              * @param {MethodDescriptor} method
              */
             function (method) {
+                var parentMethod = findParentMethod(def, method.name);
                 if(method.flags.isOverride){
-                    if(!findParentMethod(def, method.name)){
-                        throw Error('There is no ' + method.name + ' method in base classes of' + def.name + ' class');
+                    if(!parentMethod){
+                        throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
                     }
                 }
                 if(method.flags.isAbstract){
-                    if(findParentMethod(def, method.name)){
+                    if(parentMethod){
                         throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
                     }
+                }
+                if(parentMethod && parentMethod.flags.isFinal){
+                    throw Error('Final method ' + method.name + ' can\'t be overriden in ' + def.name + ' class');
                 }
                 if(method.retType == ria.__SYNTAX.Modifiers.SELF)
                     method.retType = ClassProxy;
