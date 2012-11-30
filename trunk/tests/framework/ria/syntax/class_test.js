@@ -3,7 +3,7 @@
     TestCase("ClassTestCase").prototype = {
         testSelf: function () {
             var baseClassDef = ria.__SYNTAX.parseClass([
-                'BaseClass', [
+                ria.__SYNTAX.Modifiers.FINAL, ria.__SYNTAX.Modifiers.ABSTRACT, 'BaseClass', [
                     function $() {},
 
                     [ria.__SYNTAX.Modifiers.SELF],
@@ -66,7 +66,7 @@
             });
 
             var childClassDef = ria.__SYNTAX.parseClass([
-                'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                ria.__SYNTAX.Modifiers.FINAL, 'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
                     function $() {},
 
                     [Number],
@@ -84,7 +84,99 @@
             });
         },
 
-        testFinalExtending: function () {
+        testFinalClassExtending: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                ria.__SYNTAX.Modifiers.FINAL, 'BaseClass', [
+                    function $() {},
+
+                    [Number],
+                    Number, function method1(a) {
+                        return 2 * a;
+                    },
+
+                    [Number],
+                    Number, function method2(a) {
+                        return 3 * a;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                        return 'Hello';
+                    },
+
+                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                        return false;
+                    },
+
+                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                        return new BaseClass();
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var childClassDef = ria.__SYNTAX.parseClass([
+                ria.__SYNTAX.Modifiers.FINAL, 'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    [Number],
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                        return 3 * a;
+                    },
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                        return true;
+                    }
+                ]]);
+
+            assertException(function () {
+                ria.__SYNTAX.buildClass('MyClass', childClassDef);
+            });
+        },
+
+        testAbstractClassInstantiating: function(){
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                ria.__SYNTAX.Modifiers.ABSTRACT, 'BaseClass', [
+                    function $() {},
+
+                    [Number],
+                    Number, function method1(a) {
+                        return 2 * a;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            assertException(function () {
+                new BaseClass();
+            });
+
+            var baseClass2Def = ria.__SYNTAX.parseClass([
+                'BaseClass2', [
+                    function $() {},
+
+                    [Number],
+                    Number, function method1(a) {
+                        return 2 * a;
+                    }
+                ]]);
+
+            var BaseClass2;
+            assertNoException(function () {
+                BaseClass2 = ria.__SYNTAX.buildClass('BaseClass2', baseClass2Def);
+            });
+
+            assertNoException(function () {
+                new BaseClass2();
+            });
+        },
+
+        testFinalMethodExtending: function () {
             var baseClassDef = ria.__SYNTAX.parseClass([
                 'BaseClass', [
                     function $() {},
@@ -136,7 +228,7 @@
             });
         },
 
-        testAbstractExtending: function () {
+        testAbstractMethodExtending: function () {
             var baseClassDef = ria.__SYNTAX.parseClass([
                 'BaseClass', [
                     function $() {},
@@ -180,7 +272,7 @@
             });
         },
 
-        testOverrideExtending: function () {
+        testOverrideMethodExtending: function () {
             var baseClassDef = ria.__SYNTAX.parseClass([
                 'BaseClass', [
                     function $() {},
@@ -317,7 +409,7 @@
             });
 
             var secondClassDef = ria.__SYNTAX.parseClass([
-                'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+                ria.__SYNTAX.Modifiers.ABSTRACT, 'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
                     function $() {},
 
                     [Number],

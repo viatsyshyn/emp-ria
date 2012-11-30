@@ -61,8 +61,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         // TODO: validate methods overrides
 
         function ClassProxy() {
+            if(def.flags.isAbstract)
+                throw Error('You can\'t instantiate abstract class ' + this.name);
             return ria.__API.init(this, ClassProxy, ClassProxy.prototype.$, arguments);
         }
+
+        if(def.base.__SYNTAX_META && def.base.__SYNTAX_META.flags.isFinal)
+            throw Error('You can\'t extend final class ' + def.base.__SYNTAX_META.name);
+
         ria.__API.clazz(ClassProxy, name, def.base, def.ifcs, def.annotations);
 
         var processedMethods = [];
