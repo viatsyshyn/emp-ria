@@ -61,6 +61,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.flags.isOverride)
             throw Error('Modifier OVERRIDE is not supported in classes');
 
+        if(def.flags.isReadonly)
+            throw Error('Modifier READONLY is not supported in classes');
+
         if(def.flags.isAbstract && def.flags.isFinal)
             throw Error('Class can not be ABSTRACT and FINAL simultaneously');
 
