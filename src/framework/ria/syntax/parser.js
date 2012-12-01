@@ -326,7 +326,22 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             o = o.__proto__;
         }
         return false;
-    }
+    };
 
+    /**
+     * @param {ClassDescriptor} clazz
+     * @param {ClassDescriptor} constructor
+     * @returns {Boolean}
+     */
+    ria.__SYNTAX.isDescendantOf = function(clazz, constructor){
+        var o = clazz;
+        while (o.__META != null) {
+            if (o === constructor)
+                break;
+
+            o = o.__META.base;
+        }
+        return o === constructor;
+    }
 
 })();
