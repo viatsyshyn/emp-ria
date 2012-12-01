@@ -79,9 +79,14 @@
                     }
                 ]]);
 
+            var ChildClass;
             assertNoException(function () {
-                ria.__SYNTAX.buildClass('MyClass', childClassDef);
+                ChildClass = ria.__SYNTAX.buildClass('MyClass', childClassDef);
             });
+
+            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, ria.__API.Class));
+            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, BaseClass));
+            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, ChildClass));
         },
 
         testFinalClassExtending: function () {
