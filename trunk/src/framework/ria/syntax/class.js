@@ -53,8 +53,17 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.buildClass = function (name, def) {
 
-        // TODO: validate if base is descendant on Class
-        // TODO: validate class flags
+        // validate if base is descendant on Class
+        if(!ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Class))
+            throw Error('Base class must be descendant of Class');
+
+        // validate class flags
+        if(def.flags.isOverride)
+            throw Error('Modifier OVERRIDE is not supported in classes');
+
+        if(def.flags.isAbstract && def.flags.isFinal)
+            throw Error('Class can not be ABSTRACT and FINAL simultaneously');
+
         // TODO: validate no duplicate members
         // TODO: validate properties
         // TODO: validate methods
