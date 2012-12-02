@@ -46,7 +46,7 @@ ria.__API = ria.__API || {};
     ria.__API.delegate = function (name, ret_, argsTypes_, argsNames_) {
         function DelegateProxy(fn) {
             // TODO ensure args names & count
-            return ria.__API.getTypeHintDecorator(DelegateProxy.__META, null, fn);
+            return ria.__API.getPipelineMethodCallProxyFor(fn, DelegateProxy.__META, null);
         }
 
         DelegateProxy.__META = new MethodDescriptor(name, ret_, argsTypes_, argsNames_);

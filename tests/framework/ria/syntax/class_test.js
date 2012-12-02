@@ -3,7 +3,7 @@
     TestCase("ClassTestCase").prototype = {
         testSelf: function () {
             var baseClassDef = ria.__SYNTAX.parseClass([
-                ria.__SYNTAX.Modifiers.FINAL, ria.__SYNTAX.Modifiers.ABSTRACT, 'BaseClass', [
+                'BaseClass', [
                     function $() {},
 
                     [ria.__SYNTAX.Modifiers.SELF],

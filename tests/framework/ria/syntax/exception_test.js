@@ -17,9 +17,9 @@
                 ]]);
 
             var MyException;
-            //assertNoException(function () {
+            assertNoException(function () {
                 MyException = ria.__SYNTAX.buildException('MyException', MyExceptionDef);
-            //});
+            });
 
             assertEquals('MyException', MyException.__META.name);
             assertNotUndefined(MyException);
@@ -33,9 +33,9 @@
                 ]]);
 
             var BaseException;
-            //assertNoException(function () {
+            assertNoException(function () {
                 BaseException = ria.__SYNTAX.buildException('MyException', baseExceptionDef);
-            //});
+            });
 
             var childExceptionDef = ria.__SYNTAX.parseException([
                 'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [

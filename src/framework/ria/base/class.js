@@ -144,13 +144,18 @@ ria.__API = ria.__API || {};
             var f_ = instance[k];
             if (typeof f_ === 'function' && f_ !== ctor && k !== 'constructor') {
                 instance[k] = f_.bind(instance);
-                //#ifdef DEBUG
-                    if (f_.__META) {
-                        var fn = ria.__API.getTypeHintDecorator(f_.__META, instance, f_);
+                if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
+                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance);
+                    //#ifdef DEBUG
                         Object.defineProperty(instance, k, { writable : false, configurable: false, value: fn });
-                        publicInstance[k] = !f_.__META.isProtected() ? fn : undefined; // TODO: maybe throw Exception on call
-                    }
-                //#endif
+                        if (f_.__META.isProtected())
+                            fn = undefined;  // TODO: maybe throw Exception on call
+                    //#endif
+                    publicInstance[k] = fn;
+                    //#ifdef DEBUG
+                        Object.defineProperty(publicInstance, k, { writable : false, configurable: false, value: fn });
+                    //#endif
+                }
             }
         }
 
@@ -158,7 +163,7 @@ ria.__API = ria.__API || {};
             instance.$ = undefined;
             publicInstance.$ = undefined;
 
-            ctor = ria.__API.getTypeHintDecorator(ctor.__META, instance, ctor);
+            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance);
         //#endif
 
         // TODO: set fields of properties with null
