@@ -12,13 +12,14 @@ ria.__API = ria.__API || {};
          */
         callInit_: [],
         /**
-         * @param {ria.__API.MethodDescriptor} method
+         * @param {Function} body
+         * @param {ria.__API.MethodDescriptor} meta
          * @param {Object} scope
          * @param {Object} callSession
          */
-        'OnCallInit': function (method, scope, callSession) {
+        'OnCallInit': function (body, meta, scope, callSession) {
             this.callInit_.forEach(function (_) {
-                _(method, scope, callSession);
+                _(body, meta, scope, callSession);
             });
         },
 
@@ -27,14 +28,15 @@ ria.__API = ria.__API || {};
          */
         beforeCall_: [],
         /**
-         * @param {ria.__API.MethodDescriptor} method
+         * @param {Function} body
+         * @param {ria.__API.MethodDescriptor} meta
          * @param {Object} scope
          * @param {Array} args
          * @param {Object} callSession
          */
-        'OnBeforeCall': function (method, scope, args, callSession) {
+        'OnBeforeCall': function (body, meta, scope, args, callSession) {
             this.beforeCall_.forEach(function (_) {
-                _(method, scope, args, callSession);
+                _(body, meta, scope, args, callSession);
             });
         },
 
@@ -43,15 +45,16 @@ ria.__API = ria.__API || {};
          */
         afterCall_: [],
         /**
-         * @param {ria.__API.MethodDescriptor} method
+         * @param {Function} body
+         * @param {ria.__API.MethodDescriptor} meta
          * @param {Object} scope
          * @param {Array} args
          * @param {Object} result
          * @param {Object} callSession
          */
-        'OnAfterCall': function (method, scope, args, result, callSession) {
+        'OnAfterCall': function (body, meta, scope, args, result, callSession) {
             this.afterCall_.forEach(function (_) {
-                _(method, scope, args, result, callSession);
+                _(body, meta, scope, args, result, callSession);
             });
         },
 
@@ -61,13 +64,14 @@ ria.__API = ria.__API || {};
         callFinally_: [],
         /**
          *
-         * @param {ria.__API.MethodDescriptor} method
+         * @param {Function} body
+         * @param {ria.__API.MethodDescriptor} meta
          * @param {Object} scope
          * @param {Object} callSession
          */
-        'OnCallFinally': function (method, scope, callSession) {
+        'OnCallFinally': function (body, meta, scope, callSession) {
             this.callFinally_.forEach(function (_) {
-                _(method, scope, callSession);
+                _(body, meta, scope, callSession);
             });
         }
     };
@@ -80,16 +84,16 @@ ria.__API = ria.__API || {};
      */
     function PipelineMethodCall(body, meta, scope, args) {
         var callSession = {};
-        pmcStages.OnCallInit(meta, scope, callSession);
+        pmcStages.OnCallInit(body, meta, scope, callSession);
         try {
-            pmcStages.OnBeforeCall(meta, scope, args, callSession);
+            pmcStages.OnBeforeCall(body, meta, scope, args, callSession);
             // THIS IS WHERE METHOD BODY IS CALLED
             var result = body.apply(scope, args);
             // END OF METHOD BODY CALL
-            pmcStages.OnAfterCall(meta, scope, args, result, callSession);
+            pmcStages.OnAfterCall(body, meta, scope, args, result, callSession);
             return result;
         } finally {
-            pmcStages.OnCallFinally(meta, scope, callSession);
+            pmcStages.OnCallFinally(body, meta, scope, callSession);
         }
     }
 

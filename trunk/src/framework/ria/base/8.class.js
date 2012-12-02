@@ -72,16 +72,18 @@ ria.__API = ria.__API || {};
     /**
      * @param {Function} clazz
      * @param {String} name
-     * @param {*} [ret_]
+     * @param {*} [propType_]
      * @param {*[]} [anns_]
+     * @param {Function} getter
+     * @param {Function} setter
      */
-    ria.__API.property = function (clazz, name, ret_, anns_, getter, setter) {
+    ria.__API.property = function (clazz, name, propType_, anns_, getter, setter) {
         ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
-        getter.__META = new ria.__API.MethodDescriptor('', ret_, [], []);
+        getter.__META = new ria.__API.MethodDescriptor('', propType_, [], []);
         if (setter)
-            setter.__META = new ria.__API.MethodDescriptor('', ria.__SYNTAX.Modifiers.VOID, [ret_], ['value']);
-        clazz.__META.addProperty(name, ret_, anns_, getter, setter);
+            setter.__META = new ria.__API.MethodDescriptor('', undefined, [propType_], ['value']);
+        clazz.__META.addProperty(name, propType_, anns_, getter, setter);
     };
 
     /**
@@ -208,5 +210,5 @@ ria.__API = ria.__API || {};
 
         ria.__API.compile(Class);
         return Class;
-    })
+    })();
 })();

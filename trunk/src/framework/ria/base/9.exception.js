@@ -45,5 +45,5 @@ ria.__API = ria.__API || {};
 
         ria.__API.compile(Exception);
         return Exception;
-    })
+    })();
 })();

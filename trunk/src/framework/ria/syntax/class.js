@@ -49,13 +49,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     /**
      * @param {String} name
      * @param {ClassDescriptor} def
-     * @param {Boolean} skipBaseCheck
+     * @param {Boolean} [skipBaseCheck_]
      * @return {Function}
      */
-    ria.__SYNTAX.buildClass = function (name, def, skipBaseCheck) {
+    ria.__SYNTAX.buildClass = function (name, def, skipBaseCheck_) {
 
         // validate if base is descendant on Class
-        if(!skipBaseCheck && !ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Class))
+        if(!skipBaseCheck_ && !ria.__SYNTAX.isDescendantOf(def.base, ria.__API.Class))
             throw Error('Base class must be descendant of Class');
 
         // validate class flags
@@ -95,11 +95,22 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 var getters = def.methods.filter(function (_1) { return _1.name == getterName});
                 var getter = getters.length == 1 ? getters[0].body : getDefaultGetter(property.name, getterName);
 
+                ClassProxy.prototype[getterName] = getter;
+                //#ifdef DEBUG
+                getter.__SELF = ClassProxy;
+                //#endif
+
                 var setterName = property.getSetterName();
                 var setters = def.methods.filter(function (_1) { return _1.name == setterName});
                 var setter = null;
-                if (!property.flags.isReadonly)
+                if (!property.flags.isReadonly) {
                     setter = setters.length == 1 ? setters[0].body : getDefaultSetter(property.name, setterName);
+
+                    ClassProxy.prototype[setterName] = setter;
+                    //#ifdef DEBUG
+                    setter.__SELF = ClassProxy;
+                    //#endif
+                }
 
                 ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
 
@@ -114,6 +125,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var argsTypes = ctors.length == 1 ? ctors[0].argsTypes : [];
         var argsNames = ctors.length == 1 ? ctors[0].argsNames : [];
         ClassProxy.prototype.$ = ctor;
+        //#ifdef DEBUG
+        ctor.__BASE_BODY = def.base ? def.base.__META.ctor.impl : undefined;
+        ctor.__SELF = ClassProxy;
+        //#endif
         ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, argsTypes, argsNames);
         processedMethods.push('$');
 
@@ -129,18 +144,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                         if(childMethod){
                             throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
                         }
-                    }else{
-                        if(baseMethod.flags.isAbstract){
-                            if(!childMethod){
-                                throw Error('The abstract method ' + baseMethod.name+ ' have to be overriden in ' + def.name + ' class');
-                            }
-                            if(!childMethod.flags.isOverride){
-                                throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-                            }
-                        }else{
-                            if(childMethod && !childMethod.flags.isOverride){
-                                throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-                            }
+                    }else if(baseMethod.flags.isAbstract){
+                        if(!childMethod){
+                            throw Error('The abstract method ' + baseMethod.name+ ' have to be overriden in ' + def.name + ' class');
+                        }
+                        if(!childMethod.flags.isOverride){
+                            throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                        }
+                    }else {
+                        if(childMethod && !childMethod.flags.isOverride){
+                            throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
                         }
                     }
                 }
@@ -158,17 +171,24 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     if(!parentMethod){
                         throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
                     }
+
+                    //#ifdef DEBUG
+                    method.body.__BASE_BODY = parentMethod.body;
+                    //#endif
                 }
-                if(method.flags.isAbstract){
-                    if(parentMethod){
-                        throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
-                    }
+
+                if(method.flags.isAbstract && parentMethod){
+                    throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
                 }
+
                 if(parentMethod && parentMethod.flags.isFinal){
                     throw Error('Final method ' + method.name + ' can\'t be overriden in ' + def.name + ' class');
                 }
-                if(method.retType == ria.__SYNTAX.Modifiers.SELF)
+
+                if(method.retType == ria.__SYNTAX.Modifiers.SELF) {
                     method.retType = ClassProxy;
+                }
+
                 method.argsTypes.forEach(function(t, index){
                     if(method.argsTypes[index] == ria.__SYNTAX.Modifiers.SELF)
                         method.argsTypes[index] = ClassProxy;
@@ -176,6 +196,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
                 if (processedMethods.indexOf(method.name) < 0) {
                     var impl = ClassProxy.prototype[method.name] = method.body;
+                    //#ifdef DEBUG
+                    impl.__SELF = ClassProxy;
+                    //#endif
                     ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
                 }
             });
@@ -191,5 +214,30 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.buildClass(name, def, false);
         ria.__SYNTAX.define(name, clazz);
-    }
+    };
+
+    //#ifdef DEBUG
+    function BaseIsUndefined() { throw Error('BASE is supported only on method with OVERRIDE'); }
+
+    ria.__API.addPipelineMethodCallStage('CallInit',
+        function (body, meta, scope, callSession) {
+            callSession.__OLD_SELF = window.SELF;
+            window.SELF = body.__SELF;
+
+            callSession.__OLD_BASE = window.BASE;
+            var base = body.__BASE_BODY;
+            window.BASE = base
+                ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope)
+                : BaseIsUndefined;
+        });
+
+    ria.__API.addPipelineMethodCallStage('CallFinally',
+        function (body, meta, scope, callSession) {
+            window.SELF = callSession.__OLD_SELF;
+            delete callSession.__OLD_SELF;
+
+            window.BASE = callSession.__OLD_BASE;
+            delete callSession.__OLD_BASE;
+        });
+    //#endif
 })();

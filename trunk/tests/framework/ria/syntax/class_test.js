@@ -22,9 +22,9 @@
                 ]]);
 
             var BaseClass;
-            assertNoException(function () {
+            //assertNoException(function () {
                 BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
-            });
+            //});
 
             assertEquals(BaseClass, BaseClass.__META.methods['me'].retType);
             assertEquals(BaseClass, BaseClass.__META.methods['me2'].retType);
@@ -765,6 +765,123 @@
             assertException(function () {
                 ria.__SYNTAX.buildClass('ThirdClass', thirdClassDef);
             });
+        },
+
+        testBASE: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    ria.__SYNTAX.Modifiers.READONLY, Number, 'value',
+
+                    function $(value) {
+                        this.value = value;
+                    },
+
+                    ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                        this.value = 6;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {
+                        BASE(5);
+                    },
+
+                    [Number],
+                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                        BASE(value);
+                    }
+                ]]);
+
+            var SecondClass;
+            assertNoException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+
+            var instance;
+            assertNoException(function () {
+                instance = new SecondClass();
+            });
+
+            assertEquals(instance.getValue(), 5);
+
+            assertNoException(function () {
+                instance.method(6);
+            });
+
+            assertEquals(instance.getValue(), 6);
+        },
+
+        testSELF: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    Number, 'value',
+
+                    function $() {
+                        assertEquals(BaseClass, SELF);
+                    },
+
+                    ria.__SYNTAX.Modifiers.VOID, function method() {
+                        assertEquals(BaseClass, SELF);
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            assertNotEquals(BaseClass, SELF);
+            var instance = new BaseClass();
+            assertNotEquals(BaseClass, SELF);
+            instance.method();
+            assertNotEquals(BaseClass, SELF);
+        },
+
+        testPropertyInheritance: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    Number, 'value',
+
+                    function $() { this.value = null; },
+
+                    ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                        this.value = value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            assertNotNull(BaseClass.__META.properties['value']);
+            assertFunction(BaseClass.__META.properties['value'].getter);
+            assertFunction(BaseClass.__META.properties['value'].setter);
+
+            var instance = new BaseClass();
+
+            assertUndefined(instance.value);
+            instance.method(5);
+            assertUndefined(instance.value);
+
+            assertEquals(5, instance.__PROTECTED.value);
+
+            assertEquals(5, instance.getValue());
+
+            assertUndefined(instance.value);
+            assertNoException(function (){
+                instance.setValue(6);
+            });
+            assertUndefined(instance.value);
+
+            assertEquals(6, instance.getValue());
         }
     };
 
