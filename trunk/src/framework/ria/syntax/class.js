@@ -49,12 +49,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     /**
      * @param {String} name
      * @param {ClassDescriptor} def
+     * @param {Boolean} skipBaseCheck
      * @return {Function}
      */
-    ria.__SYNTAX.buildClass = function (name, def) {
+    ria.__SYNTAX.buildClass = function (name, def, skipBaseCheck) {
 
         // validate if base is descendant on Class
-        if(!ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Class))
+        if(!skipBaseCheck && !ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Class))
             throw Error('Base class must be descendant of Class');
 
         // validate class flags
@@ -187,7 +188,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.CLASS = function () {
         var def = ria.__SYNTAX.parseClass([].slice.call(arguments));
         var name = ria.__SYNTAX.getFullName(def.name);
-        var clazz = ria.__SYNTAX.buildClass(name, def);
+        var clazz = ria.__SYNTAX.buildClass(name, def, false);
         ria.__SYNTAX.define(name, clazz);
     }
 })();

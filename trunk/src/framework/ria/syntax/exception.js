@@ -30,7 +30,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(!ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Exception))
             throw Error('Errors can extend only from other exceptions');
 
-        return ria.__SYNTAX.buildClass(name, def);
+        return ria.__SYNTAX.buildClass(name, def, true);
     };
 
     ria.__SYNTAX.EXCEPTION = function () {

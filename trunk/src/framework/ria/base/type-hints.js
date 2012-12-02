@@ -227,35 +227,38 @@ ria.__API = ria.__API || {};
         //#endif
     };
 
+    if (ria.__CFG.checkedMode) {
+        ria.__API.addPipelineMethodCallStage('BeforeCall',
+            function (meta, scope, args) {
+                ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
+            });
+
+        ria.__API.addPipelineMethodCallStage('AfterCall',
+            function (meta, scope, args, result) {
+                ria.__API.checkReturn(meta.ret, result);
+            });
+    }
     /**
      * @param {ria.__API.MethodDescriptor} meta
      * @param {Object} instance
      * @param {Function} body
      * @return {Function}
      */
-    ria.__API.getTypeHintDecorator = function (meta, instance, body) {
-        //#ifdef DEBUG
-            ria.__API.checkArg('meta', [ria.__API.MethodDescriptor], meta);
-        //#endif
+    /*ria.__API.getTypeHintDecorator = function (meta, instance, body) {
+        ria.__API.checkArg('meta', [ria.__API.MethodDescriptor], meta);
 
         var f_ = function TypeHintDecorator() {
             var args = [].slice.call(arguments);
-            //#ifdef DEBUG
-                ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
-            //#endif
+            ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
             var res = body.apply(instance, args);
-            //#ifdef DEBUG
-                ria.__API.checkReturn(meta.ret, res);
-            //#endif
+            ria.__API.checkReturn(meta.ret, res);
             return res;
         };
 
         f_.__META = meta;
-        //#ifdef DEBUG
-            Object.freeze(f_);
-        //#endif
+        Object.freeze(f_);
 
         return f_;
-    }
+    }*/
 
 })();

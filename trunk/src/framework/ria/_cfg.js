@@ -12,7 +12,8 @@ var ria = {};
 ria.__CFG = {
 //#ifdef DEBUG
     prettyStackTraces: true,
-    checkedMode: true
+    checkedMode: true,
+    enablePipelineMethodCall: true
 //#endif
 };
 
