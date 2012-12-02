@@ -229,12 +229,12 @@ ria.__API = ria.__API || {};
 
     if (ria.__CFG.checkedMode) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
-            function (meta, scope, args) {
+            function (body, meta, scope, args) {
                 ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
             });
 
         ria.__API.addPipelineMethodCallStage('AfterCall',
-            function (meta, scope, args, result) {
+            function (body, meta, scope, args, result) {
                 ria.__API.checkReturn(meta.ret, result);
             });
     }

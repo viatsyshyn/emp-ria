@@ -209,7 +209,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     /**
-     * @param {ria.__API.ClassDescriptor} base
+     * @param {Function} base
      * @constructor
      */
     function ExtendsDescriptor(base) {
@@ -229,7 +229,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     /**
-     * @param {ria.__API.InterfaceDescriptor[]} ifcs
+     * @param {Function[]} ifcs
      * @constructor
      */
     function ImplementsDescriptor(ifcs) {
@@ -259,8 +259,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     /**
      * @param {String} name
-     * @param {ClassDescriptor} base
-     * @param {InterfaceDescriptor[]} ifcs
+     * @param {Function} base
+     * @param {Function[]} ifcs
      * @param {Object} flags
      * @param {AnnotationInstance[]} annotations
      * @param {PropertyDescriptor[]} properties
@@ -281,10 +281,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     /**
      * @param {Array} args
-     * @param {Function} base
+     * @param {Function} baseClass
      * @returns {ClassDescriptor}
      */
-    ria.__SYNTAX.parseClassDef = function (args, base) {
+    ria.__SYNTAX.parseClassDef = function (args, baseClass) {
         var body = args.pop();
 
         var ifcs = [];
@@ -295,7 +295,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             args.push(ifcs_);
         }
 
-        var base = base;
+        var base = baseClass;
         var base_ = args.pop();
         if (base_ instanceof ExtendsDescriptor) {
             base = base_.base;
