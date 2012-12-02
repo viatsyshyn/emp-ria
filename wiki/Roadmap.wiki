@@ -41,12 +41,14 @@
     * Private Classes
     * ~~ctor~~
       * BASE
+      * SEFL in ctor body
     * Methods
-      * ABSTRACT
-      * OVERRIDE
-      * FINAL
+      * ~~ABSTRACT~~
+      * ~~OVERRIDE~~
+      * ~~FINAL~~
       * BASE
-      * SELF
+      * ~~SELF~~
+      * SELF in method body
     * Properties
       * ~~READONLY~~
       * FINAL
