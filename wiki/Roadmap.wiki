@@ -41,7 +41,7 @@
     * Private Classes
     * ~~ctor~~
       * ~~BASE~~
-      * ~~SEFL in ctor body~~
+      * ~~SELF in ctor body~~
     * Methods
       * ~~ABSTRACT~~
       * ~~OVERRIDE~~
