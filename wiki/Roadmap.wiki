@@ -36,8 +36,8 @@
   * [Classes]
     * ~~EXTENDS~~
     * ~~IMPLEMENTS~~
-    * ABSTRACT class
-    * FINAL class
+    * ~~ABSTRACT class~~
+    * ~~FINAL class~~
     * Private Classes
     * ~~ctor~~
       * BASE
