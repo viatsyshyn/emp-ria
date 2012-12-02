@@ -238,27 +238,5 @@ ria.__API = ria.__API || {};
                 ria.__API.checkReturn(meta.ret, result);
             });
     }
-    /**
-     * @param {ria.__API.MethodDescriptor} meta
-     * @param {Object} instance
-     * @param {Function} body
-     * @return {Function}
-     */
-    /*ria.__API.getTypeHintDecorator = function (meta, instance, body) {
-        ria.__API.checkArg('meta', [ria.__API.MethodDescriptor], meta);
-
-        var f_ = function TypeHintDecorator() {
-            var args = [].slice.call(arguments);
-            ria.__API.checkArgs(meta.argsNames, meta.argsTypes, args);
-            var res = body.apply(instance, args);
-            ria.__API.checkReturn(meta.ret, res);
-            return res;
-        };
-
-        f_.__META = meta;
-        Object.freeze(f_);
-
-        return f_;
-    }*/
 
 })();
