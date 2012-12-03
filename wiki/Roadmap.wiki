@@ -28,7 +28,7 @@
 
 == Syntax ==
 
-  * [Exceptions]
+  * ~~[Exceptions]~~
   * ~~[Delegates]~~
   * ~~[Annotations]~~
   * ~~[Interfaces]~~ 
