@@ -35,6 +35,8 @@ CLASS(
 
 Class may contain properties. Property is complex of protected field and public getter and setter. Property name can be only valid JS variable name and can NOT start with *_$_* or end with *`_`*. Getter name is constructed by capitalizing field name and prefixing with *_is_* in case of Boolean properties or *_get_* otherwise. Setter name is constructed by capitalizing field name and prefixig with *_set_*. If class contains no explicit declaration of getter or setter or both, defaults are added implicitly.
 
+Properties can be marked with FINAL, ABSTRACT and READONLY. Final property means that getter and setter can NOT be overridden in descendants. Abstract property means that getter and setter MUST be overridden in descendants. Property may be either FINAL or ABSTRACT. READONLY property has no setter. Declaring explicit setter for readonly property MUST trigger exception. Explicit getters and setter MUST be marked with same flags as property.
+
 {{{
 CLASS(
   'MyClass', EXTENDS(MyBaseClass), IMPLEMENTS(MyIfc), [
