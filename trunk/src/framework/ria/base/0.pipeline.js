@@ -54,8 +54,9 @@ ria.__API = ria.__API || {};
          */
         'OnAfterCall': function (body, meta, scope, args, result, callSession) {
             this.afterCall_.forEach(function (_) {
-                _(body, meta, scope, args, result, callSession);
+                result = _(body, meta, scope, args, result, callSession);
             });
+            return result;
         },
 
         /**
@@ -90,8 +91,7 @@ ria.__API = ria.__API || {};
             // THIS IS WHERE METHOD BODY IS CALLED
             var result = body.apply(scope, args);
             // END OF METHOD BODY CALL
-            pmcStages.OnAfterCall(body, meta, scope, args, result, callSession);
-            return result;
+            return pmcStages.OnAfterCall(body, meta, scope, args, result, callSession);
         } finally {
             pmcStages.OnCallFinally(body, meta, scope, callSession);
         }
