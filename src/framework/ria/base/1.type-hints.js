@@ -236,6 +236,7 @@ ria.__API = ria.__API || {};
         ria.__API.addPipelineMethodCallStage('AfterCall',
             function (body, meta, scope, args, result) {
                 ria.__API.checkReturn(meta.ret, result);
+                return result;
             });
     }
 
