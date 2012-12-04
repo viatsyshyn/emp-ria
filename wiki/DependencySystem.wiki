@@ -27,3 +27,54 @@ All this files are fetched asynchronyous and only when all is ready NS callback 
 At compile time content can be either embeded to compilation output or fetched at runtime
 
 Dependency system suports custom content loaders/compilers
+
+
+= Implementation Details =
+
+== Load stages ==
+
+* PreResolve
+* Mapping
+* Loading
+* PreProcess
+* Process
+* PostProcess
+* PostResolve
+
+=== Code Entity flow ===
+
+* PreResolve: x
+* Mapping: transform entity name to path (maybe using server side path resolver)
+* Loading: load code using <script />
+* PreProcess: x
+* Process: execute code via <script />
+* PostProcess: x
+* PostResolve: check is entity is loaded
+
+
+=== Haml asset flow ===
+* PreResolve
+* Mapping: resolve asset URL
+* Loading: load haml using AJAX
+* PreProcess: x
+* Process: compile haml to js and execute via <script />
+* PostProcess: x
+* PostResolve: check is asset is loaded
+
+=== Image asset flow ==
+* PreResolve
+* Mapping: resolve asset URL
+* Loading: load image using Image()
+* PreProcess: x
+* Process: set asset to it's identifier
+* PostProcess: x
+* PostResolve: check asset is loaded
+
+=== i18n asset flow ===
+* PreResolve: x
+* Mapping: resolve asset URL
+* Loading: load using AJAX
+* PreProcess: x
+* Process: parse JSON and assign to identifier
+* PostProcess: x
+* PostResolve: check if asset is loaded
