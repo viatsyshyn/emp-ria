@@ -57,7 +57,7 @@ Dependency system suports custom content loaders/compilers
  * Mapping: resolve asset URL
  * Loading: load haml using AJAX
  * PreProcess: x
- * Process: compile haml to js and execute via <script />
+ * Process: compile haml to js and execute via script tag
  * PostProcess: x
  * PostResolve: check is asset is loaded
 
