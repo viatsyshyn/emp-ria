@@ -45,9 +45,9 @@ Dependency system suports custom content loaders/compilers
 
  * PreResolve: x
  * Mapping: transform entity name to path (maybe using server side path resolver)
- * Loading: load code using <script />
+ * Loading: load code using script tag
  * PreProcess: x
- * Process: execute code via <script />
+ * Process: execute code via script tag
  * PostProcess: x
  * PostResolve: check is entity is loaded
 
