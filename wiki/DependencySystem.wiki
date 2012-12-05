@@ -39,6 +39,9 @@ Dependency system suports custom content loaders/compilers
  * PreProcess
  * Process
  * PostProcess
+ * CollectDeps
+ * CollectCallbacks
+ * DepsResolved
  * PostResolve
 
 === Code Entity flow ===
@@ -49,6 +52,9 @@ Dependency system suports custom content loaders/compilers
  * PreProcess: x
  * Process: execute code via script tag
  * PostProcess: x
+ * CollectDeps: collect calls to REQUIRE
+ * CollectCallbacks: collect calls to ASSET in callbacks
+ * DepsResolved: x
  * PostResolve: check is entity is loaded
 
 
@@ -57,8 +63,11 @@ Dependency system suports custom content loaders/compilers
  * Mapping: resolve asset URL
  * Loading: load haml using AJAX
  * PreProcess: x
- * Process: compile haml to js and execute via script tag
+ * Process: compile haml to js
  * PostProcess: x
+ * CollectDeps: add runtime to deps
+ * CollectCallbacks: add callback that executes compiled js via script tag
+ * DepsResolved: x
  * PostResolve: check is asset is loaded
 
 === Image asset flow ==
@@ -66,8 +75,11 @@ Dependency system suports custom content loaders/compilers
  * Mapping: resolve asset URL
  * Loading: load image using Image()
  * PreProcess: x
- * Process: set asset to it's identifier
+ * Process: x
  * PostProcess: x
+ * CollectDeps: x
+ * CollectCallbacks: add callback that assigns asset to identifier
+ * DepsResolved: x
  * PostResolve: check asset is loaded
 
 === i18n asset flow ===
@@ -75,6 +87,9 @@ Dependency system suports custom content loaders/compilers
  * Mapping: resolve asset URL
  * Loading: load using AJAX
  * PreProcess: x
- * Process: parse JSON and assign to identifier
+ * Process: parse JSON
  * PostProcess: x
+ * CollectDeps: x
+ * CollectCallbacks: add callback that assigns to identifier
+ * DepsResolved: x
  * PostResolve: check if asset is loaded
