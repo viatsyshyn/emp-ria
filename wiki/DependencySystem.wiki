@@ -7,6 +7,9 @@ Ria.js asks developers to use one source file for one entity. This makes it easi
 Ria.js dependency system works around entities and files.
 
 {{{
+INCLUDE('~/scripts/jquery.min.js'); // relative to app root
+INCLUDE('@/libs/date.js'); // relative to app code root
+
 REQUIRE('empx.domx.MyAnnotation');
 REQUIRE('empx.domx.MyIfc');
 REQUIRE('empx.mvcx.BaseController');
@@ -23,6 +26,8 @@ All this files are fetched asynchronyous and only when all is ready NS callback 
 `REQUIRE()` loads entities mapping entity name to file path, eg empx.domx.MyAnnotation is mapped empx/domx/MyAnnotation.js, after module is loaded and ready then it's checked if empx.domx.MyAnnotation is defined. If so dependency is considered resolved. If all dependencies are resolved module is considered loaded and NS callbacks are called. If all callbacks execute successfully then module is considered ready.
 
 `ASSET()` works similar to REQUIRE, but it only loads external files. If file is loaded then dependency is resolved. NS searches for ASSET calls in it's callback and adds it's arguments to dependency list. Inside callback ASSET returns fetched content.
+
+`INCLUDE()` works like REQUIRE() but it just loads JS code files.
 
 At compile time content can be either embeded to compilation output or fetched at runtime
 
