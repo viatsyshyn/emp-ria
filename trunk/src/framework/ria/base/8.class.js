@@ -125,6 +125,10 @@ ria.__API = ria.__API || {};
         //#endif
     };
 
+    function ProtectedMethodProxy() {
+        throw Error('Can NOT call protected methods');
+    }
+
     /**
      * @param {Object} instance
      * @param {Function} clazz
@@ -151,7 +155,7 @@ ria.__API = ria.__API || {};
                     //#ifdef DEBUG
                         Object.defineProperty(instance, k, { writable : false, configurable: false, value: fn });
                         if (f_.__META.isProtected())
-                            fn = undefined;  // TODO: maybe throw Exception on call
+                            fn = ProtectedMethodProxy;
                     //#endif
                     publicInstance[k] = fn;
                     //#ifdef DEBUG
