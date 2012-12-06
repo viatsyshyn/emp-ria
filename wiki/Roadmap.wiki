@@ -32,7 +32,8 @@
   * ~~[Delegates]~~
   * ~~[Annotations]~~
   * ~~[Interfaces]~~ 
-    * SELF
+    * ~~SELF~~
+    * ~~Properties~~
   * [Classes]
     * ~~EXTENDS~~
     * ~~IMPLEMENTS~~
