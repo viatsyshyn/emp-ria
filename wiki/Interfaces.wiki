@@ -17,7 +17,15 @@ INTERFACE(
   ]);
 }}}
 
-Interface can contain only definition of public members. Suffix *`_`* is forbidden as well as prefix *$*. Properties are forbidden. Annotations are forbidden.
+Interface can contain only definition of public members. Suffix *`_`* is forbidden as well as prefix *$*. Annotations are forbidden. Properties declaration is an alias to declaring getter/setter. Declaration of properties permits only READONLY flag. For example:
+
+{{{
+INTERFACE(
+  'MyComparatorIfc', [
+    READONLY, Boolean, 'myFlag'
+  ]);
+}}}
+
 
 = Usage =
 
