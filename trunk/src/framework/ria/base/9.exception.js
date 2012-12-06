@@ -8,8 +8,8 @@
 
         Exception.prototype.$ = function (msg, inner_) {
             //#ifdef DEBUG
-            ria.__API.checkArg('msg', String, msg);
-            ria.__API.checkArg('inner_', [Error, Exception], inner_ || null);
+            //TODO: ria.__API.checkArg('msg', String, msg);
+            //TODO: ria.__API.checkArg('inner_', [Error, Exception], inner_ || null);
             //#endif
             this.msg = msg;
             this.stack = ria.__API.getStackTrace(Error(msg));

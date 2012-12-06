@@ -1,4 +1,6 @@
+
 /** @namespace ria.__SYNTAX */
+ria = ria || {};
 ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
@@ -12,7 +14,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var values = {};
         function IdentifierValue(value) {
             //#ifdef DEBUG
-            ria.__API.checkArg('value', [String, Number, Boolean], value);
+            ria.__SYNTAX.checkArg('value', [String, Number, Boolean], value);
             //#endif
             return values.hasOwnProperty(value) ? values[value] : (values[value] = new IdentifierValueImpl(value));
         }

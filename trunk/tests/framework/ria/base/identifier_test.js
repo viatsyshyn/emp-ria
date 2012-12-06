@@ -8,9 +8,6 @@
             var CardValue = function () {
                 var values = {};
                 function CardValue(value) {
-                    //#ifdef DEBUG
-                    ria.__API.checkArg('value', [String, Number, Boolean], value);
-                    //#endif
                     return values.hasOwnProperty(value) ? values[value] : (values[value] = new CardValueImpl(value));
                 }
                 ria.__API.identifier(CardValue, 'CardValue');
@@ -37,9 +34,6 @@
             var CardValue = function () {
                 var values = {};
                 function CardValue(value) {
-                    //#ifdef DEBUG
-                    ria.__API.checkArg('value', [String, Number, Boolean], value);
-                    //#endif
                     return values.hasOwnProperty(value) ? values[value] : (values[value] = new CardValueImpl(value));
                 }
                 ria.__API.identifier(CardValue, 'CardValue');
@@ -58,9 +52,6 @@
             var MoneyValue = function () {
                 var values = {};
                 function MoneyValue(value) {
-                    //#ifdef DEBUG
-                    ria.__API.checkArg('value', [String, Number, Boolean], value);
-                    //#endif
                     return values.hasOwnProperty(value) ? values[value] : (values[value] = new MoneyValueImpl(value));
                 }
                 ria.__API.identifier(MoneyValue, 'MoneyValue');

@@ -11,10 +11,10 @@ NS('ria.reflection', function () {
             READONLY, String, 'name',
 
             function $(clazz, name) {
-                ria.__API.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
 
                 this.property = clazz.__META.properties[name];
-                ria.__API.checkArg('name', [ria.__API.PropertyDescriptor], this.property.__META);
+                ria.__SYNTAX.checkArg('name', [ria.__API.PropertyDescriptor], this.property.__META);
             },
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
@@ -24,7 +24,7 @@ NS('ria.reflection', function () {
             Object, function getType() { return this.property.type; },
 
             function invokeGetterOn(instance) {
-                ria.__API.checkArg('instance', [this.clazz], instance);
+                ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
                 //#ifdef DEBUG
                     instance = instance.__PROTECTED || instance;
                 //#endif
@@ -32,8 +32,8 @@ NS('ria.reflection', function () {
             },
 
             VOID, function invokeSetterOn(instance, value) {
-                ria.__API.checkArg('instance', [this.clazz], instance);
-                ria.__API.checkArg('value', [this.property.type], value);
+                ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
+                ria.__SYNTAX.checkArg('value', [this.property.type], value);
                 //#ifdef DEBUG
                     instance = instance.__PROTECTED || instance;
                 //#endif

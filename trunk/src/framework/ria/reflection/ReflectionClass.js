@@ -10,7 +10,7 @@ NS('ria.reflection', function () {
             READONLY, Function, 'clazz',
 
             function $(clazz) {
-                ria.__API.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
             },
 
             String, function getName() { return this.clazz.__META.name; },

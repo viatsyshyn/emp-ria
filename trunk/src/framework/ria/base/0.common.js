@@ -73,4 +73,72 @@ ria.__API = ria.__API || {};
         f.prototype = ctor.prototype;
         return new f();
     };
+
+    /**
+     * Get string name of given type
+     * @param {Object} type
+     * @return {String}
+     */
+    ria.__API.getIdentifierOfType = function (type) {
+        if (type === undefined) return 'void';
+        //if (type === __API.Modifiers.SELF) return 'SELF';
+        if (type === null) return '*';
+        if (type === Function) return 'Function';
+        if (type === Number) return 'Number';
+        if (type === Boolean) return 'Boolean';
+        if (type === String) return 'String';
+        if (type === RegExp) return 'RegExp';
+        if (type === Date) return 'Date';
+        if (type === Array) return 'Array';
+        if (type === Object) return 'Object';
+
+        /*if (ArrayOfDescriptor.isArrayOfDescriptor(type))
+            return type.toString();
+
+        if (isCustomType(type))
+            return type.__IDENTIFIER__;
+
+        if (isImportedType(type))
+            return type.__IDENTIFIER__;*/
+
+        return type.name || 'UnknownType';
+    };
+
+    /**
+     * Get string name of type of given value
+     * @param {Object} value
+     * @return {String}
+     */
+    ria.__API.getIdentifierOfValue = function (value) {
+        if (value === undefined || value === null)
+            return 'void';
+
+        if (typeof value === 'number') return 'Number';
+        if (typeof value === 'boolean') return 'Boolean';
+        if (typeof value === 'string') return 'String';
+        if (typeof value === 'regexp') return 'RegExp';
+        if (typeof value === 'date') return 'Date';
+        if (typeof value === 'function') return 'Function';
+
+        if (Array.isArray(value)) return 'Array';
+
+        // TODO: fix this
+        /*if (ria.__API.isIdentifier(value))
+            return ria.__API.getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';*/
+
+        // TODO: fix this
+        /*if (ria.__API.isEnum(value))
+            return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';*/
+
+        /*if (value instanceof __API.Class)
+            return getConstructorOf(value).__IDENTIFIER__ || 'Class';*/
+
+        if (value instanceof Object) {
+            var ctor = ria.__API.getConstructorOf(value);
+            if (ctor)
+                return ctor.name || 'Constructor';
+        }
+
+        return 'Object';
+    };
 })();
