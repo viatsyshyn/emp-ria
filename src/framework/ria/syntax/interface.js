@@ -1,6 +1,4 @@
-
 /** @namespace ria.__SYNTAX */
-ria = ria || {};
 ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
@@ -36,16 +34,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         // TODO: throw Error if any flags on methods
         // TODO: throw Error if any annotations on methods
 
-        var methods = def.methods.map(
-            /**
-             * @param {MethodDescriptor} method
-             */
-            function (method) {
-                return [method.name, method.retType, method.argsTypes, method.argsNames];
-            });
-
-        var ifc = ria.__API.ifc(name, methods);
-
         function InterfaceProxy() {
             var members = ria.__SYNTAX.parseMembers([].slice.call(arguments));
             var flags = {isFinal: true };
@@ -56,7 +44,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             return impl();
         }
 
-        InterfaceProxy.__META = ifc.__META;
+        var methods = def.methods.map(
+            /**
+             * @param {MethodDescriptor} method
+             */
+            function (method) {
+                if (method.flags.isAbstract || method.flags.isReadonly || method.flags.isReadonly )
+                    throw Error('');
+
+                var types = method.argsTypes.map(function (_) {
+                    return _ === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : _;
+                });
+
+                return [method.name,
+                    method.retType === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : method.retType,
+                    types,
+                    method.argsNames];
+            });
+
+        ria.__API.ifc(InterfaceProxy, name, methods);
 
         //#ifdef DEBUG
             Object.freeze(InterfaceProxy);
@@ -70,5 +76,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.buildInterface(name, def);
         ria.__SYNTAX.define(name, clazz);
-    }
+    };
+
+    //#ifdef DEBUG
+    ria.__API.addPipelineMethodCallStage('AfterCall',
+        function (body, meta, scope, args, result, callSession) {
+            if (meta.ret && ria.__API.isInterface(meta.ret)) {
+                var fn = function AnonymousClass() {};
+            }
+
+            return result;
+        });
+    //#endif
 })();

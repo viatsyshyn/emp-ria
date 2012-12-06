@@ -1,6 +1,4 @@
-
 /** @namespace ria.__SYNTAX */
-ria = ria || {};
 ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
@@ -167,7 +165,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (type === undefined)
             throw Error('Expected type or class for property "' + name + '", but got undefined');
 
-        if (Array.isArray(type) || type instanceof Modifiers) {
+        if (Array.isArray(type) || (type instanceof Modifiers && type !== Modifiers.SELF)) {
             throw Error('Expected property type before property name');
         }
 

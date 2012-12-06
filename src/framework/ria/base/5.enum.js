@@ -1,14 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Ostap
- * Date: 25.09.12
- * Time: 23:33
- * To change this template use File | Settings | File Templates.
- */
-
-ria = ria || {};
-ria.__API = ria.__API || {};
-
 (function () {
     "use strict";
 

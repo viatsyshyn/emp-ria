@@ -203,6 +203,23 @@
             assertEquals(2, result.methods.length);
             assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result.methods[0]);
             assertInstanceOf(ria.__SYNTAX.MethodDescriptor, result.methods[1]);
+        },
+
+        testParseClassWithSELF: function () {
+            //noinspection WithStatementJS
+            with(ria.__SYNTAX.Modifiers) { //noinspection WithStatementJS
+                var result = ria.__SYNTAX.parseClass([
+                    ABSTRACT, FINAL, OVERRIDE, 'MyClass', [
+                        SELF, 'member',
+
+                        [SELF],
+                        function $(a) {},
+
+                        SELF, function b() {
+                            return this;
+                        }
+                    ]]);
+            }
         }
     };
 

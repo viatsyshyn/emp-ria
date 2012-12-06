@@ -7,7 +7,7 @@
  */
 
 /** @namespace ria */
-ria = ria || {};
+var ria = window.ria || {};
 
 /** @namespace ria.__API */
 ria.__API = ria.__API || {};

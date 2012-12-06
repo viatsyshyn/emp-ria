@@ -1,6 +1,5 @@
 
 /** @namespace ria.__SYNTAX */
-ria = ria || {};
 ria.__SYNTAX = ria.__SYNTAX || {};
 
 ria.__CFG.AssertWithExceptions = !!ria.__CFG.AssertWithExceptions;

@@ -1,8 +1,3 @@
-
-/** @namespace ria.__API */
-ria = ria || {};
-ria.__API = ria.__API || {};
-
 (function () {
     "use strict";
 
