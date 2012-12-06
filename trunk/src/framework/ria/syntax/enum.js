@@ -1,6 +1,4 @@
-
 /** @namespace ria.__SYNTAX */
-ria = ria || {};
 ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
@@ -8,6 +6,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     /**
      * @param {String} name
+     * @param {Object} val
      * @return {Function}
      */
     ria.__SYNTAX.buildEnum = function (name, val) {

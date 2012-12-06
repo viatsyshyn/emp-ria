@@ -1,6 +1,3 @@
-ria = ria || {};
-ria.__API = ria.__API || {};
-
 (function () {
     "use strict";
 
@@ -15,8 +12,8 @@ ria.__API = ria.__API || {};
         methods.forEach(function (method) {
             this.methods[method[0]] = {
                 retType: method[1],
-                argsNames: method[2],
-                argsTypes: method[3]
+                argsNames: method[3],
+                argsTypes: method[2]
             }
         }.bind(this));
     }
@@ -24,18 +21,12 @@ ria.__API = ria.__API || {};
     ria.__API.InterfaceDescriptor = InterfaceDescriptor;
 
     /**
+     * @param {Function} ifc
      * @param {String} name
      * @param {Array} methods
-     * @return {Function}
      */
-    ria.__API.ifc = function(name, methods) {
-        function InterfaceProxy() {
-            throw Error ('Can not instantiate interface');
-        }
-
-        InterfaceProxy.__META = new InterfaceDescriptor(name, methods);
-
-        return InterfaceProxy;
+    ria.__API.ifc = function(ifc, name, methods) {
+        ifc.__META = new InterfaceDescriptor(name, methods);
     };
 
     ria.__API.isInterface = function (ifc) {

@@ -5,16 +5,14 @@
         setUp: function(){},
 
         testCreate: function () {
-            var i = ria.__API.ifc('TestInterface', ['compare', Boolean, [String, String], ['_1', '_2']]);
+            function InterfaceProxy() {
+                throw Error ('Can not instantiate interface');
+            }
 
-            assertFunction(i);
-            assertNotUndefined(i.__META);
-        },
+            ria.__API.ifc(InterfaceProxy, 'TestInterface', ['compare', Boolean, [String, String], ['_1', '_2']]);
 
-        testUsage: function() {
-            var i = ria.__API.ifc('TestInterface', ['compare', Boolean, [String, String], ['_1', '_2']]);
-
-            assertException(function () { i(); }, 'Error');
+            assertNotUndefined(InterfaceProxy);
+            assertTrue(ria.__API.isInterface(InterfaceProxy))
         }
     }
 })(ria);

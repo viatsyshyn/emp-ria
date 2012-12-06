@@ -1,7 +1,3 @@
-/** @namespace ria.__API */
-ria = ria || {};
-ria.__API = ria.__API || {};
-
 (function () {
 
     /** @class ria.__API.Exception */
