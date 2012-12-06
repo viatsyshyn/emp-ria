@@ -27,7 +27,7 @@ All this files are fetched asynchronyous and only when all is ready NS callback 
 
 `ASSET()` works similar to REQUIRE, but it only loads external files. If file is loaded then dependency is resolved. NS searches for ASSET calls in it's callback and adds it's arguments to dependency list. Inside callback ASSET returns fetched content.
 
-`INCLUDE()` works like REQUIRE() but it just loads JS code files.
+`INCLUDE()` works like REQUIRE() but it just loads JS code files. This files are added to resulting build without compilation.
 
 At compile time content can be either embeded to compilation output or fetched at runtime
 
