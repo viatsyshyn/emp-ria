@@ -49,8 +49,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              * @param {MethodDescriptor} method
              */
             function (method) {
-                if (method.flags.isAbstract || method.flags.isReadonly || method.flags.isReadonly )
-                    throw Error('');
+                if (method.flags.isAbstract || method.flags.isOverride || method.flags.isReadonly || method.flags.isFinal )
+                    throw Error('Interface method can NOT be marked with ABSTRACT, OVERRIDE, READONLY or FINAL');
 
                 var types = method.argsTypes.map(function (_) {
                     return _ === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : _;
@@ -61,6 +61,32 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     types,
                     method.argsNames];
             });
+
+        def.properties.forEach(
+                    /**
+                     * @param {PropertyDescriptor} property
+                     */
+                    function (property) {
+                        if (property.flags.isAbstract || property.flags.isOverride || property.flags.isFinal )
+                            throw Error('Interface property can NOT be marked with ABSTRACT, OVERRIDE or FINAL');
+
+                        methods.push([
+                            property.getGetterName(),
+                            property.type === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : property.type,
+                            [],
+                            []
+                        ]);
+
+                        if (property.flags.isReadonly)
+                            return ;
+
+                        methods.push([
+                            property.getSetterName(),
+                            null,
+                            [property.type === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : property.type],
+                            ['value']
+                        ]);
+                    });
 
         ria.__API.ifc(InterfaceProxy, name, methods);
 
