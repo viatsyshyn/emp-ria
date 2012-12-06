@@ -4,8 +4,8 @@
     TestCase("ClassTestCase").prototype = {
         setUp: function(){
             function Clazz() { return ria.__API.init(this, Clazz, Clazz.prototype.$, arguments) }
-            ria.__API.clazz(Clazz, 'TestInterface', null, [], []);
-            Clazz.prototype.$ = function () { this.testProp = 1; };
+            ria.__API.clazz(Clazz, 'Clazz', null, [], []);
+            Clazz.prototype.$ = function () { this.testProp = null; };
             ria.__API.ctor(Clazz, Clazz.prototype.$, [], [], []);
             Clazz.prototype.compare = function (_1, _2) { return _1 === _2; };
             ria.__API.method(Clazz, Clazz.prototype.compare, 'compare', Boolean, [String, String], ['_1', '_2'], []);
@@ -95,8 +95,8 @@
                 assertFunction(instance.__PROTECTED[k]);
             }
 
-            // TODO: check __PROTECTED has all fields initialized
-            fail('TODO: check __PROTECTED has all fields initialized');
+            assertUndefined(instance.testProp);
+            assertNotUndefined(instance.__PROTECTED.testProp);
         }
     }
 })(ria);
