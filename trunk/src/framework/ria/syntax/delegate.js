@@ -24,7 +24,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.retType == ria.__SYNTAX.Modifiers.SELF)
             throw Error('Return type can\'t be SELF in delegates');
         // TODO: warn if has body
-        return ria.__API.delegate(name, def.ret, def.argsTypes, def.argsNames);
+        return ria.__API.delegate(name, def.retType, def.argsTypes, def.argsNames);
     };
 
     ria.__SYNTAX.DELEGATE = function () {

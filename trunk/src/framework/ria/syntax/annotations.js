@@ -23,8 +23,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if(type == ria.__SYNTAX.Modifiers.SELF)
                 throw Error('Argument type can\'t be SELF in annotations');
         });
+
         // TODO: warn if has body
-        return ria.__API.annotation(name, def.argsTypes, def.argsNames);
+
+        var fn_ = ria.__API.annotation(name, def.argsTypes, def.argsNames);
+        return ria.__CFG.enablePipelineMethodCall
+            ? ria.__API.getPipelineMethodCallProxyFor(fn_, fn_.__META, window)
+            : fn_;
     };
 
     ria.__SYNTAX.ANNOTATION = function () {
