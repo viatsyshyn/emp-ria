@@ -54,10 +54,6 @@
          */
         function AnnotationProxy() {
             var args = [].slice.call(arguments);
-            //#ifdef DEBUG
-                //TODO: move to syntax ria.__API.checkArgs(argsNames_, argsTypes_, args);
-            //#endif
-
             var o = {};
             for(var index = 0; index < argsNames_.length; index++) {
                 o[argsNames_[index]] = args[index];
