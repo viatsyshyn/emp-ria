@@ -53,7 +53,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function parseName(fn) {
-        return fn.name || (fn.toString().substring(9).match(/[a-z0-9_]+/i) || [])[0] || '';
+        return fn.name || (fn.toString().substring(9).match(/[a-z0-9_$]+/i) || [])[0] || '';
     }
 
     function getParameters(fn) {
@@ -157,8 +157,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 retType = null;
             }
 
-            if (retType === Modifiers.VOID)
+            if (retType === Modifiers.VOID) {
                 retType = undefined;
+            }
         }
 
         var flags = ria.__SYNTAX.parseModifiers(args);
