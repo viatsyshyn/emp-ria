@@ -51,7 +51,12 @@
         },
 
         testProtectedVisibility: function () {
-            fail();
+            var Clazz = this.Clazz;
+
+            var instance = new Clazz();
+
+            assertNotUndefined(instance.__PROTECTED.testProp);
+            assertUndefined(instance.testProp);
         },
 
         testClassExtending: function () {
@@ -77,10 +82,21 @@
         },
 
         testClassProtectedArea: function () {
-            // TODO: check __PROTECTED is instance of same class
-            // TODO: check __PROTECTED contains all same public members
+
+            var Clazz = this.Clazz;
+
+            var instance = new Clazz();
+
+            assertInstanceOf(Clazz, instance.__PROTECTED);
+            assertUndefined(instance.testProp);
+
+            for(var k in instance) if (instance.hasOwnProperty(k) && typeof instance[k] == 'function') {
+                assertFunction(instance[k]);
+                assertFunction(instance.__PROTECTED[k]);
+            }
+
             // TODO: check __PROTECTED has all fields initialized
-            fail();
+            fail('TODO: check __PROTECTED has all fields initialized');
         }
     }
 })(ria);

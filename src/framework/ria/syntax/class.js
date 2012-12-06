@@ -146,14 +146,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                         }
                     }else if(baseMethod.flags.isAbstract){
                         if(!childMethod){
-                            throw Error('The abstract method ' + baseMethod.name+ ' have to be overriden in ' + def.name + ' class');
+                            throw Error('The abstract method ' + baseMethod.name+ ' have to be overridden in ' + def.name + ' class');
                         }
                         if(!childMethod.flags.isOverride){
-                            throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                            throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
                         }
                     }else {
                         if(childMethod && !childMethod.flags.isOverride){
-                            throw Error('The overriden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                            throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
                         }
                     }
                 }

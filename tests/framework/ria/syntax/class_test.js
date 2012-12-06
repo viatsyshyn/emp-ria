@@ -777,7 +777,7 @@
                     },
 
                     ria.__SYNTAX.Modifiers.VOID, function method(value) {
-                        this.value = 6;
+                        this.value = value;
                     }
                 ]]);
 
@@ -812,10 +812,10 @@
             assertEquals(instance.getValue(), 5);
 
             assertNoException(function () {
-                instance.method(6);
+                instance.method(7);
             });
 
-            assertEquals(instance.getValue(), 6);
+            assertEquals(instance.getValue(), 7);
         },
 
         testSELF: function () {

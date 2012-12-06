@@ -7,7 +7,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     function parseName(fn) {
-        return fn.name || (fn.substring(9).match(/[a-z0-9_]+/i) || [])[0] || '';
+        return fn.name || (fn.toString().substring(9).match(/[a-z0-9_]+/i) || [])[0] || '';
     }
 
     function getParameters(fn) {
