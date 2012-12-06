@@ -13,6 +13,7 @@
         this.argsNames = argsNames;
         //noinspection JSUnusedGlobalSymbols
         this.argsTypes = argsTypes;
+        this.ret = null;
 
         //#ifdef DEBUG
             Object.freeze(this);

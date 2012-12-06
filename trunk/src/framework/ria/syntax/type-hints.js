@@ -104,8 +104,9 @@
         if (type === null)
             return ;
 
-        if (type === undefined && value !== undefined)
+        if (type === undefined && value !== undefined) {
             throw Error('No return expected but got ' + ria.__API.getIdentifierOfValue(value));
+        }
 
         if (type !== undefined && !checkTypeHint(value, type))
             throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type) + ' but got ' + ria.__API.getIdentifierOfValue(value));
