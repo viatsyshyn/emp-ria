@@ -26,10 +26,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         // TODO: warn if has body
 
-        var fn_ = ria.__API.annotation(name, def.argsTypes, def.argsNames);
-        return ria.__CFG.enablePipelineMethodCall
-            ? ria.__API.getPipelineMethodCallProxyFor(fn_, fn_.__META, window)
-            : fn_;
+        return ria.__API.annotation(name, def.argsTypes, def.argsNames);
     };
 
     ria.__SYNTAX.ANNOTATION = function () {

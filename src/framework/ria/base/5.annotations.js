@@ -67,11 +67,15 @@
         }
 
         AnnotationProxy.__META = new AnnotationDescriptor(name, argsTypes_, argsNames_);
+        var fn_ = AnnotationProxy;
+        fn_ = ria.__CFG.enablePipelineMethodCall
+            ? ria.__API.getPipelineMethodCallProxyFor(fn_, fn_.__META, null)
+            : fn_;
 
         //#ifdef DEBUG
-            Object.freeze(AnnotationProxy);
+            Object.freeze(fn_);
         //#endif
-        return AnnotationProxy;
+        return fn_;
     };
 
     ria.__API.isAnnotation = function (value) {
