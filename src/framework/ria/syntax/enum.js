@@ -21,10 +21,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
           ria.__API.extend(EnumImpl, Enum);
           for (var prop in val)
           {
-              var id = val[prop];
+              var value_ = val[prop];
               //TODO: throw correct error message
-              ria.__API.checkArg('value', [Number, String, Boolean], id);
-              values[id] = Enum[prop] = new EnumImpl(id);
+              ria.__SYNTAX.checkArg('value', [Number, String, Boolean], value_);
+              values[value_] = Enum[prop] = new EnumImpl(value_);
           }
 
           //#ifdef DEBUG

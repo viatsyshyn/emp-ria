@@ -82,7 +82,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
                         methods.push([
                             property.getSetterName(),
-                            null,
+                            undefined,
                             [property.type === ria.__SYNTAX.Modifiers.SELF ? InterfaceProxy : property.type],
                             ['value']
                         ]);

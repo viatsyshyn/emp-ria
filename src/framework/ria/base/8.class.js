@@ -58,7 +58,7 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_) {
-        ria.__API.checkArg('clazz', [Function], clazz);
+        //TODO: ria.__API.checkArg('clazz', [Function], clazz);
 
         clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
         if (base_)
@@ -74,7 +74,7 @@
      * @param {Function} setter
      */
     ria.__API.property = function (clazz, name, propType_, anns_, getter, setter) {
-        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
+        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         getter.__META = new ria.__API.MethodDescriptor('', propType_, [], []);
         if (setter)
@@ -92,7 +92,7 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.method = function (clazz, impl, name, ret_, argsTypes_, argsNames_, anns_) {
-        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
+        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         clazz.__META.addMethod(impl, name, ret_, argsTypes_, argsNames_, anns_);
 
@@ -111,7 +111,7 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.ctor = function (clazz, impl, argsTypes_, argsNames_, anns_) {
-        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
+        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
 
         clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
 
@@ -181,10 +181,14 @@
     };
 
     ria.__API.compile = function(clazz) {
-        ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
+        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
         //#ifdef DEBUG
             Object.freeze(clazz);
         //#endif
+    };
+
+    ria.__API.isClassConstructor = function(type) {
+        return type.__META instanceof ClassDescriptor;
     };
 
     ria.__API.Class = (function () {

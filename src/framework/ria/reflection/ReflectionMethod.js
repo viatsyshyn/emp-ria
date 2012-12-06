@@ -11,10 +11,10 @@ NS('ria.reflection', function () {
             READONLY, String, 'name',
 
             function $(clazz, name) {
-                ria.__API.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
 
                 this.method = clazz.__META.methods[name];
-                ria.__API.checkArg('name', [ria.__API.MethodDescriptor], this.method.__META);
+                ria.__SYNTAX.checkArg('name', [ria.__API.MethodDescriptor], this.method.__META);
             },
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
@@ -28,8 +28,8 @@ NS('ria.reflection', function () {
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
 
             function invokeOn(instance, args) {
-                ria.__API.checkArg('instance', [this.clazz], instance);
-                ria.__API.checkArgs(this.method.argsNames, this.method.argsTypes, args);
+                ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
+                ria.__SYNTAX.checkArgs(this.method.argsNames, this.method.argsTypes, args);
                 //#ifdef DEBUG
                     instance = instance.__PROTECTED || instance;
                 //#endif

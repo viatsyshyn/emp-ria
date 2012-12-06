@@ -4,6 +4,54 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
+    /**
+     * Checks if type is native js constructor
+     * @param {*} type
+     * @return {Boolean}
+     */
+    function isBuildInType(type) {
+        return type === Function
+            || type === String
+            || type === Boolean
+            || type === Number
+            || type === RegExp
+            || type === Object
+            || type === Array
+            || type === Date
+    }
+
+    /**
+     * Checks if type is ria enabled custom constructor
+     * @param {*} type
+     * @return {Boolean}
+     */
+    function isCustomType(type) {
+        return ria.__API.isClassConstructor(type)
+            || ria.__API.isInterface(type)
+            || ria.__API.isEnum(type)
+            || ria.__API.isIdentifier(type)
+            //|| ArrayOfDescriptor.isArrayOfDescriptor(type)
+            ;
+    }
+
+    /**
+     * Checks if type is ria enabled external constructor
+     * @param type
+     * @return {Boolean}
+     */
+    function isImportedType(type) {
+        return false;
+    }
+
+    /**
+     * Check if type is embedded or ria enabled type
+     * @param {*} type
+     * @return {Boolean}
+     */
+    function isType(type) {
+        return isBuildInType(type) || isCustomType(type) || isImportedType(type);
+    }
+
     function parseName(fn) {
         return fn.name || (fn.toString().substring(9).match(/[a-z0-9_]+/i) || [])[0] || '';
     }
@@ -191,7 +239,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 continue;
             }
 
-            if (typeof arg === 'function' && !ria.__API.isType(arg)) {
+            if (typeof arg === 'function' && !isType(arg)) {
                 members.push(ria.__SYNTAX.parseMethod(args.splice(0, end + 1)));
                 end = 0;
                 continue;
