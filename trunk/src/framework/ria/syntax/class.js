@@ -182,7 +182,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 }
 
                 if(parentMethod && parentMethod.flags.isFinal){
-                    throw Error('Final method ' + method.name + ' can\'t be overriden in ' + def.name + ' class');
+                    throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
                 }
 
                 if(method.retType == ria.__SYNTAX.Modifiers.SELF) {
