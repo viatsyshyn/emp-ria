@@ -4,7 +4,9 @@
     TestCase("TypeHintsTestCase").prototype = {
 
         testCheckArgs: function () {
-            var d = ria.__SYNTAX.buildDelegate('TestDelegate', Boolean, [String, Number], ['s', 'n_']);
+            var d = ria.__SYNTAX.buildDelegate('TestDelegate', ria.__SYNTAX.parseMethod([
+                [String, Number],
+                Boolean, function TestDelegate(s, n_) {}]));
             var wrapper = d(function (s, n) { return s === String(n); });
 
             assertNoException(function () { wrapper('1'); });
@@ -16,7 +18,10 @@
         },
 
         testCheckReturn: function () {
-            var d = ria.__SYNTAX.buildDelegate('TestDelegate', Boolean, [Object], ['s']);
+            var d = ria.__SYNTAX.buildDelegate('TestDelegate', ria.__SYNTAX.parseMethod([
+                            [Object],
+                            Boolean, function TestDelegate(s) {}]));
+
             var wrapper = d(function (s) { return s; });
 
             assertNoException(function () { wrapper(true); });
