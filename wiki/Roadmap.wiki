@@ -54,7 +54,7 @@
       * ~~READONLY~~
       * FINAL
       * ABSTRACT 
-      * SELF
+      * ~~SELF~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
   * Proxy interface impls in DEBUG (to protect implementation)
