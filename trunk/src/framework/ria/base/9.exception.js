@@ -7,23 +7,19 @@
         ria.__API.clazz(Exception, 'Exception', null, [], []);
 
         Exception.prototype.$ = function (msg, inner_) {
-            //#ifdef DEBUG
-            //TODO: ria.__API.checkArg('msg', String, msg);
-            //TODO: ria.__API.checkArg('inner_', [Error, Exception], inner_ || null);
-            //#endif
             this.msg = msg;
             this.stack = ria.__API.getStackTrace(Error(msg));
             this.inner_ = inner_;
         };
-        ria.__API.ctor(Exception, Exception.prototype.$, [], [], []);
+        ria.__API.ctor(Exception, Exception.prototype.$, [String, [Error, Exception]], ['msg', 'inner_'], []);
 
         Exception.prototype.toString = function () {
             var msg = this.msg + '\n  ' + this.stack.join('\n  ');
 
             if (this.inner_) {
                 msg += '\nCaused by: ';
-                if (this.inner_ instanceof Error && this.inner_.stack) {
-                    msg += this.inner_.stack;
+                if (this.inner_ instanceof Error) {
+                    msg += ria.__API.getStackTrace(this.inner_);
                 } else {
                     msg += this.inner_.toString();
                 }
