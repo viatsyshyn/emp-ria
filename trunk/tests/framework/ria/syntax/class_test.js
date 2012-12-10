@@ -882,6 +882,359 @@
             assertUndefined(instance.value);
 
             assertEquals(6, instance.getValue());
+        },
+
+        testPropertyFlags: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.abstractString = null;
+                        this.value = null;
+                        this.selfValue = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.ABSTRACT, String, 'abstractString',
+
+                    ria.__SYNTAX.Modifiers.ABSTRACT, String, function getAbstractString() {
+                        return this.abstractString;
+                    },
+
+                    [String],
+                    ria.__SYNTAX.Modifiers.ABSTRACT, ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                        this.abstractString = string;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                        return this.value;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value2'
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                        return this.abstractString;
+                    },
+
+                    [String],
+                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                        this.abstractString = string;
+                    }
+                ]]);
+
+            var SecondClass;
+            assertNoException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+        },
+
+        testPropertyFlags_redefining: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {},
+
+                    Number, 'value'
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, 'value'
+                ]]);
+
+            var SecondClass;
+            assertException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+            var secondClass2Def = ria.__SYNTAX.parseClass([
+                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    Number, 'value'
+                ]]);
+
+            var SecondClass2;
+            assertException(function () {
+                SecondClass2 = ria.__SYNTAX.buildClass('SecondClass2', secondClass2Def);
+            });
+        },
+
+        testPropertyFlags_differentFlagsToGettersSetters: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.value = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+
+                    Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var baseClass2Def = ria.__SYNTAX.parseClass([
+                'BaseClass2', [
+                    function $() {
+                        this.value = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+
+                    ria.__SYNTAX.Modifiers.ABSTRACT, Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass2;
+            assertException(function () {
+                BaseClass2 = ria.__SYNTAX.buildClass('BaseClass2', baseClass2Def);
+            });
+        },
+
+        testPropertyFlags_abstractGettersSetters: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.abstractString = null;
+                        this.value = null;
+                        this.selfValue = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.ABSTRACT, String, 'abstractString'
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {}
+                ]]);
+
+            var SecondClass;
+            assertException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+            var secondClass2Def = ria.__SYNTAX.parseClass([
+                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                        return this.abstractString + "_";
+                    }
+                ]]);
+
+            var SecondClass2;
+            assertException(function () {
+                SecondClass2 = ria.__SYNTAX.buildClass('SecondClass2', secondClass2Def);
+            });
+
+            var secondClass3Def = ria.__SYNTAX.parseClass([
+                'SecondClass3', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                        return this.abstractString + "_";
+                    },
+
+                    [String],
+                    ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                        this.abstractString = string;
+                    }
+                ]]);
+
+            var SecondClass3;
+            assertException(function () {
+                SecondClass3 = ria.__SYNTAX.buildClass('SecondClass2', secondClass3Def);
+            });
+        },
+
+        testPropertyFlags_overriddenGettersSetters: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.value = null;
+                    },
+
+                    Number, 'value',
+
+                    Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {}
+                ]]);
+
+            var SecondClass;
+            assertNoException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+            var thirdClassDef = ria.__SYNTAX.parseClass([
+                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var ThirdClass;
+            assertException(function () {
+                ThirdClass = ria.__SYNTAX.buildClass('ThirdClass', thirdClassDef);
+            });
+
+            var thirdClass2Def = ria.__SYNTAX.parseClass([
+                'ThirdClass2', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    [Number],
+                    ria.__SYNTAX.Modifiers.VOID, function setValue(value) {
+                        this.value = value;
+                    }
+                ]]);
+
+            var ThirdClass2;
+            assertException(function () {
+                ThirdClass2 = ria.__SYNTAX.buildClass('ThirdClass2', thirdClass2Def);
+            });
+
+            var thirdClass3Def = ria.__SYNTAX.parseClass([
+                'ThirdClass3', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    [Number],
+                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function setValue(value) {
+                        this.value = value;
+                    }
+                ]]);
+
+            var ThirdClass3;
+            assertNoException(function () {
+                ThirdClass3 = ria.__SYNTAX.buildClass('ThirdClass3', thirdClass3Def);
+            });
+
+            var thirdClass4Def = ria.__SYNTAX.parseClass([
+                'ThirdClass4', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var ThirdClass4;
+            assertNoException(function () {
+                ThirdClass4 = ria.__SYNTAX.buildClass('ThirdClass4', thirdClass4Def);
+            });
+
+            var thirdClass5Def = ria.__SYNTAX.parseClass([
+                'ThirdClass5', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {
+                        this.value2 = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
+                        return this.value2;
+                    }
+                ]]);
+
+            var ThirdClass5;
+            assertException(function () {
+                ThirdClass5 = ria.__SYNTAX.buildClass('ThirdClass5', thirdClass5Def);
+            });
+        },
+
+        testPropertyFlags_finalGettersSetters: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.value = null;
+                    },
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+
+                    ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {}
+                ]]);
+
+            var SecondClass;
+            assertNoException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+            var secondClass2Def = ria.__SYNTAX.parseClass([
+                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var SecondClass2;
+            assertException(function () {
+                SecondClass2 = ria.__SYNTAX.buildClass('SecondClass2', secondClass2Def);
+            });
+
+            var thirdClassDef = ria.__SYNTAX.parseClass([
+                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var ThirdClass;
+            assertException(function () {
+                ThirdClass = ria.__SYNTAX.buildClass('ThirdClass', thirdClassDef);
+            });
         }
     };
 
