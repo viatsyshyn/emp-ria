@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ria.MVC demo</title>
+    <style type="text/css">
+        BODY {background: black; color: #ff8c00; font-size: .67em;}
+    </style>
+</head>
+<body>
+    <h1>ria.MVC demo</h1>
+
+<script src="../../../src/framework/ria/_bootstrap.js" type="text/javascript">
+    ria.__CFG = {
+        "prettyStackTraces": true,
+        "checkedMode": true,
+        "enablePipelineMethodCall": true,
+        "stackTraceJs": "lib/stacktrace.js",
+
+        "#require": {
+            "plugins": ["demo.build.i18n", "ria.haml.Loader"],
+            "appRoot": "",
+            "appCodeDir": "~/app/"
+        },
+
+        "#mvc": {
+            "appClass": "demo.Application",
+            "appSession": {
+                "emp.player": "c01t",
+                "emp.session": "123456789098756432123645",
+                "xmpp.enabled": true,
+                "xmpp.service": "/service/",
+                "emp.locale": "uk-UA",
+                "vk.appId": 12345678,
+                "vk.likeTag": "vk-like"
+            }
+        }
+    }
+</script>
+</body>
+</html>
