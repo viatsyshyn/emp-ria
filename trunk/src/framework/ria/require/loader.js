@@ -52,7 +52,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
      * @param {Function} loader Loader is responsible for loading given URI
      */
     ria.__REQUIRE.addLoader = function (filter, loader) {
-        loaders.push([filter, handler]);
+        loaders.push([filter, loader]);
     };
 
     /**
@@ -65,5 +65,33 @@ ria.__REQUIRE = ria.__REQUIRE || {};
             throw Error('Found not loader capable to load "' + uri + '"');
 
         return loadWith(uri, loader);
-    }
+    };
+
+    var modules = {};
+
+    modules.__root = null;
+
+    /**
+     * @param {String} module
+     * @param {String} dependency
+     */
+    ria.__REQUIRE.addDependency = function (module, dependency) {
+
+    };
+
+    /**
+     * @param {String} module
+     * @param {Function} callback
+     */
+    ria.__REQUIRE.addCallback = function (module, callback) {
+
+    };
+
+    /**
+     * @param {String} module
+     * @return {*}
+     */
+    ria.__REQUIRE.getContent = function (module) {
+        return null;
+    };
 })();

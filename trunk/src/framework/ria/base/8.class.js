@@ -1,8 +1,8 @@
 (function () {
     "use strict";
 
+    //noinspection JSUnusedLocalSymbols
     function TypeOf(type) {}
-
 
     /**
      * @param {String} name
@@ -50,6 +50,16 @@
 
     ria.__API.ClassDescriptor = ClassDescriptor;
 
+    var clazzRegister = {};
+
+    /**
+     * @param {String} name
+     * @return {Function}
+     */
+    ria.__API.getClassByName = function(name) {
+        return clazzRegister[name];
+    };
+
     /**
      * @param {Function} clazz
      * @param {String} name
@@ -58,7 +68,7 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_) {
-        //TODO: ria.__API.checkArg('clazz', [Function], clazz);
+        clazzRegister[name] = clazz;
 
         clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
         if (base_)
@@ -74,11 +84,12 @@
      * @param {Function} setter
      */
     ria.__API.property = function (clazz, name, propType_, anns_, getter, setter) {
-        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
-
+        //noinspection JSUndefinedPropertyAssignment
         getter.__META = new ria.__API.MethodDescriptor('', propType_, [], []);
         if (setter)
+        { //noinspection JSUndefinedPropertyAssignment
             setter.__META = new ria.__API.MethodDescriptor('', undefined, [propType_], ['value']);
+        }
         clazz.__META.addProperty(name, propType_, anns_, getter, setter);
     };
 
@@ -92,8 +103,6 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.method = function (clazz, impl, name, ret_, argsTypes_, argsNames_, anns_) {
-        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
-
         clazz.__META.addMethod(impl, name, ret_, argsTypes_, argsNames_, anns_);
 
         impl.__META = new ria.__API.MethodDescriptor(name, ret_, argsTypes_, argsNames_);
@@ -111,8 +120,6 @@
      * @param {Annotation[]} [anns_]
      */
     ria.__API.ctor = function (clazz, impl, argsTypes_, argsNames_, anns_) {
-        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
-
         clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
 
         impl.__META = new ria.__API.MethodDescriptor('$', undefined, argsTypes_, argsNames_);
@@ -143,19 +150,21 @@
         //#endif
 
         for(var k in instance) {
-            var f_ = instance[k];
+            //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop
+            var name_ = k;
+            var f_ = instance[name_];
             if (typeof f_ === 'function' && f_ !== ctor && k !== 'constructor') {
-                instance[k] = f_.bind(instance);
+                instance[name_] = f_.bind(instance);
                 if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
                     var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance);
                     //#ifdef DEBUG
-                        Object.defineProperty(instance, k, { writable : false, configurable: false, value: fn });
+                        Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
                         if (f_.__META.isProtected())
                             fn = ProtectedMethodProxy;
                     //#endif
-                    publicInstance[k] = fn;
+                    publicInstance[name_] = fn;
                     //#ifdef DEBUG
-                        Object.defineProperty(publicInstance, k, { writable : false, configurable: false, value: fn });
+                        Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
                     //#endif
                 }
             }
@@ -164,11 +173,18 @@
         //#ifdef DEBUG
             instance.$ = undefined;
             publicInstance.$ = undefined;
-
-            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance);
         //#endif
 
-        // TODO: set fields of properties with null
+        if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
+            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance);
+        }
+
+        //#ifdef DEBUG
+        for(var name in clazz.__META.properties)
+            if (clazz.__META.properties.hasOwnProperty(name)) {
+                Object.defineProperty(instance, name, {configurable: false, value: null});
+            }
+        //#endif
 
         ctor.apply(instance, args);
 
@@ -181,7 +197,6 @@
     };
 
     ria.__API.compile = function(clazz) {
-        //TODO: ria.__API.checkArg('clazz', [ClassDescriptor], clazz.__META);
         //#ifdef DEBUG
             Object.freeze(clazz);
         //#endif
