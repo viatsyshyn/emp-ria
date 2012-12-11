@@ -216,6 +216,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     //#ifdef DEBUG
                     setter.__SELF = ClassProxy;
                     //#endif
+                }else{
+                    if(setters.length){
+                        throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
+                    }
                 }
 
                 ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
@@ -254,18 +258,41 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                         var propertyFromMeta = findParentPropertyFromMeta(def, propertyName);
                         if(property.flags.isFinal)
                             throw Error('There is no ability to override setter or getter of final property ' + property.name + ' in ' + def.name + ' class');
+
                         var getter, setter;
+
                         var setterInMethods = def.methods.filter(function (_1) { return _1.name == property.getSetterName()})[0];
+                        setterInMethods && processedMethods.push(setterInMethods.name);
                         if(setterInMethods && !setterInMethods.flags.isOverride)
                             throw Error('Method' + setterInMethods.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+
                         var getterInMethods = def.methods.filter(function (_1) { return _1.name == property.getGetterName()})[0];
+                        getterInMethods && processedMethods.push(getterInMethods.name);
                         if(getterInMethods && !getterInMethods.flags.isOverride)
                             throw Error('Method' + getterInMethods.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+
                         getter = getterInMethods ? getterInMethods.body : propertyFromMeta.getter;
                         setter = setterInMethods ? setterInMethods.body : propertyFromMeta.setter;
+
                         if(setterInMethods && getterInMethods && !isSameFlags(setterInMethods, getterInMethods))
                             throw Error('Setter' + setterInMethods.name + ' ang getter' + getterInMethods.name
                                 + ' have to have to have the same flags in ' + def.name + ' class');
+
+                        ClassProxy.prototype[getter.name] = getter;
+                        //#ifdef DEBUG
+                        getter.__SELF = ClassProxy;
+                        //#endif
+
+                        if (!property.flags.isReadonly) {
+                            ClassProxy.prototype[setter.name] = setter;
+                            //#ifdef DEBUG
+                            setter.__SELF = ClassProxy;
+                            //#endif
+                        }else{
+                            if(setterInMethods){
+                                throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
+                            }
+                        }
                         ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
                     }else{
                         var parentMethod = findParentMethod(def, method.name);
