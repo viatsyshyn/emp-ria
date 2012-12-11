@@ -1247,7 +1247,7 @@
                 'ThirdClass2', ria.__SYNTAX.EXTENDS(SecondClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
+                    ria.__SYNTAX.Modifiers.FINAL, ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
                         return this.value2;
                     }
                 ]]);
