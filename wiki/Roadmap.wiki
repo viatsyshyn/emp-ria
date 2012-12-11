@@ -21,6 +21,7 @@
   * ~~[Identifiers]~~
   * [ArrayOf]
   * [ClassOf]
+  * [ImplementorOf]
 
 == Fix ==
 
