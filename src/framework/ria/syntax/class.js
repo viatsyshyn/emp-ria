@@ -46,12 +46,29 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var baseProperty;
         while(base){
             base.properties.forEach(function(property){
-                if(property.name == name)
+                if(property.name.toLocaleLowerCase() == name.toLocaleLowerCase())
                     baseProperty = property;
             });
             if(baseProperty)
                 break;
             base = base.base && base.base.__SYNTAX_META;
+        }
+        return baseProperty;
+    }
+
+    /**
+     * @param {ClassDescriptor} def
+     * @param {String} name
+     * @return {PropertyDescriptor}
+     */
+    function findParentPropertyFromMeta(def, name){
+        var base = def.base && def.base.__META;
+        var baseProperty;
+        while(base){
+            baseProperty = base.properties[name];
+            if(baseProperty)
+                break;
+            base = base.base && base.base.__META;
         }
         return baseProperty;
     }
@@ -228,39 +245,63 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              */
             function (method) {
                 if (processedMethods.indexOf(method.name) < 0) {
-                    var parentMethod = findParentMethod(def, method.name);
-                    if(method.flags.isOverride){
-                        if(!parentMethod){
-                            throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
+                    var isSetter = method.name.match(/^set/), isGetter = method.name.match(/^get/);
+                    if(isSetter || isGetter){
+                        if(!method.flags.isOverride)
+                            throw Error('Method' + method.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                        var propertyName = method.name.slice(3).toLocaleLowerCase();
+                        var property = findParentProperty(def, propertyName);
+                        var propertyFromMeta = findParentPropertyFromMeta(def, propertyName);
+                        if(property.flags.isFinal)
+                            throw Error('There is no ability to override setter or getter of final property ' + property.name + ' in ' + def.name + ' class');
+                        var getter, setter;
+                        var setterInMethods = def.methods.filter(function (_1) { return _1.name == property.getSetterName()})[0];
+                        if(setterInMethods && !setterInMethods.flags.isOverride)
+                            throw Error('Method' + setterInMethods.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                        var getterInMethods = def.methods.filter(function (_1) { return _1.name == property.getGetterName()})[0];
+                        if(getterInMethods && !getterInMethods.flags.isOverride)
+                            throw Error('Method' + getterInMethods.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+                        getter = getterInMethods ? getterInMethods.body : propertyFromMeta.getter;
+                        setter = setterInMethods ? setterInMethods.body : propertyFromMeta.setter;
+                        if(setterInMethods && getterInMethods && !isSameFlags(setterInMethods, getterInMethods))
+                            throw Error('Setter' + setterInMethods.name + ' ang getter' + getterInMethods.name
+                                + ' have to have to have the same flags in ' + def.name + ' class');
+                        ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
+                    }else{
+                        var parentMethod = findParentMethod(def, method.name);
+                        if(method.flags.isOverride){
+                            if(!parentMethod){
+                                throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
+                            }
+
+                            //#ifdef DEBUG
+                            method.body.__BASE_BODY = parentMethod.body;
+                            //#endif
                         }
 
+                        if(method.flags.isAbstract && parentMethod){
+                            throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
+                        }
+
+                        if(parentMethod && parentMethod.flags.isFinal){
+                            throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
+                        }
+
+                        if(method.retType == ria.__SYNTAX.Modifiers.SELF) {
+                            method.retType = ClassProxy;
+                        }
+
+                        method.argsTypes.forEach(function(t, index){
+                            if(method.argsTypes[index] == ria.__SYNTAX.Modifiers.SELF)
+                                method.argsTypes[index] = ClassProxy;
+                        });
+
+                        var impl = ClassProxy.prototype[method.name] = method.body;
                         //#ifdef DEBUG
-                        method.body.__BASE_BODY = parentMethod.body;
+                        impl.__SELF = ClassProxy;
                         //#endif
+                        ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
                     }
-
-                    if(method.flags.isAbstract && parentMethod){
-                        throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
-                    }
-
-                    if(parentMethod && parentMethod.flags.isFinal){
-                        throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
-                    }
-
-                    if(method.retType == ria.__SYNTAX.Modifiers.SELF) {
-                        method.retType = ClassProxy;
-                    }
-
-                    method.argsTypes.forEach(function(t, index){
-                        if(method.argsTypes[index] == ria.__SYNTAX.Modifiers.SELF)
-                            method.argsTypes[index] = ClassProxy;
-                    });
-
-                    var impl = ClassProxy.prototype[method.name] = method.body;
-                    //#ifdef DEBUG
-                    impl.__SELF = ClassProxy;
-                    //#endif
-                    ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
                 }
             });
 

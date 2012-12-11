@@ -1184,12 +1184,19 @@
                 'BaseClass', [
                     function $() {
                         this.value = null;
+                        this.value2 = null;
                     },
 
                     ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
 
                     ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
                         return this.value;
+                    },
+
+                    Number, 'value2',
+
+                    Number, function getValue2() {
+                        return this.value2;
                     }
                 ]]);
 
@@ -1234,6 +1241,20 @@
             var ThirdClass;
             assertException(function () {
                 ThirdClass = ria.__SYNTAX.buildClass('ThirdClass', thirdClassDef);
+            });
+
+            var thirdClass2Def = ria.__SYNTAX.parseClass([
+                'ThirdClass2', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
+                        return this.value2;
+                    }
+                ]]);
+
+            var ThirdClass2;
+            assertNoException(function () {
+                ThirdClass2 = ria.__SYNTAX.buildClass('ThirdClass2', thirdClass2Def);
             });
         }
     };
