@@ -1256,6 +1256,63 @@
             assertNoException(function () {
                 ThirdClass2 = ria.__SYNTAX.buildClass('ThirdClass2', thirdClass2Def);
             });
+        },
+
+        testPropertyFlags_overriddenAndFinal: function () {
+            var baseClassDef = ria.__SYNTAX.parseClass([
+                'BaseClass', [
+                    function $() {
+                        this.value = null;
+                    },
+
+                    Number, 'value',
+
+                    Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
+            });
+
+            var secondClassDef = ria.__SYNTAX.parseClass([
+                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                        return this.value * 2;
+                    }
+                ]]);
+
+            var SecondClass;
+            assertNoException(function () {
+                SecondClass = ria.__SYNTAX.buildClass('SecondClass', secondClassDef);
+            });
+
+            var thirdClassDef = ria.__SYNTAX.parseClass([
+                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+                    function $() {},
+
+                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                        return this.value * 3;
+                    }
+                ]]);
+
+            var ThirdClass;
+            assertException(function () {
+                ThirdClass = ria.__SYNTAX.buildClass('ThirdClass', thirdClassDef);
+            });
+
+            var first = new BaseClass();
+            first.setValue(3);
+
+            var second = new SecondClass();
+            second.setValue(3);
+
+            assertEquals(first.getValue(), 3);
+            assertEquals(second.getValue(), 6);
         }
     };
 

@@ -73,6 +73,33 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return baseProperty;
     }
 
+    /**
+     * @param {ClassDescriptor} def
+     * @param {String} name
+     * @return {Object}
+     */
+    function findParentPropertyByGetterOrSetter(def, name){
+        var base = def.base && def.base.__SYNTAX_META;
+        var baseProperty, res={};
+        while(base){
+            base.properties.forEach(function(property){
+                if(property.getSetterName()== name){
+                    baseProperty = property;
+                    res.isGetter = true;
+                }
+                if(property.getGetterName()== name){
+                    baseProperty = property;
+                    res.isSetter = true;
+                }
+            });
+            if(baseProperty)
+                break;
+            base = base.base && base.base.__SYNTAX_META;
+        }
+        res.property = baseProperty;
+        return res;
+    }
+
     function isSameFlags(def1, def2){
         for(var flag in def1.flags){
             if(def1.flags[flag] != def2.flags[flag])
@@ -249,12 +276,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              */
             function (method) {
                 if (processedMethods.indexOf(method.name) < 0) {
-                    var isSetter = method.name.match(/^set/), isGetter = method.name.match(/^get/);
-                    if(isSetter || isGetter){
+                    var baseSearchResult = findParentPropertyByGetterOrSetter(def, method.name);
+                    if(baseSearchResult.property){
                         if(!method.flags.isOverride)
                             throw Error('Method' + method.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-                        var propertyName = method.name.slice(3).toLocaleLowerCase();
-                        var property = findParentProperty(def, propertyName);
+                        var property = baseSearchResult.property;
+                        var propertyName = property.name;
                         var propertyFromMeta = findParentPropertyFromMeta(def, propertyName);
                         if(property.flags.isFinal)
                             throw Error('There is no ability to override setter or getter of final property ' + property.name + ' in ' + def.name + ' class');
@@ -294,6 +321,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                             }
                         }
                         ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
+                        var newProperty = new ria.__SYNTAX.PropertyDescriptor(property.name, property.type, property.annotations, method.flags);
+                        def.properties.push(newProperty);
                     }else{
                         var parentMethod = findParentMethod(def, method.name);
                         if(method.flags.isOverride){
