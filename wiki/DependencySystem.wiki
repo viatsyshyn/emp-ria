@@ -8,7 +8,7 @@ Ria.js dependency system works around entities and files.
 
 {{{
 INCLUDE('~/scripts/jquery.min.js'); // relative to app root
-INCLUDE('@/libs/date.js'); // relative to app code root
+INCLUDE('libs/date.js'); // relative to app code root
 
 REQUIRE('empx.domx.MyAnnotation');
 REQUIRE('empx.domx.MyIfc');
