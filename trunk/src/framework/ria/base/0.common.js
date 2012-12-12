@@ -64,10 +64,12 @@ ria.__API = ria.__API || {};
      * @return {Object}
      */
     ria.__API.getInstanceOf = function (ctor, name_) {
-        var f = function InstanceOfProxy() {};
+        var f = function InstanceOfProxy() {
+            this.constructor = ctor;
+        };
         //#ifdef DEBUG
             if (ria.__CFG.prettyStackTraces)
-                f = new Function('return ' + f.toString().replace('InstanceOfProxy', name_))();
+                f = new Function('ctor', 'return ' + f.toString().replace('InstanceOfProxy', name_))(ctor);
         //#endif
 
         f.prototype = ctor.prototype;
