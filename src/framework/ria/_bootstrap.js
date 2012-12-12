@@ -9,7 +9,11 @@
 var ria = {};
 
 (function () {
+    "use strict";
+
     ria.__BOOTSTRAP = ria.__BOOTSTRAP || {};
+
+    ria.__CFG = {"#require": {"plugins": []}};
 
     var scripts = document.getElementsByTagName('script');
     for(var index = 0; index < scripts.length; index++) {
@@ -44,22 +48,12 @@ var ria = {};
         return path.replace(/\/\//gi, '/');
     }
 
-    ria.__BOOTSTRAP.REQUIRE = REQUIRE;
-
     function REQUIRE(path) {
-        var path_ = resolve(path);
-        document.write("<" + "script src='" + path_ + "' type='text/javascript'></" + "script>");
+        document.write("<" + "script src='" + resolve(path) + "' type='text/javascript'></" + "script>");
     }
 
     if (!ria.__CFG._bootstraps)
         ria.__CFG._bootstraps = [];
-
-    // configure bootstraps
-    for(var k in ria.__CFG) if (ria.__CFG.hasOwnProperty(k) && /^#./i.test(k)) {
-        var name = k.replace('#', 'ria/');
-        if (ria.__CFG._bootstraps.indexOf(name) < 0)
-            ria.__CFG._bootstraps.push(name);
-    }
 
     Object.freeze(ria.__CFG);
 
@@ -92,10 +86,21 @@ var ria = {};
     REQUIRE('ria/syntax/parser.js');
     REQUIRE('ria/syntax/type-hints.js');
 
-    console.info('ria.js bootstrapped.');
+    // load ria.require
+    REQUIRE('ria/require/loader.js');
+    REQUIRE('ria/require/require.js');
 
     var boostraps = ria.__CFG._bootstraps;
     while(boostraps.length > 0) {
         REQUIRE(boostraps.shift() + '/_bootstrap.js');
     }
+
+    document.write('<' + 'script type="text/javascript" ' + '>ria.__BOOTSTRAP.fire()</' + 'script>');
+
+    var callbacks = [];
+    ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
+    ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
+    ria.__BOOTSTRAP.fire = function () {
+        ria.__REQUIRE.init(ria.__CFG['#require']);
+    };
 })();
