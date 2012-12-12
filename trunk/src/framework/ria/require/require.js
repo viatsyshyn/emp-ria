@@ -42,6 +42,10 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
     }
 
+    ria.__REQUIRE.init = function (cfg) {
+        console.info('ria.require.js init()');
+    };
+
     ria.__REQUIRE.requireSymbol = function (symbol) {
 
     };
