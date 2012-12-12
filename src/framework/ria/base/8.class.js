@@ -141,11 +141,11 @@
      */
     ria.__API.init = function (instance, clazz, ctor, args) {
         if ((!instance instanceof clazz))
-            instance = ria.__API.getInstanceOf(clazz);
+            instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
 
         var publicInstance = instance;
         //#ifdef DEBUG
-            instance = ria.__API.getInstanceOf(clazz);
+            instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
             publicInstance.__PROTECTED = instance;
         //#endif
 
@@ -182,7 +182,7 @@
         //#ifdef DEBUG
         for(var name in clazz.__META.properties)
             if (clazz.__META.properties.hasOwnProperty(name)) {
-                Object.defineProperty(instance, name, {configurable: false, value: null});
+                instance[name] = null;
             }
         //#endif
 
