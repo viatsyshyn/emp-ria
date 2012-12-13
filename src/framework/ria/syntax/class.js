@@ -23,13 +23,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     function findParentMethod(def, name){
         var base = def.base && def.base.__SYNTAX_META;
-        var baseMethod;
-        while(base){
-            base.methods.forEach(function(method){
-                if(method.name == name)
-                    baseMethod = method;
-            });
-            if(baseMethod)
+        var baseMethod = null;
+        while (base) {
+            baseMethod = base.methods.filter(function(method){ return method.name == name }).pop();
+            if (baseMethod)
                 break;
             base = base.base && base.base.__SYNTAX_META;
         }
@@ -43,12 +40,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     function findParentProperty(def, name){
         var base = def.base && def.base.__SYNTAX_META;
-        var baseProperty;
+        var baseProperty = null;
         while(base){
-            base.properties.forEach(function(property){
-                if(property.name.toLocaleLowerCase() == name.toLocaleLowerCase())
-                    baseProperty = property;
-            });
+            baseProperty = base.properties.filter(function(property){ return property.name == name }).pop();
             if(baseProperty)
                 break;
             base = base.base && base.base.__SYNTAX_META;
@@ -101,7 +95,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function isSameFlags(def1, def2){
-        for(var flag in def1.flags){
+        for(var flag in def1.flags) if (def1.flags.hasOwnProperty(flag)) {
             if(def1.flags[flag] != def2.flags[flag])
                 return false;
         }
@@ -144,7 +138,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Setter' + setterInMethods.name + ' ang getter' + getterInMethods.name
                 + ' have to have to have the same flags in ' + def.name + ' class');
 
-        getter = getterInMethods ? getterInMethods.body : function () { return BASE(); };
+        getter = getterInMethods ? getterInMethods.body : function () {
+            //noinspection JSPotentiallyInvalidConstructorUsage
+            return BASE();
+        };
         ClassProxy.prototype[getter.name] = getter;
         //#ifdef DEBUG
         getter.__BASE_BODY = propertyFromMeta.getter;
@@ -152,7 +149,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         //#endif
 
         if (!property.flags.isReadonly) {
-            setter = setterInMethods ? setterInMethods.body : function (value) { BASE(value)};
+            setter = setterInMethods ? setterInMethods.body : function (value) {
+                //noinspection JSPotentiallyInvalidConstructorUsage
+                BASE(value);
+            };
             ClassProxy.prototype[setter.name] = setter;
             //#ifdef DEBUG
             setter.__BASE_BODY = propertyFromMeta.setter;
