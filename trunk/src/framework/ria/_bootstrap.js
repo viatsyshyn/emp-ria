@@ -86,6 +86,9 @@ var ria = {};
     REQUIRE('ria/syntax/parser.js');
     REQUIRE('ria/syntax/type-hints.js');
 
+    // load symbols
+    REQUIRE('ria/syntax/defines.js');
+
     // load ria.require
     REQUIRE('ria/require/loader.js');
     REQUIRE('ria/require/require.js');
@@ -95,12 +98,12 @@ var ria = {};
         REQUIRE(boostraps.shift() + '/_bootstrap.js');
     }
 
-    document.write('<' + 'script type="text/javascript" ' + '>ria.__BOOTSTRAP.fire()</' + 'script>');
+    document.write('<' + 'script type="text/javascript" ' + '>ria.__BOOTSTRAP.complete()</' + 'script>');
 
     var callbacks = [];
     ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
     ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
-    ria.__BOOTSTRAP.fire = function () {
+    ria.__BOOTSTRAP.complete = function () {
         ria.__REQUIRE.init(ria.__CFG['#require']);
     };
 })();

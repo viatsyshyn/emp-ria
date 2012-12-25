@@ -97,12 +97,17 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return InterfaceProxy;
     };
 
-    ria.__SYNTAX.INTERFACE = function () {
+    /**
+     * @function
+     */
+    function INTERFACE() {
         var def = ria.__SYNTAX.parseClassDef([].slice.call(arguments), null);
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.buildInterface(name, def);
         ria.__SYNTAX.define(name, clazz);
-    };
+    }
+
+    ria.__SYNTAX.INTERFACE = INTERFACE;
 
     //#ifdef DEBUG
     ria.__API.addPipelineMethodCallStage('AfterCall',
