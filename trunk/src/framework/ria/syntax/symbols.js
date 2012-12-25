@@ -8,6 +8,9 @@ var SELF = ria.__SYNTAX.Modifiers.SELF;
 var FINAL = ria.__SYNTAX.Modifiers.FINAL;
 var READONLY = ria.__SYNTAX.Modifiers.READONLY;
 
+var Class = ria.__API.Class;
+var Exception = ria.__API.Exception;
+
 /**
  * @type {Function}
  */
@@ -22,5 +25,7 @@ window.IDENTIFIER = ria.__SYNTAX.IDENTIFIER;
 window.INTERFACE = ria.__SYNTAX.INTERFACE;
 window.NS = ria.__SYNTAX.NS;
 window.NAMESPACE = ria.__SYNTAX.NS;
+window.IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
+window.EXTENDS = ria.__SYNTAX.EXTENDS;
 window.VALIDATE_ARG = ria.__SYNTAX.checkArg;
 

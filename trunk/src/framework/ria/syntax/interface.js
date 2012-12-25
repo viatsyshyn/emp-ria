@@ -110,6 +110,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.INTERFACE = INTERFACE;
 
     //#ifdef DEBUG
+    ria.__API.addPipelineMethodCallStage('BeforeCall',
+        function (body, meta, scope, args, result, callSession) {
+            // TODO: wrap args into proxy if it's ifc
+        });
+
     ria.__API.addPipelineMethodCallStage('AfterCall',
         function (body, meta, scope, args, result, callSession) {
             if (meta.ret && ria.__API.isInterface(meta.ret)) {

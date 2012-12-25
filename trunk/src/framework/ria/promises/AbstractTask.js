@@ -43,7 +43,7 @@ NS('ria.promises', function () {
             VOID, function cancel() {},
 
             function $() {
-                this.promise = FutureImpl();
+                this.promise = FutureImpl(this);
             }
         ])
 })
