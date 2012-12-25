@@ -404,6 +404,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__SYNTAX.define(name, clazz);
     };
 
+    ria.__SYNTAX.PRIVATE_CLASS = function () {
+        var def = ria.__SYNTAX.parseClass([].slice.call(arguments));
+        var name = ria.__SYNTAX.getFullName(def.name + '_' + Math.random().toString(36).substr(2));
+        return ria.__SYNTAX.buildClass(name, def, false);
+    };
+
     //#ifdef DEBUG
     function BaseIsUndefined() { throw Error('BASE is supported only on method with OVERRIDE'); }
 

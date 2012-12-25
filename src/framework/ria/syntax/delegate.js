@@ -27,10 +27,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return ria.__API.delegate(name, def.retType, def.argsTypes, def.argsNames);
     };
 
-    ria.__SYNTAX.DELEGATE = function () {
+    function DELEGATE() {
         var def = ria.__SYNTAX.parseMethod([].slice.call(arguments));
         var name = ria.__SYNTAX.getFullName(def.name);
         var delegate = ria.__SYNTAX.buildDelegate(name, def);
         ria.__SYNTAX.define(name, delegate);
     }
+
+    ria.__SYNTAX.DELEGATE = DELEGATE;
 })();
