@@ -1,5 +1,5 @@
 load:
-  - ../../../src/framework/ria/_cfg.js
+  - _cfg.js
   - ../../../src/framework/ria/base/*.js
 
 test:
