@@ -1,0 +1,24 @@
+//
+   Created with JetBrains WebStorm.
+   User: paladin
+   Date: 2/6/13
+   Time: 11:07 PM
+   To change this template use File | Settings | File Templates.
+
+mixin ActionLink(controller, action)
+    - attrs = merge(locals.attributes, attributes)
+    - attrs['data-controller'] = controller
+    - attrs['data-action'] = action
+    - attrs.href = 'javascript:'
+    - if (arguments.length > 2) (attrs['data-params'] = [].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(','))
+    a(attrs)
+        block
+
+
+mixin ActionForm(controller, action)
+    - attrs = merge(locals.attributes, attributes)
+    - attrs['data-controller'] = controller
+    - attrs['data-action'] = action
+    - attrs.action = 'javascript:'
+    form(attrs)
+        block
