@@ -15,27 +15,35 @@ function main(path, prefix, suffix) {
 
     function escape(v) {
         return v
-            .replace(/\(/gi, '\\(')
-            .replace(/\)/gi, '\\)')
-            .replace(/\./gi, '\\.')
-            .replace(/'/gi,  '\\\'');
+            .replace(/\(/g, '\\(')
+            .replace(/\)/g, '\\)')
+            .replace(/\./g, '\\.');
     }
 
     var contents = File.readFile(path);
 
-    var regex = new RegExp(escape(prefix || '') + '([a-z0-9\.-_\/]+\.[a-z0-9]+)' + escape(suffix || ''), 'gi');
+    var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix || '\'') + ']+\.[a-z0-9]+)' + escape(suffix || '\''), 'gi');
 
+    Env.print('Searching ' + path + ' with ' + regex);
+
+    var count = 0;
     contents = contents.replace(regex, function (match, path) {
+        //Env.print('Match: ' + path);
         if (File.exists(path)) {
             var crc = Hash.crc32(path);
+            
+            Env.print('Match: "' + match + '", CRC32: ' + crc);
+            count++;
+            
             var parts = path.split('.');
             var ext = parts.pop();
             var name = parts.join('.');
-            return (prefix || '') + name + '.' + crc + '.' + ext + (suffix || '');
+            return match.replace(path, name + '.' + crc.toString(36) + '.' + ext);
         }
 
-        return match
+        return match;
     });
 
-    Env.print(contents);
+    File.saveUtf8File(path, contents);
+    Env.print("Processed " + path + ", files: " + count);
 }
