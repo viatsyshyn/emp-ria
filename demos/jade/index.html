@@ -3,22 +3,21 @@
 <head>
     <title></title>
     <script src="file:///Users/paladin/Work/emp-ria/demos/jade/jquery-1.9.1.min.js" type="text/javascript"></script>
-    <script src="file:///Users/paladin/Work/emp-ria/demos/jade/runtime.js" type="text/javascript"></script>
     <script src="file:///Users/paladin/Work/emp-ria/demos/jade/jade.js" type="text/javascript"></script>
 
     <script type="text/jade" id="mixins">
 mixin ActionLink(controller, action)
-    -attributes['data-controller'] = controller;
-    -attributes['data-action'] = action;
-    -attributes.href = 'javascript:';
-    -if (arguments.length > 2) (attributes['data-params'] = [].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(','));
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.href = attributes.href || 'javascript:';
+    -if (arguments.length > 2) (attributes['data-params'] = escape([].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(',')));
     a(attributes)
         block
 
 mixin ActionForm(controller, action)
-    -attributes['data-controller'] = controller;
-    -attributes['data-action'] = action;
-    -attributes.action = 'javascript:';
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.action = attributes.action || 'javascript:';
     form(attributes)
         block
 
@@ -26,8 +25,8 @@ mixin ActionForm(controller, action)
 
     <script type="text/jade" id="test">
 #me.test
-    +ActionLink('space', 'view', star.x, star.y)(checked):= star.name
-    +ActionForm('space', 'goto')
+    +ActionLink('space', 'view', star.x, star.y):= star.name
+    +ActionForm('space', 'view')
         label(for="m")= $L('label')
         input#m(name="me", value=$L('value'))
 
@@ -39,42 +38,14 @@ mixin ActionForm(controller, action)
             var test = jQuery('#test').text();
             //jQuery('<pre></pre>').text(jade.compile(mixins, {client:true, compileDebug: false}).toString()).appendTo('body');
 
-            var attrs = jade.attrs,
-                escape = jade.escape,
-                rethrow = jade.rethrow,
-                merge = jade.merge;
-
             window.$L = function (_) { return _; };
 
-            window.ActionLink_mixin = function(controller, action){
-                var block = this.block, attributes = this.attributes || {}, escaped = this.escaped || {}, buf = this.buf;
-                attributes['data-controller'] = controller;
-                attributes['data-action'] = action;
-                attributes.href = 'javascript:';
-                if (arguments.length > 2) (attributes['data-params'] = escape([].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(',')));
-                buf.push('<a');
-                buf.push(attrs(merge({  }, attributes), merge({}, escaped, true)));
-                buf.push('>');
-                block && block();
-                buf.push('</a>');
-            };
+            Jade.compile(mixins, {client:false, compileDebug: false, globalizeMixins: true })();
+            //jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
 
-            window.ActionForm_mixin = function(controller, action){
-                var block = this.block, attributes = this.attributes || {}, escaped = this.escaped || {}, buf = this.buf;
-                attributes['data-controller'] = controller;
-                attributes['data-action'] = action;
-                attributes.action = 'javascript:';
-                buf.push('<form');
-                buf.push(attrs(merge({  }, attributes), merge({}, escaped, true)));
-                buf.push('>');
-                block && block();
-                buf.push('</form>');
-            };
-
-            var fn = Jade.compile(test, {client:true, compileDebug: false});
-            jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
+            var fn = Jade.compile(test, {client:false, compileDebug: false });
+            //jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
             var res = fn({star:{x:1,y:'2',name:'name'}});
-            console.info(res);
             jQuery('<pre></pre>').text(res).appendTo('body');
         })
     </script>

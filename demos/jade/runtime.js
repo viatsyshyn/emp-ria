@@ -174,6 +174,8 @@ exports.rethrow = function rethrow(err, filename, lineno){
   throw err;
 };
 
+exports.globals = {};
+
   return exports;
 
 })({});
