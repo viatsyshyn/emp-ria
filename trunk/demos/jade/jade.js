@@ -1035,10 +1035,14 @@ exports.compile = function(str, options){
   }
 
   if (client) {
-    fn = 'attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge; globals = globals || jade.globals\n' + fn;
+    fn = 'attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge; globals = globals || jade.globals;\n' + fn;
   }
 
+  try {
   fn = new Function('locals, attrs, escape, rethrow, merge, globals', fn);
+  } catch (e) {
+      console.error(e, fn);
+  }
 
   if (client) return fn;
 

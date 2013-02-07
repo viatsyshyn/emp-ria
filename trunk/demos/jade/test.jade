@@ -10,3 +10,6 @@
     +ActionForm('space', 'view')
         label(for="m")= $L('label')
         input#m(name="me", value=$L('value'))
+
+
+    +RenderWith(stars, emp.templates.Space.Star)(param1=true, selected=currentStarId)

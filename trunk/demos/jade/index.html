@@ -21,6 +21,22 @@ mixin ActionForm(controller, action)
     form(attributes)
         block
 
+mixin RenderWithSingle(obj, tplClass)
+    -var tpl = new tplClass
+    -var tpl.assign(obj)
+    -var tpl.options(attributes)
+    -buf.push(tpl.renderBuffer())
+
+mixin RenderWith(obj, tpl)
+    -attributes.block = block
+    if 'number' == typeof obj.length
+        each value, key in obj
+            -attributes.collectionIndex=key
+            -attributes.collection=obj
+            +RenderWithSingle(value, tpl)(attributes)
+    else
+        +RenderWithSingle(obj, tpl)(attributes)
+
     </script>
 
     <script type="text/jade" id="test">
@@ -40,13 +56,13 @@ mixin ActionForm(controller, action)
 
             window.$L = function (_) { return _; };
 
-            Jade.compile(mixins, {client:false, compileDebug: false, globalizeMixins: true })();
-            //jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
+            var fn = Jade.compile(mixins, {client:true, compileDebug: false, globalizeMixins: true });
+            jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
 
-            var fn = Jade.compile(test, {client:false, compileDebug: false });
+            /*var fn = Jade.compile(test, {client:false, compileDebug: false });
             //jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
             var res = fn({star:{x:1,y:'2',name:'name'}});
-            jQuery('<pre></pre>').text(res).appendTo('body');
+            jQuery('<pre></pre>').text(res).appendTo('body');*/
         })
     </script>
 </head>
