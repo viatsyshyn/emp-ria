@@ -6,8 +6,7 @@
    To change this template use File | Settings | File Templates.
 
 #me.test
-    - var star = {}
-    +ActionLink('space', 'view', star.x, star.y) =star.name
-    +ActionForm('space', 'goto')
-        label(for="m") =$L('label')
+    +ActionLink('space', 'view', star.x, star.y)(title=$L('title... he he he')):= star.name
+    +ActionForm('space', 'view')
+        label(for="m")= $L('label')
         input#m(name="me", value=$L('value'))
