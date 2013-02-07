@@ -104,6 +104,7 @@ var Compiler = module.exports = function Compiler(node, options) {
   this.debug = false !== options.compileDebug;
   this.indents = 0;
   this.parentIndents = 0;
+  this.globalizeMixins = true === options.globalizeMixins;
   if (options.doctype) this.setDoctype(options.doctype);
 };
 
@@ -342,7 +343,7 @@ Compiler.prototype = {
       if (pp) this.buf.push("__indent.push('" + Array(this.indents + 1).join('  ') + "');")
       if (block || attrs.length) {
 
-        this.buf.push(name + '.call({buf:buf,');
+        this.buf.push(name + '.call({\nbuf:buf,');
 
         if (block) {
           this.buf.push('block: function(){');
@@ -383,7 +384,7 @@ Compiler.prototype = {
       }
       if (pp) this.buf.push("__indent.pop();")
     } else {
-      this.buf.push('var ' + name + ' = function(' + args + '){');
+      this.buf.push((this.globalizeMixins ? 'globals.' : 'var ') + name + ' = function(' + args + '){');
       this.buf.push('var block = this.block, attributes = this.attributes || {}, escaped = this.escaped || {}, buf = this.buf;');
       this.parentIndents++;
       this.visit(block);
@@ -965,11 +966,15 @@ function parse(str, options){
       console.error('\nCompiled Function:\n\n\033[90m%s\033[0m', js.replace(/^/gm, '  '));
     }
 
+    js = (options.self
+        ? 'var self = locals || {};\n' + js + '\n'
+        : 'with (locals || {}) {\n' + js + '\n}\n');
+
     return ''
       + 'var buf = [];\n'
-      + (options.self
-        ? 'var self = locals || {};\n' + js
-        : 'with (locals || {}) {\n' + js + '\n}\n')
+      + (false !== options.allowGlobals
+        ? 'with (globals) {\n' + js + '}\n'
+        : js)
       + 'return buf.join("");';
   } catch (err) {
     parser = parser.context();
@@ -1030,15 +1035,15 @@ exports.compile = function(str, options){
   }
 
   if (client) {
-    fn = 'attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;\n' + fn;
+    fn = 'attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge; globals = globals || jade.globals\n' + fn;
   }
 
-  fn = new Function('locals, attrs, escape, rethrow, merge', fn);
+  fn = new Function('locals, attrs, escape, rethrow, merge, globals', fn);
 
   if (client) return fn;
 
   return function(locals){
-    return fn(locals, runtime.attrs, runtime.escape, runtime.rethrow, runtime.merge);
+    return fn(locals, runtime.attrs, runtime.escape, runtime.rethrow, runtime.merge, runtime.globals);
   };
 };
 
@@ -3554,6 +3559,8 @@ exports.rethrow = function rethrow(err, filename, lineno){
   throw err;
 };
 
+exports.globals = {};
+
 }); // module: runtime.js
 
 require.register("self-closing.js", function(module, exports, require){
@@ -3651,4 +3658,5 @@ exports.merge = function(a, b) {
 }); // module: utils.js
 
 window.Jade = require("jade");
+window.jade = window.Jade.runtime;
 })();
