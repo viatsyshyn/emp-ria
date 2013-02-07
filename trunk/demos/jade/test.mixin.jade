@@ -6,19 +6,16 @@
    To change this template use File | Settings | File Templates.
 
 mixin ActionLink(controller, action)
-    - attrs = merge(locals.attributes, attributes)
-    - attrs['data-controller'] = controller
-    - attrs['data-action'] = action
-    - attrs.href = 'javascript:'
-    - if (arguments.length > 2) (attrs['data-params'] = [].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(','))
-    a(attrs)
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.href = attributes.href || 'javascript:';
+    -if (arguments.length > 2) (attributes['data-params'] = escape([].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(',')));
+    a(attributes)
         block
 
-
 mixin ActionForm(controller, action)
-    - attrs = merge(locals.attributes, attributes)
-    - attrs['data-controller'] = controller
-    - attrs['data-action'] = action
-    - attrs.action = 'javascript:'
-    form(attrs)
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.action = attributes.action || 'javascript:';
+    form(attributes)
         block
