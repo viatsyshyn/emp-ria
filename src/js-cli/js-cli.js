@@ -1,15 +1,24 @@
 var Env = {
   IncludePath: [],
-  load: function (path) {
-    if ((new java.io.File(path)).exists()) 
-      return this(path);
 
-    for each(var root in Env.IncludePath) {
-      if ((new java.io.File(root + '/' + path)).exists()) 
-        return this(root + '/' + path);
-    }
-    
-    throw Error ('Failed to load "' + path + '": File not found. Include path: "' + Env.IncludePath.join(';') + '"');
+  resolve: function (path) {
+      if ((new java.io.File(path)).exists())
+          return path;
+
+      for each(var root in Env.IncludePath) {
+          if ((new java.io.File(root + '/' + path)).exists())
+              return root + '/' + path;
+      }
+
+      return null;
+  },
+
+  load: function (path) {
+    var resolved = Env.resolve(path);
+    if (!resolved)
+      throw Error ('Failed to load "' + path + '": File not found. Include path: "' + Env.IncludePath.join(';') + '"');
+
+    return this( resolved );
   }.bind(this['load']),
   
   print:this['print']

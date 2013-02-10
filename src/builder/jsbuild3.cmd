@@ -1,0 +1,1 @@
+CALL %~dp0..\js-cli\bin\js-cli.cmd --include %~dp0 %~dp0jsbuild3.js %*
