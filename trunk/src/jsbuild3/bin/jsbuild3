@@ -1,0 +1,48 @@
+#! /usr/bin/env node
+// -*- js -*-
+
+"use strict";
+
+var config = require("../lib/config")
+var ARGS = require("optimist")
+    .usage("$0 config")
+    .describe("config", "Specify an path to config file")
+    .default("config", "jsbuild.json")
+    .string("config")
+    .wrap(80)
+    .argv;
+
+var fs = require("fs");
+var Path = require("path");
+var CFG = new config.Configuration(JSON.parse(fs.readFileSync(ARGS.config)), ARGS.config);
+
+// todo: load plugins
+for(var plugin in CFG.getPlugins()) {
+    console.info(plugin.path);
+}
+
+var JsBuild3 = require("../tools/jsbuild");
+
+CFG.getModules().forEach(/** @param {ModuleConfiguration} module */ function (module) {
+    CFG.setModuleConfig(module);
+
+    //Env.print('Processing: ' + module.getName());
+    var inPath = CFG.resolveFilePath(module.getInFile());
+
+    var fileContents = [];
+    module.getPrepend().forEach(function (prepend) {
+      var path = config.resolveFilePath(prepend);
+      fileContents.push('/** @path ' + prepend + ' */');
+      fileContents.push(fs.readFileSync(path));
+    });
+
+    fileContents.push(JsBuild3.compile(inPath, CFG));
+
+    var outPath = Path.resolve(CFG.getBasePath() + module.getOutFile());
+
+    var jsbuildParams = CFG.getPluginConfiguration("jsbuild");
+    fs.writeFileSync(outPath, fileContents.join(jsbuildParams.separator || ';'), "utf-8");
+});
+
+console.info("done");
+
