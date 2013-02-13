@@ -12,7 +12,7 @@ In EMP Ria interfaces can contain only methods declarations, all methods bodies 
 {{{
 INTERFACE(
   'MyComparatorIfc', [
-    [String, String],
+    [[String, String]],
     Boolean, function compare(_1, _2) {}
   ]);
 }}}
@@ -32,7 +32,7 @@ INTERFACE(
 {{{
 CLASS(
   'MyComparator', IMPLEMENTS(MyComparatorIfc), [
-    [String, String],
+    [[String, String]],
     Boolean, function compare(_1, _2) {
       return _1 === _2;
     }
@@ -43,7 +43,7 @@ cmp.compare('1', '2'); // false
 
 CLASS(
   'Array', [
-    [MyComparatorIfc],
+    [[MyComparatorIfc]],
     function sort(cmp) {
       // implementation
     }
@@ -53,7 +53,7 @@ var arr = Array();
 arr.sort(cmp);
 
 arr.sort(MyComparatorIfc(
-  [String, String],
+  [[String, String]],
   Boolean, function compare(_1, _2) {
     return _1 === _2;
   }));
