@@ -8,24 +8,23 @@
 
 "use strict";
 
-function DelegateCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'DELEGATE') {
+function AnnotationCompiler(ns, node, descend) {
+    if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'ANNOTATION') {
         var tkz = new Tokenizer(node.args);
 
         var method = ria.__SYNTAX.parseMember(tkz);
 
         //ria.__SYNTAX.
 
-        console.info('Found delegate ' + method.name + ' in ' + ns);
+        console.info('Found annotation ' + method.name + ' in ' + ns);
 
         return new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), method.name),
             operator: '=',
             right: new UglifyJS.AST_Call({
-                expression: getNameTraversed('ria.__API'.split('.'), 'delegate'),
+                expression: getNameTraversed('ria.__API'.split('.'), 'annotation'),
                 args: [
                     new UglifyJS.AST_String({value: ns + '.' + method.name}),
-                    method.retType.raw,
                     new UglifyJS.AST_Array({elements: method.argsTypes.map(function (_) { return _.raw; })}),
                     new UglifyJS.AST_Array({elements: method.argsNames.map(function (_) { return new UglifyJS.AST_String({ value: _})})})
                 ]
@@ -34,4 +33,4 @@ function DelegateCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(DelegateCompiler);
+compilers.push(AnnotationCompiler);

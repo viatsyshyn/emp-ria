@@ -27,10 +27,16 @@ function load_global(file) {
 
     ([
         "../lib/jsbuild3.js",
+        "../../framework/ria/base/0.common.js",
+        "../lib/syntax/tokenizer.js",
+        "../../framework/ria/syntax/parser2.js",
         "../lib/syntax/compiler.js",
         "../lib/syntax/ns.js",
         "../lib/syntax/identifier.js",
         "../lib/syntax/enum.js",
+        "../lib/syntax/delegate.js",
+        "../lib/syntax/annotation.js",
+        "../lib/syntax/interface.js",
         "../lib/syntax/class.js"
         ])
     .map(function(file){
