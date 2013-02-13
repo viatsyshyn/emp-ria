@@ -26,7 +26,7 @@ CLASS(
     // contains public properties (ONLY public)
     String, 'value', 
 
-    [String]
+    [[String]],
     function setValue(value) {
       this.value = value;
     }
@@ -41,7 +41,7 @@ Properties can be marked with FINAL, ABSTRACT and READONLY. Final property means
 CLASS(
   'MyClass', EXTENDS(MyBaseClass), IMPLEMENTS(MyIfc), [
     // contains public ctor
-    [String]
+    [[String]],
     function $(value) {
       BASE();
     }
@@ -80,7 +80,7 @@ Classes can be marked as *ABSTRACT* if it's direct instantiation is forbidden or
 {{{
 CLASS(
   // Classes can be annotated
-  [MyAnnotation]
+  [MyAnnotation],
   'MyClass', [    
   ]);
 }}}
@@ -103,7 +103,7 @@ CLASS(
       BASE(5);
     },
 
-    [String, Number],
+    [[String, Number]],
     Boolean, function compare(x, y) { 
       return x === String(y) 
     },
