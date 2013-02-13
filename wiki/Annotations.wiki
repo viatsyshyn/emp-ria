@@ -12,7 +12,7 @@ In EMP Ria classes, public methods and properties can be annotated and are refle
 
 {{{
 ANNOTATION(
-  [Boolean, Number],
+  [[Boolean, Number]],
   function BaseAnnotation(s, n_) {});
 }}}
 
