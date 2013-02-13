@@ -31,7 +31,7 @@ function getEnumImplementation(name, fullName, body) {
 
         <!-- values here -->
 
-        return IdName;
+        return EnumName;
     }.toString().replace('<!-- values here -->', values.join('\n')).replace(/EnumName/g, name).replace(/EnumFullName/g, fullName), {});
 }
 

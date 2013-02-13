@@ -19,19 +19,39 @@ NS('empx.demos', function () {
     });
 
     DELEGATE(
-        [String, String],
+        [[String, String]],
+        Boolean, function Comparator(_1, _2) {});
+
+    DELEGATE(
+        [[String, String]],
         Boolean, function Comparator(_1, _2) {});
 
     ANNOTATION(
-        [String, Function],
+        [[String, Function]],
         function ModelBind(prop_, converter_) {});
+
+    INTERFACE(
+        'MyIfc', [
+            [[String, String]],
+            Boolean, function compareStr(s1, s2) {},
+
+            [[Number, Number]],
+            Boolean, function compareNum(n1, n2) {}
+        ]);
 
     EXCEPTION(
         'MyException', []);
 
     /** @class empx.demos.MyClass */
     CLASS('MyClass', [
+        function $() {
+            BASE();
+        },
 
+        [[String, Boolean]],
+        FINAL, Number, function pubMethod(a, b_) {
+
+        }
     ]);
 
     var MyChildClass = PRIVATE_CLASS('MyChildClass', EXTENDS(empx.demos.MyClass), [
