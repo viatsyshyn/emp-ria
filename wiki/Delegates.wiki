@@ -9,7 +9,7 @@ Delegates are type hinting mechanism used to ensure callback contract.
 
 {{{
 DELEGATE(
-  [String, String],
+  [[String, String]],
   Boolean, function Comparator(s1, s2) {});
 }}}
 
@@ -23,7 +23,7 @@ wrapper('1', '2');
 {{{
 CLASS(
   'Array', [
-    [Comparator]
+    [[Comparator]]
     VOID, function sort(cmp) {
       // implemention
     }
@@ -37,7 +37,7 @@ instance.sort(Comparator(function (_1, _2) { return _1 === _2; }));
 {{{
 CLASS(
   'Comparators', [
-    [String, String],
+    [[String, String]],
     Boolean, function stringCmp(_1, _2) { return _1 === _2; }
   ]);
 
