@@ -1,157 +1,165 @@
 (ria = ria || {}).__SYNTAX = ria.__SYNTAX || {};
 
-var Modifiers = function () {
-    function Modifiers() { throw Error(); }
-    function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
-    ria.__API.extend(ModifiersImpl, Modifiers);
+(function () {
+    "use strict";
 
-    var values = {};
-    values['OVERRIDE'] = Modifiers.OVERRIDE = new ModifiersImpl('OVERRIDE');
-    values['ABSTRACT'] = Modifiers.ABSTRACT = new ModifiersImpl('ABSTRACT');
-    values['FINAL'] = Modifiers.FINAL = new ModifiersImpl('FINAL');
-    values['READONLY'] = Modifiers.READONLY = new ModifiersImpl('READONLY');
-    Modifiers.fromValue = function (raw) {
-        return values.hasOwnProperty(raw) ? values[raw] : undefined;
+    var Modifiers = function () {
+        function Modifiers() { throw Error(); }
+        function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
+        ria.__API.extend(ModifiersImpl, Modifiers);
+
+        var values = {};
+        values['OVERRIDE'] = Modifiers.OVERRIDE = new ModifiersImpl('OVERRIDE');
+        values['ABSTRACT'] = Modifiers.ABSTRACT = new ModifiersImpl('ABSTRACT');
+        values['FINAL'] = Modifiers.FINAL = new ModifiersImpl('FINAL');
+        values['READONLY'] = Modifiers.READONLY = new ModifiersImpl('READONLY');
+        Modifiers.fromValue = function (raw) {
+            return values.hasOwnProperty(raw) ? values[raw] : undefined;
+        };
+        return Modifiers;
+    }();
+
+    ria.__SYNTAX.Modifiers = Modifiers;
+
+    function FunctionToken(value) {
+        this.value = value;
+        this.raw = value;
+    }
+
+    FunctionToken.prototype.getName = function () {
+        return this.value.name.name;
     };
-    return Modifiers;
-}();
 
-ria.__SYNTAX.Modifiers = Modifiers;
+    FunctionToken.prototype.getParameters = function () {
+        return this.value.argnames.map(function (_) { return _.name; });
+    };
 
-function FunctionToken(value) {
-    this.value = value;
-    this.raw = value;
-}
+    function FunctionCallToken(token) {
+        this.call = token;
+        this.raw = token;
+    }
 
-FunctionToken.prototype.getName = function () {
-    return this.value.name.name;
-};
+    FunctionCallToken.prototype.getName = function () {
+        return this.call.expression.print_to_string();
+    };
 
-FunctionToken.prototype.getParameters = function () {
-    return this.value.argnames.map(function (_) { return _.name; });
-};
+    FunctionCallToken.prototype.getArgs = function () {
+        return this.call.args.map(function(_) { return _.print_to_string(); });
+    };
 
-function FunctionCallToken(token) {
-    this.call = token;
-    this.raw = token;
-}
+    function StringToken (str) {
+        this.value = str.value;
+        this.raw = str;
+    }
 
-FunctionCallToken.prototype.getName = function () {
-    return this.call.expression.print_to_string();
-};
+    function RefToken (ref) {
+        this.value = ref.print_to_string();
+        this.raw = ref;
+    }
 
-FunctionCallToken.prototype.getArgs = function () {
-    return this.call.args.map(function(_) { return _.print_to_string(); });
-};
+    function ModifierToken(mod) {
+        this.value = mod;
+    }
 
-function StringToken (str) {
-    this.value = str.value;
-    this.raw = str;
-}
+    function ArrayToken(value, raw) {
+        this.values = value;
+        this.raw = raw;
+    }
 
-function RefToken (ref) {
-    this.value = ref.print_to_string();
-    this.raw = ref;
-}
+    ArrayToken.prototype.getTokenizer = function () {
+        return new Tokenizer(this.raw);
+    };
 
-function ModifierToken(mod) {
-    this.value = mod;
-}
+    function DoubleArrayToken(value, raw) {
+        this.values = value;
+        this.raw = raw;
+    }
 
-function ArrayToken(value, raw) {
-    this.values = value;
-    this.raw = raw;
-}
+    function VoidToken() {}
+    function SelfToken() {}
 
-function DoubleArrayToken(value, raw) {
-    this.values = value;
-    this.raw = raw;
-}
+    function ExtendsToken(base) {
+        this.value = base;
+        this.raw = base;
+    }
 
-function VoidToken() {}
-function SelfToken() {}
-
-function ExtendsToken(base) {
-    this.value = base;
-    this.raw = base;
-}
-
-function ImplementsToken(ifcs) {
-    this.raw = this.values = [].slice.call(ifcs);
-}
+    function ImplementsToken(ifcs) {
+        this.raw = this.values = [].slice.call(ifcs);
+    }
 
 
-function Tokenizer(data, processed) {
-    this.token = this.token.bind(this);
+    function Tokenizer(data, processed) {
+        this.token = this.token.bind(this);
 
-    this.data = data ? [].slice.call(data).map(this.token) : processed;
-}
+        this.data = data ? [].slice.call(data).map(this.token) : processed;
+    }
 
-Tokenizer.prototype.token = function (token) {
-    if (token.print_to_string() == 'SELF')
-        return new SelfToken();
+    Tokenizer.prototype.token = function (token) {
+        if (token.print_to_string() == 'SELF')
+            return new SelfToken();
 
-    if (token.print_to_string() == 'VOID')
-        return new VoidToken();
+        if (token.print_to_string() == 'VOID')
+            return new VoidToken();
 
-    if (Modifiers.fromValue(token.print_to_string()))
-        return new ModifierToken(Modifiers.fromValue(token.print_to_string()));
+        if (Modifiers.fromValue(token.print_to_string()))
+            return new ModifierToken(Modifiers.fromValue(token.print_to_string()));
 
-    if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'EXTENDS')
-        return new ExtendsToken(token.args[0]);
+        if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'EXTENDS')
+            return new ExtendsToken(token.args[0]);
 
-    if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'IMPLEMENTS')
-        return new ImplementsToken(token.args.slice());
+        if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'IMPLEMENTS')
+            return new ImplementsToken(token.args.slice());
 
-    if (token instanceof UglifyJS.AST_Array && token.elements.length == 1 && token.elements[0] instanceof UglifyJS.AST_Array)
-        return new DoubleArrayToken([].slice.call(token.elements[0].elements).map(this.token), token.elements[0]);
+        if (token instanceof UglifyJS.AST_Array && token.elements.length == 1 && token.elements[0] instanceof UglifyJS.AST_Array)
+            return new DoubleArrayToken([].slice.call(token.elements[0].elements).map(this.token), token.elements[0]);
 
-    if (token instanceof UglifyJS.AST_Array)
-        return new ArrayToken([].slice.call(token.elements).map(this.token), token);
+        if (token instanceof UglifyJS.AST_Array)
+            return new ArrayToken([].slice.call(token.elements).map(this.token), token);
 
-    if (token instanceof UglifyJS.AST_Call)
-        return new FunctionCallToken(token);
+        if (token instanceof UglifyJS.AST_Call)
+            return new FunctionCallToken(token);
 
-    if (token instanceof UglifyJS.AST_Lambda)
-        return new FunctionToken(token);
+        if (token instanceof UglifyJS.AST_Lambda)
+            return new FunctionToken(token);
 
-    if (token instanceof UglifyJS.AST_String)
-        return new StringToken(token);
+        if (token instanceof UglifyJS.AST_String)
+            return new StringToken(token);
 
-    if (token instanceof UglifyJS.AST_SymbolRef
-        || token instanceof UglifyJS.AST_Dot)
-        return new RefToken(token);
+        if (token instanceof UglifyJS.AST_SymbolRef
+            || token instanceof UglifyJS.AST_Dot)
+            return new RefToken(token);
 
-    throw Error('Unknown token : ' + (token.print_to_string ? token.print_to_string() : token ));
-};
+        throw Error('Unknown token : ' + (token.print_to_string ? token.print_to_string() : token ));
+    };
 
-Tokenizer.prototype.check = function (type) {
-    return this.data[0] instanceof type;
-};
+    Tokenizer.prototype.check = function (type) {
+        return this.data[0] instanceof type;
+    };
 
-Tokenizer.prototype.next = function () {
-    return this.data.shift();
-};
+    Tokenizer.prototype.next = function () {
+        return this.data.shift();
+    };
 
-Tokenizer.prototype.ensure = function(type) {
-    if (!this.check(type))
-        throw Error('Expected ' + type.name);
-};
+    Tokenizer.prototype.ensure = function(type) {
+        if (!this.check(type))
+            throw Error('Expected ' + type.name);
+    };
 
-Tokenizer.prototype.eot = function () {
-    return this.data.length < 1;
-};
+    Tokenizer.prototype.eot = function () {
+        return this.data.length < 1;
+    };
 
-Tokenizer.FunctionToken = FunctionToken;
-Tokenizer.FunctionCallToken = FunctionCallToken;
-Tokenizer.StringToken = StringToken;
-Tokenizer.RefToken = RefToken;
-Tokenizer.ModifierToken = ModifierToken;
-Tokenizer.ArrayToken = ArrayToken;
-Tokenizer.DoubleArrayToken = DoubleArrayToken;
-Tokenizer.VoidToken = VoidToken;
-Tokenizer.SelfToken = SelfToken;
-Tokenizer.ExtendsToken = ExtendsToken;
-Tokenizer.ImplementsToken = ImplementsToken;
+    Tokenizer.FunctionToken = FunctionToken;
+    Tokenizer.FunctionCallToken = FunctionCallToken;
+    Tokenizer.StringToken = StringToken;
+    Tokenizer.RefToken = RefToken;
+    Tokenizer.ModifierToken = ModifierToken;
+    Tokenizer.ArrayToken = ArrayToken;
+    Tokenizer.DoubleArrayToken = DoubleArrayToken;
+    Tokenizer.VoidToken = VoidToken;
+    Tokenizer.SelfToken = SelfToken;
+    Tokenizer.ExtendsToken = ExtendsToken;
+    Tokenizer.ImplementsToken = ImplementsToken;
 
-ria.__SYNTAX.Tokenizer = Tokenizer;
+    ria.__SYNTAX.Tokenizer = Tokenizer;
+})();
