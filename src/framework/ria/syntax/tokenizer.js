@@ -40,6 +40,9 @@
      * @return {Boolean}
      */
     function isImportedType(type) {
+        if (!type)
+            throw Error('value expected');
+
         return false;
     }
 
@@ -95,27 +98,35 @@
     };
 
     function FunctionCallToken(token) {
-        this.call = token;
+        throw Error('This token type can not be detected at RtDebug')
     }
 
     function StringToken (str) {
         this.value = str;
+        this.raw = str;
     }
 
     function RefToken (ref) {
         this.value = ref;
+        this.raw = ref;
     }
 
     function ModifierToken(mod) {
         this.value = mod;
     }
 
-    function ArrayToken(value) {
+    function ArrayToken(value, raw) {
         this.values = value;
+        this.raw = raw;
     }
 
-    function DoubleArrayToken(value) {
+    ArrayToken.prototype.getTokenizer = function () {
+        return new Tokenizer(this.raw);
+    };
+
+    function DoubleArrayToken(value, raw) {
         this.values = value;
+        this.raw = raw;
     }
 
     function VoidToken() {}
@@ -123,10 +134,11 @@
 
     function ExtendsToken(base) {
         this.value = base;
+        this.raw = base;
     }
 
     function ImplementsToken(ifcs) {
-        this.values = [].slice.call(ifcs);
+        this.raw = this.values = [].slice.call(ifcs);
     }
 
     /**
@@ -200,10 +212,10 @@
             return new ImplementsToken(token.ifcs);
 
         if (Array.isArray(token) && token.length == 1 && Array.isArray(token[0]))
-            return new ArrayToken([].slice.call(token).map(this.token[0]));
+            return new DoubleArrayToken(token[0].map(this.token), token);
 
         if (Array.isArray(token))
-            return new ArrayToken([].slice.call(token).map(this.token));
+            return new ArrayToken(token.map(this.token), token);
 
         if (typeof token === 'function' && !isType(token))
             return new FunctionToken(token);

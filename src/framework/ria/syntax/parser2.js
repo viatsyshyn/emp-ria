@@ -157,7 +157,7 @@
             ifcs = tkz.next().values;
 
         tkz.ensure(Tokenizer.ArrayToken);
-        var members = ria.__SYNTAX.parseMembers(new Tokenizer(tkz.next().raw.elements));
+        var members = ria.__SYNTAX.parseMembers(tkz.next().getTokenizer());
 
         if (!tkz.eot())
             throw Error('Expected end of class declaration');
