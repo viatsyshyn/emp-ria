@@ -25,18 +25,14 @@ NS('ria.reflection', function () {
 
             function invokeGetterOn(instance) {
                 ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
-                //#ifdef DEBUG
-                    instance = instance.__PROTECTED || instance;
-                //#endif
+                _DEBUG && (instance = instance.__PROTECTED || instance);
                 this.method.getter.call(instance);
             },
 
             VOID, function invokeSetterOn(instance, value) {
                 ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
                 ria.__SYNTAX.checkArg('value', [this.property.type], value);
-                //#ifdef DEBUG
-                    instance = instance.__PROTECTED || instance;
-                //#endif
+                _DEBUG && (instance = instance.__PROTECTED || instance);
                 this.method.setter.call(instance, value);
             }
         ]);

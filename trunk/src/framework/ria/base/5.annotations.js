@@ -15,9 +15,7 @@
         this.argsTypes = argsTypes;
         this.ret = null;
 
-        //#ifdef DEBUG
-            Object.freeze(this);
-        //#endif
+        _DEBUG && Object.freeze(this);
     }
 
     ria.__API.AnnotationDescriptor = AnnotationDescriptor;
@@ -36,9 +34,7 @@
 
         this.__META = meta;
 
-        //#ifdef DEBUG
-            Object.freeze(this);
-        //#endif
+        _DEBUG && Object.freeze(this);
     }
 
     /**
@@ -69,9 +65,7 @@
             ? ria.__API.getPipelineMethodCallProxyFor(fn_, fn_.__META, null)
             : fn_;
 
-        //#ifdef DEBUG
-            Object.freeze(fn_);
-        //#endif
+        _DEBUG && Object.freeze(fn_);
         return fn_;
     };
 

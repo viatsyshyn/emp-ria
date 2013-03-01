@@ -13,9 +13,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.buildIdentifier = function (name) {
         var values = {};
         function IdentifierValue(value) {
-            //#ifdef DEBUG
-            ria.__SYNTAX.checkArg('value', [String, Number, Boolean], value);
-            //#endif
+            _DEBUG && ria.__SYNTAX.checkArg('value', [String, Number, Boolean], value);
             return values.hasOwnProperty(value) ? values[value] : (values[value] = new IdentifierValueImpl(value));
         }
         ria.__API.identifier(IdentifierValue, name);
@@ -23,17 +21,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         function IdentifierValueImpl(value) {
             this.valueOf = function () { return value; };
             this.toString = function toString() { return '[' + name + '#' + value + ']'; };
-            //#ifdef DEBUG
-            Object.freeze(this);
-            //#endif
+            _DEBUG && Object.freeze(this);
         }
 
         ria.__API.extend(IdentifierValueImpl, IdentifierValue);
 
-        //#ifdef DEBUG
-        Object.freeze(IdentifierValue);
-        Object.freeze(IdentifierValueImpl);
-        //#endif
+        _DEBUG && Object.freeze(IdentifierValue);
+        _DEBUG && Object.freeze(IdentifierValueImpl);
 
         return IdentifierValue;
     };

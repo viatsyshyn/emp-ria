@@ -10,9 +10,7 @@
         this.identifierClass = identifierClass;
         this.name = name;
 
-        //#ifdef DEBUG
-            Object.freeze(this);
-        //#endif
+        _DEBUG && Object.freeze(this);
     }
 
     ria.__API.IdentifierDescriptor = IdentifierDescriptor;

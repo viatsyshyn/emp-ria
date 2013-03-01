@@ -120,9 +120,7 @@
         if (ria.__CFG.checkedMode)
             f_.__META = meta;
 
-        //#ifdef DEBUG
-            Object.freeze(f_);
-        //#endif
+        _DEBUG && Object.freeze(f_);
 
         return f_;
     };

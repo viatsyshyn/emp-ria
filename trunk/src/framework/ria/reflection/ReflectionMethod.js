@@ -30,9 +30,7 @@ NS('ria.reflection', function () {
             function invokeOn(instance, args) {
                 ria.__SYNTAX.checkArg('instance', [this.clazz], instance);
                 ria.__SYNTAX.checkArgs(this.method.argsNames, this.method.argsTypes, args);
-                //#ifdef DEBUG
-                    instance = instance.__PROTECTED || instance;
-                //#endif
+                _DEBUG && (instance = instance.__PROTECTED || instance);
                 this.method.impl.apply(instance, args);
             }
         ]);

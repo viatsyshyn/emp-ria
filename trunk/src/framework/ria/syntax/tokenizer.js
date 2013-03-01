@@ -77,9 +77,7 @@
         Modifiers.SELF = new ModifiersImpl('SELF');
         Modifiers.FINAL = new ModifiersImpl('FINAL');
         Modifiers.READONLY = new ModifiersImpl('READONLY');
-        //#ifdef DEBUG
-        Object.freeze(Modifiers);
-        //#endif
+        _DEBUG && Object.freeze(Modifiers);
         return Modifiers;
     }();
 

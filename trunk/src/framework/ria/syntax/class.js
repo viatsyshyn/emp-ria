@@ -143,10 +143,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             return BASE();
         };
         ClassProxy.prototype[getter.name] = getter;
-        //#ifdef DEBUG
-        getter.__BASE_BODY = propertyFromMeta.getter;
-        getter.__SELF = ClassProxy;
-        //#endif
+        if (_DEBUG) {
+            getter.__BASE_BODY = propertyFromMeta.getter;
+            getter.__SELF = ClassProxy;
+        }
 
         if (!property.flags.isReadonly) {
             setter = setterInMethods ? setterInMethods.body : function (value) {
@@ -154,10 +154,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 BASE(value);
             };
             ClassProxy.prototype[setter.name] = setter;
-            //#ifdef DEBUG
-            setter.__BASE_BODY = propertyFromMeta.setter;
-            setter.__SELF = ClassProxy;
-            //#endif
+            if (_DEBUG) {
+                setter.__BASE_BODY = propertyFromMeta.setter;
+                setter.__SELF = ClassProxy;
+            }
         }
 
         ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
@@ -172,9 +172,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
             }
 
-            //#ifdef DEBUG
-            method.body.__BASE_BODY = parentMethod.body;
-            //#endif
+            _DEBUG && (method.body.__BASE_BODY = parentMethod.body);
         }
 
         if (method.flags.isAbstract && parentMethod) {
@@ -195,9 +193,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         });
 
         var impl = ClassProxy.prototype[method.name] = method.body;
-        //#ifdef DEBUG
-        impl.__SELF = ClassProxy;
-        //#endif
+        _DEBUG && (impl.__SELF = ClassProxy);
         ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
     }
 
@@ -212,9 +208,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('The flags of getter ' + getters[0].name + ' should be the same with property flags');
 
         ClassProxy.prototype[getterName] = getter;
-        //#ifdef DEBUG
-        getter.__SELF = ClassProxy;
-        //#endif
+        _DEBUG && (getter.__SELF = ClassProxy);
 
         var setterName = property.getSetterName();
         var setters = def.methods.filter(function (_1) {
@@ -229,9 +223,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             setter = setters.length == 1 ? setters[0].body : getDefaultSetter(property.name, setterName);
 
             ClassProxy.prototype[setterName] = setter;
-            //#ifdef DEBUG
-            setter.__SELF = ClassProxy;
-            //#endif
+            _DEBUG && (setter.__SELF = ClassProxy);
         } else {
             if (setters.length) {
                 throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
@@ -249,10 +241,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var argsTypes = ctors.length == 1 ? ctors[0].argsTypes : [];
         var argsNames = ctors.length == 1 ? ctors[0].argsNames : [];
         ClassProxy.prototype.$ = ctor;
-        //#ifdef DEBUG
-        ctor.__BASE_BODY = def.base ? def.base.__META.ctor.impl : undefined;
-        ctor.__SELF = ClassProxy;
-        //#endif
+        if (_DEBUG) {
+            ctor.__BASE_BODY = def.base ? def.base.__META.ctor.impl : undefined;
+            ctor.__SELF = ClassProxy;
+        }
         ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, argsTypes, argsNames);
         processedMethods.push('$');
     }
@@ -410,11 +402,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return ria.__SYNTAX.buildClass(name, def, false);
     };
 
-    //#ifdef DEBUG
-    function BaseIsUndefined() { throw Error('BASE is supported only on method with OVERRIDE'); }
+    _DEBUG && ria.__API.addPipelineMethodCallStage('CallInit', function () {
+        function BaseIsUndefined() { throw Error('BASE is supported only on method with OVERRIDE'); }
 
-    ria.__API.addPipelineMethodCallStage('CallInit',
-        function (body, meta, scope, callSession) {
+        return function (body, meta, scope, callSession) {
             callSession.__OLD_SELF = window.SELF;
             window.SELF = body.__SELF;
 
@@ -423,9 +414,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             window.BASE = base
                 ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope)
                 : BaseIsUndefined;
-        });
+        } }());
 
-    ria.__API.addPipelineMethodCallStage('CallFinally',
+    _DEBUG && ria.__API.addPipelineMethodCallStage('CallFinally',
         function (body, meta, scope, callSession) {
             window.SELF = callSession.__OLD_SELF;
             delete callSession.__OLD_SELF;
@@ -433,5 +424,5 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             window.BASE = callSession.__OLD_BASE;
             delete callSession.__OLD_BASE;
         });
-    //#endif
+
 })();

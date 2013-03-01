@@ -107,9 +107,7 @@
 
         impl.__META = new ria.__API.MethodDescriptor(name, ret_, argsTypes_, argsNames_);
 
-        //#ifdef DEBUG
-            Object.freeze(impl);
-        //#endif
+        _DEBUG && Object.freeze(impl);
     };
 
     /**
@@ -123,9 +121,7 @@
         clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
 
         impl.__META = new ria.__API.MethodDescriptor('$', undefined, argsTypes_, argsNames_);
-        //#ifdef DEBUG
-            Object.freeze(impl);
-        //#endif
+        _DEBUG && Object.freeze(impl);
     };
 
     function ProtectedMethodProxy() {
@@ -144,10 +140,10 @@
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
 
         var publicInstance = instance;
-        //#ifdef DEBUG
+        if (_DEBUG) {
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
             publicInstance.__PROTECTED = instance;
-        //#endif
+        }
 
         for(var k in instance) {
             //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop
@@ -157,49 +153,43 @@
                 instance[name_] = f_.bind(instance);
                 if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
                     var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance);
-                    //#ifdef DEBUG
+                    if (_DEBUG) {
                         Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
                         if (f_.__META.isProtected())
                             fn = ProtectedMethodProxy;
-                    //#endif
+                    }
                     publicInstance[name_] = fn;
-                    //#ifdef DEBUG
-                        Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
-                    //#endif
+                    _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
                 }
             }
         }
 
-        //#ifdef DEBUG
+        if (_DEBUG) {
             instance.$ = undefined;
             publicInstance.$ = undefined;
-        //#endif
+        }
 
         if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
             ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance);
         }
 
-        //#ifdef DEBUG
-        for(var name in clazz.__META.properties)
+
+        if (_DEBUG) for(var name in clazz.__META.properties) {
             if (clazz.__META.properties.hasOwnProperty(name)) {
                 instance[name] = null;
             }
-        //#endif
+        }
 
         ctor.apply(instance, args);
 
-        //#ifdef DEBUG
-            Object.seal(instance);
-            Object.freeze(publicInstance);
-        //#endif
+        _DEBUG && Object.seal(instance);
+        _DEBUG && Object.freeze(publicInstance);
 
         return publicInstance;
     };
 
     ria.__API.compile = function(clazz) {
-        //#ifdef DEBUG
-            Object.freeze(clazz);
-        //#endif
+        _DEBUG && Object.freeze(clazz);
     };
 
     ria.__API.isClassConstructor = function(type) {
@@ -212,9 +202,7 @@
 
         Class.prototype.$ = function () {
             this.hashCode = Math.random().toString(36);
-            //#ifdef DEBUG
-                Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
-            //#endif
+            _DEBUG && Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
         };
         ria.__API.ctor(Class, Class.prototype.$, [], [], []);
 
