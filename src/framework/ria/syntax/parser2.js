@@ -144,12 +144,12 @@
 
     ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
 
-    ria.__SYNTAX.parseClassDef = function (tkz, baseClass) {
+    ria.__SYNTAX.parseClassDef = function (tkz) {
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
         var flags = ria.__SYNTAX.parseModifiers(tkz);
         tkz.ensure(Tokenizer.StringToken);
         var name = tkz.next().value;
-        var base = baseClass;
+        var base = null;
         if (tkz.check(Tokenizer.ExtendsToken))
             base = tkz.next().value;
         var ifcs = [];
