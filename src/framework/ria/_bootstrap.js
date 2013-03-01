@@ -7,6 +7,8 @@
  */
 
 var ria = {};
+var _DEBUG = true;
+var _RELEASE = false;
 
 (function () {
     "use strict";
@@ -103,7 +105,7 @@ var ria = {};
     var callbacks = [];
     ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
     ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
-    ria.__BOOTSTRAP.complete = function () {
+    rzia.__BOOTSTRAP.complete = function () {
         ria.__REQUIRE.init(ria.__CFG['#require']);
     };
 })();

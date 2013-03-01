@@ -15,9 +15,7 @@
                 function CardValueImpl(value) {
                     this.valueOf = function () { return value; };
                     this.toString = function toString() { return '[CardValue#' + value + ']'; };
-                    //#ifdef DEBUG
                     Object.freeze(this);
-                    //#endif
                 };
                 ria.__API.extend(CardValueImpl, CardValue);
                 return CardValue;
@@ -41,9 +39,7 @@
                 function CardValueImpl(value) {
                     this.valueOf = function () { return value; };
                     this.toString = function toString() { return '[CardValue#' + value + ']'; };
-                    //#ifdef DEBUG
                     Object.freeze(this);
-                    //#endif
                 }
                 ria.__API.extend(CardValueImpl, CardValue);
                 return CardValue;
@@ -59,9 +55,7 @@
                 function MoneyValueImpl(value) {
                     this.valueOf = function () { return value; };
                     this.toString = function toString() { return '[MoneyValue#' + value + ']'; };
-                    //#ifdef DEBUG
                     Object.freeze(this);
-                    //#endif
                 }
                 ria.__API.extend(MoneyValueImpl, MoneyValue);
                 return MoneyValue;

@@ -12,7 +12,9 @@
     if (!cfg.appClass)
         throw Error('__CFG.#mvc.appClass option is required.');
 
-    ria.__BOOTSTRAP.REQUIRE(cfg.appClass);
+    // TODO: REQUIRE mvc load/require/asset plugins
 
-    console.info('ria.mvc.js bootstrapped.');
+    // TODO: add bootstrapped callback and load cfg.appClass
+
+    //ria.__BOOTSTRAP.REQUIRE(cfg.appClass);
 })();

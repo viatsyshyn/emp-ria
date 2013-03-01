@@ -90,9 +90,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         ria.__API.ifc(InterfaceProxy, name, methods);
 
-        //#ifdef DEBUG
-            Object.freeze(InterfaceProxy);
-        //#endif
+        _DEBUG && Object.freeze(InterfaceProxy);
 
         return InterfaceProxy;
     };
@@ -109,13 +107,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.INTERFACE = INTERFACE;
 
-    //#ifdef DEBUG
-    ria.__API.addPipelineMethodCallStage('BeforeCall',
+    _DEBUG && ria.__API.addPipelineMethodCallStage('BeforeCall',
         function (body, meta, scope, args, result, callSession) {
             // TODO: wrap args into proxy if it's ifc
         });
 
-    ria.__API.addPipelineMethodCallStage('AfterCall',
+    _DEBUG && ria.__API.addPipelineMethodCallStage('AfterCall',
         function (body, meta, scope, args, result, callSession) {
             if (meta.ret && ria.__API.isInterface(meta.ret)) {
                 var fn = function AnonymousClass() {};
@@ -123,5 +120,4 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
             return result;
         });
-    //#endif
 })();

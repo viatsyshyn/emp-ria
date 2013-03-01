@@ -10,13 +10,9 @@ var ria = {};
 
 /** @class ria.__CFG */
 ria.__CFG = {
-//#ifdef DEBUG
     prettyStackTraces: true,
     checkedMode: true,
     enablePipelineMethodCall: true
-//#endif
 };
 
-//#ifdef DEBUG
-    Object.defineProperty(ria, '__CFG', {writable: false});
-//#endif
+Object.defineProperty(ria, '__CFG', {writable: false});

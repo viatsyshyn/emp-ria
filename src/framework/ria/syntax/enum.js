@@ -11,26 +11,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.buildEnum = function (name, val) {
         var values = {};
-        function Enum(raw) { return values[raw];}
-          ria.__API.enum(Enum, name);
-          function EnumImpl(raw) {
-              this.valueOf = function () { return raw; };
-              this.toString = function () { return name + '#' + raw; };
-          }
+        function Enum(raw) { return values[raw]; }
+        ria.__API.enum(Enum, name);
+        function EnumImpl(raw) {
+            this.valueOf = function () { return raw; };
+            this.toString = function () { return name + '#' + raw; };
+        }
 
-          ria.__API.extend(EnumImpl, Enum);
-          for (var prop in val)
-          {
-              var value_ = val[prop];
-              //TODO: throw correct error message
-              ria.__SYNTAX.checkArg('value', [Number, String, Boolean], value_);
-              values[value_] = Enum[prop] = new EnumImpl(value_);
-          }
+        ria.__API.extend(EnumImpl, Enum);
+        for (var prop in val) {
+            var value_ = val[prop];
+            //TODO: throw correct error message
+            ria.__SYNTAX.checkArg('value', [Number, String, Boolean], value_);
+            values[value_] = Enum[prop] = new EnumImpl(value_);
+        }
 
-          //#ifdef DEBUG
-            Object.freeze(Enum);
-            Object.freeze(values);
-          //#endif
+
+        _DEBUG && Object.freeze(Enum);
+        _DEBUG && Object.freeze(values);
+
         return Enum;
     };
 

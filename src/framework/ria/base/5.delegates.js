@@ -14,9 +14,7 @@
         this.argsTypes = argsTypes;
         this.argsNames = argsNames;
 
-        //#ifdef DEBUG
-            Object.freeze(this);
-        //#endif
+        _DEBUG && Object.freeze(this);
     }
 
     MethodDescriptor.prototype.isProtected = function () {
@@ -42,9 +40,8 @@
 
         DelegateProxy.__META = new MethodDescriptor(name, ret_, argsTypes_, argsNames_);
 
-        //#ifdef DEBUG
-            Object.freeze(DelegateProxy);
-        //#endif
+        _DEBUG && Object.freeze(DelegateProxy);
+
         return DelegateProxy;
     };
 
