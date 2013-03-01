@@ -8,6 +8,9 @@
 
 var ria = {};
 
+var _DEBUG = true;
+var _RELEASE = false;
+
 /** @class ria.__CFG */
 ria.__CFG = {
     prettyStackTraces: true,

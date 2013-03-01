@@ -5,11 +5,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     /**
-     * @param {String} name
      * @param {MethodDescriptor} def
-     * @return {Function}
      */
-    ria.__SYNTAX.buildDelegate = function (name, def) {
+    ria.__SYNTAX.validateDelegateDecl = function (def) {
         if(def.annotations.length)
             throw Error('Annotations are not supported in delegates');
 
@@ -17,20 +15,34 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Modifiers are not supported in delegates');
 
         def.argsTypes.forEach(function(type){
-            if(type == ria.__SYNTAX.Modifiers.SELF)
+            if(type instanceof ria.__SYNTAX.Tokenizer.SelfToken)
                 throw Error('Argument type can\'t be SELF in delegates');
         });
 
-        if(def.retType == ria.__SYNTAX.Modifiers.SELF)
+        if(def.retType instanceof ria.__SYNTAX.Tokenizer.SelfToken)
             throw Error('Return type can\'t be SELF in delegates');
+
         // TODO: warn if has body
-        return ria.__API.delegate(name, def.retType, def.argsTypes, def.argsNames);
+    };
+
+    /**
+     * @param {String} name
+     * @param {MethodDescriptor} def
+     * @return {Function}
+     */
+    ria.__SYNTAX.compileDelegate = function (name, def) {
+        return ria.__API.delegate(
+            name,
+            def.retType.value,
+            def.argsTypes.map(function (_) { return _.value; }),
+            def.argsNames);
     };
 
     function DELEGATE() {
-        var def = ria.__SYNTAX.parseMethod([].slice.call(arguments));
+        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateDelegateDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
-        var delegate = ria.__SYNTAX.buildDelegate(name, def);
+        var delegate = ria.__SYNTAX.compileDelegate(name, def);
         ria.__SYNTAX.define(name, delegate);
     }
 

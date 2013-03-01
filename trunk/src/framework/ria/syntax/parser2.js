@@ -4,14 +4,13 @@
 (function () {
     "use strict";
 
-    var Tokenizer = ria.__SYNTAX.Tokenizer;
-    var Modifiers = ria.__SYNTAX.Modifiers;
-
     /**
-     * @param {Tokenizer} tkz
+     * @param ria.__SYNTAX.Tokenizer tkz
      * @return {Object}
      */
     ria.__SYNTAX.parseModifiers = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+
         var flags = {
             isAbstract: false,
             isFinal: false,
@@ -19,12 +18,12 @@
             isReadonly: false
         };
 
-        while (!tkz.eot() && tkz.check(Tokenizer.ModifierToken)) {
+        while (!tkz.eot() && tkz.check(ria.__SYNTAX.Tokenizer.ModifierToken)) {
             switch(tkz.next().value) {
-                case Modifiers.ABSTRACT: flags.isAbstract = true; break;
-                case Modifiers.FINAL: flags.isFinal = true; break;
-                case Modifiers.OVERRIDE: flags.isOverride = true; break;
-                case Modifiers.READONLY: flags.isReadonly = true; break;
+                case ria.__SYNTAX.Modifiers.ABSTRACT: flags.isAbstract = true; break;
+                case ria.__SYNTAX.Modifiers.FINAL: flags.isFinal = true; break;
+                case ria.__SYNTAX.Modifiers.OVERRIDE: flags.isOverride = true; break;
+                case ria.__SYNTAX.Modifiers.READONLY: flags.isReadonly = true; break;
             }
         }
 
@@ -32,12 +31,14 @@
     };
 
     /**
-     * @param {Tokenizer} tkz
+     * @param ria.__SYNTAX.Tokenizer tkz
      * @return {Object}
      */
     ria.__SYNTAX.parseAnnotations = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+
         var annotations = [];
-        while(!tkz.eot() && tkz.check(Tokenizer.ArrayToken)) {
+        while(!tkz.eot() && tkz.check(ria.__SYNTAX.Tokenizer.ArrayToken)) {
             var a = tkz.next();
             console.info(a, a.values, a.values.length);
             if (a.values.length != 1
@@ -75,7 +76,7 @@
     }
 
     PropertyDescriptor.prototype.getGetterName = function () {
-        return ((this.type === Boolean) ? 'is' : 'get') + capitalize(this.name);
+        return ((this.type.value === Boolean) ? 'is' : 'get') + capitalize(this.name);
     };
 
     PropertyDescriptor.prototype.getSetterName = function () {
@@ -85,36 +86,38 @@
     ria.__SYNTAX.PropertyDescriptor = PropertyDescriptor;
     /**
      *
-     * @param {Tokenizer} tkz
+     * @param ria.__SYNTAX.Tokenizer tkz
      * @return {MethodDescriptor|PropertyDescriptor}
      */
     ria.__SYNTAX.parseMember = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
         //if (tkz.check(Tokenizer.ArrayToken))
 
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
         var argsHints = [];
-        if (tkz.check(Tokenizer.DoubleArrayToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.DoubleArrayToken))
             argsHints = tkz.next().values;
 
         var flags = ria.__SYNTAX.parseModifiers(tkz);
 
         var retType = null;
-        if (tkz.check(Tokenizer.RefToken) || tkz.check(Tokenizer.VoidToken) || tkz.check(Tokenizer.SelfToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.RefToken) || tkz.check(ria.__SYNTAX.Tokenizer.VoidToken) || tkz.check(ria.__SYNTAX.Tokenizer.SelfToken))
             retType = tkz.next();
 
-        if (tkz.check(Tokenizer.StringToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.StringToken))
             return new PropertyDescriptor(tkz.next().value, retType, annotations, flags);
 
-        tkz.ensure(Tokenizer.FunctionToken);
+        tkz.ensure(ria.__SYNTAX.Tokenizer.FunctionToken);
         var body = tkz.next();
         return new MethodDescriptor(body.getName(), body.getParameters(), argsHints, retType, flags, body, annotations);
     };
 
     /**
      *
-     * @param {Tokenizer} tkz
+     * @param ria.__SYNTAX.Tokenizer tkz
      */
     ria.__SYNTAX.parseMembers = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
         var members = [];
         while (!tkz.eot())
             members.push(ria.__SYNTAX.parseMember(tkz));
@@ -145,18 +148,20 @@
     ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
 
     ria.__SYNTAX.parseClassDef = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
         var flags = ria.__SYNTAX.parseModifiers(tkz);
-        tkz.ensure(Tokenizer.StringToken);
+        tkz.ensure(ria.__SYNTAX.Tokenizer.StringToken);
         var name = tkz.next().value;
         var base = null;
-        if (tkz.check(Tokenizer.ExtendsToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.ExtendsToken))
             base = tkz.next().value;
         var ifcs = [];
-        if (tkz.check(Tokenizer.ImplementsToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.ImplementsToken))
             ifcs = tkz.next().values;
 
-        tkz.ensure(Tokenizer.ArrayToken);
+        tkz.ensure(ria.__SYNTAX.Tokenizer.ArrayToken);
         var members = ria.__SYNTAX.parseMembers(tkz.next().getTokenizer());
 
         if (!tkz.eot())
