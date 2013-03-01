@@ -8,12 +8,29 @@
         return /^.+_$/.test(name);
     };
 
+    var Modifiers = function () {
+        function Modifiers() { throw Error(); }
+        ria.__API.enum(Modifiers, 'Modifiers');
+        function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
+        ria.__API.extend(ModifiersImpl, Modifiers);
+        Modifiers.OVERRIDE = new ModifiersImpl(1);
+        Modifiers.ABSTRACT = new ModifiersImpl(2);
+        Modifiers.VOID = new ModifiersImpl(3);
+        Modifiers.SELF = new ModifiersImpl(4);
+        Modifiers.FINAL = new ModifiersImpl(5);
+        Modifiers.READONLY = new ModifiersImpl(6);
+        Object.freeze(Modifiers);
+        return Modifiers;
+    }();
+
+    ria.__SYNTAX.Modifiers = Modifiers;
+
     /**
-     * @param ria.__SYNTAX.Tokenizer tkz
+     * @param {ria.__SYNTAX.Tokenizer} tkz
      * @return {Object}
      */
     ria.__SYNTAX.parseModifiers = function (tkz) {
-        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
 
         var flags = {
             isAbstract: false,
@@ -35,11 +52,11 @@
     };
 
     /**
-     * @param ria.__SYNTAX.Tokenizer tkz
+     * @param {ria.__SYNTAX.Tokenizer} tkz
      * @return {Object}
      */
     ria.__SYNTAX.parseAnnotations = function (tkz) {
-        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
 
         var annotations = [];
         while(!tkz.eot() && tkz.check(ria.__SYNTAX.Tokenizer.ArrayToken)) {
@@ -90,11 +107,11 @@
     ria.__SYNTAX.PropertyDescriptor = PropertyDescriptor;
     /**
      *
-     * @param ria.__SYNTAX.Tokenizer tkz
+     * @param {ria.__SYNTAX.Tokenizer} tkz
      * @return {MethodDescriptor|PropertyDescriptor}
      */
     ria.__SYNTAX.parseMember = function (tkz) {
-        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
         //if (tkz.check(Tokenizer.ArrayToken))
 
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
@@ -118,10 +135,10 @@
 
     /**
      *
-     * @param ria.__SYNTAX.Tokenizer tkz
+     * @param {ria.__SYNTAX.Tokenizer} tkz
      */
     ria.__SYNTAX.parseMembers = function (tkz) {
-        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
         var members = [];
         while (!tkz.eot())
             members.push(ria.__SYNTAX.parseMember(tkz));
@@ -151,8 +168,12 @@
 
     ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
 
+    /**
+     * @param {ria.__SYNTAX.Tokenizer} tkz
+     * @return {ClassDescriptor}
+     */
     ria.__SYNTAX.parseClassDef = function (tkz) {
-        ria.__SYNTAX.checkArg('tkz', ria.__SYNTAX.Tokenizer, tkz);
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
 
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
         var flags = ria.__SYNTAX.parseModifiers(tkz);

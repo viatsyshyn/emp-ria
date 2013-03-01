@@ -5,7 +5,7 @@
         testBuildIdentifier: function () {
             var result;
             assertNoException(function () {
-                result = ria.__SYNTAX.buildIdentifier('MyIdentifier');
+                result = ria.__SYNTAX.compileIdentifier('MyIdentifier');
             });
 
             assertNotUndefined(result);
