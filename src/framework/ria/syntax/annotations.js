@@ -42,6 +42,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__SYNTAX.validateAnnotationDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
         var annotation = ria.__SYNTAX.compileAnnotation(name, def);
-        ria.__SYNTAX.define(name, annotation);
+        ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, annotation);
+        return annotation;
     }
 })();

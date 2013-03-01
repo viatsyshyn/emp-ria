@@ -3,21 +3,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
 (function () {
     "use strict";
-    /**
-     * @param {Array} args
-     * @return {ClassDescriptor}
-     */
-    ria.__SYNTAX.parseException = function (args) {
-        var def = ria.__SYNTAX.parseClassDef(args, ria.__API.Exception);
-        return def;
-    };
 
     /**
-     * @param {String} name
      * @param {ClassDescriptor} def
-     * @return {Function}
      */
-    ria.__SYNTAX.buildException = function (name, def) {
+    ria.__SYNTAX.validateException = function (def) {
+
+        ria.__SYNTAX.validateClassDecl(def, ria.__API.Exception);
 
         if(def.annotations.length)
             throw Error('Annotations are not supported in delegates');
@@ -27,14 +19,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if(!ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Exception))
             throw Error('Errors can extend only from other exceptions');
-
-        return ria.__SYNTAX.buildClass(name, def, true);
     };
 
     ria.__SYNTAX.EXCEPTION = function () {
-        var def = ria.__SYNTAX.parseException([].slice.call(arguments));
+        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateException(def);
         var name = ria.__SYNTAX.getFullName(def.name);
-        var exception = ria.__SYNTAX.buildException(name, def);
-        ria.__SYNTAX.define(name, exception);
+        var exception = ria.__SYNTAX.compileClass(name, def);
+        ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, exception);
+        return exception;
     }
 })();

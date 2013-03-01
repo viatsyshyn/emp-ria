@@ -10,7 +10,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @param {String} name
      * @return {Function}
      */
-    ria.__SYNTAX.buildIdentifier = function (name) {
+    ria.__SYNTAX.compileIdentifier = function (name) {
         var values = {};
         function IdentifierValue(value) {
             ria.__SYNTAX.checkArg('value', [String, Number, Boolean], value);
@@ -34,7 +34,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.IDENTIFIER = function (n) {
         var name = ria.__SYNTAX.getFullName(n);
-        var delegate = ria.__SYNTAX.buildIdentifier(name);
-        ria.__SYNTAX.define(name, delegate);
+        var identifier = ria.__SYNTAX.compileIdentifier(name);
+        ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, identifier);
+        return identifier;
     };
 })();

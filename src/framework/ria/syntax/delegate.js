@@ -43,7 +43,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__SYNTAX.validateDelegateDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
         var delegate = ria.__SYNTAX.compileDelegate(name, def);
-        ria.__SYNTAX.define(name, delegate);
+        ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, delegate);
+        return delegate;
     }
 
     ria.__SYNTAX.DELEGATE = DELEGATE;
