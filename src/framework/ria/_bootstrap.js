@@ -105,7 +105,7 @@ var _RELEASE = false;
     var callbacks = [];
     ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
     ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
-    rzia.__BOOTSTRAP.complete = function () {
+    ria.__BOOTSTRAP.complete = function () {
         ria.__REQUIRE.init(ria.__CFG['#require']);
     };
 })();
