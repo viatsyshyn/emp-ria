@@ -27,8 +27,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
 
 
-        _DEBUG && Object.freeze(Enum);
-        _DEBUG && Object.freeze(values);
+        Object.freeze(Enum);
+        Object.freeze(values);
 
         return Enum;
     };

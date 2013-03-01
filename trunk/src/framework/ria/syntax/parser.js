@@ -74,7 +74,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         Modifiers.SELF = new ModifiersImpl(4);
         Modifiers.FINAL = new ModifiersImpl(5);
         Modifiers.READONLY = new ModifiersImpl(6);
-        _DEBUG && Object.freeze(Modifiers);
+        Object.freeze(Modifiers);
         return Modifiers;
     }();
 
