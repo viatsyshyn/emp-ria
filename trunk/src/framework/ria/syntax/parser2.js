@@ -4,6 +4,10 @@
 (function () {
     "use strict";
 
+    ria.__SYNTAX.isProtected = function (name) {
+        return /^.+_$/.test(name);
+    };
+
     /**
      * @param ria.__SYNTAX.Tokenizer tkz
      * @return {Object}

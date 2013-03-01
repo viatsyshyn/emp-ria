@@ -41,8 +41,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.NS = function (name, callback) {
         var old = CurrentNamespace;
-        CurrentNamespace = name;
-        setPath(CurrentNamespace, {});
+        //noinspection JSUnusedAssignment
+        setPath(CurrentNamespace = name, {});
         callback();
         CurrentNamespace = old;
     }

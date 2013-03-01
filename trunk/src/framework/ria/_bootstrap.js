@@ -85,7 +85,7 @@ var _RELEASE = false;
     REQUIRE('ria/syntax/identifier.js');
     REQUIRE('ria/syntax/interface.js');
     REQUIRE('ria/syntax/ns.js');
-    REQUIRE('ria/syntax/parser.js');
+    REQUIRE('ria/syntax/parser2.js');
     REQUIRE('ria/syntax/type-hints.js');
 
     // load symbols

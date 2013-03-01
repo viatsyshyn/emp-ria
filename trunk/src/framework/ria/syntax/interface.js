@@ -125,24 +125,27 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
         ria.__SYNTAX.validateInterfaceDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
-        var clazz = ria.__SYNTAX.compileInterface(name, def);
-        ria.__SYNTAX.define(name, clazz);
+        var ifc = ria.__SYNTAX.compileInterface(name, def);
+        ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, ifc);
+        return ifc;
     }
 
     ria.__SYNTAX.INTERFACE = INTERFACE;
 
-    ria.__API.addPipelineMethodCallStage('BeforeCall',
-        function (body, meta, scope, args, result, callSession) {
-            // TODO: wrap args into proxy if it's ifc
-        });
+    if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
+        ria.__API.addPipelineMethodCallStage('BeforeCall',
+            function (body, meta, scope, args, result, callSession) {
+                // TODO: wrap args into proxy if it's ifc
+            });
 
-    ria.__API.addPipelineMethodCallStage('AfterCall',
-        function (body, meta, scope, args, result, callSession) {
-            if (meta.ret && ria.__API.isInterface(meta.ret)) {
-                var fn = function AnonymousClass() {};
-                // TODO: wrap result into proxy if it's ifc
-            }
+        ria.__API.addPipelineMethodCallStage('AfterCall',
+            function (body, meta, scope, args, result, callSession) {
+                if (meta.ret && ria.__API.isInterface(meta.ret)) {
+                    var fn = function AnonymousClass() {};
+                    // TODO: wrap result into proxy if it's ifc
+                }
 
-            return result;
-        });
+                return result;
+            });
+    }
 })();
