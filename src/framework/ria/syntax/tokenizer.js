@@ -189,6 +189,7 @@
     };
 
     function Tokenizer(data) {
+        this.token = this.token.bind(this);
         this.data = [].slice.call(data).map(this.token);
     }
 
@@ -224,7 +225,10 @@
         if (typeof token === 'function')
             return new RefToken(token);
 
-        throw Error('Unknown token');
+        if (typeof token === 'object')
+            return new RefToken(token);
+
+        throw Error('Unexpected token, type: ' + typeof token);
     };
 
     Tokenizer.prototype.check = function (type) {

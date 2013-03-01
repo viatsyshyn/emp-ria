@@ -5,11 +5,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     /**
-     * @param {String} name
      * @param {MethodDescriptor} def
-     * @return {Function}
      */
-    ria.__SYNTAX.buildAnnotation = function (name, def) {
+    ria.__SYNTAX.validateAnnotationDecl = function (def) {
         if(def.annotations.length)
             throw Error('Annotations are not supported in annotations');
 
@@ -25,14 +23,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         });
 
         // TODO: warn if has body
+    };
 
-        return ria.__API.annotation(name, def.argsTypes, def.argsNames);
+    /**
+     * @param {String} name
+     * @param {MethodDescriptor} def
+     * @return {Function}
+     */
+    ria.__SYNTAX.compileAnnotation = function (name, def) {
+        return ria.__API.annotation(
+            name,
+            def.argsTypes.map(function(_) { return _.value}),
+            def.argsNames);
     };
 
     ria.__SYNTAX.ANNOTATION = function () {
-        var def = ria.__SYNTAX.parseMethod([].slice.call(arguments));
+        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateAnnotationDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
-        var annotation = ria.__SYNTAX.buildAnnotation(name, def);
+        var annotation = ria.__SYNTAX.compileAnnotation(name, def);
         ria.__SYNTAX.define(name, annotation);
     }
 })();

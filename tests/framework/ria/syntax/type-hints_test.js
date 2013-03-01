@@ -4,9 +4,9 @@
     TestCase("TypeHintsTestCase").prototype = {
 
         testCheckArgs: function () {
-            var d = ria.__SYNTAX.buildDelegate('TestDelegate', ria.__SYNTAX.parseMethod([
-                [String, Number],
-                Boolean, function TestDelegate(s, n_) {}]));
+            var d = ria.__SYNTAX.compileDelegate('TestDelegate', ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, Number]],
+                Boolean, function TestDelegate(s, n_) {}])));
             var wrapper = d(function (s, n) { return s === String(n); });
 
             assertNoException(function () { wrapper('1'); });
@@ -18,9 +18,9 @@
         },
 
         testCheckReturn: function () {
-            var d = ria.__SYNTAX.buildDelegate('TestDelegate', ria.__SYNTAX.parseMethod([
-                            [Object],
-                            Boolean, function TestDelegate(s) {}]));
+            var d = ria.__SYNTAX.compileDelegate('TestDelegate', ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                            [[Object]],
+                            Boolean, function TestDelegate(s) {}])));
 
             var wrapper = d(function (s) { return s; });
 

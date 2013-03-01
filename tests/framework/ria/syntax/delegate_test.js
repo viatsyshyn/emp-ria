@@ -3,15 +3,16 @@
 
     TestCase("DelegateTestCase").prototype = {
         testBuildDelegate: function () {
-            var descriptor = ria.__SYNTAX.parseMethod([
-                [String, String],
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, String]],
                 Boolean, function compare(_1, _2) {}
-            ]);
+            ]));
 
-            var result;
             assertNoException(function() {
-                result = ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             });
+
+            var result = ria.__SYNTAX.compileDelegate('Compare', descriptor);
 
             assertNotUndefined(result);
             assertFunction(result);
@@ -23,71 +24,71 @@
 
             var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
 
-            var descriptor = ria.__SYNTAX.parseMethod([
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
                 [MyAnnotation],
-                [String, String],
+                [[String, String]],
                 Boolean, function compare(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             }, 'Error');
         },
 
         testBuildDelegateWithFINAL: function () {
 
-            var descriptor = ria.__SYNTAX.parseMethod([
-                [String, String],
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, String]],
                 ria.__SYNTAX.Modifiers.FINAL, Boolean, function compare(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             }, 'Error');
         },
 
         testBuildDelegateWithAbstract: function () {
 
-            var descriptor = ria.__SYNTAX.parseMethod([
-                [String, String],
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, String]],
                 ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function compare(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             }, 'Error');
         },
 
         testBuildDelegateWithOverride: function () {
 
-            var descriptor = ria.__SYNTAX.parseMethod([
-                [String, String],
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, String]],
                 ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function compare(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             }, 'Error');
         },
 
         testBuildAnnotationWithSelf: function () {
 
-            var descriptor = ria.__SYNTAX.parseMethod([
-                [String, String],
+            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, String]],
                 ria.__SYNTAX.Modifiers.SELF, function compare(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare', descriptor);
+                ria.__SYNTAX.validateDelegateDecl(descriptor);
             }, 'Error');
 
-            var descriptor2 = ria.__SYNTAX.parseMethod([
-                [String, ria.__SYNTAX.Modifiers.SELF],
+            var descriptor2 = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+                [[String, ria.__SYNTAX.Modifiers.SELF]],
                 Boolean,function compare2(_1, _2) {}
-            ]);
+            ]));
 
             assertException(function() {
-                ria.__SYNTAX.buildDelegate('Compare2', descriptor2);
+                ria.__SYNTAX.validateDelegateDecl(descriptor2);
             }, 'Error');
         }
     };

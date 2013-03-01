@@ -4,22 +4,23 @@
         testSelf: function () {
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                var ifcDef = ria.__SYNTAX.parseClass([
+                var ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                     'MyIfc', [
                         READONLY, SELF, 'myProp',
 
                         SELF, function method1() {},
 
-                        [SELF],
+                        [[SELF]],
                         VOID, function method2(a) {}
                     ]
-                ]);
+                ]));
             }
 
-            var MyIfc;
             assertNoException(function () {
-                MyIfc = ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             });
+
+            var MyIfc = ria.__SYNTAX.compileInterface(ifcDef.name, ifcDef);
 
             assertEquals(MyIfc, MyIfc.__META.methods.method1.retType);
             assertEquals(MyIfc, MyIfc.__META.methods.method2.argsTypes[0]);
@@ -29,19 +30,20 @@
         testProperties: function () {
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                var ifcDef = ria.__SYNTAX.parseClass([
+                var ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                     'MyIfc', [
                         Number, 'myProp',
 
                         READONLY, Boolean, 'myFlag'
                     ]
-                ]);
+                ]));
             }
 
-            var MyIfc;
             assertNoException(function () {
-                MyIfc = ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             });
+
+            var MyIfc = ria.__SYNTAX.compileInterface(ifcDef.name, ifcDef);
 
             assertNotUndefined(MyIfc.__META.methods.getMyProp);
             assertNotUndefined(MyIfc.__META.methods.setMyProp);
@@ -53,54 +55,58 @@
         testCtor: function() {
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                var ifcDef = ria.__SYNTAX.parseClass([
+                var ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                     'MyIfc', [
                         function $() {}
                     ]
-                ]);
+                ]));
             }
 
-            //assertException(function () {
-                ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
-            //}, 'Error');
+            assertException(function () {
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
+            }, 'Error');
         },
 
         testFlags: function() {
             var ifcDef;
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                ifcDef = ria.__SYNTAX.parseClass([ABSTRACT, 'MyIfc', []]);
+                ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
+                    ABSTRACT, 'MyIfc', []]));
             }
 
             assertException(function () {
-                ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             }, 'Error');
 
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                ifcDef = ria.__SYNTAX.parseClass([OVERRIDE, 'MyIfc', []]);
+                ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
+                    OVERRIDE, 'MyIfc', []]));
             }
 
             assertException(function () {
-                ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             }, 'Error');
 
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                ifcDef = ria.__SYNTAX.parseClass([FINAL, 'MyIfc', []]);
+                ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
+                    FINAL, 'MyIfc', []]));
             }
 
             assertException(function () {
-                ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             }, 'Error');
 
             //noinspection WithStatementJS
             with (ria.__SYNTAX.Modifiers) {
-                ifcDef = ria.__SYNTAX.parseClass([READONLY, 'MyIfc', []]);
+                ifcDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
+                    READONLY, 'MyIfc', []]));
             }
 
             assertException(function () {
-                ria.__SYNTAX.buildInterface(ifcDef.name, ifcDef);
+                ria.__SYNTAX.validateInterfaceDecl(ifcDef);
             }, 'Error');
         }
     };
