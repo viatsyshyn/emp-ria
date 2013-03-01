@@ -13,7 +13,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (typeof name !== 'string')
             throw Error('String is expected as enum name');
 
-        for (var prop in val) {
+        for (var prop in val) if (val.hasOwnProperty(prop)) {
             var value_ = val[prop];
             switch (typeof value_) {
                 case 'number':
@@ -21,7 +21,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 case 'boolean':
                     break;
                 default:
-                    throw Error('Enum value should Number, String or Boolean, got ' + typeof value_)
+                    throw Error('Enum value should Number, String or Boolean, got ' + (typeof value_))
 
             }
         }
@@ -42,7 +42,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
 
         ria.__API.extend(EnumImpl, Enum);
-        for (var prop in val) {
+        for (var prop in val) if (val.hasOwnProperty(prop)) {
             var value_ = val[prop];
             values[value_] = Enum[prop] = new EnumImpl(value_);
         }

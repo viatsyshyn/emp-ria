@@ -4,7 +4,7 @@
     TestCase("ExceptionTestCase").prototype = {
         testBuildException: function () {
 
-            var MyExceptionDef = ria.__SYNTAX.parseException([
+            var MyExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'MyException', [
                     String, 'member',
 
@@ -14,38 +14,40 @@
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;
                     }
-                ]]);
+                ]]));
 
-            var MyException;
             assertNoException(function () {
-                MyException = ria.__SYNTAX.buildException('MyException', MyExceptionDef);
+                ria.__SYNTAX.validateException(MyExceptionDef);
             });
 
+            var MyException = ria.__SYNTAX.compileClass('MyException', MyExceptionDef);
             assertEquals('MyException', MyException.__META.name);
             assertNotUndefined(MyException);
             assertFunction(MyException);
         },
 
         testBaseException: function () {
-            var baseExceptionDef = ria.__SYNTAX.parseException([
+            var baseExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'BaseException', [
                     function $() {}
-                ]]);
+                ]]));
 
-            var BaseException;
             assertNoException(function () {
-                BaseException = ria.__SYNTAX.buildException('MyException', baseExceptionDef);
+                ria.__SYNTAX.validateException(baseExceptionDef);
             });
 
-            var childExceptionDef = ria.__SYNTAX.parseException([
+            var BaseException = ria.__SYNTAX.compileClass('MyException', baseExceptionDef);
+
+            var childExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [
                     function $() {}
-                ]]);
+                ]]));
 
-            var ChildException;
             assertNoException(function () {
-                ChildException = ria.__SYNTAX.buildException('MyException', childExceptionDef);
+                ria.__SYNTAX.validateException(childExceptionDef);
             });
+
+            var ChildException = ria.__SYNTAX.compileClass('MyException', childExceptionDef);
 
             //noinspection JSUnusedAssignment
             var instance = new ChildException();
@@ -55,17 +57,16 @@
         },
 
         testBadExtending: function () {
-            var baseClassDef = ria.__SYNTAX.parseClass([
+            var baseClassDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'BaseClass', [
                     function $() {}
-                ]]);
+                ]]));
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = ria.__SYNTAX.buildClass('BaseClass', baseClassDef);
-            });
+            ria.__SYNTAX.validateClassDecl(baseClassDef);
 
-            var childExceptionDef = ria.__SYNTAX.parseException([
+            var BaseClass = ria.__SYNTAX.compileClass('BaseClass', baseClassDef);
+
+            var childExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'MyException', ria.__SYNTAX.EXTENDS(BaseClass), [
                     function $() {},
 
@@ -73,10 +74,10 @@
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;
                     }
-                ]]);
+                ]]));
 
             assertException('Expects invalid parent error.', function () {
-                ria.__SYNTAX.buildException('MyException', childExceptionDef);
+                ria.__SYNTAX.validateException(childExceptionDef);
             });
         }
     };

@@ -5,7 +5,7 @@
         testBuildEnum: function () {
             var result;
             assertNoException(function () {
-                result = ria.__SYNTAX.buildEnum('Enumchyk', {
+                result = ria.__SYNTAX.compileEnum('Enumchyk', {
                     TWIX: true,
                     MARS: 2,
                     NUTS: '3'
@@ -19,7 +19,7 @@
 
         testEnumException: function () {
             assertException(function () {
-                ria.__SYNTAX.buildEnum('Enumchyk', {
+                ria.__SYNTAX.validateEnumDecl('Enumchyk', {
                     TWIX: true,
                     MARS: function (){},
                     NUTS: '3'
