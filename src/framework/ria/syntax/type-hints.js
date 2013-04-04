@@ -1,3 +1,6 @@
+(ria = ria || {}).__SYNTAX = ria.__SYNTAX || {};
+(ria = ria || {}).__CFG = ria.__CFG || {};
+
 (function () {
     "use strict";
 

@@ -3,6 +3,10 @@
 (function () {
     "use strict";
 
+    function __clone(a) {
+        return [].slice.call(a);
+    }
+
     var Modifiers = function () {
         function Modifiers() { throw Error(); }
         function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
@@ -67,7 +71,7 @@
     }
 
     ArrayToken.prototype.getTokenizer = function () {
-        return new Tokenizer(this.raw);
+        return new Tokenizer(null, this.values);
     };
 
     function DoubleArrayToken(value, raw) {
@@ -84,14 +88,14 @@
     }
 
     function ImplementsToken(ifcs) {
-        this.raw = this.values = [].slice.call(ifcs);
+        this.raw = this.values = __clone(ifcs);
     }
 
 
     function Tokenizer(data, processed) {
         this.token = this.token.bind(this);
 
-        this.data = data ? [].slice.call(data).map(this.token) : processed;
+        this.data = data ? __clone(data).map(this.token) : processed;
     }
 
     Tokenizer.prototype.token = function (token) {
@@ -111,10 +115,10 @@
             return new ImplementsToken(token.args.slice());
 
         if (token instanceof UglifyJS.AST_Array && token.elements.length == 1 && token.elements[0] instanceof UglifyJS.AST_Array)
-            return new DoubleArrayToken([].slice.call(token.elements[0].elements).map(this.token), token.elements[0]);
+            return new DoubleArrayToken(__clone(token.elements[0].elements).map(this.token), token.elements[0]);
 
         if (token instanceof UglifyJS.AST_Array)
-            return new ArrayToken([].slice.call(token.elements).map(this.token), token);
+            return new ArrayToken(__clone(token.elements).map(this.token), token);
 
         if (token instanceof UglifyJS.AST_Call)
             return new FunctionCallToken(token);

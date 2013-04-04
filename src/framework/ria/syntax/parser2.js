@@ -8,9 +8,9 @@
         return /^.+_$/.test(name);
     };
 
-    var Modifiers = function () {
+    /**var Modifiers = function () {
         function Modifiers() { throw Error(); }
-        ria.__API.enum(Modifiers, 'Modifiers');
+        //ria.__API.enum(Modifiers, 'Modifiers');
         function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
         ria.__API.extend(ModifiersImpl, Modifiers);
         Modifiers.OVERRIDE = new ModifiersImpl(1);
@@ -23,7 +23,7 @@
         return Modifiers;
     }();
 
-    ria.__SYNTAX.Modifiers = Modifiers;
+    ria.__SYNTAX.Modifiers = Modifiers;**/
 
     /**
      * @param {ria.__SYNTAX.Tokenizer} tkz
@@ -61,7 +61,6 @@
         var annotations = [];
         while(!tkz.eot() && tkz.check(ria.__SYNTAX.Tokenizer.ArrayToken)) {
             var a = tkz.next();
-            console.info(a, a.values, a.values.length);
             if (a.values.length != 1
                 //|| !(a.values[0] instanceof Tokenizer.FunctionCallToken || a.values[0] instanceof Tokenizer.RefToken)
                 )
@@ -139,6 +138,7 @@
      */
     ria.__SYNTAX.parseMembers = function (tkz) {
         ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
+
         var members = [];
         while (!tkz.eot())
             members.push(ria.__SYNTAX.parseMember(tkz));
@@ -181,10 +181,10 @@
         var name = tkz.next().value;
         var base = null;
         if (tkz.check(ria.__SYNTAX.Tokenizer.ExtendsToken))
-            base = tkz.next().value;
-        var ifcs = [];
+            base = tkz.next();
+        var ifcs = new ria.__SYNTAX.Tokenizer.ImplementsToken([]);
         if (tkz.check(ria.__SYNTAX.Tokenizer.ImplementsToken))
-            ifcs = tkz.next().values;
+            ifcs = tkz.next();
 
         tkz.ensure(ria.__SYNTAX.Tokenizer.ArrayToken);
         var members = ria.__SYNTAX.parseMembers(tkz.next().getTokenizer());
@@ -196,5 +196,36 @@
         var methods = members.filter(function (_1) {return _1 instanceof MethodDescriptor; });
 
         return new ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods);
+    };
+
+    /**
+     * @param {ClassDescriptor} object
+     * @param {ClassDescriptor} constructor
+     * @returns {Boolean}
+     */
+    ria.__SYNTAX.isInstanceOf = function(object, constructor){
+        var o = object;
+        while (o.__proto__ != null) {
+            if (o.__proto__ === constructor.prototype)
+                return true;
+            o = o.__proto__;
+        }
+        return false;
+    };
+
+    /**
+     * @param {ClassDescriptor} clazz
+     * @param {ClassDescriptor} constructor
+     * @returns {Boolean}
+     */
+    ria.__SYNTAX.isDescendantOf = function(clazz, constructor){
+        var o = clazz;
+        while (o.__META != null) {
+            if (o === constructor)
+                break;
+
+            o = o.__META.base;
+        }
+        return o === constructor;
     }
 })();

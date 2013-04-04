@@ -10,13 +10,11 @@
 
 function InterfaceCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'INTERFACE') {
-        var tkz = new Tokenizer(node.args);
+        var tkz = new ria.__SYNTAX.Tokenizer(node.args);
 
         var def = ria.__SYNTAX.parseClassDef(tkz);
 
-        //ria.__SYNTAX.validateInterfaceDeclaration
-
-        console.info(def);
+        ria.__SYNTAX.validateInterfaceDecl(def);
 
         console.info('Found interface ' + def.name + ' in ' + ns);
 
@@ -29,7 +27,7 @@ function InterfaceCompiler(ns, node, descend) {
             ]})
         });
 
-        return new UglifyJS.AST_Assign({
+        var result = new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), def.name),
             operator: '=',
             right: new UglifyJS.AST_Call({
@@ -40,6 +38,11 @@ function InterfaceCompiler(ns, node, descend) {
                 ]
             })
         });
+
+        result.start = node.start;
+        result.end = node.end;
+
+        return result;
     }
 }
 

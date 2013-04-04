@@ -183,8 +183,8 @@
             assertEquals('MyClass', result.name);
             assertNull(result.base);
 
-            assertArray(result.ifcs);
-            assertEquals(0, result.ifcs.length);
+            assertArray(result.ifcs.values);
+            assertEquals(0, result.ifcs.values.length);
 
             assertObject(result.flags);
             assertTrue(result.flags.isAbstract);

@@ -36,7 +36,7 @@
                 ria.__SYNTAX.validateException(baseExceptionDef);
             });
 
-            var BaseException = ria.__SYNTAX.compileClass('MyException', baseExceptionDef);
+            var BaseException = ria.__SYNTAX.compileClass('BaseException', baseExceptionDef);
 
             var childExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [
@@ -62,7 +62,7 @@
                     function $() {}
                 ]]));
 
-            ria.__SYNTAX.validateClassDecl(baseClassDef);
+            ria.__SYNTAX.validateClassDecl(baseClassDef, ria.__API.Class);
 
             var BaseClass = ria.__SYNTAX.compileClass('BaseClass', baseClassDef);
 
