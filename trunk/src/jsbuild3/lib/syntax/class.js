@@ -9,34 +9,15 @@
 function ClassCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'CLASS') {
 
-        var def = [].slice.call(node.args);
-        var body = def.pop();
-        if (!(body instanceof UglifyJS.AST_Array))
-            throw Error('Array expected');
+        console.info(node.args);
 
-        var name = def.pop();
-        if (name instanceof UglifyJS.AST_Call && name.expression.print_to_string() == 'IMPLEMENTS') {
-            // TODO: process implements
-            name = def.pop();
-        }
+        var tkz = new ria.__SYNTAX.Tokenizer(node.args);
 
-        if (name instanceof UglifyJS.AST_Call && name.expression.print_to_string() == 'EXTENDS') {
-            // TODO: process extends
-            name = def.pop();
-        }
+        var def = ria.__SYNTAX.parseClassDef(tkz);
 
-        if (!(name instanceof UglifyJS.AST_String))
-            throw Error('Expected string literal, got ' + name.print_to_string());
+        //ria.__SYNTAX.validateClassDecl(def);
 
-        // TODO: process implements
-        name = name.value;
-
-        // TODO: process annotations
-
-        var members = [].slice.call(body.elements);
-        // TODO: parse members
-
-        console.info('found class ' + name + ' in ' + ns);
+        console.info('found class ' + def.name + ' in ' + ns);
 
         return make_node(UglifyJS.AST_BlockStatement, node, { body: []});
     }

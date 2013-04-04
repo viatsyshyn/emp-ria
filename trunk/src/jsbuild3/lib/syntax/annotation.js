@@ -10,11 +10,11 @@
 
 function AnnotationCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'ANNOTATION') {
-        var tkz = new Tokenizer(node.args);
+        var tkz = new ria.__SYNTAX.Tokenizer(node.args);
 
         var method = ria.__SYNTAX.parseMember(tkz);
 
-        //ria.__SYNTAX.
+        ria.__SYNTAX.validateAnnotationDecl(method);
 
         console.info('Found annotation ' + method.name + ' in ' + ns);
 

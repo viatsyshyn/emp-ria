@@ -22,12 +22,12 @@
         this.ctor = null;
     }
 
-    ClassDescriptor.prototype.addProperty = function (name, ret, anns, setter, getter) {
+    ClassDescriptor.prototype.addProperty = function (name, ret, anns, getter, setter) {
         this.properties[name] = {
             retType: ret,
             annotations: anns,
-            setter: setter,
-            getter: getter
+            getter: getter,
+            setter: setter
         };
     };
     ClassDescriptor.prototype.addMethod = function (impl, name, ret, argsTypes, argsNames, anns) {

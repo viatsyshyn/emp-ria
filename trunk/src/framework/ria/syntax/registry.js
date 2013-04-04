@@ -29,5 +29,5 @@
             throw Error('String is only acceptable type for name');
 
         registry[name] = value;
-    }
+    };
 })();

@@ -10,7 +10,7 @@
 NS('empx.demos', function () {
     "use strict";
 
-    IDENTIFIER('MyId');
+    /*IDENTIFIER('MyId');
 
     ENUM('MyEnum', {
         "Value1": 1,
@@ -29,6 +29,7 @@ NS('empx.demos', function () {
     ANNOTATION(
         [[String, Function]],
         function ModelBind(prop_, converter_) {});
+        */
 
     INTERFACE(
         'MyIfc', [
@@ -54,6 +55,6 @@ NS('empx.demos', function () {
         }
     ]);
 
-    var MyChildClass = PRIVATE_CLASS('MyChildClass', EXTENDS(empx.demos.MyClass), [
-    ]);
+    /*var MyChildClass = CLASS('MyChildClass_', EXTENDS(empx.demos.MyClass), [
+    ]);**/
 });

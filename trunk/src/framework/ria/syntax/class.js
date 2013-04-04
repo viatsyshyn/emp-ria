@@ -5,15 +5,15 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     function getDefaultGetter(property, name) {
-        return new Function ('return ' + function getPropertyProxy() { return this.name; }.toString().replace('name', property).replace('getProperty', name))();
+        return {value: new Function ('return ' + function getPropertyProxy() { return this.name; }.toString().replace('name', property).replace('getProperty', name))()};
     }
 
     function getDefaultSetter(property, name) {
-        return new Function ('return ' + function setPropertyProxy(value) { this.name = value; }.toString().replace('name', property).replace('setProperty', name))();
+        return {value: new Function ('return ' + function setPropertyProxy(value) { this.name = value; }.toString().replace('name', property).replace('setProperty', name))()};
     }
 
     function getDefaultCtor(name) {
-        return new Function ('return ' + function ConstructorProxy(value) { BASE(); }.toString().replace('Constructor', name))();
+        return {value: new Function ('return ' + function ConstructorProxy(value) { BASE(); }.toString().replace('Constructor', name))() };
     }
 
     /**
@@ -22,13 +22,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {MethodDescriptor}
      */
     function findParentMethod(def, name){
-        var base = def.base && def.base.__SYNTAX_META;
+        if (!def.base)
+            return null;
+
+        var base = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
         var baseMethod = null;
         while (base) {
             baseMethod = base.methods.filter(function(method){ return method.name == name }).pop();
             if (baseMethod)
                 break;
-            base = base.base && base.base.__SYNTAX_META;
+            base = base.base && ria.__SYNTAX.Registry.find(base.base.value.__META.name);
         }
         return baseMethod;
     }
@@ -148,7 +151,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         var propertyFromMeta = findParentPropertyFromMeta(def, property.name);
 
-        getter = getterInMethods ? getterInMethods.body : function () {
+        getter = getterInMethods ? getterInMethods.body.value : function () {
             //noinspection JSPotentiallyInvalidConstructorUsage
             return BASE();
         };
@@ -157,7 +160,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         getter.__SELF = ClassProxy;
 
         if (!property.flags.isReadonly) {
-            setter = setterInMethods ? setterInMethods.body : function (value) {
+            setter = setterInMethods ? setterInMethods.body.value : function (value) {
                 //noinspection JSPotentiallyInvalidConstructorUsage
                 BASE(value);
             };
@@ -189,21 +192,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     function compileMethodDeclaration(def, method, ClassProxy) {
         var parentMethod = findParentMethod(def, method.name);
         if (method.flags.isOverride) {
-            method.body.__BASE_BODY = parentMethod.body;
+            method.body.value.__BASE_BODY = parentMethod.body.value;
         }
 
-        if (method.retType == ria.__SYNTAX.Modifiers.SELF) {
-            method.retType = ClassProxy;
+        if (method.retType instanceof ria.__SYNTAX.Tokenizer.SelfToken) {
+            method.retType = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
         }
 
         method.argsTypes.forEach(function (t, index) {
-            if (method.argsTypes[index] == ria.__SYNTAX.Modifiers.SELF)
-                method.argsTypes[index] = ClassProxy;
+            if (method.argsTypes[index] instanceof ria.__SYNTAX.Tokenizer.SelfToken)
+                method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
         });
 
-        var impl = ClassProxy.prototype[method.name] = method.body;
+        var impl = ClassProxy.prototype[method.name] = method.body.value;
         impl.__SELF = ClassProxy;
-        ria.__API.method(ClassProxy, impl, method.name, method.retType, method.argsTypes, method.argsNames);
+        ria.__API.method(ClassProxy, impl, method.name,
+            method.retType.value,
+            method.argsTypes.map(function (_) { return _.value }),
+            method.argsNames,
+            method.annotations.map(function(_) { return _.value }));
     }
 
     function validatePropertyDeclaration(property, def, processedMethods) {
@@ -238,31 +245,40 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         processedMethods.push(getterName);
         processedMethods.push(setterName);
 
+        if (property.type instanceof ria.__SYNTAX.Tokenizer.SelfToken) {
+            property.type = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
+        }
+
         var getter = getterDef ? getterDef.body : getDefaultGetter(property.name, getterName);
-        ClassProxy.prototype[getterName] = getter;
-        getter.__SELF = ClassProxy;
+        ClassProxy.prototype[getterName] = getter.value;
+        ClassProxy.prototype[getterName].__SELF = ClassProxy;
 
         var setter = null;
         if (!property.flags.isReadonly) {
             setter = setterDef ? setterDef.body : getDefaultSetter(property.name, setterName);
-            ClassProxy.prototype[setterName] = setter;
-            setter.__SELF = ClassProxy;
+            ClassProxy.prototype[setterName] = setter.value;
+            ClassProxy.prototype[setterName].__SELF = ClassProxy;
         }
 
-        ria.__API.property(ClassProxy, property.name, property.type, property.annotations, getter, setter);
+        ria.__API.property(ClassProxy, property.name,
+            property.type.value,
+            property.annotations.map(function (_) { return _.value }),
+            getter.value, setter ? setter.value : null);
     }
 
     function compileCtorDeclaration(def, ClassProxy, processedMethods) {
         var ctorDef = def.methods.filter(function (_1) { return _1.name == '$'}).pop();
 
-        var ctor = ctorDef ? ctorDef.body : getDefaultCtor(def.name);
+        var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name);
         var argsTypes = ctorDef ? ctorDef.argsTypes : [];
         var argsNames = ctorDef ? ctorDef.argsNames : [];
 
         ClassProxy.prototype.$ = ctor;
-        ctor.__BASE_BODY = def.base ? def.base.__META.ctor.impl : undefined;
-        ctor.__SELF = ClassProxy;
-        ria.__API.ctor(ClassProxy, ClassProxy.prototype.$, argsTypes, argsNames);
+        ClassProxy.prototype.$.__BASE_BODY = def.base ? def.base.value.__META.ctor.impl : undefined;
+        ClassProxy.prototype.$.__SELF = ClassProxy;
+        ria.__API.ctor(ClassProxy, ClassProxy.prototype.$,
+            argsTypes.map(function (_) { return _.value }),
+            argsNames);
 
         processedMethods.push('$');
     }
@@ -310,10 +326,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.validateClassDecl = function (def, baseClass) {
         // validate if base is descendant on Class
-        def.base = def.base === null ? baseClass : def.base;
+        def.base = def.base === null ? new ria.__SYNTAX.Tokenizer.RefToken(baseClass) : def.base;
 
-        if(!ria.__SYNTAX.isDescendantOf(def.base, baseClass))
-            throw Error('Base class must be descendant of ' + baseClass.__IDENTIFIER__);
+        if(!ria.__SYNTAX.isDescendantOf(def.base.value, baseClass))
+            throw Error('Base class must be descendant of ' + baseClass.__META.name);
 
         // validate class flags
         if(def.flags.isOverride)
@@ -330,10 +346,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         // TODO: validate methods
         // TODO: validate methods overrides
 
-        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.__META.name);
+        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
 
         if (baseSyntaxMeta.flags.isFinal)
-            throw Error('Can NOT extend final class ' + def.base.__SYNTAX_META.name);
+            throw Error('Can NOT extend final class ' + def.base.value.__META.name);
 
         baseSyntaxMeta.properties.forEach(function(baseProperty){
             var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
@@ -398,7 +414,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.flags.isAbstract)
             ClassProxy = function ClassProxy() { throw Error('Can NOT instantiate abstract class ' + def.name); };
 
-        ria.__API.clazz(ClassProxy, name, def.base, def.ifcs, def.annotations);
+        ria.__API.clazz(ClassProxy, name,
+            def.base.value,
+            def.ifcs.values.map(function (_) { return _.value }),
+            def.annotations.map(function (_) { return _.value }));
 
         var processedMethods = [];
         def.properties.forEach(
