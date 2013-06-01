@@ -22,6 +22,10 @@ NAMESPACE('ria.async', function () {
                 return future_protected[method].call(future_protected, arg);
             },
 
+            VOID, function progress(data) {
+                this.doCallFuture_('updateProgress_', data);
+            },
+
             VOID, function complete(data) {
                 this.doCallFuture_('complete_', data);
             },
