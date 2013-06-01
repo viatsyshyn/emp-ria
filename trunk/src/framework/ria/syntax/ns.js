@@ -21,7 +21,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             root = root[n];
         }
 
-        Object.defineProperty(root, name, { writable: false, configurable: false, value: value });
+        if (!root.hasOwnProperty(name))
+            Object.defineProperty(root, name, { writable: false, configurable: false, value: value });
     }
 
     ria.__SYNTAX.getFullName = function (name) {
