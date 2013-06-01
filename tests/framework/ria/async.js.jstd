@@ -1,0 +1,11 @@
+load:
+  - _cfg.js
+  - ../../../src/framework/ria/base/*.js
+  - ../../../src/framework/ria/syntax/*.js
+  - async/require_stub.js
+  - ../../../src/framework/ria/async/Cancelable.js
+  - ../../../src/framework/ria/async/Future.js
+  - ../../../src/framework/ria/async/Completer.js
+
+test:
+  - async/*_test.js
