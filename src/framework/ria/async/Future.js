@@ -15,6 +15,11 @@ NAMESPACE('ria.async', function () {
         [[Object]],
         Object, function FutureDataDelegate(data){});
 
+    /** @class ria.async.FutureProgressDelegate */
+    DELEGATE(
+        [[Object]],
+        Object, function FutureProgressDelegate(data){});
+
     /** @class ria.async.FutureErrorDelegate */
     DELEGATE(
         [[Object]],
@@ -34,6 +39,7 @@ NAMESPACE('ria.async', function () {
                 this.next = null;
 
                 this.onData = null;
+                this.onProgress = null;
                 this.onError = null;
                 this.onComplete = null;
                 this.broke = false;
@@ -46,6 +52,12 @@ NAMESPACE('ria.async', function () {
             [[ria.async.FutureDataDelegate]],
             SELF, function then(handler) {
                 this.onData = handler;
+                return this.attach(new SELF(this));
+            },
+
+            [[ria.async.FutureProgressDelegate]],
+            SELF, function handleProgress(handler) {
+                this.onProgress = handler;
                 return this.attach(new SELF(this));
             },
 
@@ -86,6 +98,16 @@ NAMESPACE('ria.async', function () {
                 var next_protected = (this.next.__PROTECTED || this.next); // this is hack
                 var args = []; arg_ !== undefined && args.push(arg_);
                 return next_protected[method].apply(next_protected, args);
+            },
+
+            VOID, function updateProgress_(data) {
+                defer(this, function () {
+                    try {
+                        this.onProgress && this.onProgress();
+                    } finally {
+                        this.doCallNext_('updateProgress_', data);
+                    }
+                });
             },
 
             VOID, function complete_(data) {
