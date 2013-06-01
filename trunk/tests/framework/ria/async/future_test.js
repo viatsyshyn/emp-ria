@@ -46,7 +46,7 @@
                     .then(function (data) {
                         throw new Exception('test');
                     })
-                    .catchError(Exception, callbacks.add(function (error) {
+                    .catchException(Exception, callbacks.add(function (error) {
                         assertEquals('test', error.getMessage());
                     }))
                 ;

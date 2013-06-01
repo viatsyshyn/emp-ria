@@ -1,5 +1,4 @@
 REQUIRE('ria.async.Future');
-REQUIRE('ria.async.ICancelable');
 
 NAMESPACE('ria.async', function () {
     "use strict";
@@ -9,26 +8,26 @@ NAMESPACE('ria.async', function () {
         'Completer', [
             READONLY, ria.async.Future, 'future',
 
-            [ria.async.ICancelable],
+            [[ria.async.ICancelable]],
             function $(canceler_) {
                 this.future = new ria.async.Future(canceler_);
             },
 
-            [String, Array],
-            function doCallFuture_(method, args) {
+            [[String, Object]],
+            function doCallFuture_(method, arg) {
                 if (!this.future)
                     return ;
 
                 var future_protected = (this.future.__PROTECTED || this.future); // this is hack
-                return future_protected[method].apply(future_protected, args);
+                return future_protected[method].call(future_protected, arg);
             },
 
             VOID, function complete(data) {
-                this.doCallFuture_('complete_', [data]);
+                this.doCallFuture_('complete_', data);
             },
 
             VOID, function completeError(error) {
-                this.doCallFuture_('completeError_', [error]);
+                this.doCallFuture_('completeError_', error);
             }
         ])
 });

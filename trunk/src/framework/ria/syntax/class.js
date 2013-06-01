@@ -207,7 +207,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var impl = ClassProxy.prototype[method.name] = method.body.value;
         impl.__SELF = ClassProxy;
         ria.__API.method(ClassProxy, impl, method.name,
-            method.retType.value,
+            method.retType ? method.retType.value : null,
             method.argsTypes.map(function (_) { return _.value }),
             method.argsNames,
             method.annotations.map(function(_) { return _.value }));

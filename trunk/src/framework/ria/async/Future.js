@@ -5,15 +5,30 @@ NAMESPACE('ria.async', function () {
 
     function DefaultHandler(e) { throw e; }
 
-    function defer(scope, method, args) {
-        setTimeout(function () { method.apply(scope, args); }, 1);
+    // todo replace with ria.async.Time.run
+    function defer(scope, method, args_) {
+        setTimeout(function () { method.apply(scope, args_ || []); }, 1);
     }
+
+    /** @class ria.async.FutureDataDelegate */
+    DELEGATE(
+        [[Object]],
+        Object, function FutureDataDelegate(data){});
+
+    /** @class ria.async.FutureErrorDelegate */
+    DELEGATE(
+        [[Object]],
+        Object, function FutureErrorDelegate(error){});
+
+    /** @class ria.async.FutureCompleteDelegate */
+    DELEGATE(
+        VOID, function FutureCompleteDelegate(){});
 
     /** @class ria.async.Future */
     CLASS(
         'Future', IMPLEMENTS(ria.async.ICancelable), [
 
-            [ria.async.ICancelable],
+            [[ria.async.ICancelable]],
             function $(canceler_) {
                 this.canceler = canceler_;
                 this.next = null;
@@ -28,14 +43,21 @@ NAMESPACE('ria.async', function () {
                 this.canceler && this.canceler.cancel();
             },
 
-            [Function],
+            [[ria.async.FutureDataDelegate]],
             SELF, function then(handler) {
                 this.onData = handler;
-                return this.attach(new SELF);
+                return this.attach(new SELF(this));
             },
 
-            [Exception, Function],
-            SELF, function catchError(exception, handler) {
+            [[ria.async.FutureErrorDelegate]],
+            SELF, function catchError(handler) {
+                this.onError = handler;
+                return this.attach(new SELF(this));
+            },
+
+            // ClassOf(Exception)
+            [[Function, ria.async.FutureErrorDelegate]],
+            SELF, function catchException(exception, handler) {
                 var me = this;
                 this.onError = function (error) {
                     if (error instanceof exception)
@@ -44,39 +66,25 @@ NAMESPACE('ria.async', function () {
                     throw error;
                 };
 
-                return this.attach(new SELF);
+                return this.attach(new SELF(this));
             },
 
-            [Function],
-            SELF, function catchError(type_, handler_) {
-                var h = type_, me = this;
-                if (type_ && handler_) {
-                    h = function (error) {
-                        if (error instanceof type_)
-                            return handler_.call(me, error);
-
-                        throw error;
-                    }
-                }
-                this.onError = h;
-                return this.attach(new SELF);
-            },
-
+            [[ria.async.FutureCompleteDelegate]],
             SELF, function complete(handler) {
                 this.onComplete = handler;
-                return this.attach(new SELF);
+                return this.attach(new SELF(this));
             },
 
             VOID, function BREAK() {
                 this.broke = true;
             },
 
-            [String, Array],
-            function doCallNext_(method, args) {
-                if (!this.next)
-                    return ;
+            [[String, Object]],
+            function doCallNext_(method, arg_) {
+                if (!this.next) return ;
 
                 var next_protected = (this.next.__PROTECTED || this.next); // this is hack
+                var args = []; arg_ !== undefined && args.push(arg_);
                 return next_protected[method].apply(next_protected, args);
             },
 
@@ -86,19 +94,19 @@ NAMESPACE('ria.async', function () {
                         if (this.onData) {
                             var result = this.onData(data);
                             if (this.broke) {
-                                this.doCallNext_('completeBreak_', []);
+                                this.doCallNext_('completeBreak_');
                             } else if (result instanceof ria.async.Future) {
                                 result.attach(this.next);
                             } else {
-                                this.doCallNext_('complete_', [result === undefined ? null : result]);
+                                this.doCallNext_('complete_', result === undefined ? null : result);
                             }
                         }
                     } catch (e) {
-                        this.doCallNext_('completeError_', [e]);
+                        this.doCallNext_('completeError_', e);
                     } finally {
                         this.onComplete && this.onComplete();
                     }
-                }, []);
+                });
             },
 
             VOID, function completeError_(error) {
@@ -108,13 +116,13 @@ NAMESPACE('ria.async', function () {
                 defer(this, function () {
                     try {
                         var result = (this.onError || DefaultHandler).call(this, error);
-                        this.doCallNext_('complete_', [result === undefined ? null : result]);
+                        this.doCallNext_('complete_', result === undefined ? null : result);
                     } catch (e) {
-                        this.doCallNext_('completeError_', [e]);
+                        this.doCallNext_('completeError_', e);
                     } finally {
                         this.onComplete && this.onComplete();
                     }
-                }, []);
+                });
             },
 
             VOID, function completeBreak_() {
@@ -122,12 +130,12 @@ NAMESPACE('ria.async', function () {
                     try {
                         this.onComplete && this.onComplete();
                     } finally {
-                        this.doCallNext_('completeBreak_', []);
+                        this.doCallNext_('completeBreak_');
                     }
-                }, []);
+                });
             },
 
-            [SELF],
+            [[SELF]],
             SELF, function attach(future) {
                 return this.next = future;
             }

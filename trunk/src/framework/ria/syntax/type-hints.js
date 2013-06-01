@@ -28,6 +28,12 @@
                     return value == type;
                 }
 
+                if (ria.__API.isDelegate(type))
+                    return 'function' === typeof value;
+
+                if (ria.__API.isInterface(type))
+                    return 'object' === typeof value;
+
                 /*if (hwa.__API.ArrayOfDescriptor.isArrayOfDescriptor(type)) {
                     if (hwa.__API.ArrayOfDescriptor.isArrayOfDescriptor(value))
                         return type.valueOf() == value.valueOf();
