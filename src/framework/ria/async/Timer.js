@@ -5,13 +5,13 @@ NAMESPACE('ria.async', function () {
 
     /** @class ria.async.TimerDelegate */
     DELEGATE(
-        [Object, Number],
+        [[Object, Number]],
         VOID, function TimerDelegate(timer, lag) {});
 
     /** @class ria.async.Timer */
     CLASS(
         'Timer', IMPLEMENTS(ria.async.ICancelable), [
-            [Number, ria.async.TimerDelegate],
+            [[Number, ria.async.TimerDelegate]],
             function $(duration, handler) {
                 var me = this;
                 var lastCall = new Date();
@@ -25,18 +25,23 @@ NAMESPACE('ria.async', function () {
                 this.cleaner(this.timer);
             }
 
-            /* function $once(duration, handler) {
+            /*
+            [[Number, ria.async.TimerDelegate]],
+            function $once(duration, handler) {
                 var me = this;
                 var lastCall = new Date();
                 this.cleaner = clearTimeout;
                 this.timer = setTimeout(function () {
                     handler(me, -(lastCall.getTime() - (lastCall = new Date).getTime() ));
                 }, duration < 0 ? 0 : duration);
-            } */
+            }
+            */
 
-            /* STATIC, VOID, function run(handler) {
-                this.timer = setTimeout(function () { handler(); }, 0);
-            }*/
-
+            /*
+            [[Function, Array, Object]],
+            STATIC, VOID, function run(handler, args, scope) {
+                setTimeout(function () { handler.apply(scope || window, args || []); }, 0);
+            }
+            */
         ]);
 });

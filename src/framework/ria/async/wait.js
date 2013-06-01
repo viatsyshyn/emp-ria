@@ -16,7 +16,7 @@ NAMESPACE('ria.async', function () {
           , complete = false;
 
         futures.forEach(function (_, index) {
-            VALIDATE_ARG('future', ria.async.Future, _);
+            VALIDATE_ARG('future', [ria.async.Future], _);
 
             _.then(function (data) {
                 if (complete) return ;
