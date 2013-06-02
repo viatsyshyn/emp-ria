@@ -129,7 +129,7 @@ NAMESPACE('ria.ajax', function () {
             [[ria.async.Timer, Number]],
             VOID, function timeoutHandler_(timer, lag) {
                 timer.cancel(); // todo remove after change to ria.async.Timer.$once
-                this.completer.isComplete() || this.cancel();
+                this.completer.isCompleted() || this.cancel();
             }
         ]);
 });

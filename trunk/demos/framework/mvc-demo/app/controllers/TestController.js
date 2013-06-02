@@ -6,7 +6,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-
 NAMESPACE('app.controllers', function () {
     "use strict";
 
@@ -43,10 +42,11 @@ NAMESPACE('app.controllers', function () {
             },
 
             [[Number, Number, app.model.CoordinateZ]],
-            function indexAction(x_, y_, z_) {
+            VOID, function indexAction(x_, y_, z_) {
                 var result = this.service
                     .getSector(x_, y_, z_)
-                    .attach(this.validateResponse_());
+                    .attach(this.validateResponse_())
+                    .then(function (data) {}); // is attached to "head" not to "tail" of validateResponse_() output
 
                 /* Put activity in stack and render when result is ready */
                 return this.View(app.activities.Test, result);
@@ -63,5 +63,5 @@ NAMESPACE('app.controllers', function () {
                     Activity should be in stack. Render when result is ready */
                 return this.PartialView(app.activities.Test, result);
             }
-        ])
+        ]);
 })

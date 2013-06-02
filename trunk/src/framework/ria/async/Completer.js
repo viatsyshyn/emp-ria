@@ -7,17 +7,17 @@ NAMESPACE('ria.async', function () {
     CLASS(
         'Completer', IMPLEMENTS(ria.async.ICancelable), [
             READONLY, ria.async.Future, 'future',
-            READONLY, Boolean, 'complete',
+            READONLY, Boolean, 'completed',
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
                 this.future = new ria.async.Future(canceler_);
-                this.complete = false;
+                this.completed = false;
             },
 
             [[String, Object]],
             function doCallFuture_(method, arg_) {
-                if (this.complete) return;
+                if (this.completed) return;
 
                 var future_protected = (this.future.__PROTECTED || this.future); // this is hack
                 var args = []; arg_ !== undefined && args.push(arg_);
@@ -29,18 +29,18 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function complete(data) {
-                this.complete = true;
                 this.doCallFuture_('complete_', data);
+                this.completed = true;
             },
 
             VOID, function completeError(error) {
-                this.complete = true;
                 this.doCallFuture_('completeError_', error);
+                this.completed = true;
             },
 
             VOID, function cancel() {
-                this.complete = true;
                 this.doCallFuture_('completeBreak_');
+                this.completed = true;
             }
         ])
 });
