@@ -8,7 +8,7 @@
         .params({a: 1, b: 3})
         .disableCache()
         .timeout(500) // ms
-        .run()
+        .run() // returns Future
             .progressUpdate(function (event) {})
             .then(function (data) {})
             .catchError(function (event) {})
@@ -96,7 +96,7 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function transferFailed_(evt) {
-                this.completer.completeError(this.xhr);
+                this.completer.completeError(evt);
             },
 
             VOID, function transferCanceled_(evt) {
@@ -115,8 +115,12 @@ NAMESPACE('ria.ajax', function () {
             },
 
             FINAL, OVERRIDE, VOID, function do_() {
-                this.xhr.open(this.method.valueOf(), this.getUrl_(), true);
-                this.xhr.send(this.getBody_());
+                try {
+                    this.xhr.open(this.method.valueOf(), this.getUrl_(), true);
+                    this.xhr.send(this.getBody_());
+                } catch (e) {
+                    this.completer.completeError(e);
+                }
 
                 // todo change to ria.async.Timer.$once
                 this.requestTimeout && new ria.async.Timer(this.requestTimeout, this.timeoutHandler_);
