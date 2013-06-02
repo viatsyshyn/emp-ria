@@ -45,8 +45,7 @@ NAMESPACE('app.controllers', function () {
             VOID, function indexAction(x_, y_, z_) {
                 var result = this.service
                     .getSector(x_, y_, z_)
-                    .attach(this.validateResponse_())
-                    .then(function (data) {}); // is attached to "head" not to "tail" of validateResponse_() output
+                    .attach(this.validateResponse_());
 
                 /* Put activity in stack and render when result is ready */
                 return this.View(app.activities.Test, result);
