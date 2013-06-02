@@ -32,7 +32,7 @@ NAMESPACE('ria.ajax', function () {
 
     /** @class ria.ajax.Task */
     CLASS(
-        'Task', [
+        'Task', EXTENDS(ria.async.Task), [
             [[String, ria.ajax.Method, Object]],
             function $(url, method_, params_) {
                 this.method = method_;
