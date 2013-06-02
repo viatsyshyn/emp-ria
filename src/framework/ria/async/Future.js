@@ -35,7 +35,7 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
-                this.canceler = canceler_;
+                this.setCanceler_(canceler_);
                 this.next = null;
 
                 this.onData = null;
@@ -52,19 +52,19 @@ NAMESPACE('ria.async', function () {
             [[ria.async.FutureDataDelegate]],
             SELF, function then(handler) {
                 this.onData = handler;
-                return this.attach(new SELF(this));
+                return this.attach(new SELF);
             },
 
             [[ria.async.FutureProgressDelegate]],
             SELF, function handleProgress(handler) {
                 this.onProgress = handler;
-                return this.attach(new SELF(this));
+                return this.attach(new SELF);
             },
 
             [[ria.async.FutureErrorDelegate]],
             SELF, function catchError(handler) {
                 this.onError = handler;
-                return this.attach(new SELF(this));
+                return this.attach(new SELF);
             },
 
             // ClassOf(Exception)
@@ -78,13 +78,13 @@ NAMESPACE('ria.async', function () {
                     throw error;
                 };
 
-                return this.attach(new SELF(this));
+                return this.attach(new SELF);
             },
 
             [[ria.async.FutureCompleteDelegate]],
             SELF, function complete(handler) {
                 this.onComplete = handler;
-                return this.attach(new SELF(this));
+                return this.attach(new SELF);
             },
 
             VOID, function BREAK() {
@@ -118,7 +118,7 @@ NAMESPACE('ria.async', function () {
                             if (this.broke) {
                                 this.doCallNext_('completeBreak_');
                             } else if (result instanceof ria.async.Future) {
-                                result.attach(this.next);
+                                this.attach(result);
                             } else {
                                 this.doCallNext_('complete_', result === undefined ? null : result);
                             }
@@ -152,14 +152,22 @@ NAMESPACE('ria.async', function () {
                     try {
                         this.onComplete && this.onComplete();
                     } finally {
-                        this.doCallNext_('completeBreak_');
+
                     }
                 });
             },
 
+            [[ria.async.ICancelable]],
+            VOID, function setCanceler_(canceler) {
+                this.canceler = canceler;
+            },
+
             [[SELF]],
             SELF, function attach(future) {
-                return this.next = future;
+                this.next && future.attach(this.next);
+                this.next = future;
+                this.doCallNext_('setCanceler_', this);
+                return future;
             }
         ]);
 });
