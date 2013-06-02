@@ -3,7 +3,8 @@ REQUIRE('ria.async.ICancelable');
 NAMESPACE('ria.async', function () {
     "use strict";
 
-    function DefaultHandler(e) { throw e; }
+    function DefaultDataHanlder(data) { return data; }
+    function DefaultErrorHandler(e) { this.RETHROW(e); }
 
     // todo replace with ria.async.Time.run
     function defer(scope, method, args_) {
@@ -35,7 +36,7 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
-                this.setCanceler_(canceler_);
+                this.canceler = canceler_;
                 this.next = null;
 
                 this.onData = null;
@@ -75,7 +76,7 @@ NAMESPACE('ria.async', function () {
                     if (error instanceof exception)
                         return handler.call(me, error);
 
-                    throw error;
+                    this.RETHROW(error);
                 };
 
                 return this.attach(new SELF);
@@ -89,6 +90,10 @@ NAMESPACE('ria.async', function () {
 
             VOID, function BREAK() {
                 this.broke = true;
+            },
+
+            VOID, function RETHROW(e) {
+                throw e; //Exception('Unhandled deferred error', e);
             },
 
             [[String, Object]],
@@ -113,15 +118,13 @@ NAMESPACE('ria.async', function () {
             VOID, function complete_(data) {
                 defer(this, function () {
                     try {
-                        if (this.onData) {
-                            var result = this.onData(data);
-                            if (this.broke) {
-                                this.doCallNext_('completeBreak_');
-                            } else if (result instanceof ria.async.Future) {
-                                this.attach(result);
-                            } else {
-                                this.doCallNext_('complete_', result === undefined ? null : result);
-                            }
+                        var result = (this.onData || DefaultDataHanlder).call(this, data);
+                        if (this.broke) {
+                            this.doCallNext_('completeBreak_');
+                        } else if (result instanceof ria.async.Future) {
+                            this.attach(result);
+                        } else {
+                            this.doCallNext_('complete_', result === undefined ? null : result);
                         }
                     } catch (e) {
                         this.doCallNext_('completeError_', e);
@@ -133,11 +136,11 @@ NAMESPACE('ria.async', function () {
 
             VOID, function completeError_(error) {
                 if (!this.next)
-                    throw error;
+                    this.RETHROW(error);
 
                 defer(this, function () {
                     try {
-                        var result = (this.onError || DefaultHandler).call(this, error);
+                        var result = (this.onError || DefaultErrorHandler).call(this, error);
                         this.doCallNext_('complete_', result === undefined ? null : result);
                     } catch (e) {
                         this.doCallNext_('completeError_', e);
@@ -152,7 +155,7 @@ NAMESPACE('ria.async', function () {
                     try {
                         this.onComplete && this.onComplete();
                     } finally {
-
+                        this.doCallNext_('completeBreak_');
                     }
                 });
             },
@@ -164,10 +167,17 @@ NAMESPACE('ria.async', function () {
 
             [[SELF]],
             SELF, function attach(future) {
-                this.next && future.attach(this.next);
+                var old_next = this.next;
                 this.next = future;
                 this.doCallNext_('setCanceler_', this);
-                return future;
+                return this.attachEnd_(old_next || null);
+            },
+
+            [[SELF]],
+            SELF, function attachEnd_(future) {
+                return this.next
+                    ? this.doCallNext_('attachEnd_', future)
+                    : (future ? (this.next = future) : this);
             }
         ]);
 });

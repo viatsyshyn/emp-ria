@@ -136,7 +136,7 @@
      * @return {Object}
      */
     ria.__API.init = function (instance, clazz, ctor, args) {
-        if ((!instance instanceof clazz))
+        if (!(instance instanceof clazz))
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
 
         var publicInstance = instance;
