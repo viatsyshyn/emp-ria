@@ -42,7 +42,7 @@ NAMESPACE('app.controllers', function () {
             },
 
             [[Number, Number, app.model.CoordinateZ]],
-            VOID, function indexAction(x_, y_, z_) {
+            function indexAction(x_, y_, z_) {
                 var result = this.service
                     .getSector(x_, y_, z_)
                     .attach(this.validateResponse_());
