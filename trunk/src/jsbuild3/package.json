@@ -1,0 +1,32 @@
+{
+  "name": "jsbuild3",
+  "description": "emp.ria build system",
+  "version": "0.1.0",
+  "author": "Volodymyr Iatsyshyn <viatsyshyn@emp-studio.net>",
+  "repository": "git://github.com/visionmedia/jade",
+  "main": "./index.js",
+  "bin": {
+    "jsbuild3": "./bin/jsbuild3"
+  },
+  "man": "./jade.1",
+  "dependencies": {
+    "optimist": "*"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "scripts": {
+    "test": "mocha -R spec",
+    "prepublish": "npm prune",
+    "build": "npm run compile && npm run minify",
+    "compile": "npm run compile-full && npm run compile-runtime",
+    "compile-full": "browserify ./lib/jade.js --standalone jade -x ./node_modules/transformers > jade.js",
+    "compile-runtime": "browserify ./lib/runtime.js --standalone jade > runtime.js",
+    "minify": "npm run minify-full && npm run minify-runtime",
+    "minify-full": "uglifyjs < jade.js > jade.min.js",
+    "minify-runtime": "uglifyjs < runtime.js > runtime.min.js"
+  },
+  "browser": {
+    "./lib/filters.js": "./lib/filters-client.js"
+  }
+}
