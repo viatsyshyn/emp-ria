@@ -110,6 +110,7 @@ var _RELEASE = false;
 
     // load ria.require
     REQUIRE('ria/require/loader.js');
+    REQUIRE('ria/require/module.js');
     REQUIRE('ria/require/require.js');
     REQUIRE('ria/require/script-loader.js');
     REQUIRE('ria/require/zzz.symbols.js');
