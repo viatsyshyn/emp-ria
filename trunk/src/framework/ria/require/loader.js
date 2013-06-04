@@ -4,6 +4,8 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 (function () {
     "use strict";
 
+    var global = this;
+
     var loaders = [];
 
     function defer(fn, args, scope) {
@@ -15,7 +17,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
      * @returns {Function}
      */
     function findLoaderFor(uri) {
-        var filtered = loaders.filter(function (_1) { return _1[0].call(uri); });
+        var filtered = loaders.filter(function (_1) { return _1[0].call(global, uri); });
         return filtered && filtered[0] && filtered[0][1];
     }
 
@@ -61,37 +63,9 @@ ria.__REQUIRE = ria.__REQUIRE || {};
      */
     ria.__REQUIRE.load = function (uri) {
         var loader = findLoaderFor(uri);
-        if (loader === null)
+        if (loader == null)
             throw Error('Found not loader capable to load "' + uri + '"');
 
         return loadWith(uri, loader);
-    };
-
-    var modules = {};
-
-    modules.__root = null;
-
-    /**
-     * @param {String} module
-     * @param {String} dependency
-     */
-    ria.__REQUIRE.addDependency = function (module, dependency) {
-
-    };
-
-    /**
-     * @param {String} module
-     * @param {Function} callback
-     */
-    ria.__REQUIRE.addCallback = function (module, callback) {
-
-    };
-
-    /**
-     * @param {String} module
-     * @return {*}
-     */
-    ria.__REQUIRE.getContent = function (module) {
-        return null;
     };
 })();

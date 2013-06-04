@@ -16,5 +16,10 @@
 
     // TODO: add bootstrapped callback and load cfg.appClass
 
-    //ria.__BOOTSTRAP.REQUIRE(cfg.appClass);
+    ria.__BOOTSTRAP.onBootstrapped(function () {
+        "use strict";
+        ria.__REQUIRE.requireSymbol(cfg.appClass);
+    })
+
+
 })();
