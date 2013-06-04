@@ -28,18 +28,29 @@ var _RELEASE = false;
 
     var appDir = "";
     var root = ria.__CFG["#require"].appRoot;
-    if (root === undefined)
-        root = window.location.pathname;
+    if (root === undefined) {
+        var t = window.location.pathname.split('/');
+        t.pop();
+        root = t.join('/') + '/';
+    }
 
     appDir = resolve(ria.__CFG["#require"].appCodeDir || "~/app/");
 
     // configuring ria.require.js
     ria.__CFG["#require"].appRoot = root;
     ria.__CFG["#require"].appCodeDir = appDir;
+    var libs = ria.__CFG["#require"].libs = ria.__CFG["#require"].libs || {};
 
     function resolve(path) {
         if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
             path = path.replace(/\./gi, '/') + '.js';
+
+        for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
+            if (path.substr(0, prefix.length) == prefix) {
+                path = libs[prefix] + path;
+                break;
+            }
+        }
 
         path = path.replace(/^~\//gi, root);
         path = path.replace(/^\.\//gi, appDir);
@@ -56,6 +67,9 @@ var _RELEASE = false;
 
     if (!ria.__CFG._bootstraps)
         ria.__CFG._bootstraps = [];
+
+    if (ria.__CFG['#mvc'])
+        ria.__CFG._bootstraps.push('ria/mvc');
 
     Object.freeze(ria.__CFG);
 
@@ -78,6 +92,9 @@ var _RELEASE = false;
     // load ria.syntax
     REQUIRE('ria/syntax/annotations.js');
     REQUIRE('ria/syntax/assert.js');
+    REQUIRE('ria/syntax/registry.js');
+    REQUIRE('ria/syntax/tokenizer.js');
+    REQUIRE('ria/syntax/parser2.js');
     REQUIRE('ria/syntax/class.js');
     REQUIRE('ria/syntax/delegate.js');
     REQUIRE('ria/syntax/enum.js');
@@ -85,15 +102,17 @@ var _RELEASE = false;
     REQUIRE('ria/syntax/identifier.js');
     REQUIRE('ria/syntax/interface.js');
     REQUIRE('ria/syntax/ns.js');
-    REQUIRE('ria/syntax/parser2.js');
     REQUIRE('ria/syntax/type-hints.js');
 
     // load symbols
-    REQUIRE('ria/syntax/defines.js');
+    REQUIRE('ria/syntax/yyy.symbols.js');
+    REQUIRE('ria/syntax/zzz.init.js');
 
     // load ria.require
     REQUIRE('ria/require/loader.js');
     REQUIRE('ria/require/require.js');
+    REQUIRE('ria/require/script-loader.js');
+    REQUIRE('ria/require/zzz.symbols.js');
 
     var boostraps = ria.__CFG._bootstraps;
     while(boostraps.length > 0) {
@@ -106,6 +125,6 @@ var _RELEASE = false;
     ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
     ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
     ria.__BOOTSTRAP.complete = function () {
-        ria.__REQUIRE.init(ria.__CFG['#require']);
+        ria.__REQUIRE.init(ria.__CFG['#require'], callbacks);
     };
 })();

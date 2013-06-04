@@ -20,12 +20,15 @@
 
         "#require": {
             "plugins": ["demo.build.i18n"],
-            "appRoot": "",
-            "appCodeDir": "~/app/"
+            "appCodeDir": "~/",
+            "libs": {
+                "lib/stacktrace.js": "/emp.ria/src/framework/",
+                "ria": "/emp.ria/src/framework/"
+            }
         },
 
         "#mvc": {
-            "appClass": "demo.Application",
+            "appClass": "app.controllers.TestController",
             "settings": {
                 "emp.player": "c01t",
                 "emp.session": "123456789098756432123645",

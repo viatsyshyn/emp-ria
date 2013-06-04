@@ -6,15 +6,18 @@
  * To change this template use File | Settings | File Templates.
  */
 
+REQUIRE('app.controllers.Base');
+REQUIRE('app.services.TestService');
+
 NAMESPACE('app.controllers', function () {
     "use strict";
 
     /** @class app.controllers.TestController */
     CLASS(
-        [ria.mvc.Controller('test')],
+        //[ria.mvc.ControllerBind('test')],
         'TestController', EXTENDS(app.controllers.Base), [
 
-            [ria.mvc.DependencyInjector],
+            //[ria.mvc.DependencyInjector],
             app.services.TestService, 'service',
 
             ria.async.Future, function validateResponse_() {
@@ -50,7 +53,6 @@ NAMESPACE('app.controllers', function () {
                 /* Put activity in stack and render when result is ready */
                 return this.View(app.activities.Test, result);
             },
-
 
             [[app.activites.CoordinatesViewModel]],
             function updateSectorAction(model) {
