@@ -19,9 +19,9 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         var content = null;
 
         ria.__REQUIRE.load(uri)
-            .done(function (content) {
+            .done(function (c) {
                 console.info('Loader.done for ' + uri);
-                content = content;
+                content = c;
                 loaded = true;
                 updateState();
             })
