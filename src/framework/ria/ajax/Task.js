@@ -116,6 +116,7 @@ NAMESPACE('ria.ajax', function () {
 
             FINAL, OVERRIDE, VOID, function do_() {
                 try {
+                    BASE();
                     this.xhr.open(this.method.valueOf(), this.getUrl_(), true);
                     this.xhr.send(this.getBody_());
                 } catch (e) {
