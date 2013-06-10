@@ -34,7 +34,7 @@
         if (dep.isNotLoaded() && !dep.isLoading() && !dep.hasError()) {
             dep.state = ModuleState.Loading;
             ria.__REQUIRE.load(dep.id)
-                .done(processDeps);
+                .done(function () { processDeps(dep.id, true); });
         }
 
         if (this.isReady())
@@ -45,7 +45,6 @@
 
     ModuleDescriptor.prototype.addReadyCallback = function addReadyCallback(fn) {
         this.cbs.push(fn);
-
         this.isReady() && fn();
     };
 
@@ -106,6 +105,15 @@
                     cb(k, modulesMap[k]);
         };
 
+        ModuleDescriptor.toArray = function () {
+            var res = [];
+            for(var k in modulesMap)
+                if (modulesMap.hasOwnProperty(k))
+                    res.push(modulesMap[k]);
+
+            return res;
+        };
+
         ModuleDescriptor.ensureNoCycles = function ensureNoCycles(root, child) {
             var deps = [child.id];
 
@@ -143,7 +151,7 @@
                     s = stack.pop();
 
                 var matches = s.match(HTTP_PATH_REGEX) || [];
-                return matches.pop().split(/\?/).shift();
+                return matches.pop().split(/\?/).shift().replace(ria.__CFG['#require'].siteRoot, '');
             }
         };
 
@@ -159,14 +167,10 @@
         if (module)
             ModuleDescriptor.getById(module).state = ModuleState.Loaded;
 
-        var is_all_executed = true;
-        ModuleDescriptor.each(function (id, module) {
-            is_all_executed = module.process() && is_all_executed;
-        });
+        if (ModuleDescriptor.toArray().every(function (_) { return _.process(); })) {
+//            ria.__API._loader.isReady = true;
+//            ria.ready(ria.__EMPTY);
 
-        if (is_all_executed) {
-            ria.__API._loader.isReady = true;
-            ria.ready(ria.__EMPTY);
         }
     }
 
