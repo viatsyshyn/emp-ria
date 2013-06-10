@@ -15,6 +15,8 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     };
 
     function resolve(path) {
+        var original = path;
+
         if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
             path = path.replace(/\./gi, '/') + '.js';
 
@@ -35,14 +37,16 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         if (!path.match(/^\//i))
             path = appCodeDir + path;
 
-        return path.replace(/\/\//gi, '/');
+        path = path.replace(/\/\//gi, '/');
+
+        return path;
     }
 
     ria.__REQUIRE.requireAsset = function (uri) {
         var dep = ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri));
 
         ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
-            .require(dep);
+            .addDependency(dep);
 
         return dep;
     };
@@ -50,7 +54,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     ria.__REQUIRE.requireSymbol = function (symbol) {
         var uri = symbol.replace(/\./g, '/') + '.js';
 
-        return ria.__REQUIRE.requireAsset(uri)
+        ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
             .addReadyCallback(function (content) {
                 var root = window;
                 symbol.split('.').forEach(function (part) {
@@ -59,7 +63,9 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
                     root = root[part];
                 });
-            })
+            });
+
+        return ria.__REQUIRE.requireAsset(uri);
     };
 
     ria.__REQUIRE.addCurrentModuleCallback = function (ns, callback) {
@@ -76,4 +82,14 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return getModule(uri).content();
     };
     */
+
+    ria.__REQUIRE.onReady = function (cb) {
+        root.addReadyCallback(cb);
+    };
+
+
+    var root = ria.__REQUIRE.ModuleDescriptor.getCurrentModule();
+
+    if (root.isNotLoaded())
+        root.state = 2; // this is a hack
 })();

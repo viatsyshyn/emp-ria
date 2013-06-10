@@ -54,7 +54,7 @@ NAMESPACE('app.controllers', function () {
                 return this.View(app.activities.Test, result);
             },
 
-            [[app.activites.CoordinatesViewModel]],
+            //[[app.activites.CoordinatesViewModel]],
             function updateSectorAction(model) {
                 var result = this.service
                     .updateSector(model.getX(), model.getY(), model.getZ(), model.getValue())

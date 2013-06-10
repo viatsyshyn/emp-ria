@@ -10,6 +10,8 @@
         function loader(src, callback) {
             //function (content, error) {
 
+            //src = src + (/\?/.test(src) ? '&' : '?') + '_=' + Math.random().toString(36).substr(2) + new Date.getTime().toString(36);
+
             var script_tag = document.createElement('script');
             script_tag.setAttribute('type', 'text/javascript');
             script_tag.setAttribute('src', src);
