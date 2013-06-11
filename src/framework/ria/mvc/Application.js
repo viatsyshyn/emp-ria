@@ -18,13 +18,14 @@ REQUIRE('ria.mvc.IView');
 
 REQUIRE('ria.mvc.Dispatcher');
 REQUIRE('ria.mvc.Controller');
+REQUIRE('ria.mvc.View');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
     var History = window.History;
 
-    /**@namespace hwa.mvc.Application */
+    /**@namespace ria.mvc.Application */
     CLASS('Application', [
 
         ria.mvc.IStateSerializer, 'serializer',
@@ -40,15 +41,17 @@ NAMESPACE('ria.mvc', function () {
             this.services = [];
         },
 
-        function initDispatcher_() {
+        ria.mvc.Dispatcher, function initDispatcher_() {
             return new ria.mvc.Dispatcher;
         },
 
-        function initSession_() {
+        ria.mvc.ISession, function initSession_() {
             return new ria.mvc.Session;
         },
 
-        ABSTRACT, function initView_() {},
+        ria.mvc.IView, function initView_() {
+            return new ria.mvc.View;
+        },
 
         function initContext_() {
             var me = this;
