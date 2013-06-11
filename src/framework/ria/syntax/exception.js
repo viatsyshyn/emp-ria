@@ -17,7 +17,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
             throw Error('Modifiers are not supported in exceptions');
 
-        if(!ria.__SYNTAX.isDescendantOf(def.base ,ria.__API.Exception))
+        if(!ria.__SYNTAX.isDescendantOf(def.base.value ,ria.__API.Exception))
             throw Error('Errors can extend only from other exceptions');
     };
 

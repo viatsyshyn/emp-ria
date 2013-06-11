@@ -9,9 +9,9 @@ NAMESPACE('ria.mvc', function () {
     INTERFACE(
         'IDispatchPlugin', [
             VOID, function dispatchStartup() {},
-            [[hwa.mvc.State]],
+            [[ria.mvc.State]],
             VOID, function preDispatch(state) {},
-            [[hwa.mvc.State]],
+            [[ria.mvc.State]],
             VOID, function postDispatch(state) {},
             VOID, function dispatchShutdown() {}
         ]);

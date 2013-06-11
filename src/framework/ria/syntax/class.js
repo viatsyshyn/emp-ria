@@ -269,7 +269,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     function compileCtorDeclaration(def, ClassProxy, processedMethods) {
         var ctorDef = def.methods.filter(function (_1) { return _1.name == '$'}).pop();
 
-        var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name);
+        var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name).value;
         var argsTypes = ctorDef ? ctorDef.argsTypes : [];
         var argsNames = ctorDef ? ctorDef.argsNames : [];
 

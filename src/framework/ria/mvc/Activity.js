@@ -8,7 +8,7 @@ NAMESPACE('ria.mvc', function () {
      * @class ria.mvc.Activity
      */
     CLASS(ABSTRACT,
-        'Activity', IMPLEMENTS(hwa.mvc.IActivity), [
+        'Activity', IMPLEMENTS(ria.mvc.IActivity), [
             function $() {
                 BASE();
                 this.inited_ = false;
@@ -20,7 +20,7 @@ NAMESPACE('ria.mvc', function () {
 
             /**
              * Make this activity visible and active
-             * @see hwa.mvc.Activity.show
+             * @see ria.mvc.Activity.show
              */
             OVERRIDE, VOID, function show() {
                 if (!this.inited_) {

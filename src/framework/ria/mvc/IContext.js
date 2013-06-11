@@ -6,12 +6,13 @@ NAMESPACE('ria.mvc', function () {
     "use strict";
 
     /**
-     * @class hwa.mvc.IContext
+     * @class ria.mvc.IContext
      */
-    INTERFACE('IContext', [
-        ria.mvc.State, function getState() {},
-        ria.mvc.IView, function getDefaultView() {},
-        ria.mvc.ISession, function getSession() {},
-        VOID, function stateUpdated() {}
-    ]);
+    INTERFACE(
+        'IContext', [
+            ria.mvc.State, function getState() {},
+            ria.mvc.IView, function getDefaultView() {},
+            ria.mvc.ISession, function getSession() {},
+            VOID, function stateUpdated() {}
+        ]);
 });
