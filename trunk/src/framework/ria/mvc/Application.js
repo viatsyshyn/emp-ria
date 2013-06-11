@@ -20,6 +20,7 @@ REQUIRE('ria.mvc.Dispatcher');
 REQUIRE('ria.mvc.Controller');
 REQUIRE('ria.mvc.Session');
 REQUIRE('ria.mvc.View');
+REQUIRE('ria.mvc.StateSerializer');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -34,12 +35,17 @@ NAMESPACE('ria.mvc', function () {
         ria.mvc.IContext, 'context',
 
         function $() {
+            this.serializer = this.initSerializer_();
             this.dispatcher = this.initDispatcher_();
             this.session = this.initSession_();
             this.defaultView = this.initView_();
             this.context = this.initContext_();
             this.appns = null;
             this.services = [];
+        },
+
+        ria.mvc.IStateSerializer, function initSerializer_() {
+            return new ria.mvc.StateSerializer('/');
         },
 
         ria.mvc.Dispatcher, function initDispatcher_() {
