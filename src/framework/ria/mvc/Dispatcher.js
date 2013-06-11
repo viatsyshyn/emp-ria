@@ -69,7 +69,7 @@ NAMESPACE('ria.mvc', function () {
                     var controllerRef = all[index - 1];
 
                     if (controllerRef.isAbstract()) {
-                        this.loadControllers(controllerRef, context);
+                        this.loadControllers_(controllerRef, context);
                         continue;
                     }
 
