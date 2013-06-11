@@ -1,12 +1,5 @@
-/**
- * Created by JetBrains WebStorm.
- * User: C01t
- * Date: 24.04.12
- * Time: 19:46
- * To change this template use File | Settings | File Templates.
- */
-
-REQUIRE('hwa.reflection.ReflectionClass');
+REQUIRE('ria.reflection.Exception');
+REQUIRE('ria.reflection.ReflectionClass');
 
 /** @namespace hwa.reflection */
 NAMESPACE('hwa.reflection', function () {

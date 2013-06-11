@@ -46,6 +46,7 @@ NAMESPACE('ria.mvc', function () {
                 this.defaultControllerAction = 'index';
                 this.plugins = [];
                 this.dispatching = false;
+                this.controllers = {};
             },
 
             [[ria.mvc.IDispatchPlugin]],

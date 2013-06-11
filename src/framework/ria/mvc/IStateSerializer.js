@@ -6,11 +6,12 @@ NAMESPACE('ria.mvc', function () {
     /**
      * @class ria.mvc.IStateSerializer
      */
-    INTERFACE('IStateSerializer', [
-        [[ria.mvc.State]],
-        String, function serialize(state) {},
+    INTERFACE(
+        'IStateSerializer', [
+            [[ria.mvc.State]],
+            String, function serialize(state) {},
 
-        [[String]],
-        ria.mvc.State, function deserialize(value) {}
-    ]);
+            [[String]],
+            ria.mvc.State, function deserialize(value) {}
+        ]);
 });
