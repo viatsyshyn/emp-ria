@@ -21,8 +21,7 @@
         ria.__REQUIRE.requireSymbol(cfg.appClass);
 
         ria.__REQUIRE.onReady(function () {
-            console.warn('Let\'s start MVC application');
-
+            (new (eval(cfg.appClass))).run();
         });
     });
 })();
