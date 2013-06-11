@@ -9,7 +9,7 @@
         .disableCache()
         .timeout(500) // ms
         .run() // returns Future
-            .progressUpdate(function (event) {})
+            .handleProgress(function (event) {})
             .then(function (data) {})
             .catchError(function (event) {})
             .complete(function () {})

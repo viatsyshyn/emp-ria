@@ -20,7 +20,7 @@
 
   "modules": [{
     "name": "app",
-    "in": "main.js",
+    "in": "controller.js",
     "out": "app.js"
   }]
 }
