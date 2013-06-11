@@ -4,7 +4,6 @@ REQUIRE('ria.mvc.IView');
 
 REQUIRE('ria.reflection.ReflectionFactory');
 
-/** @namespace hwa.mvc */
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
@@ -12,7 +11,7 @@ NAMESPACE('ria.mvc', function () {
      * @class ria.mvc.View
      */
     CLASS(
-        'View', IMPLEMENTS(hwa.mvc.IView), [
+        'View', IMPLEMENTS(ria.mvc.IView), [
             function $() {
                 BASE();
                 this.stack = [];
@@ -20,14 +19,14 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
             Boolean, function isSameActivityGroup_(a1, a2) {
-                var ref1 = hwa.reflection.ReflectionFactory(a1.getClass());
-                var ref2 = hwa.reflection.ReflectionFactory(a2.getClass());
-                var v1 = ref1.getAnnotation(hwa.mvc.ActivityGroup);
-                var v2 = ref2.getAnnotation(hwa.mvc.ActivityGroup);
+                var ref1 = ria.reflection.ReflectionFactory(a1.getClass());
+                var ref2 = ria.reflection.ReflectionFactory(a2.getClass());
+                var v1 = ref1.getAnnotation(ria.mvc.ActivityGroup);
+                var v2 = ref2.getAnnotation(ria.mvc.ActivityGroup);
                 return v1 != null && v2 != null && v1.name == v2.name;
             },
 
-            [[hwa.mvc.IActivity]],
+            [[ria.mvc.IActivity]],
             VOID, function push_(activity){
                 activity.addCloseCallback(this.onActivityClosed_);
                 activity.show();
@@ -55,7 +54,7 @@ NAMESPACE('ria.mvc', function () {
              * Push activity at the top of stack and hide previous
              * @param {ria.mvc.Activity} activity
              */
-            [[hwa.mvc.IActivity]],
+            [[ria.mvc.IActivity]],
             VOID, function push(activity) {
                 var top = this.getCurrent();
                 if (top) {
@@ -72,7 +71,7 @@ NAMESPACE('ria.mvc', function () {
              * Shade top of stack with activity
              * @param {ria.mvc.Activity} activity
              */
-            [[hwa.mvc.IActivity]],
+            [[ria.mvc.IActivity]],
             VOID, function shade(activity) {
                 var top = this.getCurrent();
                 if (top) {
@@ -114,7 +113,6 @@ NAMESPACE('ria.mvc', function () {
 
             /**
              * Pop all from stack with stop and reset engine
-             * @return {hwa.mvc.IView}
              */
             VOID, function reset() {
                 while (this.getCurrent() !== null)

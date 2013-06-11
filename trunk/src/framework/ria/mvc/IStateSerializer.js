@@ -1,6 +1,5 @@
 REQUIRE('ria.mvc.State');
 
-/** @namespace hwa.mvc */
 NAMESPACE('ria.mvc', function () {
     "use strict";
 

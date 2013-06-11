@@ -87,6 +87,7 @@ var _RELEASE = false;
     REQUIRE('ria/base/5.identifier.js');
     REQUIRE('ria/base/6.interface.js');
     REQUIRE('ria/base/8.class.js');
+    REQUIRE('ria/base/9.arrayof.js');
     REQUIRE('ria/base/9.exception.js');
 
     // load ria.syntax

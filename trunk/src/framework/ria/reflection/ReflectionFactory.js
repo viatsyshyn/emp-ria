@@ -1,3 +1,5 @@
+REQUIRE('ria.reflection.ReflectionClass');
+
 NAMESPACE('ria.reflection', function () {
 
     var reflectionClassCache = {};
@@ -7,16 +9,16 @@ NAMESPACE('ria.reflection', function () {
         if (clazz instanceof ria.__API.Class)
             clazz = clazz.getClass();
 
-        if (clazz instanceof hwa.__API.ClassDescriptor)
+        if (clazz instanceof ria.__API.ClassDescriptor)
             clazz = clazz.ctor;
 
-        if (!ria.__API.ClassDescriptor.isClassConstructor(clazz))
+        if (!ria.__API.isClassConstructor(clazz))
             throw new ria.reflection.Exception('ReflectionFactory works only on hwa.base classes');
 
         var name = clazz.__META.name;
         if (reflectionClassCache.hasOwnProperty(name))
             return reflectionClassCache[name];
 
-        return reflectionClassCache[name] = new hwa.reflection.ReflectionClass(clazz);
+        return reflectionClassCache[name] = new ria.reflection.ReflectionClass(clazz);
     };
 });

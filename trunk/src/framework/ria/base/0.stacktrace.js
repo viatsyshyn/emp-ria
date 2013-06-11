@@ -59,7 +59,7 @@
     function getPrintStackTraceWrapper() {
         "use strict";
         return function (e) {
-            window.printStackTrace({
+            return window.printStackTrace({
                 e: e,
                 guess: ria.__CFG.prettyStackTraces
             });

@@ -19,7 +19,7 @@
             if (this.inner_) {
                 msg += '\nCaused by: ';
                 if (this.inner_ instanceof Error) {
-                    msg += ria.__API.getStackTrace(this.inner_);
+                    msg += ria.__API.getStackTrace(this.inner_).join('\n  ');
                 } else {
                     msg += this.inner_.toString();
                 }

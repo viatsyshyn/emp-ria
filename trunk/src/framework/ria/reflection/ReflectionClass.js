@@ -23,7 +23,7 @@ NS('ria.reflection', function () {
             ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs; },
             ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
             ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
-            ArrayOf(Function), function getChildren() { }, // TODO: fast way to get children
+            ArrayOf(Function), function getChildren() { return []; }, // TODO: fast way to get children
 
             Object, function getCtorAnnotations() { return this.clazz.__META.ctor.annotations; },
             Object, function getCtorArguments() { return this.clazz.__META.ctor.argsNames; },

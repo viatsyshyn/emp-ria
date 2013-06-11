@@ -18,6 +18,7 @@ REQUIRE('ria.mvc.IView');
 
 REQUIRE('ria.mvc.Dispatcher');
 REQUIRE('ria.mvc.Controller');
+REQUIRE('ria.mvc.Session');
 REQUIRE('ria.mvc.View');
 
 NAMESPACE('ria.mvc', function () {
@@ -33,7 +34,7 @@ NAMESPACE('ria.mvc', function () {
         ria.mvc.IContext, 'context',
 
         function $() {
-            this.dispatcher = this.initDispatcher_;
+            this.dispatcher = this.initDispatcher_();
             this.session = this.initSession_();
             this.defaultView = this.initView_();
             this.context = this.initContext_();
@@ -55,7 +56,7 @@ NAMESPACE('ria.mvc', function () {
 
         function initContext_() {
             var me = this;
-            return new ria.mvc.IContext([
+            return null; /*new ria.mvc.IContext([
                 ria.mvc.IView, function getDefaultView() {
                     return me.defaultView;
                 },
@@ -72,7 +73,7 @@ NAMESPACE('ria.mvc', function () {
                 ria.mvc.State, function getState() {
                     return me.dispatcher.getState();
                 }
-            ]);
+            ]);*/
         },
 
         VOID, function run() {
@@ -82,13 +83,14 @@ NAMESPACE('ria.mvc', function () {
                     return me.onInitialize_();
                 })
                 .then(function () {
-                    this.dispatcher.loadControllers(me.context);
+                    return me.dispatcher.loadControllers(me.context);
                 })
                 .then(function () {
-                    return this.onStart_();
+                    return me.onStart_();
                 })
                 .then(function() {
-                    this.dispatch();
+                    me.dispatch();
+                    return null;
                 })
                 .catchError(function (e) {
                     throw new ria.mvc.MvcException('Failed to start application', e);
@@ -111,18 +113,4 @@ NAMESPACE('ria.mvc', function () {
             return ria.async.DeferredAction();
         }
     ]);
-
-    hwa.ready(function () {
-        var ref = hwa.reflection.ReflectionFactory(hwa.mvc.Application);
-        var c = ref.getChildren();
-        if (c.length == 0)
-            throw Error('No class derrives from hwa.mvc.Application');
-
-        if (c.length > 1)
-            throw Error('Multiple classes derrive from hwa.mvc.Application');
-
-        var ctor = c[0].getConstructor();
-        new ctor().run();
-        console.info('inited');
-    })
 });

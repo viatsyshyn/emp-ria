@@ -97,7 +97,7 @@ NAMESPACE('ria.mvc', function () {
                             || method.getNumberOfParameters() != c || method.getShortName() != action)
                         continue;
 
-                    var role = method.getAnnotation(hwa.mvc.AccessFor);
+                    var role = method.getAnnotation(ria.mvc.AccessFor);
                     if (role && (Array.isArray(role.roles) ? role.roles.indexOf(current_role) < 0 : role.roles != current_role))
                         continue;
 
@@ -105,7 +105,7 @@ NAMESPACE('ria.mvc', function () {
                 }
 
                 if (methods.length != 1) {
-                    throw new hwa.mvc.MvcException('Found ' + methods.length + ' overloads of ' + ref.getName()+ '#'  + action
+                    throw new ria.mvc.MvcException('Found ' + methods.length + ' overloads of ' + ref.getName()+ '#'  + action
                             + ' action that accepts exactly ' + c + ' arguments. '
                             + '(filtered for role: \'' + current_role + '\')');
                 }
@@ -113,7 +113,7 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     this[action].apply(this.publicInstance, state.getParams());
                 } catch (e) {
-                    throw new hwa.mvc.MvcException("Exception in action " + methods[0].getSignature() + ' of ' + ref.getName(), e);
+                    throw new ria.mvc.MvcException("Exception in action " + methods[0].getSignature() + ' of ' + ref.getName(), e);
                 }
             },
 

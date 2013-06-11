@@ -28,14 +28,14 @@
                     return value == type;
                 }
 
-                /*if (ria.__API.isDelegate(type))
+                if (ria.__API.isDelegate(type))
                     return 'function' === typeof value;
 
                 if (ria.__API.isInterface(type))
-                    return 'object' === typeof value;*/
+                    return 'object' === typeof value;
 
-                /*if (hwa.__API.ArrayOfDescriptor.isArrayOfDescriptor(type)) {
-                    if (hwa.__API.ArrayOfDescriptor.isArrayOfDescriptor(value))
+                if (ria.__API.ArrayOfDescriptor.isArrayOfDescriptor(type)) {
+                    if (ria.__API.ArrayOfDescriptor.isArrayOfDescriptor(value))
                         return type.valueOf() == value.valueOf();
 
                     if (!(value instanceof Array))
@@ -50,12 +50,12 @@
                 }
 
                 // check is type is Interface
-                if (hwa.__API.InterfaceDescriptor.isInterfaceProxy(type)) {
-                    if (hwa.__API.InterfaceDescriptor.isInterfaceProxy(value))
-                        return type.__interfaceDescriptor == value.__interfaceDescriptor;
+                if (ria.__API.isInterface(type)) {
+                    if (ria.__API.isInterface(value))
+                        return type.__META == value.__META;
 
                     return type.implementedBy(value);
-                }*/
+                }
 
                 return value === type || value instanceof type;
         }
