@@ -16,5 +16,11 @@ NAMESPACE('app.services', function () {
 
     /** @class app.services.TestService */
     CLASS(
-        'TestService', [])
+        'TestService', [
+            ria.async.Future, function getItems(page) {
+                return this.getList('my-server-action', app.model.MyArrayViewModel, {
+                    "page": page
+                });
+            }
+        ])
 });

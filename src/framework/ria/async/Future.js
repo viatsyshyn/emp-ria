@@ -180,4 +180,10 @@ NAMESPACE('ria.async', function () {
                     : (future ? (this.next = future) : this);
             }
         ]);
+
+    ria.async.DeferredAction = function () {
+        var future = new ria.async.Future;
+        defer(null, (future.__PROTECTED || future).complete_, [null]);
+        return future;
+    }
 });
