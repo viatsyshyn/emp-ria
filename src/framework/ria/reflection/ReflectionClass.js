@@ -65,7 +65,7 @@ NS('ria.reflection', function () {
 
             // TODO: fast way to get children
             ArrayOf(Function), function getChildren() {
-                return [];
+                return this.clazz.children;
             },
 
             ArrayOf(SELF), function getChildrenReflector() {
