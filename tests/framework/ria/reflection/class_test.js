@@ -108,6 +108,38 @@
             assertEquals(1, annotations.length);
             assertEquals(42, annotations[0].param);
             assertUndefined(annotations[0].optional_);
+        },
+
+        testIsAnnotatedWith: function() {
+
+            var WarriorAnnotation = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
+            var WarriorAnnotation2 = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
+
+            var baseClassDef = ClassDef([
+                [WarriorAnnotation(42)],
+                'BugWarrior', [
+                    function $() {},
+                    [[Number]],
+                    Number, function methodThatReturnsNumber(){
+                        return 4; //choosed by fair dice roll}
+                    },
+                    [[String]],
+                    String, function methodThatReturnsString() {
+                        return 'example';
+                    }
+                ]]);
+
+            var cls = MakeClass('BugWarrior', baseClassDef);
+            var reflectionCls;
+
+            assertNoException(function () {
+                reflectionCls = new ria.reflection.ReflectionClass(cls);
+            });
+
+            var annotations = reflectionCls.getAnnotations();
+
+            assertTrue(reflectionCls.isAnnotatedWith(WarriorAnnotation));
+            assertFalse(reflectionCls.isAnnotatedWith(WarriorAnnotation2));
         }
 
         /*testIsAbstract: function(){
