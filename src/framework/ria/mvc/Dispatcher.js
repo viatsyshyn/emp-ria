@@ -94,8 +94,8 @@ NAMESPACE('ria.mvc', function () {
              * @class ria.mvc.Dispatcher.dispatch
              * @param {String} query
              */
-            [[ria.mvc.State]],
-            VOID, function dispatch(state) {
+            [[ria.mvc.State, ria.mvc.IContext]],
+            VOID, function dispatch(state, context) {
                 var index;
                 try {
                     this.dispatching = true;
@@ -124,8 +124,8 @@ NAMESPACE('ria.mvc', function () {
 
                             var instanse = this.controllers[state.getController()].instantiate();
 
+                            instanse.setContext(context);
                             instanse.onInitialize();
-
                             instance.dispatch(state);
 
                             if (!state.isDispatched())

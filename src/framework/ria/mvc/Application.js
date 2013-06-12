@@ -106,7 +106,7 @@ NAMESPACE('ria.mvc', function () {
         VOID, function dispatch() {
             var state = this.serializer.deserialize('');
             state.setPublic(true);
-            this.dispatcher.dispatch(state);
+            this.dispatcher.dispatch(state, this.context);
         },
 
         ria.async.Future, function onInitialize_() {
