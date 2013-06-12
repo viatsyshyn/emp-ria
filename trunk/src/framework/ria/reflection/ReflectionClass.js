@@ -84,7 +84,7 @@ NS('ria.reflection', function () {
 
             Boolean, function isAnnotatedWith(ann) {
                 return this.getAnnotations()
-                    .some(function (_) { return _ instanceof ann });
+                    .some(function (_) { return _.__META == ann.__META });
             },
 
             ArrayOf(Function), function getParents() {
