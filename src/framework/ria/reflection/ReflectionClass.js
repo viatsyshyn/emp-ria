@@ -26,12 +26,26 @@ NS('ria.reflection', function () {
             ArrayOf(Function), function getChildren() { return []; }, // TODO: fast way to get children
 
             Object, function getCtorAnnotations() { return this.clazz.__META.ctor.annotations; },
-            Object, function getCtorArguments() { return this.clazz.__META.ctor.argsNames; },
-            Object, function getCtorArgumentsTypes() { return this.clazz.__META.ctor.argsTypes; },
+            ArrayOf(String), function getCtorArguments() { return this.clazz.__META.ctor.argsNames; },
+            ArrayOf(Object), function getCtorArgumentsTypes() { return this.clazz.__META.ctor.argsTypes; },
 
-            Boolean, function isAnnotatedWith(ann) {},
-            Boolean, function extendsClass(parent) {},
-            Boolean, function implementsIfc(parent) {},
+            Boolean, function isAnnotatedWith(ann) {
+                return this.getAnnotations().some(function (_) { return _ instanceof ann });
+            },
+
+            Boolean, function extendsClass(parent) {
+                var root = this.clazz;
+                while (root != null) {
+                    if (root = parent)
+                        return true;
+
+                    root = root.__META.base;
+                }
+
+                return false;
+            },
+
+            Boolean, function implementsIfc(ifc) { return this.clazz.__META.ifcs.indexOf(ifc) >= 0; },
             [[String]],
             Boolean, function hasProperty(name) { return this.clazz.__META.properties.hasOwnProperty(name); },
             [[String]],

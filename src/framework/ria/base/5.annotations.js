@@ -75,5 +75,5 @@
         }
 
         return value instanceof AnnotationInstance;
-    }
+    };
 })();
