@@ -12,14 +12,16 @@ NS('ria.reflection', function () {
 
             function $(clazz, name) {
                 ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                this.clazz = clazz;
 
                 this.property = clazz.__META.properties[name];
                 ria.__SYNTAX.checkArg('name', [ria.__API.PropertyDescriptor], this.property.__META);
+                this.name = name;
             },
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
+            String, function getShortName() { return this.name; },
             String, function isReadonly() { return this.property.setter == undefined; },
-
             Array, function getAnnotations() { return this.property.annotations; },
             Object, function getType() { return this.property.type; },
 

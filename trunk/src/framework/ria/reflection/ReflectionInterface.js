@@ -1,4 +1,5 @@
 REQUIRE('ria.reflection.Reflector');
+REQUIRE('ria.reflection.ReflectionMethod');
 
 /** @namespace ria.reflection*/
 NS('ria.reflection', function () {
@@ -11,16 +12,30 @@ NS('ria.reflection', function () {
 
             function $(ifc) {
                 ria.__SYNTAX.checkArg('clazz', [ria.__API.InterfaceDescriptor], ifc.__META);
+                this.ifc = ifc;
             },
 
-            String, function getName() { return this.ifc.__META.name; },
+            String, function getName() {
+                return this.ifc.__META.name;
+            },
 
-            Array, function getMethodsNames() { return Object.keys(this.ifc.methods) },
+            Array, function getMethodsNames() {
+                return Object.keys(this.ifc.methods)
+            },
 
-            Object, function getMethodReturnType(name) { return this.ifc.methods[name].retType; },
-            Array, function getMethodArguments(name) { return this.ifc.methods[name].argsNames;},
-            Array, function getMethodArgumentsTypes(name) { return this.ifc.methods[name].argsTypes;},
+            [[String]],
+            ria.reflection.ReflectionMethod, function getMethodReflector(name) {
+                var method = this.clazz.__META.methods[name];
+                return method ? new ria.reflection.ReflectionMethod(this.ifc, name) : null;
+            },
 
-            Boolean, function hasMethod(name) {}
+            ArrayOf(String), function getMethodsReflector() {
+                return this.getMethodsNames()
+                    .map(function (_) { this.getMethodReflector(_); }.bind(this));
+            },
+
+            Boolean, function hasMethod(name) {
+                return this.ifc.methods.hasOwnProperty(name);
+            }
         ]);
 });

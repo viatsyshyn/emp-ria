@@ -1,4 +1,7 @@
 REQUIRE('ria.reflection.Reflector');
+REQUIRE('ria.reflection.ReflectionMethod');
+REQUIRE('ria.reflection.ReflectionProperty');
+REQUIRE('ria.reflection.ReflectionInterface');
 
 /** @namespace ria.reflection*/
 NS('ria.reflection', function () {
@@ -21,42 +24,105 @@ NS('ria.reflection', function () {
 
             Array, function getAnnotations() { return this.clazz.__META.annotations; },
             Function, function getBaseClass() { return this.clazz.__META.base || null; },
-            ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs; },
-            ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
-            ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
-            ArrayOf(Function), function getChildren() { return []; }, // TODO: fast way to get children
 
-            Object, function getCtorAnnotations() { return this.clazz.__META.ctor.annotations; },
-            ArrayOf(String), function getCtorArguments() { return this.clazz.__META.ctor.argsNames; },
-            ArrayOf(Object), function getCtorArgumentsTypes() { return this.clazz.__META.ctor.argsTypes; },
+            SELF, function getBaseClassReflector() {
+                var base = this.getBaseClass();
+                return base ? this.getCached(SELF, base) : null;
+            },
+
+            ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
+
+            ArrayOf(ria.reflection.ReflectionInterface), function getInterfaces() {
+                return this.getInterfaces()
+                    .map(function (_) { return this.getCached(ria.reflection.ReflectionInterface, _); }.bind(this));
+            },
+
+            ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
+
+            [[String]],
+            ria.reflection.ReflectionMethod, function getMethodReflector(name) {
+                var method = this.clazz.__META.methods[name];
+                return method ? new ria.reflection.ReflectionMethod(this.clazz, method) : null;
+            },
+
+            ArrayOf(String), function getMethodsReflector() {
+                return this.getMethodsNames()
+                    .map(function (_) { this.getMethodReflector(_); }.bind(this));
+            },
+
+            ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
+
+            [[String]],
+            ria.reflection.ReflectionMethod, function getPropertyReflector(name) {
+                var property = this.clazz.__META.properties[name];
+                return property ? new ria.reflection.ReflectionProperty(this.clazz, name) : null;
+            },
+
+            ArrayOf(String), function getPropertiesReflector() {
+                return this.getPropertiesNames()
+                    .map(function (_) { this.getPropertyReflector(_); }.bind(this));
+            },
+
+            // TODO: fast way to get children
+            ArrayOf(Function), function getChildren() {
+                return [];
+            },
+
+            ArrayOf(SELF), function getChildrenReflector() {
+                return this.getChildren()
+                    .map(function (_) { return this.getCached(SELF, _);}.bind(this))
+            },
+
+            Object, function getCtorAnnotations() {
+                return this.clazz.__META.ctor.annotations;
+            },
+
+            ria.reflection.ReflectionMethod, function getCtorReflector() {
+                return this.getCached(ria.reflection.ReflectionMethod, this.clazz.__META.ctor);
+            },
 
             Boolean, function isAnnotatedWith(ann) {
-                return this.getAnnotations().some(function (_) { return _ instanceof ann });
+                return this.getAnnotations()
+                    .some(function (_) { return _ instanceof ann });
+            },
+
+            ArrayOf(Function), function getParents() {
+                var parents = [];
+                var root = this.getBaseClass();
+                while (root != null) {
+                    parents.push(root);
+                    root = root.__META.base;
+                }
+                return parents;
+            },
+
+            ArrayOf(SELF), function getParentsReflector() {
+                return this.getParents()
+                    .map(function (_) { return this.getCached(SELF, _)}.bind(this));
             },
 
             Boolean, function extendsClass(parent) {
-                var root = this.clazz;
-                while (root != null) {
-                    if (root = parent)
-                        return true;
-
-                    root = root.__META.base;
-                }
-
-                return false;
+                return this.clazz == parent || this.getParents()
+                    .some(function (_) { return _ == parent; });
             },
 
             Boolean, function implementsIfc(ifc) {
                 if (!ria.__API.isInterface(ifc))
                     throw ria.reflection.Exception('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
 
-                return this.clazz.__META.ifcs.some(function (_) { return _ === ifc })
+                return this.getInterfaces()
+                    .some(function (_) { return _ === ifc })
             },
 
             [[String]],
-            Boolean, function hasProperty(name) { return this.clazz.__META.properties.hasOwnProperty(name); },
+            Boolean, function hasProperty(name) {
+                return this.clazz.__META.properties.hasOwnProperty(name);
+            },
+
             [[String]],
-            Boolean, function hasMethod(name) { return this.clazz.__META.methods.hasOwnProperty(name); },
+            Boolean, function hasMethod(name) {
+                return this.clazz.__META.methods.hasOwnProperty(name);
+            },
 
             [[Array]],
             Class, function instantiate(args) {
