@@ -65,18 +65,19 @@ NAMESPACE('ria.mvc', function () {
                 var f = ria.async.DeferredAction();
 
                 baseRef.getChildrenReflector().forEach(function (controllerRef) {
-                    var name = controllerNameToUri(controllerRef.getShortName());
-                    if (controllerRef.hasAnnotation(ria.mvc.ControllerUri))
-                        name = controllerRef.getAnnotation(ria.mvc.ControllerUri).value;
+                    var name = controllerRef.getShortName();
+                    if (name.match(/.*Controller$/)) {
+                        if (controllerRef.isAnnotatedWith(ria.mvc.ControllerUri))
+                            name = controllerRef.getAnnotation(ria.mvc.ControllerUri).shift().value;
+                        else
+                            name = controllerNameToUri(name);
 
-                    try {
-                        if (name.test(/.*Controller$/)) {
+                        try {
                             controllerRef.instantiate([]).onAppStart();
-
                             this.controllers[name] = controllerRef;
+                        } catch (e) {
+                            throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
                         }
-                    } catch (e) {
-                        throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
                     }
 
                     this.loadControllers_(controllerRef);

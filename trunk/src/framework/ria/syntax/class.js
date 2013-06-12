@@ -200,9 +200,21 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             method.retType = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
         }
 
+        if (method.retType
+                && method.retType.value instanceof ria.__API.ArrayOfDescriptor
+                && method.retType.value.clazz == ria.__SYNTAX.Modifiers.SELF) {
+            method.retType = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ArrayOf(ClassProxy));
+        }
+
         method.argsTypes.forEach(function (t, index) {
             if (method.argsTypes[index] instanceof ria.__SYNTAX.Tokenizer.SelfToken)
                 method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
+
+            if (method.argsTypes[index]
+                    && method.argsTypes[index].value instanceof ria.__API.ArrayOfDescriptor
+                    && method.argsTypes[index].value.clazz == ria.__SYNTAX.Modifiers.SELF) {
+                method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ArrayOf(ClassProxy));
+            }
         });
 
         var impl = ClassProxy.prototype[method.name] = method.body.value;

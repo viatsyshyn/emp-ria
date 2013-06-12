@@ -14,7 +14,7 @@ NAMESPACE('app.controllers', function () {
 
     /** @class app.controllers.TestController */
     CLASS(
-        //[ria.mvc.ControllerBind('test')],
+        [ria.mvc.ControllerUri('index')],
         'TestController', EXTENDS(app.controllers.Base), [
 
             //[ria.mvc.DependencyInjector],

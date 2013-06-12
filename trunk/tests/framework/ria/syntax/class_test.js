@@ -24,7 +24,9 @@
                     ria.__SYNTAX.Modifiers.SELF, function me() {
                         return new BaseClass();
                     },
-                    ria.__API.ArrayOf(ria.__SYNTAX.Modifiers.SELF), function me1() {
+
+                    [[ria.__API.ArrayOf(ria.__SYNTAX.Modifiers.SELF)]],
+                    ria.__API.ArrayOf(ria.__SYNTAX.Modifiers.SELF), function me1(a) {
                         return new BaseClass();
                     },
 
@@ -44,6 +46,8 @@
             assertEquals(BaseClass, BaseClass.__META.methods['me'].retType);
             assertInstanceOf(ria.__API.ArrayOfDescriptor, BaseClass.__META.methods['me1'].retType);
             assertEquals(BaseClass, BaseClass.__META.methods['me1'].retType.clazz);
+            assertInstanceOf(ria.__API.ArrayOfDescriptor, BaseClass.__META.methods['me1'].argsTypes[0]);
+            assertEquals(BaseClass, BaseClass.__META.methods['me1'].argsTypes[0].clazz);
             assertEquals(BaseClass, BaseClass.__META.methods['me2'].retType);
             assertEquals(BaseClass, BaseClass.__META.methods['me2'].argsTypes[0]);
             assertEquals(BaseClass, BaseClass.__META.methods['method2'].argsTypes[0]);
