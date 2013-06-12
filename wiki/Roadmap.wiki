@@ -3,9 +3,9 @@
 = Milestones =
 
   * ~~#1. Low-level API~~
-  * #2. Syntax, Dependencies, Reflection
+  * ~~#2. Syntax, Dependencies, Reflection~~
   * #3. Compilation and GCC optimizations
-  * #4. Promises, AJAX, MVC, DOM, HAML Templates, JSON Serialization
+  * #4. Futures, AJAX, MVC, DOM, Jade Templates, Data Serialization
   * #5. XMPP,...
 
 = Milestone #1. Low-level API =
@@ -19,7 +19,7 @@
   * ~~[Classes]~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
-  * [ArrayOf]
+  * ~~[ArrayOf]~~
   * [ClassOf]
   * [ImplementorOf]
 
@@ -65,7 +65,7 @@
 
 Wiki page [DependencySystem]
 
-  * Runtime dependency management
+  * ~~Runtime dependency management~~
   * Runtime code loaders
   * Runtime content loaders
 
@@ -73,7 +73,7 @@ Wiki page [DependencySystem]
 
 Wiki page [Reflection]
 
-  * ~~[Interfaces]~~, Tests 
-  * ~~[Classes]~~, Tests
-  * ~~Methods~~, Tests
+  * ~~[Interfaces]~~, ~~Tests~~ 
+  * ~~[Classes]~~, ~~Tests~~
+  * ~~Methods~~, ~~Tests~~
   * ~~Properties~~, Tests
