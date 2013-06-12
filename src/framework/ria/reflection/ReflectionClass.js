@@ -18,11 +18,12 @@ NS('ria.reflection', function () {
             },
 
             String, function getName() { return this.clazz.__META.name; },
+            String, function getShortName() { return this.clazz.__META.name.split('.').pop(); },
 
             //Boolean, function isAbstract() { return this.clazz.__META.flags.isAbstract; },
             //Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
-            Array, function getAnnotations() { return this.clazz.__META.annotations; },
+            Array, function getAnnotations() { return this.clazz.__META.anns; },
             Function, function getBaseClass() { return this.clazz.__META.base || null; },
 
             SELF, function getBaseClassReflector() {

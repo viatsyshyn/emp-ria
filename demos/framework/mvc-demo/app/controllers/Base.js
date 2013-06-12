@@ -1,5 +1,4 @@
-//REQUIRE('ria.mvc.Controller');
-//REQUIRE('ria.mvc.ControllerBind');
+REQUIRE('ria.mvc.Controller');
 //REQUIRE('ria.mvc.DependencyInjector');
 
 NAMESPACE('app.controllers', function () {
@@ -7,6 +6,6 @@ NAMESPACE('app.controllers', function () {
 
     /** @class app.controllers.Base */
     CLASS(
-        'Base', /*EXTENDS(ria.mvc.Controller), */[
+        'Base', EXTENDS(ria.mvc.Controller), [
         ])
 });
