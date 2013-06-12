@@ -118,6 +118,7 @@ NS('ria.reflection', function () {
 
                 return this.getInterfaces()
                     .some(function (_) { return _ === ifc })
+                        || (this.getBaseClass() ? this.getBaseClassReflector().implementsIfc(ifc) : false);
             },
 
             [[String]],
