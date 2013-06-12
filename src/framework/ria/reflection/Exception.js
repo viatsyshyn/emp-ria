@@ -3,8 +3,8 @@ NAMESPACE('ria.reflection', function () {
 
     /** @class ria.reflection.Exception */
     EXCEPTION('Exception', [
-        [String, Object],
-        PUBLIC, function $(message, inner_) {
+        [[String, Object]],
+        function $(message, inner_) {
             BASE(message, inner);
         }
     ]);
