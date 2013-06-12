@@ -19,8 +19,8 @@ NS('ria.reflection', function () {
 
             String, function getName() { return this.clazz.__META.name; },
 
-            Boolean, function isAbstract() { return this.clazz.__META.flags.isAbstract; },
-            Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
+            //Boolean, function isAbstract() { return this.clazz.__META.flags.isAbstract; },
+            //Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
             Array, function getAnnotations() { return this.clazz.__META.annotations; },
             Function, function getBaseClass() { return this.clazz.__META.base || null; },
