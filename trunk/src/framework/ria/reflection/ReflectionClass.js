@@ -32,12 +32,12 @@ NS('ria.reflection', function () {
             Boolean, function isAnnotatedWith(ann) {},
             Boolean, function extendsClass(parent) {},
             Boolean, function implementsIfc(parent) {},
-            [String],
+            [[String]],
             Boolean, function hasProperty(name) { return this.clazz.__META.properties.hasOwnProperty(name); },
-            [String],
+            [[String]],
             Boolean, function hasMethod(name) { return this.clazz.__META.methods.hasOwnProperty(name); },
 
-            [Array],
+            [[Array]],
             Class, function instantiate(args) {
                 return ria.__API.init(null, this.clazz, this.clazz.__META.ctor.impl, args);
             }
