@@ -101,7 +101,7 @@ NAMESPACE('ria.mvc', function () {
                     return this.cache[name];
                 }
 
-                var instanse = this.cache[name] = ref.instatiate();
+                var instanse = this.cache[name] = ref.instantiate();
 
                 if (ref.implementsIfc(ria.mvc.IContextable)) {
                     ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
@@ -118,7 +118,7 @@ NAMESPACE('ria.mvc', function () {
                     if (_.isReadonly()) return;
                     if (!_.isAnnotatedWith(ria.mvc.Inject)) return;
 
-                    _.invokeSetterOn(instanse, this.getCached_(_.getType()));
+                    _.invokeSetterOn(instanse, this.getCached_(_.getType(), context));
                 }.bind(this));
 
                 if (ref.implementsIfc(ria.mvc.IContextable)) {

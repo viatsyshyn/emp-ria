@@ -22,7 +22,7 @@ NS('ria.reflection', function () {
             String, function getShortName() { return this.name; },
             Boolean, function isReadonly() { return this.property.setter == undefined; },
             Array, function getAnnotations() { return this.property.annotations; },
-            Object, function getType() { return this.property.type; },
+            Object, function getType() { return this.property.retType; },
 
             Boolean, function isAnnotatedWith(ann) {
                 return this.getAnnotations()
@@ -32,14 +32,14 @@ NS('ria.reflection', function () {
             function invokeGetterOn(instance) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.method.getter.call(instance);
+                this.property.getter.call(instance);
             },
 
             VOID, function invokeSetterOn(instance, value) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
-                VALIDATE_ARG('value', [this.property.type], value);
+                VALIDATE_ARG('value', [this.property.retType], value);
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.method.setter.call(instance, value);
+                this.property.setter.call(instance, value);
             }
         ]);
 });
