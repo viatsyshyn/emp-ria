@@ -11,6 +11,7 @@ NS('ria.reflection', function () {
 
             function $(clazz) {
                 ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                this.clazz = clazz;
             },
 
             String, function getName() { return this.clazz.__META.name; },

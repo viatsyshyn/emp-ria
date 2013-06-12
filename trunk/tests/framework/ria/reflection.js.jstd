@@ -1,0 +1,13 @@
+load:
+  - _cfg.js
+  - ../../../src/framework/ria/base/*.js
+  - ../../../src/framework/ria/syntax/*.js
+  - async/require_stub.js
+  - ../../../src/framework/ria/reflection/Exception.js
+  - ../../../src/framework/ria/reflection/Reflector.js
+  - ../../../src/framework/ria/reflection/ReflectionMethod.js
+  - ../../../src/framework/ria/reflection/ReflectionProperty.js
+  - ../../../src/framework/ria/reflection/ReflectionInterface.js
+  - ../../../src/framework/ria/reflection/ReflectionClass.js
+test:
+  - reflection/*_test.js

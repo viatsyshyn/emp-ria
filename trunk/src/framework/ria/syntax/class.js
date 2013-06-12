@@ -98,8 +98,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function isSameFlags(def1, def2){
-        for(var flag in def1.flags) if (def1.flags.hasOwnProperty(flag)) {
-            if(def1.flags[flag] != def2.flags[flag])
+        for(var flag in def1.flags)  {
+            if (flag == 'isReadonly') continue;
+            if (def1.flags.hasOwnProperty(flag) && def1.flags[flag] != def2.flags[flag])
                 return false;
         }
         return true;
