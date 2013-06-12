@@ -43,7 +43,7 @@ NS('ria.reflection', function () {
             [[String]],
             ria.reflection.ReflectionMethod, function getMethodReflector(name) {
                 var method = this.clazz.__META.methods[name];
-                return method ? new ria.reflection.ReflectionMethod(this.clazz, method) : null;
+                return method ? new ria.reflection.ReflectionMethod(this.clazz, name) : null;
             },
 
             ArrayOf(String), function getMethodsReflector() {
