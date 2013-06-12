@@ -20,16 +20,16 @@ NS('ria.reflection', function () {
             },
 
             Array, function getMethodsNames() {
-                return Object.keys(this.ifc.methods)
+                return Object.keys(this.ifc.__META.methods)
             },
 
-            Object, function getMethodInfo(name) { return this.ifc.methods[name] || null; },
-            function getMethodReturnType(name) { return this.ifc.methods[name].retType; },
-            ArrayOf(String), function getMethodArguments(name) { return this.ifc.methods[name].argsNames;},
-            ArrayOf(Object), function getMethodArgumentsTypes(name) { return this.ifc.methods[name].argsTypes;},
+            Object, function getMethodInfo(name) { return this.ifc.__META.methods[name] || null; },
+            function getMethodReturnType(name) { return this.ifc.__META.methods[name].retType; },
+            ArrayOf(String), function getMethodArguments(name) { return this.ifc.__META.methods[name].argsNames;},
+            ArrayOf(Object), function getMethodArgumentsTypes(name) { return this.ifc.__META.methods[name].argsTypes;},
 
             Boolean, function hasMethod(name) {
-                return this.ifc.methods.hasOwnProperty(name);
+                return this.ifc.__META.methods.hasOwnProperty(name);
             }
         ]);
 });
