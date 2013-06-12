@@ -46,9 +46,9 @@ NS('ria.reflection', function () {
                 return method ? new ria.reflection.ReflectionMethod(this.clazz, name) : null;
             },
 
-            ArrayOf(String), function getMethodsReflector() {
+            ArrayOf(ria.reflection.ReflectionMethod), function getMethodsReflector() {
                 return this.getMethodsNames()
-                    .map(function (_) { this.getMethodReflector(_); }.bind(this));
+                    .map(function (_) { return this.getMethodReflector(_); }.bind(this));
             },
 
             ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
