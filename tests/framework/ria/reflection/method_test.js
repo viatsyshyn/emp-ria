@@ -49,23 +49,29 @@
         testAnnotationAndArgs: function () {
 
             var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
+            var MyAnnotation2 = ria.__API.annotation('MyAnnotation2', [], []);
 
             var baseClassDef = ClassDef([
                 'BugWarrior', [
                     function $() {},
 
                     [MyAnnotation], [[Number, String]],
-                    String, function method1(a, b) {
+                    String, function method1(a, b, c_, d_, e_) {
                         return a + b;
                     },
 
                     Number, function method2() {
                         return "aaa";
+                    },
+
+                    [MyAnnotation2], [[Number, String]],
+                    String, function method3(a, b) {
+                        return a + b;
                     }
             ]]);
 
             var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionMethod1, reflectionMethod2;
+            var reflectionMethod1, reflectionMethod2, reflectionMethod3;
 
             assertNoException(function () {
                 reflectionMethod1 = new ria.reflection.ReflectionMethod(cls, 'method1');
@@ -73,6 +79,10 @@
 
             assertNoException(function () {
                 reflectionMethod2 = new ria.reflection.ReflectionMethod(cls, 'method2');
+            });
+
+            assertNoException(function () {
+                reflectionMethod3 = new ria.reflection.ReflectionMethod(cls, 'method3');
             });
 
             var annotation1 = reflectionMethod1.getAnnotations();
@@ -85,17 +95,32 @@
             assertArray(annotation2);
             assertEquals(annotation2.length, 0);
 
+            assertTrue(reflectionMethod1.isAnnotatedWith(MyAnnotation));
+            assertFalse(reflectionMethod2.isAnnotatedWith(MyAnnotation2));
+            assertFalse(reflectionMethod2.isAnnotatedWith(MyAnnotation));
+            assertFalse(reflectionMethod3.isAnnotatedWith(MyAnnotation));
+            assertTrue(reflectionMethod3.isAnnotatedWith(MyAnnotation2));
+
             assertEquals(reflectionMethod1.getReturnType(), String);
             assertEquals(reflectionMethod2.getReturnType(), Number);
 
             var args1 = reflectionMethod1.getArguments();
             var args2 = reflectionMethod2.getArguments();
+            var recArgs1 = reflectionMethod1.getRequiredArguments();
+            var recArgs2 = reflectionMethod2.getRequiredArguments();
 
-            assertEquals(args1.length, 2);
+            assertEquals(args1.length, 5);
+            assertEquals(args1[0], 'a');
+            assertEquals(args1[1], 'b');
+            assertEquals(args1[2], 'c_');
+            assertEquals(args1[3], 'd_');
+            assertEquals(args1[4], 'e_');
+            assertEquals(2, recArgs1.length);
             assertEquals(args1[0], 'a');
             assertEquals(args1[1], 'b');
 
             assertEquals(args2.length, 0);
+            assertEquals(recArgs2.length, 0);
 
             var argsTypes1 = reflectionMethod1.getArgumentsTypes();
             var argsTypes2 = reflectionMethod2.getArgumentsTypes();
