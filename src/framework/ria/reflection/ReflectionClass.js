@@ -13,7 +13,7 @@ NS('ria.reflection', function () {
             READONLY, Function, 'clazz',
 
             function $(clazz) {
-                ria.__SYNTAX.checkArg('clazz', [ria.__API.ClassDescriptor], clazz.__META);
+                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
             },
 
@@ -87,6 +87,11 @@ NS('ria.reflection', function () {
                     .some(function (_) { return _.__META == ann.__META });
             },
 
+            Array, function findAnnotation(ann) {
+                return this.clazz.__META.anns
+                    .filter(function (_) { return _.__META == ann.__META});
+            },
+
             ArrayOf(Function), function getParents() {
                 var parents = [];
                 var root = this.getBaseClass();
@@ -126,8 +131,8 @@ NS('ria.reflection', function () {
             },
 
             [[Array]],
-            Class, function instantiate(args) {
-                return ria.__API.init(null, this.clazz, this.clazz.__META.ctor.impl, args);
+            Class, function instantiate(args_) {
+                return ria.__API.init(null, this.clazz, this.clazz.__META.ctor.impl, args_ ? args_ : []);
             }
         ]);
 });
