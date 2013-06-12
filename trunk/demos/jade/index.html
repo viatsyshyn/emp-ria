@@ -2,8 +2,8 @@
 <html>
 <head>
     <title></title>
-    <script src="file:///Users/paladin/Work/emp-ria/demos/jade/jquery-1.9.1.min.js" type="text/javascript"></script>
-    <script src="file:///Users/paladin/Work/emp-ria/demos/jade/jade.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
+    <script src="file:///g:\projects\emp.jade\jade.js" type="text/javascript"></script>
 
     <script type="text/jade" id="mixins">
 mixin ActionLink(controller, action)
@@ -21,21 +21,21 @@ mixin ActionForm(controller, action)
     form(attributes)
         block
 
-mixin RenderWithSingle(obj, tplClass)
-    -var tpl = new tplClass
-    -var tpl.assign(obj)
-    -var tpl.options(attributes)
+mixin RenderWithSingle_(obj, tplClass)
+    -var tpl = new tplClass();
+    -tpl.assign(obj);
+    -tpl.options(attributes);
     -buf.push(tpl.renderBuffer())
 
 mixin RenderWith(obj, tpl)
     -attributes.block = block
-    if 'number' == typeof obj.length
+    if ('number' == typeof obj.length)
         each value, key in obj
             -attributes.collectionIndex=key
             -attributes.collection=obj
-            +RenderWithSingle(value, tpl)(attributes)
+            +RenderWithSingle_(value, tpl)(attributes)
     else
-        +RenderWithSingle(obj, tpl)(attributes)
+        +RenderWithSingle_(obj, tpl)(attributes)
 
     </script>
 
@@ -56,7 +56,7 @@ mixin RenderWith(obj, tpl)
 
             window.$L = function (_) { return _; };
 
-            var fn = Jade.compile(mixins, {client:true, compileDebug: false, globalizeMixins: true });
+            var fn = jade.compile(mixins, {client:true, compileDebug: false });
             jQuery('<pre></pre>').text(fn.toString()).appendTo('body');
 
             /*var fn = Jade.compile(test, {client:false, compileDebug: false });

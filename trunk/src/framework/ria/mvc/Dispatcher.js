@@ -6,6 +6,7 @@ REQUIRE('ria.mvc.IStateSerializer');
 REQUIRE('ria.mvc.IDispatchPlugin');
 
 REQUIRE('ria.async.Future');
+REQUIRE('ria.async.wait');
 REQUIRE('ria.reflection.ReflectionFactory');
 
 NAMESPACE('ria.mvc', function () {
@@ -62,18 +63,17 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.reflection.ReflectionClass]],
             ria.async.Future, function loadControllers_(baseRef) {
-                var f = ria.async.DeferredAction();
-
+                var onAppStartFutures = [];
                 baseRef.getChildrenReflector().forEach(function (controllerRef) {
                     var name = controllerRef.getShortName();
                     if (name.match(/.*Controller$/)) {
                         if (controllerRef.isAnnotatedWith(ria.mvc.ControllerUri))
-                            name = controllerRef.getAnnotation(ria.mvc.ControllerUri).shift().value;
+                            name = controllerRef.findAnnotation(ria.mvc.ControllerUri).shift().value;
                         else
                             name = controllerNameToUri(name);
 
                         try {
-                            controllerRef.instantiate([]).onAppStart();
+                            onAppStartFutures.push(controllerRef.instantiate([]).onAppStart());
                             this.controllers[name] = controllerRef;
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
@@ -83,7 +83,7 @@ NAMESPACE('ria.mvc', function () {
                     this.loadControllers_(controllerRef);
                 }.bind(this));
 
-                return f;
+                return ria.async.wait(onAppStartFutures);
             },
 
             ria.async.Future, function loadControllers() {
@@ -122,7 +122,11 @@ NAMESPACE('ria.mvc', function () {
                                 throw new ria.mvc.MvcException('Controller with id "' + state.getController() + '" not found');
                             }
 
-                            this.controllers[state.getController()].dispatch(state);
+                            var instanse = this.controllers[state.getController()].instantiate();
+
+                            instanse.onInitialize();
+
+                            instance.dispatch(state);
 
                             if (!state.isDispatched())
                                 continue;

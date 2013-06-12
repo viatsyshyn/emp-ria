@@ -10,7 +10,8 @@
   },
   "man": "./jade.1",
   "dependencies": {
-    "optimist": "*"
+    "optimist": "*",
+    "uglify-js": "*"
   },
   "devDependencies": {
     "mocha": "*"

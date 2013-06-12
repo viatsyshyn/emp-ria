@@ -8,12 +8,14 @@ NAMESPACE('ria.async', function () {
      * @returns {ria.async.Future}
      */
     ria.async.wait = function (future) {
-        var futures = [].slice.call(arguments)
+        var futures = Array.isArray(future) ? future : [].slice.call(arguments)
           , completer = new ria.async.Completer
           , counter = 0
-          , size = futures.size
+          , size = futures.length + 1
           , results = []
           , complete = false;
+
+        futures.unshift(ria.async.DeferredAction()); // just in case futures are empty or all resolved :)
 
         futures.forEach(function (_, index) {
             VALIDATE_ARG('future', [ria.async.Future], _);

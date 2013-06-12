@@ -174,8 +174,12 @@ exports.rethrow = function rethrow(err, filename, lineno){
   throw err;
 };
 
-exports.globals = {};
+/**
+ * Contains globals for jade scoping
+ * @type {Object}
+ */
 
+exports.globals = {};
   return exports;
 
 })({});

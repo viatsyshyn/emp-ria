@@ -28,5 +28,6 @@ window.NAMESPACE = ria.__SYNTAX.NS;
 window.IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
 window.EXTENDS = ria.__SYNTAX.EXTENDS;
 window.VALIDATE_ARG = ria.__SYNTAX.checkArg;
+window.VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
 window.ArrayOf = ria.__API.ArrayOf;
 

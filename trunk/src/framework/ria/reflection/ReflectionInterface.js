@@ -11,7 +11,7 @@ NS('ria.reflection', function () {
             READONLY, Function, 'ifc',
 
             function $(ifc) {
-                ria.__SYNTAX.checkArg('clazz', [ria.__API.InterfaceDescriptor], ifc.__META);
+                VALIDATE_ARG('clazz', [ria.__API.InterfaceDescriptor], ifc.__META);
                 this.ifc = ifc;
             },
 
