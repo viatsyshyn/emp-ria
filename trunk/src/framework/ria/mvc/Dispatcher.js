@@ -60,36 +60,33 @@ NAMESPACE('ria.mvc', function () {
                 (index >= 0) && this.plugins.splice(index, 1);
             },
 
-            [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
-            ria.async.Future, function loadControllers_(baseRef, context) {
+            [[ria.reflection.ReflectionClass]],
+            ria.async.Future, function loadControllers_(baseRef) {
                 var f = ria.async.DeferredAction();
 
-                var all = baseRef.getChildren();
-                for(var index = all.length; index > 0; index--) {
-                    var controllerRef = all[index - 1];
-
-                    if (controllerRef.isAbstract()) {
-                        this.loadControllers_(controllerRef, context);
-                        continue;
-                    }
-
+                baseRef.getChildrenReflector().forEach(function (controllerRef) {
                     var name = controllerNameToUri(controllerRef.getShortName());
                     if (controllerRef.hasAnnotation(ria.mvc.ControllerUri))
                         name = controllerRef.getAnnotation(ria.mvc.ControllerUri).value;
 
                     try {
-                        this.controllers[name] = controllerRef.newInstanceArgs([context]);
+                        if (name.test(/.*Controller$/)) {
+                            controllerRef.instantiate([]).onAppStart();
+
+                            this.controllers[name] = controllerRef;
+                        }
                     } catch (e) {
-                        throw new ria.mvc.MvcException('Error instantiating controller ' + controllerRef.getName(), e);
+                        throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
                     }
-                }
+
+                    this.loadControllers_(controllerRef);
+                }.bind(this));
 
                 return f;
             },
 
-            [[ria.mvc.IContext]],
-            ria.async.Future, function loadControllers(context) {
-                return this.loadControllers_(ria.reflection.ReflectionFactory(ria.mvc.Controller), context)
+            ria.async.Future, function loadControllers() {
+                return this.loadControllers_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
             },
 
             /**

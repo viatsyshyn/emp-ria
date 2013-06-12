@@ -6,7 +6,7 @@ NAMESPACE('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionFactory */
     ria.reflection.ReflectionFactory = function (clazz, reflector) {
-        if (reflector == ria.reflection.ReflectionClass) {
+        if (reflector == undefined || reflector == ria.reflection.ReflectionClass) {
             if (clazz instanceof ria.__API.Class)
                 clazz = clazz.getClass();
 
