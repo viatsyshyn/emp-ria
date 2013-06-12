@@ -5,6 +5,7 @@ REQUIRE('ria.mvc.State');
 REQUIRE('ria.mvc.IStateSerializer');
 REQUIRE('ria.mvc.IDispatchPlugin');
 
+REQUIRE('ria.mvc.Controller');
 REQUIRE('ria.async.Future');
 REQUIRE('ria.async.wait');
 REQUIRE('ria.reflection.ReflectionFactory');
@@ -48,6 +49,7 @@ NAMESPACE('ria.mvc', function () {
                 this.plugins = [];
                 this.dispatching = false;
                 this.controllers = {};
+                this.cache = {};
             },
 
             [[ria.mvc.IDispatchPlugin]],
@@ -90,6 +92,41 @@ NAMESPACE('ria.mvc', function () {
                 return this.loadControllers_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
             },
 
+            [[Function, ria.mvc.IContext]],
+            Object, function getCached_(type, context) {
+                var ref = ria.reflection.ReflectionFactory(type);
+                var name = ref.getName();
+
+                if (this.cache.hasOwnProperty(name)) {
+                    return this.cache[name];
+                }
+
+                var instanse = this.cache[name] = ref.instatiate();
+
+                if (ref.implementsIfc(ria.mvc.IContextable)) {
+                    ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
+                }
+
+                return instanse;
+            },
+
+            [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
+            ria.mvc.Controller, function prepareController_(ref, context) {
+                var instanse = ref.instantiate();
+
+                ref.getPropertiesReflector().forEach(function (_) {
+                    if (_.isReadonly()) return;
+                    if (!_.isAnnotatedWith(ria.mvc.Inject)) return;
+
+                    _.invokeSetterOn(instanse, this.getCached_(_.getType()));
+                }.bind(this));
+
+                if (ref.implementsIfc(ria.mvc.IContextable)) {
+                    ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
+                }
+                return instanse;
+            },
+
             /**
              * @class ria.mvc.Dispatcher.dispatch
              * @param {String} query
@@ -122,9 +159,8 @@ NAMESPACE('ria.mvc', function () {
                                 throw new ria.mvc.MvcException('Controller with id "' + state.getController() + '" not found');
                             }
 
-                            var instanse = this.controllers[state.getController()].instantiate();
+                            var instanse = this.prepareController_(this.controllers[state.getController()], context);
 
-                            instanse.setContext(context);
                             instanse.onInitialize();
                             instanse.dispatch(state);
 

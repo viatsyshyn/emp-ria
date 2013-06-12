@@ -54,14 +54,14 @@ NS('ria.reflection', function () {
             ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
 
             [[String]],
-            ria.reflection.ReflectionMethod, function getPropertyReflector(name) {
+            ria.reflection.ReflectionProperty, function getPropertyReflector(name) {
                 var property = this.clazz.__META.properties[name];
                 return property ? new ria.reflection.ReflectionProperty(this.clazz, name) : null;
             },
 
-            ArrayOf(String), function getPropertiesReflector() {
+            ArrayOf(ria.reflection.ReflectionProperty), function getPropertiesReflector() {
                 return this.getPropertiesNames()
-                    .map(function (_) { this.getPropertyReflector(_); }.bind(this));
+                    .map(function (_) { return this.getPropertyReflector(_); }.bind(this));
             },
 
             // TODO: fast way to get children
