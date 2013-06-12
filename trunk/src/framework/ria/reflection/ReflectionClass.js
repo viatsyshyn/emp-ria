@@ -33,7 +33,7 @@ NS('ria.reflection', function () {
 
             ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
 
-            ArrayOf(ria.reflection.ReflectionInterface), function getInterfaces() {
+            ArrayOf(ria.reflection.ReflectionInterface), function getInterfacesReflector() {
                 return this.getInterfaces()
                     .map(function (_) { return this.getCached(ria.reflection.ReflectionInterface, _); }.bind(this));
             },
