@@ -20,7 +20,7 @@
         this.properties = {};
         this.methods = {};
         this.ctor = null;
-        this.chidren = [];
+        this.children = [];
     }
 
     ClassDescriptor.prototype.addProperty = function (name, ret, anns, getter, setter) {
@@ -55,7 +55,7 @@
         if (clazz.__META.base.__META != this)
             throw Error('Child should extend me.');
 
-        this.chidren.push(clazz);
+        this.children.push(clazz);
     };
 
     ria.__API.ClassDescriptor = ClassDescriptor;

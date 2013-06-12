@@ -89,7 +89,7 @@ NAMESPACE('ria.mvc', function () {
                     return me.onInitialize_();
                 })
                 .then(function () {
-                    return me.dispatcher.loadControllers(me.context);
+                    return me.dispatcher.loadControllers();
                 })
                 .then(function () {
                     return me.onStart_();
