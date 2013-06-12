@@ -60,7 +60,7 @@
         },
         testGetInterfaces: function(){
 
-        }
+        },
         /*testGetBaseClassReflector: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
@@ -77,7 +77,7 @@
             assertEquals(reflectionCls.getBaseClassReflector(), cls);
         }*/
 
-        /*testGetAnnotations: function() {
+        testGetAnnotations: function() {
 
             var WarriorAnnotation = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
 
@@ -104,9 +104,12 @@
 
             var annotations = reflectionCls.getAnnotations();
 
-            assertNoUndefined(annotations);
-            assertEquals(annotations.length, 1);
-        }*/
+            assertNotUndefined(annotations);
+            assertEquals(1, annotations.length);
+            assertEquals(42, annotations[0].param);
+            assertUndefined(annotations[0].optional_);
+        }
+
         /*testIsAbstract: function(){
 
             var baseClassDef = ClassDef([
