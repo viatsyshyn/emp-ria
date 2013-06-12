@@ -11,11 +11,10 @@ NS('ria.reflection', function () {
             READONLY, String, 'name',
 
             function $(clazz, name) {
-                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor, ria.__API.InterfaceDescriptor], clazz.__META);
+                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
 
                 this.method = clazz.__META.methods[name];
-                VALIDATE_ARG('name', [ria.__API.MethodDescriptor], this.method.__META);
                 this.name = name;
             },
 
@@ -27,7 +26,14 @@ NS('ria.reflection', function () {
 
             Array, function getAnnotations() { return this.method.annotations; },
             Object, function getReturnType() { return this.method.retType; },
-            Array, function getArguments() { return this.method.argsNames;},
+
+            ArrayOf(String), function getArguments() { return this.method.argsNames;},
+
+            ArrayOf(String), function getRequiredArguments() {
+                return this.getArguments()
+                    .filter(function (_) { !/^.+_$/.test(_) });
+            },
+
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
 
             function invokeOn(instance, args) {

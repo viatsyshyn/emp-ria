@@ -30,6 +30,12 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.State, 'state',
             ria.mvc.IView, 'view',
 
+            function $() {
+                this.context = null;
+                this.state = null;
+                this.view = null;
+            },
+
             /**
              * Method is called once Application is starting
              * A magic method 'cause you can load required resources but can not use this to store them
@@ -76,44 +82,37 @@ NAMESPACE('ria.mvc', function () {
                 this.context.stateUpdated();
             },
 
-            [[ria.mvc.State]],
-            VOID, function preDispatchAction_(state) {},
+            VOID, function preDispatchAction_() {},
 
-            [[ria.mvc.State]],
-            VOID, function postDispatchAction_(state) {},
+            VOID, function postDispatchAction_() {},
 
             [[ria.mvc.State]],
             VOID, function callAction_(state) {
-                var action = toCamelCase(state.getAction()) + 'Action';
-                var current_role = this.context.getCurrentRole();
+                var ref = ria.reflection.ReflectionFactory(this.getClass()),
+                    action = toCamelCase(state.getAction()) + 'Action',
+                    all = ref.getMethodsReflector(),
+                    params = state.getParams(),
+                    c = params.length;
 
-                var ref = ria.reflection.ReflectionFactory(this.getClass());
-                var all = ref.getMethods();
-                var c = state.getParams().length;
-                var methods = [];
-                while (all.length) {
-                    var method = all.pop();
-                    if (!method.isPublic() || method.isAbstract() || method.isStatic() || method.hasVarArgs()
-                            || method.getNumberOfParameters() != c || method.getShortName() != action)
-                        continue;
+                var method = ref.getMethodReflector(action);
+                if (!method)
+                    throw new ria.mvc.MvcException('Controller ' + ref.getName() + ' has no method ' + action
+                        + ' for action ' + state.getAction());
 
-                    var role = method.getAnnotation(ria.mvc.AccessFor);
-                    if (role && (Array.isArray(role.roles) ? role.roles.indexOf(current_role) < 0 : role.roles != current_role))
-                        continue;
+                var min = method.getRequiredArguments().length;
+                if (min > c)
+                    throw new ria.mvc.MvcException('Method ' + method.getName() + ' requires at least ' + min + ' arguments.');
 
-                    methods.push(method);
-                }
+                var max = method.getArguments().length;
+                if (max < c)
+                    throw new ria.mvc.MvcException('Method ' + method.getName() + ' requires at most ' + max + ' arguments.');
 
-                if (methods.length != 1) {
-                    throw new ria.mvc.MvcException('Found ' + methods.length + ' overloads of ' + ref.getName()+ '#'  + action
-                            + ' action that accepts exactly ' + c + ' arguments. '
-                            + '(filtered for role: \'' + current_role + '\')');
-                }
+                // TODO: check roles
 
                 try {
-                    this[action].apply(this.publicInstance, state.getParams());
+                    method.invokeOn(this, params);
                 } catch (e) {
-                    throw new ria.mvc.MvcException("Exception in action " + methods[0].getSignature() + ' of ' + ref.getName(), e);
+                    throw new ria.mvc.MvcException("Exception in action " + methods.getName(), e);
                 }
             },
 
@@ -127,8 +126,6 @@ NAMESPACE('ria.mvc', function () {
 
                 if (state.isPublic()) {
                     this.view.reset();
-                    // TODO: push2URL(state)
-                    // window.History.setHash(dispatcher.serialize(state));
                 }
 
                 this.callAction_(state);

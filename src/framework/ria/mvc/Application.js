@@ -16,11 +16,12 @@ REQUIRE('ria.mvc.ISession');
 REQUIRE('ria.mvc.IStateSerializer');
 REQUIRE('ria.mvc.IView');
 
+REQUIRE('ria.mvc.BaseContext');
 REQUIRE('ria.mvc.Dispatcher');
-REQUIRE('ria.mvc.Controller');
 REQUIRE('ria.mvc.Session');
 REQUIRE('ria.mvc.View');
 REQUIRE('ria.mvc.StateSerializer');
+REQUIRE('ria.mvc.Controller');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -37,11 +38,7 @@ NAMESPACE('ria.mvc', function () {
         function $() {
             this.serializer = this.initSerializer_();
             this.dispatcher = this.initDispatcher_();
-            this.session = this.initSession_();
-            this.defaultView = this.initView_();
             this.context = this.initContext_();
-            this.appns = null;
-            this.services = [];
         },
 
         ria.mvc.IStateSerializer, function initSerializer_() {
@@ -61,25 +58,11 @@ NAMESPACE('ria.mvc', function () {
         },
 
         function initContext_() {
-            var me = this;
-            return null; /*new ria.mvc.IContext([
-                ria.mvc.IView, function getDefaultView() {
-                    return me.defaultView;
-                },
-
-                ria.mvc.IAppSession, function getSession() {
-                    return me.session;
-                },
-
-                VOID, function stateUpdated() {
-                    if (!me.dispatcher.isDispatching())
-                        me.dispatcher.dispatch(me.dispatcher.getState());
-                },
-
-                ria.mvc.State, function getState() {
-                    return me.dispatcher.getState();
-                }
-            ]);*/
+            var context = new ria.mvc.BaseContext;
+            context.setDispatcher(this.dispatcher);
+            context.setSession(this.initSession_());
+            context.setDefaultView(this.initView_());
+            return context;
         },
 
         VOID, function run() {

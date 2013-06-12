@@ -126,7 +126,7 @@ NAMESPACE('ria.mvc', function () {
 
                             instanse.setContext(context);
                             instanse.onInitialize();
-                            instance.dispatch(state);
+                            instanse.dispatch(state);
 
                             if (!state.isDispatched())
                                 continue;
