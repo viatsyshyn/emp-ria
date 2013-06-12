@@ -429,7 +429,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         ria.__API.clazz(ClassProxy, name,
             def.base.value,
-            def.ifcs.values.map(function (_) { return _.value }),
+            def.ifcs.values,//.map(function (_) { return _.value }),
             def.annotations.map(function (_) { return _.value }));
 
         var processedMethods = [];
