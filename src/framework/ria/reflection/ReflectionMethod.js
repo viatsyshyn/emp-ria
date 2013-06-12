@@ -36,6 +36,11 @@ NS('ria.reflection', function () {
 
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
 
+            Boolean, function isAnnotatedWith(ann) {
+                return this.getAnnotations()
+                    .some(function (_) { return _.__META == ann.__META });
+            },
+
             function invokeOn(instance, args) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
                 VALIDATE_ARGS(this.method.argsNames, this.method.argsTypes, args);

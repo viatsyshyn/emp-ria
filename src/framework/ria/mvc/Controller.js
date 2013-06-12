@@ -14,6 +14,10 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         function AccessFor(roles) {});
 
+    /** @class ria.mvc.Inject */
+    ANNOTATION(
+        function Inject() {});
+
     function toCamelCase(str) {
         return str.replace(/(\-[a-z])/g, function($1){
             return $1.substring(1).toUpperCase();

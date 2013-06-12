@@ -17,7 +17,7 @@ NAMESPACE('app.controllers', function () {
         [ria.mvc.ControllerUri('index')],
         'TestController', EXTENDS(app.controllers.Base), [
 
-            //[ria.mvc.DependencyInjector],
+            [ria.mvc.Inject],
             app.services.TestService, 'service',
 
             ria.async.Future, function validateResponse_() {

@@ -15,15 +15,19 @@ NS('ria.reflection', function () {
                 this.clazz = clazz;
 
                 this.property = clazz.__META.properties[name];
-                VALIDATE_ARG('name', [ria.__API.PropertyDescriptor], this.property.__META);
                 this.name = name;
             },
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
             String, function getShortName() { return this.name; },
-            String, function isReadonly() { return this.property.setter == undefined; },
+            Boolean, function isReadonly() { return this.property.setter == undefined; },
             Array, function getAnnotations() { return this.property.annotations; },
             Object, function getType() { return this.property.type; },
+
+            Boolean, function isAnnotatedWith(ann) {
+                return this.getAnnotations()
+                    .some(function (_) { return _.__META == ann.__META });
+            },
 
             function invokeGetterOn(instance) {
                 VALIDATE_ARG('instance', [this.clazz], instance);

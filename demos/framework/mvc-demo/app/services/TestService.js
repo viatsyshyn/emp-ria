@@ -21,6 +21,10 @@ NAMESPACE('app.services', function () {
                 return this.getList('my-server-action', app.model.MyArrayViewModel, {
                     "page": page
                 });
+            },
+
+            ria.async.Future, function getSector(x_, y_, z_) {
+                return ria.async.DeferredAction();
             }
         ])
 });
