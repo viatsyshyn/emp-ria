@@ -23,16 +23,10 @@ NS('ria.reflection', function () {
                 return Object.keys(this.ifc.methods)
             },
 
-            [[String]],
-            ria.reflection.ReflectionMethod, function getMethodReflector(name) {
-                var method = this.clazz.__META.methods[name];
-                return method ? new ria.reflection.ReflectionMethod(this.ifc, name) : null;
-            },
-
-            ArrayOf(String), function getMethodsReflector() {
-                return this.getMethodsNames()
-                    .map(function (_) { this.getMethodReflector(_); }.bind(this));
-            },
+            Object, function getMethodInfo(name) { return this.ifc.methods[name] || null; },
+            function getMethodReturnType(name) { return this.ifc.methods[name].retType; },
+            ArrayOf(String), function getMethodArguments(name) { return this.ifc.methods[name].argsNames;},
+            ArrayOf(Object), function getMethodArgumentsTypes(name) { return this.ifc.methods[name].argsTypes;},
 
             Boolean, function hasMethod(name) {
                 return this.ifc.methods.hasOwnProperty(name);

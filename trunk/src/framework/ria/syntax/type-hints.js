@@ -4,6 +4,10 @@
 (function () {
     "use strict";
 
+    function checkDelegate(value, type) {
+        return true;
+    }
+
     /**
      * @param {*} value
      * @param {*} type
@@ -20,16 +24,19 @@
             case 'number': return type === Number;
             case 'string': return type === String;
             case 'boolean': return type === Boolean;
+            case 'function':
+                return ria.__API.isDelegate(type)
+                    ? checkDelegate(value, type)
+                    : type === Function;
+
             default:
                 if ( value === Boolean
                   || value === String
                   || value === Number
+                  || value === Function
                   || value === RegExp ) {
                     return value == type;
                 }
-
-                if (ria.__API.isDelegate(type))
-                    return 'function' === typeof value;
 
                 if (ria.__API.isInterface(type))
                     return 'object' === typeof value;
@@ -42,7 +49,7 @@
                         return false;
 
                     for (var i = 0; i < value.length; i++) {
-                        if (!checkArgumentHinting(value[i], type.valueOf()))
+                        if (!checkTypeHint(value[i], type.valueOf()))
                             return false;
                     }
 
