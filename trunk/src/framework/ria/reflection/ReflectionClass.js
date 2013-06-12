@@ -20,7 +20,7 @@ NS('ria.reflection', function () {
             Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
             Array, function getAnnotations() { return this.clazz.__META.annotations; },
-            Function, function getBaseClass() { return this.clazz.__META.base; },
+            Function, function getBaseClass() { return this.clazz.__META.base || null; },
             ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs; },
             ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
             ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
@@ -46,7 +46,13 @@ NS('ria.reflection', function () {
                 return false;
             },
 
-            Boolean, function implementsIfc(ifc) { return this.clazz.__META.ifcs.indexOf(ifc) >= 0; },
+            Boolean, function implementsIfc(ifc) {
+                if (!ria.__API.isInterface(ifc))
+                    throw ria.reflection.Exception('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
+
+                return this.clazz.__META.ifcs.some(function (_) { return _ === ifc })
+            },
+
             [[String]],
             Boolean, function hasProperty(name) { return this.clazz.__META.properties.hasOwnProperty(name); },
             [[String]],
