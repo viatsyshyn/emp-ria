@@ -20,6 +20,7 @@
         this.properties = {};
         this.methods = {};
         this.ctor = null;
+        this.chidren = [];
     }
 
     ClassDescriptor.prototype.addProperty = function (name, ret, anns, getter, setter) {
@@ -47,6 +48,15 @@
             annotations: anns
         }
     };
+    ClassDescriptor.prototype.addChild = function (clazz) {
+        if (!ria.__API.isClassConstructor(clazz))
+            throw Error('Child should be a CLASS');
+
+        if (clazz.__META.base.__META != this)
+            throw Error('Child should extend me.');
+
+        this.chidren.push(clazz);
+    };
 
     ria.__API.ClassDescriptor = ClassDescriptor;
 
@@ -71,8 +81,10 @@
         clazzRegister[name] = clazz;
 
         clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
-        if (base_)
+        if (base_) {
             ria.__API.extend(clazz, base_);
+            base_.__META.addChild(clazz);
+        }
     };
 
     /**
