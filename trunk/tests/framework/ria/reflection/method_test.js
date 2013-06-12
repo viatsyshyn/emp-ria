@@ -132,18 +132,30 @@
                     Number, 'prop'
             ]]);
 
-            var cls = new MakeClass('BugWarrior', baseClassDef);
-            var cls2 = new MakeClass('BugWarrior', baseClassDef2);
+            var cls = MakeClass('BugWarrior', baseClassDef);
+            var cls2 = MakeClass('BugWarrior2', baseClassDef2);
+            var baseClassDef3 = ClassDef([
+                'BugWarrior3', ria.__SYNTAX.EXTENDS(cls), []]);
+            var cls3 = MakeClass('BugWarrior3', baseClassDef3);
             var reflectionMethod1;
 
             assertNoException(function () {
                 reflectionMethod1 = new ria.reflection.ReflectionMethod(cls, 'method1');
             });
 
-            reflectionMethod1.invokeOn(cls, [5]);
+            var inst = new cls();
+            var inst2 = new cls2();
+            var inst3 = new cls3();
 
-            assertEquals(cls.getProp(), 0);
-            assertEquals(cls2.getProp(), 5);
+            reflectionMethod1.invokeOn(inst, [5]);
+            reflectionMethod1.invokeOn(inst3, [3]);
+
+            assertException(function(){
+                reflectionMethod1.invokeOn(inst2, [5]);
+            });
+
+            assertEquals(inst.getProp(), 5);
+            assertEquals(inst3.getProp(), 3);
         }
     };
 
