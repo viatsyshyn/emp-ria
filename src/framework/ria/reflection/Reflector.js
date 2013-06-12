@@ -7,5 +7,13 @@ NS('ria.reflection', function () {
      * @class ria.reflection.Reflector
      */
     CLASS(
-        ABSTRACT, 'Reflector', []);
+        ABSTRACT, 'Reflector', [
+
+            SELF, function getCached(clazz, value) {
+                if (ria.reflection.ReflectionFactory)
+                    return ria.reflection.ReflectionFactory(value, clazz);
+
+                return new clazz(value);
+            }
+        ]);
 });
