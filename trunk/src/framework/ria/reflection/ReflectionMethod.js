@@ -31,7 +31,7 @@ NS('ria.reflection', function () {
 
             ArrayOf(String), function getRequiredArguments() {
                 return this.getArguments()
-                    .filter(function (_) { !/^.+_$/.test(_) });
+                    .filter(function (_) { return !/^.+_$/.test(_) });
             },
 
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
