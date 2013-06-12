@@ -112,7 +112,7 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     method.invokeOn(this, params);
                 } catch (e) {
-                    throw new ria.mvc.MvcException("Exception in action " + methods.getName(), e);
+                    throw new ria.mvc.MvcException("Exception in action " + method.getName(), e);
                 }
             },
 

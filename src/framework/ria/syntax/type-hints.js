@@ -131,12 +131,20 @@
     if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
             function (body, meta, scope, args) {
-                ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args);
+                try {
+                    ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args);
+                } catch (e) {
+                    throw new ria.__API.Exception('Bad argument for ' + meta.name, e);
+                }
             });
 
         ria.__API.addPipelineMethodCallStage('AfterCall',
             function (body, meta, scope, args, result) {
-                ria.__SYNTAX.checkReturn(meta.ret, result);
+                try {
+                    ria.__SYNTAX.checkReturn(meta.ret, result);
+                } catch (e) {
+                    throw new ria.__API.Exception('Bad return of ' + meta.name, e);
+                }
                 return result;
             });
     }
