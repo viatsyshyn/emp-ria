@@ -26,7 +26,7 @@
                 reflectionCls = new ria.reflection.ReflectionClass(cls);
             });
 
-            assertEquals(reflectionCls.getName(), 'BugWarrior');
+            assertEquals('BugWarrior', reflectionCls.getName());
         },
         testGetBaseClass: function(){
             var baseClassDef = ClassDef([
@@ -56,8 +56,11 @@
             });
 
 
-            assertEquals(reflectionCls.getBaseClass(), BaseClass);
-        }//,
+            assertEquals(BaseClass, reflectionCls.getBaseClass());
+        },
+        testGetInterfaces: function(){
+
+        }
         /*testGetBaseClassReflector: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
