@@ -7,7 +7,7 @@ NAMESPACE('ria.async', function () {
     CLASS(ABSTRACT,
         'Task', IMPLEMENTS(ria.async.ICancelable), [
             function $() {
-                this.completer = new ria.async.Completer(this);
+                this._completer = new ria.async.Completer(this);
             },
 
             /**
@@ -19,12 +19,12 @@ NAMESPACE('ria.async', function () {
              * Override this if task can be canceled
              */
             VOID, function cancel() {
-                this.completer.cancel();
+                this._completer.cancel();
             },
 
             ria.async.Future, function run() {
                 setTimeout(this.do_, 0); // defer start
-                return this.completer.getFuture();
+                return this._completer.getFuture();
             }
         ])
 });

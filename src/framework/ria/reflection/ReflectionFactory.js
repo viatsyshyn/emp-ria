@@ -14,7 +14,7 @@ NAMESPACE('ria.reflection', function () {
                 clazz = clazz.ctor;
 
             if (!ria.__API.isClassConstructor(clazz))
-                throw new ria.reflection.Exception('ReflectionFactory works only on hwa.base classes');
+                throw new ria.reflection.Exception('ReflectionFactory works only on CLASS');
 
             var name = clazz.__META.name;
             if (reflectionClassCache.hasOwnProperty(name))

@@ -56,7 +56,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.ENUM = function (n, val) {
         ria.__SYNTAX.validateEnumDecl(n, val);
         var name = ria.__SYNTAX.getFullName(n);
-        var enumeration = ria.__SYNTAX.buildEnum(name, val);
+        var enumeration = ria.__SYNTAX.compileEnum(name, val);
         ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, enumeration);
         return enumeration;
     };

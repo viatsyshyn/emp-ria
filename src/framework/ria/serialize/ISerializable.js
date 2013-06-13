@@ -1,4 +1,3 @@
-/** @namespace hwa.serialize */
 NAMESPACE('ria.serialize', function () {
     "use strict";
 

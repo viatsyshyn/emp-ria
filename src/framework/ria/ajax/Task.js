@@ -35,52 +35,54 @@ NAMESPACE('ria.ajax', function () {
         'Task', EXTENDS(ria.async.Task), [
             [[String, ria.ajax.Method, Object]],
             function $(url, method_, params_) {
-                this.method = method_;
-                this.url = url;
-                this.params = params_ || {};
-                this.requestTimeout = null;
+                BASE();
 
-                this.xhr = new XmlHttpRequest();
+                this._method = method_;
+                this._url = url;
+                this._params = params_ || {};
+                this._requestTimeout = null;
 
-                this.xhr.addEventListener("progress", this.updateProgress_, false);
-                this.xhr.addEventListener("load", this.transferComplete_, false);
-                this.xhr.addEventListener("error", this.transferFailed_, false);
-                this.xhr.addEventListener("abort", this.transferCanceled_, false);
+                this._xhr = new XMLHttpRequest();
+
+                this._xhr.addEventListener("progress", this.updateProgress_, false);
+                this._xhr.addEventListener("load", this.transferComplete_, false);
+                this._xhr.addEventListener("error", this.transferFailed_, false);
+                this._xhr.addEventListener("abort", this.transferCanceled_, false);
             },
 
             OVERRIDE, function cancel() {
-                this.xhr.abort();
+                this._xhr.abort();
             },
 
             [[ria.ajax.Method]],
             SELF, function method(method) {
-                this.method = method;
-                return this; // todo: return public version of this
+                this._method = method;
+                return this;
             },
 
             [[Object]],
             SELF, function params(obj) {
-                var p = this.params;
+                var p = this._params;
                 for(var key in obj) if (obj.hasOwnProperty(key)) {
                     p[key] = obj[key];
                 }
-                return this; // todo: return public version of this
+                return this;
             },
 
             [[String]],
             SELF, function disableCache(paramName_) {
-                this.params[paramName_ || '_'] = Math.random().toString(36).substr(2) + (new Date).getTime().toString(36);
-                return this; // todo: return public version of this
+                this._params[paramName_ || '_'] = Math.random().toString(36).substr(2) + (new Date).getTime().toString(36);
+                return this;
             },
 
             [[Number]],
             SELF, function timeout(duration) {
-                this.requestTimeout = duration;
-                return this; // todo: return public version of this
+                this._requestTimeout = duration;
+                return this;
             },
 
             FINAL, String, function getParamsAsQueryString_() {
-                var p = this.params, r = [];
+                var p = this._params, r = [];
                 for(var key in p) if (p.hasOwnProperty(key)) {
                     r.push([key, p[key].map(encodeURIComponent).join('=')]);
                 }
@@ -88,49 +90,49 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function updateProgress_(oEvent) {
-                this.completer.progress(event);
+                this._completer.progress(event);
             },
 
             VOID, function transferComplete_(evt) {
-                this.completer.complete(this.xhr.responseText);
+                this._completer.complete(this._xhr.responseText);
             },
 
             VOID, function transferFailed_(evt) {
-                this.completer.completeError(evt);
+                this._completer.completeError(evt);
             },
 
             VOID, function transferCanceled_(evt) {
-                this.completer.cancel();
+                this._completer.cancel();
             },
 
             String, function getUrl_() {
-                if (this.method != ria.ajax.Method.GET)
-                    return this.url;
+                if (this._method != ria.ajax.Method.GET)
+                    return this._url;
 
-                return this.url + ((/\?/).test(this.url) ? "&" : "?") + this.getParamsAsQueryString_();
+                return this._url + ((/\?/).test(this._url) ? "&" : "?") + this.getParamsAsQueryString_();
             },
 
             String, function getBody_() {
-                return this.method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : null;
+                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : '';
             },
 
             FINAL, OVERRIDE, VOID, function do_() {
                 try {
                     BASE();
-                    this.xhr.open(this.method.valueOf(), this.getUrl_(), true);
-                    this.xhr.send(this.getBody_());
+                    this._xhr.open(this._method.valueOf(), this.getUrl_(), true);
+                    this._xhr.send(this.getBody_());
                 } catch (e) {
-                    this.completer.completeError(e);
+                    this._completer.completeError(e);
                 }
 
                 // todo change to ria.async.Timer.$once
-                this.requestTimeout && new ria.async.Timer(this.requestTimeout, this.timeoutHandler_);
+                this._requestTimeout && new ria.async.Timer(this._requestTimeout, this.timeoutHandler_);
             },
 
             [[ria.async.Timer, Number]],
             VOID, function timeoutHandler_(timer, lag) {
                 timer.cancel(); // todo remove after change to ria.async.Timer.$once
-                this.completer.isCompleted() || this.cancel();
+                this._completer.isCompleted() || this.cancel();
             }
         ]);
 });

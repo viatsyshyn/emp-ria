@@ -96,8 +96,8 @@ ria.__API = ria.__API || {};
         if (ria.__API.isArrayOfDescriptor(type))
             return type.toString();
 
-        if (obj.__META)
-            return obj.__META.name;
+        if (type.__META)
+            return type.__META.name;
 
         /*if (isCustomType(type))
             return type.__IDENTIFIER__;

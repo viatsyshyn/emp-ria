@@ -26,19 +26,21 @@ NAMESPACE('app.controllers', function () {
 
                 (head = new ria.async.Future)
                     .catchError(function (error) {
-                        throw app.service.DataException('Failed to load data: ' + error);
+                        throw app.services.DataException('Failed to load data', error);
                     })
                     .then(function (data) {
-                        if (!data.isOkResponse())
-                            throw app.service.DataException('Failed to load data: ' + $L(data.getErrorCode()));
+                        // TODO: check response here
+                        /*if (!data.isOkResponse())
+                            throw app.services.DataException('Failed to load data: ' + $L(data.getErrorCode()));*/
 
-                        return data.getValues();
+                        return data;
                     })
                     .catchException(app.services.DataException, function (error) {
                         this.BREAK(); // failed with exception, stop further processing
 
+                        console.error(error.toString());
                         // todo: scoping !?
-                        me.view.showAlertBox(error.getMessage());
+                        //me.view.showAlertBox(error.getMessage());
                     });
 
                 return head;
