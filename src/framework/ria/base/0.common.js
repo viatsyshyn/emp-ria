@@ -127,8 +127,8 @@ ria.__API = ria.__API || {};
         if (Array.isArray(value))
             return 'Array';
 
-        if (ria.getConstructorOf(value).__META)
-            return ria.getConstructorOf(value).__META.name;
+        if (ria.__API.getConstructorOf(value).__META)
+            return ria.__API.getConstructorOf(value).__META.name;
 
         if (value instanceof Object) {
             var ctor = ria.__API.getConstructorOf(value);
