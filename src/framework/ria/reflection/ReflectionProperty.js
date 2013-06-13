@@ -32,7 +32,7 @@ NS('ria.reflection', function () {
             function invokeGetterOn(instance) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.property.getter.call(instance);
+                return this.property.getter.call(instance);
             },
 
             VOID, function invokeSetterOn(instance, value) {
