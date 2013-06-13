@@ -34,7 +34,7 @@
         if (dep.isNotLoaded() && !dep.isLoading() && !dep.hasError()) {
             dep.state = ModuleState.Loading;
             ria.__REQUIRE.load(dep.id)
-                .done(function () { processDeps(dep.id, true); });
+                .done(function (content) { processDeps(dep.id, true, content); });
         }
 
         if (this.isReady())
@@ -160,12 +160,15 @@
         }
     })();
 
-    function processDeps(module, loaded) {
+    function processDeps(module, loaded, content) {
         if (loaded === false)
             throw Error('Error loading: ' + module);
 
-        if (module)
-            ModuleDescriptor.getById(module).state = ModuleState.Loaded;
+        if (module) {
+            var m = ModuleDescriptor.getById(module);
+            m.state = ModuleState.Loaded;
+            m.content = content;
+        }
 
         if (ModuleDescriptor.toArray().every(function (_) { return _.process(); })) {
 //            ria.__API._loader.isReady = true;

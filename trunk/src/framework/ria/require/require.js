@@ -14,10 +14,12 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         onBootstraped.forEach(function (_) { defer(_) } );
     };
 
+    var SYMBOL_REGEX = /^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi;
+
     function resolve(path) {
         var original = path;
 
-        if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
+        if (SYMBOL_REGEX.test(path))
             path = path.replace(/\./gi, '/') + '.js';
 
         var libs = ria.__CFG['#require'].libs;
@@ -52,7 +54,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     };
 
     ria.__REQUIRE.requireSymbol = function (symbol) {
-        var uri = symbol.replace(/\./g, '/') + '.js';
+        var uri = resolve(symbol);
 
         ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
             .addReadyCallback(function (content) {
@@ -68,20 +70,32 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return ria.__REQUIRE.requireAsset(uri);
     };
 
+    var ASSET_REGEX = /ASSET\('([^']+)'\)/g;
+
     ria.__REQUIRE.addCurrentModuleCallback = function (ns, callback) {
-        ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
-            .addReadyCallback(function () {
-                ria.__SYNTAX.NS(ns, callback);
-            });
+        var R = ria.__REQUIRE.ModuleDescriptor,
+            root = R.getCurrentModule(),
+            fn = callback.toString(),
+            m;
+;
+        while(m = ASSET_REGEX.exec(fn)) {
+            root.addDependency(R.getById(resolve(m[1])));
+            fn = fn.substring(m.index + m[1].length);
+        }
+
+        root.addReadyCallback(function () {
+            ria.__SYNTAX.NS(ns, callback);
+        });
     };
 
     /**
      * @param {String} uri
      * @return {*}
+     */
     ria.__REQUIRE.getContent = function (uri) {
-        return getModule(uri).content();
+        return ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri)).content;
     };
-    */
+
 
     ria.__REQUIRE.onReady = function (cb) {
         root.addReadyCallback(cb);

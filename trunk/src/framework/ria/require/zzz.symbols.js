@@ -8,4 +8,5 @@
 
 
 window.REQUIRE = ria.__REQUIRE.requireSymbol;
+window.ASSET = ria.__REQUIRE.getContent;
 window.NAMESPACE = window.NS = ria.__REQUIRE.addCurrentModuleCallback;

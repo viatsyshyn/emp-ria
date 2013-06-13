@@ -116,17 +116,19 @@ var _RELEASE = false;
     REQUIRE('ria/require/script-loader.js');
     REQUIRE('ria/require/zzz.symbols.js');
 
+    var callbacks = [];
+    ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb); };
+
     var boostraps = ria.__CFG._bootstraps;
     while(boostraps.length > 0) {
         REQUIRE(boostraps.shift() + '/_bootstrap.js');
     }
 
-    document.write('<' + 'script type="text/javascript" ' + '>ria.__BOOTSTRAP.complete()</' + 'script>');
+    ria.__CFG['#require'].plugins.forEach(REQUIRE);
 
-    var callbacks = [];
-    ria.__BOOTSTRAP.loadPlugin = function (clazz) { ria.__CFG['#require'].plugins.push(clazz); };
-    ria.__BOOTSTRAP.onBootstrapped = function (cb) {callbacks.push(cb);};
     ria.__BOOTSTRAP.complete = function () {
         ria.__REQUIRE.init(ria.__CFG['#require'], callbacks);
     };
+
+    document.write('<' + 'script type="text/javascript" ' + '>ria.__BOOTSTRAP.complete()</' + 'script>');
 })();

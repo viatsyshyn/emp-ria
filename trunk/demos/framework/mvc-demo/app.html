@@ -5,10 +5,15 @@
     <style type="text/css">
         BODY {background: black; color: #ff8c00; font-size: .67em;}
     </style>
+    <script src="http://code.jquery.com/jquery-2.0.1.min.js"></script>
+
 </head>
 <body>
     <h1>ria.MVC demo</h1>
-    <h2>Loading...</h2>
+
+    <div id="main">
+        <h2>Loading...</h2>
+    </div>
 
 <script src="../../../src/framework/ria/_bootstrap.js" type="text/javascript">
     ria.__CFG = {
@@ -19,12 +24,12 @@
         "stackTraceJs": "lib/stacktrace.js",
 
         "#require": {
-            "plugins": ["demo.build.i18n"],
+            "plugins": ["~/assets/jade.js"],
             "siteRoot": "http://localhost",
             "appRoot": "/emp.ria/demos/framework/mvc-demo/",
             "appCodeDir": "~/",
             "libs": {
-                "lib/stacktrace.js": "/emp.ria/src/framework/",
+                "lib/": "/emp.ria/src/framework/",
                 "ria": "/emp.ria/src/framework/"
             }
         },
