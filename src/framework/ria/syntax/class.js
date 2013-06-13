@@ -285,7 +285,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name).value;
         var argsTypes = ctorDef ? ctorDef.argsTypes : [];
         var argsNames = ctorDef ? ctorDef.argsNames : [];
-        var anns = ctorDef ? ctorDef.anns : [];
+        var anns = ctorDef ? ctorDef.annotations.map(function(item){
+            return item.value
+        }) : [];
 
         ClassProxy.prototype.$ = ctor;
         ClassProxy.prototype.$.__BASE_BODY = def.base ? def.base.value.__META.ctor.impl : undefined;
