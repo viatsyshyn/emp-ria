@@ -1,6 +1,6 @@
 REQUIRE('ria.mvc.Application');
 
-REQUIRE('app.controllers.TestController');
+REQUIRE('app.controllers.NotesController');
 
 NAMESPACE('app', function (){
 
