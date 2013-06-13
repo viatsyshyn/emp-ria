@@ -285,13 +285,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name).value;
         var argsTypes = ctorDef ? ctorDef.argsTypes : [];
         var argsNames = ctorDef ? ctorDef.argsNames : [];
+        var anns = ctorDef ? ctorDef.anns : [];
 
         ClassProxy.prototype.$ = ctor;
         ClassProxy.prototype.$.__BASE_BODY = def.base ? def.base.value.__META.ctor.impl : undefined;
         ClassProxy.prototype.$.__SELF = ClassProxy;
         ria.__API.ctor(ClassProxy, ClassProxy.prototype.$,
             argsTypes.map(function (_) { return _.value }),
-            argsNames);
+            argsNames, anns);
 
         processedMethods.push('$');
     }
