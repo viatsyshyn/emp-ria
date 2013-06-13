@@ -41,11 +41,11 @@ NS('ria.reflection', function () {
                     .some(function (_) { return _.__META == ann.__META });
             },
 
-            function invokeOn(instance, args) {
+            function invokeOn(instance, args_) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
-                VALIDATE_ARGS(this.method.argsNames, this.method.argsTypes, args);
+                VALIDATE_ARGS(this.method.argsNames, this.method.argsTypes, args_ || []);
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.method.impl.apply(instance, args);
+                this.method.impl.apply(instance, args_ || []);
             }
         ]);
 });
