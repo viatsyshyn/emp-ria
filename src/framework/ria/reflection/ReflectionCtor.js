@@ -20,7 +20,9 @@ NS('ria.reflection', function () {
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
 
-            Array, function getAnnotations() { return this.method.annotations; },
+            Array, function getAnnotations() {
+                return this.method.annotations;
+            },
 
             ArrayOf(String), function getArguments() { return this.method.argsNames;},
             ArrayOf(String), function getRequiredArguments() {
