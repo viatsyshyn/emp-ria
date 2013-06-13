@@ -12,7 +12,7 @@ NAMESPACE('app.services', function () {
             }
         ]);
 
-    // Single instanse
+    // Single instance
     var Serializer = new ria.serialize.JsonSerializer;
 
     /** @class app.services.Base */
