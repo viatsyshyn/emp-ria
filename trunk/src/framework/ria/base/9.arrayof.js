@@ -13,7 +13,7 @@
     };
 
     ArrayOfDescriptor.prototype = {
-        toString: function () { return 'Array<' + getIdentifierOfType(this.clazz) + '>'; },
+        toString: function () { return 'Array<' + ria.__API.getIdentifierOfType(this.clazz) + '>'; },
         valueOf: function () { return this.clazz; }
     };
 

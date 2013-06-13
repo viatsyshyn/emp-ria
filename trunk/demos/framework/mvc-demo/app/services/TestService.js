@@ -6,25 +6,16 @@
  * To change this template use File | Settings | File Templates.
  */
 
-
-REQUIRE('ria.async.Future');
-
 REQUIRE('app.model.CoordinateZ');
+
+REQUIRE('app.services.Base');
 
 NAMESPACE('app.services', function () {
     "use strict";
 
-    /** @class app.services.DataException */
-    EXCEPTION(
-        'DataException', [
-            function $(msg, inner_) {
-                BASE(msg, inner_);
-            }
-        ]);
-
     /** @class app.services.TestService */
     CLASS(
-        'TestService', [
+        'TestService', EXTENDS(app.services.Base), [
             ria.async.Future, function getItems(page) {
                 return this.getList('my-server-action', app.model.MyArrayViewModel, {
                     "page": page
@@ -32,7 +23,7 @@ NAMESPACE('app.services', function () {
             },
 
             ria.async.Future, function getSector(x_, y_, z_) {
-                return ria.async.DeferredAction();
+                return this.get('data/sample.json', ArrayOf(app.model.MyViewModel));
             }
         ])
 });

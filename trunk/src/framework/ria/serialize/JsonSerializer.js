@@ -4,8 +4,8 @@ REQUIRE('ria.serialize.Exception');
 REQUIRE('ria.serialize.SerializeProperty');
 REQUIRE('ria.serialize.IDeserializable');
 REQUIRE('ria.serialize.ISerializable');
+REQUIRE('ria.serialize.ISerializer');
 
-/** @namespace hwa.serialize */
 NAMESPACE('ria.serialize', function () {
     "use strict";
 
@@ -30,7 +30,7 @@ NAMESPACE('ria.serialize', function () {
             if (clazz === Number || clazz === Boolean || clazz === String)
                 return clazz(raw || '');
 
-            if (hwa.__API.isIdentifier(clazz))
+            if (ria.__API.isIdentifier(clazz))
                 return raw !== undefined ? clazz(raw) : null;
 
             if (ria.__API.isEnum(clazz)) {
@@ -56,7 +56,7 @@ NAMESPACE('ria.serialize', function () {
                 var type = clazz.valueOf();
                 return raw.filter(isValue).map(function (_, i) {
                     try {
-                        deserialize(_, clazz);
+                        return deserialize(_, type);
                     } catch (e) {
                         throw new ria.serialize.Exception('Error deserializing ' + clazz + ' value with index ' + i, e);
                     }
@@ -67,7 +67,7 @@ NAMESPACE('ria.serialize', function () {
                 if (raw === null || raw === undefined)
                     return null;
 
-                var ref = hwa.reflection.ReflectionFactory(clazz);
+                var ref = ria.reflection.ReflectionFactory(clazz);
                 value = ref.instantiate();
 
                 if (ref.implementsIfc(ria.serialize.IDeserializable)) {
