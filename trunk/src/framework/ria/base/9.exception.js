@@ -14,7 +14,7 @@
         ria.__API.ctor(Exception, Exception.prototype.$, [String, [Error, Exception]], ['msg', 'inner_'], []);
 
         Exception.prototype.toString = function () {
-            var msg = /*this.msg + '\n  ' + */this.stack.join('\n  ');
+            var msg = this.stack.join('\n  ').replace('Error:', ria.__API.getIdentifierOfValue(this) + ':');
 
             if (this.inner_) {
                 msg += '\nCaused by: ';
