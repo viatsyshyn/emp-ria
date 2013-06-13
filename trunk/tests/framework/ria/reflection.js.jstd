@@ -5,6 +5,7 @@ load:
   - async/require_stub.js
   - ../../../src/framework/ria/reflection/Exception.js
   - ../../../src/framework/ria/reflection/Reflector.js
+  - ../../../src/framework/ria/reflection/ReflectionCtor.js
   - ../../../src/framework/ria/reflection/ReflectionMethod.js
   - ../../../src/framework/ria/reflection/ReflectionProperty.js
   - ../../../src/framework/ria/reflection/ReflectionInterface.js
