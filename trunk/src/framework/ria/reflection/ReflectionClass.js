@@ -117,8 +117,7 @@ NS('ria.reflection', function () {
                     throw ria.reflection.Exception('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
 
                 return this.getInterfaces()
-                    .some(function (_) { return _ === ifc })
-                        || (this.getBaseClass() ? this.getBaseClassReflector().implementsIfc(ifc) : false);
+                    .some(function (_) { return _ === ifc });
             },
 
             [[String]],

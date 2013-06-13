@@ -14,11 +14,11 @@
         this.name = name;
         this.base = base;
         //noinspection JSUnusedGlobalSymbols
-        this.ifcs = ifcs;
+        this.ifcs = [].concat.call(base ? base.__META.ifcs : []).concat(ifcs);
         //noinspection JSUnusedGlobalSymbols
         this.anns = anns;
-        this.properties = {};
-        this.methods = {};
+        this.properties = base ? ria.__API.clone(base.__META.properties) : {};
+        this.methods = base ? ria.__API.clone(base.__META.methods) : {};
         this.ctor = null;
         this.children = [];
     }

@@ -142,4 +142,31 @@ ria.__API = ria.__API || {};
 
         return 'Object';
     };
+
+    ria.__API.clone = function clone(obj) {
+        switch(typeof obj) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+            case 'regexp':
+                return obj;
+
+            default:
+                if (Array.isArray(obj) || obj.length === +obj.length)
+                    return [].slice.call(obj);
+
+                if ('function' == typeof obj.clone)
+                    return obj.clone();
+
+                if (ria.__API.getConstructorOf(obj) !== Object)
+                    throw Error('Can not clone instance of ' + ria.__API.getIdentifierOfValue(obj));
+
+                var result = {};
+                Object.keys(obj).forEach(function (_) {
+                    result[_] = obj[_];
+                });
+
+                return result;
+        }
+    }
 })();
