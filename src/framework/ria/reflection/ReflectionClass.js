@@ -1,4 +1,5 @@
 REQUIRE('ria.reflection.Reflector');
+REQUIRE('ria.reflection.ReflectionCtor');
 REQUIRE('ria.reflection.ReflectionMethod');
 REQUIRE('ria.reflection.ReflectionProperty');
 REQUIRE('ria.reflection.ReflectionInterface');
@@ -74,12 +75,8 @@ NS('ria.reflection', function () {
                     .map(function (_) { return this.getCached(SELF, _);}.bind(this))
             },
 
-            Object, function getCtorAnnotations() {
-                return this.clazz.__META.ctor.annotations;
-            },
-
-            ria.reflection.ReflectionMethod, function getCtorReflector() {
-                return this.getCached(ria.reflection.ReflectionMethod, this.clazz.__META.ctor);
+            ria.reflection.ReflectionCtor, function getCtorReflector() {
+                return new ria.reflection.ReflectionCtor(this.clazz);
             },
 
             Boolean, function isAnnotatedWith(ann) {
