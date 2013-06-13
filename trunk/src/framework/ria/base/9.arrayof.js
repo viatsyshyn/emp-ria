@@ -29,4 +29,5 @@
     }
 
     ria.__API.ArrayOf = ArrayOf;
+    ria.__API.isArrayOfDescriptor = ArrayOfDescriptor.isArrayOfDescriptor;
 })();

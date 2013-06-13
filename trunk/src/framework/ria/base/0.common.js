@@ -93,10 +93,13 @@ ria.__API = ria.__API || {};
         if (type === Array) return 'Array';
         if (type === Object) return 'Object';
 
-        /*if (ArrayOfDescriptor.isArrayOfDescriptor(type))
+        if (ria.__API.isArrayOfDescriptor(type))
             return type.toString();
 
-        if (isCustomType(type))
+        if (obj.__META)
+            return obj.__META.name;
+
+        /*if (isCustomType(type))
             return type.__IDENTIFIER__;
 
         if (isImportedType(type))
@@ -121,18 +124,11 @@ ria.__API = ria.__API || {};
         if (typeof value === 'date') return 'Date';
         if (typeof value === 'function') return 'Function';
 
-        if (Array.isArray(value)) return 'Array';
+        if (Array.isArray(value))
+            return 'Array';
 
-        // TODO: fix this
-        /*if (ria.__API.isIdentifier(value))
-            return ria.__API.getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Identifier';*/
-
-        // TODO: fix this
-        /*if (ria.__API.isEnum(value))
-            return getConstructorOf(getProtoOf(value)).__IDENTIFIER__ || 'Enum';*/
-
-        /*if (value instanceof __API.Class)
-            return getConstructorOf(value).__IDENTIFIER__ || 'Class';*/
+        if (ria.getConstructorOf(value).__META)
+            return ria.getConstructorOf(value).__META.name;
 
         if (value instanceof Object) {
             var ctor = ria.__API.getConstructorOf(value);
@@ -162,9 +158,7 @@ ria.__API = ria.__API || {};
                     throw Error('Can not clone instance of ' + ria.__API.getIdentifierOfValue(obj));
 
                 var result = {};
-                Object.keys(obj).forEach(function (_) {
-                    result[_] = obj[_];
-                });
+                Object.keys(obj).forEach(function (_) { result[_] = obj[_]; });
 
                 return result;
         }
