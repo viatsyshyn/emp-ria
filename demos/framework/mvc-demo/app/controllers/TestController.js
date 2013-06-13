@@ -34,7 +34,7 @@ NAMESPACE('app.controllers', function () {
 
                         return data.getValues();
                     })
-                    .catchException(app.service.DataException, function (error) {
+                    .catchException(app.services.DataException, function (error) {
                         this.BREAK(); // failed with exception, stop further processing
 
                         // todo: scoping !?

@@ -14,6 +14,14 @@ REQUIRE('app.model.CoordinateZ');
 NAMESPACE('app.services', function () {
     "use strict";
 
+    /** @class app.services.DataException */
+    EXCEPTION(
+        'DataException', [
+            function $(msg, inner_) {
+                BASE(msg, inner_);
+            }
+        ]);
+
     /** @class app.services.TestService */
     CLASS(
         'TestService', [
