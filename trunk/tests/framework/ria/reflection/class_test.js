@@ -38,6 +38,21 @@
 
             assertEquals('BugWarrior', reflectionCls.getName());
         },
+        testGetShortName: function() {
+            var baseClassDef = ClassDef([
+                'ria.baga.na.bazi.BugWarrior', [
+                    function $() {}
+                ]]);
+
+            var cls = MakeClass('ria.baga.na.bazi.BugWarrior', baseClassDef);
+            var reflectionCls;
+
+            assertNoException(function () {
+                reflectionCls = new ria.reflection.ReflectionClass(cls);
+            });
+
+            assertEquals('BugWarrior', reflectionCls.getShortName());
+        },
         testGetBaseClass: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
@@ -67,6 +82,20 @@
 
 
             assertEquals(BaseClass, reflectionCls.getBaseClass());
+        },
+        testGetBaseClassReflector: function(){
+            var baseClassDef = ClassDef([
+                'BugWarrior', [
+                    function $() {}
+                ]]);
+
+            var cls = MakeClass('BugWarrior', baseClassDef);
+            var reflectionCls;
+
+            assertNoException(function () {
+                reflectionCls = new ria.reflection.ReflectionClass(cls);
+            });
+            assertEquals(reflectionCls.getBaseClassReflector().getClazz(), reflectionCls.getBaseClass());
         },
         testGetInterfaces: function(){
             var ifcDef =  InterfaceDef([
@@ -337,7 +366,75 @@
             assertEquals(B, cParents[0]);
             assertEquals(A, cParents[1]);
             assertEquals(ria.__API.Class, cParents[2]);
+        },
+        testFindAnnotation: function(){
+            var WarriorAnnotation = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
+
+            var WarriorAnnotation2 = ria.__API.annotation('Annotation2', [Number, Boolean], ['param2', 'optional_']);
+
+            var baseClassDef = ClassDef([
+                [WarriorAnnotation(42)],
+                'BugWarrior', [
+                    function $() {},
+                    [[Number]],
+                    Number, function methodThatReturnsNumber(){
+                        return 4; //choosed by fair dice roll}
+                    },
+                    [[String]],
+                    String, function methodThatReturnsString() {
+                        return 'example';
+                    }
+                ]]);
+
+            var cls = MakeClass('BugWarrior', baseClassDef);
+            var reflectionCls;
+
+            assertNoException(function () {
+                reflectionCls = new ria.reflection.ReflectionClass(cls);
+            });
+
+            var annotation;
+            assertNoException(function () {
+                annotation = reflectionCls.findAnnotation(WarriorAnnotation);
+            });
+
+            assertNotUndefined(annotation);
+            assertEquals(1, annotation.length);
+            assertEquals(42, annotation[0].param);
+            assertUndefined(annotation[0].optional_);
+
+            var annotation2 = reflectionCls.findAnnotation(WarriorAnnotation2);
+            assertEquals(0, annotation2.length);
+        },
+        testGetMethodsNames: function(){
+            var baseClassDef = ClassDef([
+                'BugWarrior', [
+                    function $() {},
+                    [[Number]],
+                    Number, function method1(){
+                        return 4; //choosed by fair dice roll}
+                    },
+                    [[String]],
+                    String, function method2() {
+                        return 'example';
+                    }
+                ]]);
+
+            var cls = MakeClass('BugWarrior', baseClassDef);
+            var reflectionCls;
+
+            assertNoException(function () {
+                reflectionCls = new ria.reflection.ReflectionClass(cls);
+            });
+
+            var methodNames = reflectionCls.getMethodsNames();
+            assertNotUndefined(methodNames);
+            assertEquals(2, methodNames.length);
+            assertEquals('method1', methodNames[0]);
+            assertEquals('method2', methodNames[1]);
+
         }
+
         /*testIsAbstract: function(){
 
             var baseClassDef = ClassDef([
@@ -354,21 +451,7 @@
 
             assertTrue(reflectionCls.isAbstract(), true);
         }*/
-        /*testGetBaseClassReflector: function(){
-         var baseClassDef = ClassDef([
-         'BugWarrior', [
-         function $() {}
-         ]]);
 
-         var cls = MakeClass('BugWarrior', baseClassDef);
-         var reflectionCls;
-
-         assertNoException(function () {
-         reflectionCls = new ria.reflection.ReflectionClass(cls);
-         });
-
-         assertEquals(reflectionCls.getBaseClassReflector(), cls);
-         }*/
         /*testIsAbstract: function(){
 
              var baseClassDef = ClassDef([
