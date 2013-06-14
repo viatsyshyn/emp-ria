@@ -70,18 +70,20 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return ria.__REQUIRE.requireAsset(uri);
     };
 
-    var ASSET_REGEX = /ASSET\('([^']+)'\)/g;
+    var AssetAliases = [/ASSET\('([^']+)'\)/g];
 
     ria.__REQUIRE.addCurrentModuleCallback = function (ns, callback) {
         var R = ria.__REQUIRE.ModuleDescriptor,
-            root = R.getCurrentModule(),
-            fn = callback.toString(),
-            m;
-;
-        while(m = ASSET_REGEX.exec(fn)) {
-            root.addDependency(R.getById(resolve(m[1])));
-            fn = fn.substring(m.index + m[1].length);
-        }
+            root = R.getCurrentModule();
+
+        AssetAliases.forEach(function (ASSET_REGEX) {
+            var m, fn = callback.toString();
+
+            while(m = ASSET_REGEX.exec(fn)) {
+                root.addDependency(R.getById(resolve(m[1])));
+                fn = fn.substring(m.index + m[1].length);
+            }
+        });
 
         root.addReadyCallback(function () {
             ria.__SYNTAX.NS(ns, callback);
@@ -96,6 +98,12 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri)).content;
     };
 
+    ria.__REQUIRE.addAssetAlias = function(alias) {
+        AssetAliases.push(new RegExp(
+            alias.replace(/\./gi, '\\.')
+            + '\\([\'"]([^\'"]+)[\'"]\\)', 'g'
+        ))
+    };
 
     ria.__REQUIRE.onReady = function (cb) {
         root.addReadyCallback(cb);
