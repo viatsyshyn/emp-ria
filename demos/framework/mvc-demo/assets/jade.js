@@ -1,5 +1,3 @@
-REQUIRE('lib/jade.js');
-
 (function () {
     "use strict";
 
