@@ -1,10 +1,10 @@
-REQUIRE('ria.templates.CompiledTemplate');
+REQUIRE('ria.templates.Template');
 
 NAMESPACE('ria.templates', function () {
 
     /** @class ria.templates.CompiledTemplate */
     CLASS(
-        'CompiledTemplate', [
+        'CompiledTemplate', EXTENDS(ria.templates.Template), [
             OVERRIDE, String, function render() {
                 return this._tpl(this.getContext_());
             }

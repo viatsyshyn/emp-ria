@@ -23,7 +23,7 @@ NAMESPACE('ria.templates', function () {
             },
 
             [[ria.templates.IConverterFactory]],
-            PUBLIC, VOID, function unregister(factory) {
+            VOID, function unregister(factory) {
                 var hashCode = factory.getHashCode();
                 if (!this._map.hasOwnProperty(hashCode))
                     throw new ria.templates.Exception('Factory ' + ria.__API.getIdentifierOfValue(factory) + ' not registered');
