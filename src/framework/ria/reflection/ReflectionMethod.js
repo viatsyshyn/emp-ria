@@ -24,7 +24,7 @@ NS('ria.reflection', function () {
             //Boolean, function isFinal() { return this.method.flags.isFinal; },
             //Boolean, function isOverride() { return this.method.flags.isOverride; },
 
-            Array, function getAnnotations() { return this.method.annotations; },
+            OVERRIDE, Array, function getAnnotations() { return this.method.annotations; },
             Object, function getReturnType() { return this.method.retType; },
 
             ArrayOf(String), function getArguments() { return this.method.argsNames;},
@@ -35,11 +35,6 @@ NS('ria.reflection', function () {
             },
 
             Array, function getArgumentsTypes() { return this.method.argsTypes;},
-
-            Boolean, function isAnnotatedWith(ann) {
-                return this.getAnnotations()
-                    .some(function (_) { return _.__META == ann.__META });
-            },
 
             function invokeOn(instance, args_) {
                 VALIDATE_ARG('instance', [this.clazz], instance);

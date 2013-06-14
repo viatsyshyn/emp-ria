@@ -20,7 +20,7 @@ NS('ria.reflection', function () {
 
             String, function getName() { return this.clazz.__META.name + '#' + this.name; },
 
-            Array, function getAnnotations() {
+            OVERRIDE, Array, function getAnnotations() {
                 return this.method.annotations;
             },
 
@@ -30,12 +30,7 @@ NS('ria.reflection', function () {
                     .filter(function (_) { return !/^.+_$/.test(_) });
             },
 
-            Array, function getArgumentsTypes() { return this.method.argsTypes;},
-
-            Boolean, function isAnnotatedWith(ann) {
-                return this.getAnnotations()
-                    .some(function (_) { return _.__META == ann.__META });
-            }
+            Array, function getArgumentsTypes() { return this.method.argsTypes;}
         ]);
 });
 
