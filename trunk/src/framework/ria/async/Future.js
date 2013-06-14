@@ -181,9 +181,12 @@ NAMESPACE('ria.async', function () {
             }
         ]);
 
-    ria.async.DeferredAction = function () {
+    /* this is hack */
+    /** @class ria.async.DeferredData*/
+    /** @class ria.async.DeferredAction*/
+    ria.async.DeferredAction = ria.async.DeferredData = function (data_) {
         var future = new ria.async.Future;
-        defer(null, (future.__PROTECTED || future).complete_, [null]);
+        defer(null, (future.__PROTECTED || future).complete_, [data_ || null]);
         return future;
-    }
+    };
 });

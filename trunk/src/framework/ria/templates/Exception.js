@@ -1,7 +1,7 @@
 NAMESPACE('ria.templates', function () {
 
     /** @class ria.templates.Exception */
-    CLASS(
+    EXCEPTION(
         'Exception', [
             function $(msg, inner_) {
                 BASE(msg, inner_);

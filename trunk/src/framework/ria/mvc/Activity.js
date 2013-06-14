@@ -11,63 +11,69 @@ NAMESPACE('ria.mvc', function () {
         'Activity', IMPLEMENTS(ria.mvc.IActivity), [
             function $() {
                 BASE();
-                this.inited_ = false;
-                this.started_ = false;
-                this.paused_ = false;
-                this.stopped_ = false;
-                this.onClose_ = [];
+                this._inited = false;
+                this._started = false;
+                this._paused = false;
+                this._stopped = false;
+                this._onClose = [];
             },
 
             /**
              * Make this activity visible and active
              * @see ria.mvc.Activity.show
              */
-            OVERRIDE, VOID, function show() {
-                if (!this.inited_) {
-                    this.onCreate();
-                    this.inited_ = true;
+            VOID, function show() {
+                if (!this._inited) {
+                    this.onCreate_();
+                    this._inited = true;
                 }
 
-                if (!this.paused_) {
-                    this.stopped_ && this.onRestart();
-                    this.onStart();
+                if (!this._paused) {
+                    this._stopped && this.onRestart_();
+                    this.onStart_();
                 }
 
-                this.onResume();
+                this.onResume_();
 
-                this.stopped_ = false;
-                this.paused_ = false;
+                this._stopped = false;
+                this._paused = false;
             },
 
             /**
              * Make this activity non-active
              */
-            OVERRIDE, VOID, function pause() {
-                if (!this.paused_) {
-                    this.onPause();
-                    this.paused_ = true;
+            VOID, function pause() {
+                if (!this._paused) {
+                    this.onPause_();
+                    this._paused = true;
                 }
             },
 
             /**
              * Make this activity non-visible and non-active
              */
-            OVERRIDE, VOID, function stop() {
-                if (!this.stopped_) {
-                    !this.paused_ && this.onPause();
-                    this.onStop();
+            VOID, function stop() {
+                if (!this._stopped) {
+                    !this._paused && this.onPause();
+                    this.onStop_();
                 }
 
-                this.stopped_ = true;
-                this.paused_ = false;
+                this._stopped = true;
+                this._paused = false;
             },
 
-            OVERRIDE, Boolean, function isForeground() {
-                return this.inited_ && !this.paused_ && !this.stopped_;
+            Boolean, function isForeground() {
+                return this._inited && !this._paused && !this._stopped;
             },
 
-            OVERRIDE, Boolean, function isStarted() {
-                return this.inited_ && !this.stopped_;
+            Boolean, function isStarted() {
+                return this._inited && !this._stopped;
+            },
+
+            [[Object]],
+            VOID, function refresh(model) {
+                this.onModelReady_(model);
+                this.onRender_(model);
             },
 
             ABSTRACT, VOID, function onCreate_() {},
@@ -76,15 +82,18 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onResume_() {},
             VOID, function onPause_() {},
             VOID, function onStop_() {},
+            [[Object]],
+            VOID, function onModelReady_(data) {},
+            [[Object]],
+            VOID, function onRender_(data) {},
 
-            OVERRIDE, VOID, function onDispose_() {
+            VOID, function onDispose_() {
                 this.stop();
-                BASE();
             },
 
             VOID, function close() {
                 var me = this;
-                this.onClose_.forEach(function (_) { _(me); });
+                this._onClose.forEach(function (_) { _(me); });
             },
 
             /**
@@ -92,7 +101,7 @@ NAMESPACE('ria.mvc', function () {
              */
             [[Function]],
             VOID, function addCloseCallback(callback) {
-                this.onClose_.unshift(callback);
+                this._onClose.unshift(callback);
             }
         ]);
 });

@@ -58,14 +58,17 @@ NAMESPACE('ria.templates', function () {
                     throw new ria.templates.Exception('Template class is not bound to model. Please use '
                         + ria.__API.getIdentifierOfType(ria.templates.ModelBind));
 
-                this._modelClass = self.getAnnotation(ria.templates.ModelBind).pop().name;
+                this._modelClass = self.findAnnotation(ria.templates.ModelBind).pop().name_;
+                if (this._modelClass === undefined)
+                    throw new ria.templates.Exception('Template class is bound to model. But model not loaded');
 
                 if (!ria.__API.isClassConstructor(this._modelClass))
                     return ;
 
                 var model = ria.reflection.ReflectionFactory(this._modelClass);
 
-                var selfProperties = self.getProperties();
+                var selfProperties = self.getPropertiesReflector(),
+                    bindings = this._bindings;
 
                 selfProperties
                     .filter(function (_) { return _.isAnnotatedWith(ria.templates.ModelBind); })
@@ -77,19 +80,16 @@ NAMESPACE('ria.templates', function () {
                             throw ria.templates.Exception('Property "' + modelPropertyName + '" not found in model ' + model.getName());
 
                         var converter = modelBind.converter_;
-                        if (converter !== null) {
-                            if (converter === undefined)
-                                throw ria.templates.Exception('Expected converter class, but got undefined');
-
+                        if (converter !== undefined) {
                             var ref = ria.reflection.ReflectionFactory(converter.converter);
                             if (!ref.implementsIfc(ria.templates.IConverter))
-                                throw ria.templates.Exception('Converter class ' + ref.getName() + ' expected to implement '
+                                throw new ria.templates.Exception('Converter class ' + ref.getName() + ' expected to implement '
                                     + ria.__API.getIdentifierOfType(ria.templates.IConverter));
 
                             converter = bind.converter;
                         }
 
-                        this.bindings.push({
+                        bindings.push({
                             sourceProp: modelProperty,
                             destProp: property,
                             converter: converter
@@ -114,7 +114,7 @@ NAMESPACE('ria.templates', function () {
                 var convertWith = this.convertWith,
                     scope = this;
 
-                this.bindings.forEach(function (_) {
+                this._bindings.forEach(function (_) {
                     var value = _.sourceProp.invokeGetterOn(model);
                     if (_.converter) {
                         value = convertWith(value, _.converter);
@@ -206,7 +206,7 @@ NAMESPACE('ria.templates', function () {
                     tpl.renderBuffer();
                 });
 
-                return tpl.flushBuffet();
+                return tpl.flushBuffer();
             },
 
             [[Object, Function]],
