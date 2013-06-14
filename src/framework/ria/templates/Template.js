@@ -34,16 +34,16 @@ NAMESPACE('ria.templates', function () {
             Array, 'collection',
             Function, 'block',
 
-            PUBLIC, function $() {
+            function $() {
                 this._modelClass = null;
                 this._bindings = [];
                 this._bundle = '';
                 this._tpl = null;
                 this._model = null;
-                this.bind();
+                this.bind_();
             },
 
-            PRIVATE, VOID, function bind() {
+            VOID, function bind_() {
                 var self = ria.reflection.ReflectionFactory(this.getClass());
 
                 // Bind template
