@@ -53,7 +53,7 @@ NAMESPACE('app.controllers', function () {
                     .attach(this.validateResponse_());
 
                 /* Put activity in stack and render when result is ready */
-                return this.View(app.activities.Test, result);
+                return this.View(app.activities.Notes, result);
             },
 
             //[[app.activites.CoordinatesViewModel]],

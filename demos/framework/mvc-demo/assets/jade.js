@@ -3,6 +3,8 @@ REQUIRE('lib/jade.js');
 (function () {
     "use strict";
 
+    ria.__REQUIRE.addAssetAlias('ria.templates.TemplateBind');
+
     ria.__REQUIRE.addLoader(
         function filter(path) {
             return /\.jade$/.test(path);

@@ -9,6 +9,8 @@
 REQUIRE('app.controllers.Base');
 REQUIRE('app.services.NotesService');
 
+REQUIRE('app.activities.Notes');
+
 NAMESPACE('app.controllers', function () {
     "use strict";
 
@@ -53,7 +55,7 @@ NAMESPACE('app.controllers', function () {
                     .attach(this.validateResponse_());
 
                 /* Put activity in stack and render when result is ready */
-                return this.View(app.activities.Test, result);
+                return this.PushView(app.activities.Notes, result);
             },
         ]);
 })
