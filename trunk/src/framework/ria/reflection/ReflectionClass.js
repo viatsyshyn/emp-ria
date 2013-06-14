@@ -24,7 +24,7 @@ NS('ria.reflection', function () {
             //Boolean, function isAbstract() { return this.clazz.__META.flags.isAbstract; },
             //Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
-            Array, function getAnnotations() { return this.clazz.__META.anns; },
+            OVERRIDE, Array, function getAnnotations() { return this.clazz.__META.anns; },
             Function, function getBaseClass() { return this.clazz.__META.base || null; },
 
             SELF, function getBaseClassReflector() {
@@ -77,16 +77,6 @@ NS('ria.reflection', function () {
 
             ria.reflection.ReflectionCtor, function getCtorReflector() {
                 return new ria.reflection.ReflectionCtor(this.clazz);
-            },
-
-            Boolean, function isAnnotatedWith(ann) {
-                return this.getAnnotations()
-                    .some(function (_) { return _.__META == ann.__META });
-            },
-
-            Array, function findAnnotation(ann) {
-                return this.clazz.__META.anns
-                    .filter(function (_) { return _.__META == ann.__META});
             },
 
             ArrayOf(Function), function getParents() {

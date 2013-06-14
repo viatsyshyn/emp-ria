@@ -30,6 +30,10 @@ NS('ria.reflection', function () {
 
             Boolean, function hasMethod(name) {
                 return this.ifc.__META.methods.hasOwnProperty(name);
-            }
+            },
+
+            OVERRIDE, Array, function getAnnotations() {
+                return []; // Interfaces has NO annotations
+            },
         ]);
 });

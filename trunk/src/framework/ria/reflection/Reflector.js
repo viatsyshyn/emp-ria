@@ -14,6 +14,18 @@ NS('ria.reflection', function () {
                     return ria.reflection.ReflectionFactory(value, clazz);
 
                 return new clazz(value);
-            }
+            },
+
+            ABSTRACT, Array, function getAnnotations() {},
+
+            Boolean, function isAnnotatedWith(ann) {
+                return this.getAnnotations()
+                    .some(function (_) { return _.__META == ann.__META });
+            },
+
+            Array, function findAnnotation(ann) {
+                return this.getAnnotations()
+                    .filter(function (_) { return _.__META == ann.__META});
+            },
         ]);
 });
