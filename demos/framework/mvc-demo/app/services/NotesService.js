@@ -8,7 +8,7 @@
 
 REQUIRE('app.services.Base');
 REQUIRE('ria.async.Future');
-REQUIRE('app.model.Note');
+REQUIRE('app.model.Notes');
 
 NAMESPACE('app.services', function () {
     "use strict";
@@ -17,7 +17,7 @@ NAMESPACE('app.services', function () {
     CLASS(
         'NotesService', EXTENDS(app.services.Base), [
             ria.async.Future, function getNotes() {
-                return this.get('data/notes.json', ArrayOf(app.model.Note));
+                return this.get('data/notes.json', app.model.Notes);
             }
         ])
 });

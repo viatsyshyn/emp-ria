@@ -7,5 +7,5 @@ NAMESPACE('app.model', function () {
             String, 'title',
             [ria.serialize.SerializeProperty('Description')],
             String, 'description'
-        ])
+        ]);
 });

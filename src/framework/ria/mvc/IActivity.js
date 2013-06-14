@@ -47,6 +47,9 @@ NAMESPACE('ria.mvc', function () {
          * Configure Close Event
          */
         [[Function]],
-        VOID, function addCloseCallback(callback) {}
+        VOID, function addCloseCallback(callback) {},
+
+        [[Object]],
+        VOID, function refresh(model) {}
     ]);
 });

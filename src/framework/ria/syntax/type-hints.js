@@ -41,11 +41,11 @@
                 if (ria.__API.isInterface(type))
                     return 'object' === typeof value;
 
-                if (ria.__API.ArrayOfDescriptor.isArrayOfDescriptor(type)) {
-                    if (ria.__API.ArrayOfDescriptor.isArrayOfDescriptor(value))
+                if (ria.__API.isArrayOfDescriptor(type)) {
+                    if (ria.__API.isArrayOfDescriptor(value))
                         return type.valueOf() == value.valueOf();
 
-                    if (!(value instanceof Array))
+                    if (!Array.isArray(value))
                         return false;
 
                     for (var i = 0; i < value.length; i++) {
