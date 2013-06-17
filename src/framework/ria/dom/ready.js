@@ -79,7 +79,7 @@ NAMESPACE('ria.dom', function () {
      * @returns {ria.async.Future}
      */
     ria.dom.ready = function () {
-        return isPageReady
+        return !isPageReady
                 ? new ria.dom.DomReadyTask().run()
                 : ria.async.DeferredAction();
     }
