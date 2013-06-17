@@ -18,10 +18,15 @@
 
     ria.__BOOTSTRAP.onBootstrapped(function () {
         "use strict";
+        ria.__REQUIRE.requireSymbol('ria.dom.ready');
         ria.__REQUIRE.requireSymbol(cfg.appClass);
 
         ria.__REQUIRE.onReady(function () {
-            (new (eval(cfg.appClass))).run();
+            ria.dom.ready()
+                .then(function () {
+                    (new (eval(cfg.appClass))).run();
+                })
+                .catchError();
         });
     });
 })();
