@@ -1,5 +1,7 @@
 REQUIRE('ria.mvc.DomActivity');
 
+REQUIRE('ria.dom.Dom');
+
 REQUIRE('app.templates.Notes');
 
 NAMESPACE('app.activities', function () {
@@ -9,7 +11,8 @@ NAMESPACE('app.activities', function () {
         [ria.mvc.DomAppendTo('#body')],
         'Notes', EXTENDS(ria.mvc.DomActivity), [
             OVERRIDE, Object, function onDomCreate_() {
-                return jQuery(jQuery.parseHTML('<div>Loading...</div>'));
+                var dom = new ria.dom.Dom();
+                return dom.fromHTML('<div>Loading...</div>');
             },
 
             [ria.mvc.DomEventBind('click', 'p')],

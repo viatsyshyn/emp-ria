@@ -26,7 +26,7 @@
                 .then(function () {
                     (new (eval(cfg.appClass))).run();
                 })
-                .catchError();
+                //.catchError();
         });
     });
 })();

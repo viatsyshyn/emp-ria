@@ -5,7 +5,6 @@
     <style type="text/css">
         BODY {background: black; color: #ff8c00; font-size: .67em;}
     </style>
-    <script src="http://code.jquery.com/jquery-2.0.1.min.js"></script>
     <script src="../../../src/framework/lib/jade.js"></script>
 
 </head>
@@ -25,7 +24,7 @@
         "stackTraceJs": "lib/stacktrace.js",
 
         "#require": {
-            "plugins": ["~/assets/jade.js"],
+            "plugins": ["/emp.ria/src/framework/lib/sizzle.js", "~/assets/jade.js"],
             "siteRoot": "http://localhost",
             "appRoot": "/emp.ria/demos/framework/mvc-demo/",
             "appCodeDir": "~/",

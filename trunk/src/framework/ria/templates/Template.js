@@ -1,5 +1,6 @@
 REQUIRE('ria.templates.Exception');
 REQUIRE('ria.templates.ConverterFactories');
+REQUIRE('ria.dom.Dom');
 
 REQUIRE('ria.reflection.ReflectionFactory');
 
@@ -8,8 +9,8 @@ NAMESPACE('ria.templates', function () {
     "use strict";
 
     function appendTo(content, to) {
-        // TODO: remove jQuery
-        jQuery(jQuery.parseHTML(content)).appendTo(to);
+        var dom = new ria.dom.Dom();
+        dom.fromHTML(content).appendTo(to);
     }
 
     /**
