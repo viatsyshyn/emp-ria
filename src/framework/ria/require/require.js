@@ -11,15 +11,15 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     }
 
     ria.__REQUIRE.init = function (cfg, onBootstraped) {
-        onBootstraped.forEach(function (_) { defer(_) } );
+        root.addReadyCallback(function () {
+            onBootstraped.forEach(function (_) { defer(_) } );
+        })
     };
-
-    var SYMBOL_REGEX = /^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi;
 
     function resolve(path) {
         var original = path;
 
-        if (SYMBOL_REGEX.test(path))
+        if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
             path = path.replace(/\./gi, '/') + '.js';
 
         var libs = ria.__CFG['#require'].libs;
@@ -44,30 +44,30 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return path;
     }
 
-    ria.__REQUIRE.requireAsset = function (uri) {
+    function requireUri(uri, cb) {
         var dep = ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri));
 
-        ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
-            .addDependency(dep);
+        var module = ria.__REQUIRE.ModuleDescriptor.getCurrentModule();
+        module.addDependency(dep);
+        cb && module.addReadyCallback(cb);
 
         return dep;
+    }
+
+    ria.__REQUIRE.requireAsset = function (uri) {
+        return requireUri(uri, null);
     };
 
     ria.__REQUIRE.requireSymbol = function (symbol) {
-        var uri = resolve(symbol);
+        return requireUri(symbol, function () {
+            var root = window;
+            symbol.split('.').forEach(function (part) {
+                if (!root.hasOwnProperty(part))
+                    throw Error('Symbol "' + symbol + '" not loaded.');
 
-        ria.__REQUIRE.ModuleDescriptor.getCurrentModule()
-            .addReadyCallback(function (content) {
-                var root = window;
-                symbol.split('.').forEach(function (part) {
-                    if (!root.hasOwnProperty(part))
-                        throw Error('Symbol "' + symbol + '" not loaded.');
-
-                    root = root[part];
-                });
+                root = root[part];
             });
-
-        return ria.__REQUIRE.requireAsset(uri);
+        });
     };
 
     var AssetAliases = [/ASSET\('([^']+)'\)/g];
@@ -105,8 +105,23 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         ))
     };
 
-    ria.__REQUIRE.onReady = function (cb) {
+    /*ria.__REQUIRE.onReady = function (cb) {
         root.addReadyCallback(cb);
+    };*/
+
+    ria.__REQUIRE.addPlugin = function (cb) {
+        var deps = [].slice.call(arguments);
+        cb = deps.pop();
+
+        var plugin = ria.__REQUIRE.ModuleDescriptor.getById('plugin-' + Math.random().toString(36).substr(2));
+        plugin.state = 2;
+        deps.forEach(function (symbol) {
+            var dep = ria.__REQUIRE.ModuleDescriptor.getById(resolve(symbol));
+            plugin.addDependency(dep);
+        });
+        plugin.addReadyCallback(cb);
+
+        root.addDependency(plugin);
     };
 
 
