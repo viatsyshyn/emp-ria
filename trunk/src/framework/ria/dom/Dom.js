@@ -21,7 +21,7 @@ NAMESPACE('ria.dom', function () {
 
     /** @class ria.dom.DomIterator */
     DELEGATE(
-        VOID, function DomIterator(node) {});
+        Object, function DomIterator(node) {});
 
     /** @class ria.dom.DomEventHandler */
     DELEGATE(
@@ -218,10 +218,30 @@ NAMESPACE('ria.dom', function () {
             [[Object]],
             SELF, function updateCss(props) {},
 
+            /* iterator */
+
+            [[ria.dom.DomIterator]],
+            SELF, function forEach(iterator) {
+                this.dom_.forEach(function (_) {
+                    iterator(SELF(_));
+                });
+            },
+
+            [[ria.dom.DomIterator]],
+            SELF, function filter(iterator) {
+                this.dom_ = this.dom_.filter(function (_) {
+                    return iterator(SELF(_));
+                });
+            },
+
+            Number, function count() {
+                return this.dom_.length;
+            },
+
             /* raw nodes */
 
             ArrayOf(Node), function valueOf() {
-                return this.dom_;
+                return this.dom_.slice();
             }
         ]);
 });
