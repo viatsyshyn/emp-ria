@@ -1,3 +1,6 @@
 .note
     h3= self.title
-    p= self.description
+    p
+        = self.description + ' '
+        span= self.title
+        = ' ' + self.description

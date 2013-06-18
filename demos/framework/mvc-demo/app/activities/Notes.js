@@ -10,15 +10,15 @@ NAMESPACE('app.activities', function () {
     CLASS(
         [ria.mvc.DomAppendTo('#body')],
         'Notes', EXTENDS(ria.mvc.DomActivity), [
-            OVERRIDE, Object, function onDomCreate_() {
+            OVERRIDE, ria.dom.Dom, function onDomCreate_() {
                 var dom = new ria.dom.Dom();
                 return dom.fromHTML('<div>Loading...</div>');
             },
 
             [ria.mvc.DomEventBind('click', 'p')],
+            [[ria.dom.Dom, ria.dom.Event]],
             Boolean, function handleClick(node, event) {
                 alert('clicked');
-                node.show();
             },
 
             OVERRIDE, VOID, function onRender_(data) {
