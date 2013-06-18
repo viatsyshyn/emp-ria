@@ -115,7 +115,7 @@ NAMESPACE('ria.dom', function () {
 
                 this.dom_.forEach(function(element){
                     events.forEach(function(evt){
-                        element.removeEventListener(evt, handler_, false);
+                        element.removeEventListener(evt, handler_.__domEvent, false);
                     })
                 });
                 return this;
