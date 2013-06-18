@@ -6,25 +6,20 @@ REQUIRE('ria.reflection.ReflectionFactory');
 
 NAMESPACE('ria.mvc', function () {
 
-    function bindEvent(event, selector, dom, f) {
-        dom.on(event, selector, function (event) {
-            var node = new ria.dom.Dom(this);
-            return f(node, event);
-        });
-    }
-
     /** @class ria.mvc.DomAppendTo */
     ANNOTATION(
+        [[String]],
         function DomAppendTo(node) {});
 
     /** @class ria.mvc.DomEventBind */
     ANNOTATION(
+        [[String, String]],
         function DomEventBind(event, selector_) {});
 
     /** @class ria.mvc.DomActivity */
     CLASS(
         'DomActivity', EXTENDS(ria.mvc.Activity), [
-            Object, 'dom',
+            ria.dom.Dom, 'dom',
 
             function $() {
                 BASE();
@@ -39,8 +34,7 @@ NAMESPACE('ria.mvc', function () {
                 if (!ref.isAnnotatedWith(ria.mvc.DomAppendTo))
                     throw new ria.mvc.MvcException('ria.mvc.DomActivity expects annotation ria.mvc.DomAppendTo');
 
-                var dom = new ria.dom.Dom();
-                this._domAppendTo =  dom.find(ref.findAnnotation(ria.mvc.DomAppendTo).pop().node);
+                this._domAppendTo = new ria.dom.Dom(ref.findAnnotation(ria.mvc.DomAppendTo).pop().node);
 
                 this._domEvents = ref.getMethodsReflector()
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.DomEventBind)})
@@ -57,18 +51,16 @@ NAMESPACE('ria.mvc', function () {
                     })
             },
 
-            ABSTRACT, Object, function onDomCreate_() {},
+            ABSTRACT, ria.dom.Dom, function onDomCreate_() {},
 
             OVERRIDE, VOID, function onCreate_() {
                 BASE();
 
-                var dom = this.dom = this.onDomCreate_();
-
-                dom.appendTo(this._domAppendTo);
+                var dom = this.dom = this.onDomCreate_().appendTo(this._domAppendTo);
 
                 var instance = this;
                 this._domEvents.forEach(function (_) {
-                    bindEvent(_.event, _.selector, dom, function () {
+                    dom.on(_.event, _.selector, function (node, event) {
                         return _.methodRef.invokeOn(instance, ria.__API.clone(arguments));
                     });
                 })

@@ -19,19 +19,34 @@ NAMESPACE('ria.dom', function () {
         __find = Sizzle,
         __is = Sizzle.matchesSelector;
 
+    function checkEventHandlerResult(event, result) {
+        if (result === false) {
+            event.stopPropagation && event.stopPropagation();
+            event.cancelBubble && event.cancelBubble();
+        }
+    }
+
+    function nulls(_) {
+        return _ == null;
+    }
+
+    /** @class ria.dom.Event */
+    ria.dom.Event = Event;
+
     /** @class ria.dom.DomIterator */
     DELEGATE(
         Object, function DomIterator(node) {});
 
     /** @class ria.dom.DomEventHandler */
     DELEGATE(
+        [[Object, ria.dom.Event]],
         Boolean, function DomEventHandler(node, event) {});
 
     /** @class ria.dom.Dom */
     CLASS(
         'Dom', [
             function $(dom_) {
-                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node)], dom_);
+                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF], dom_);
                 this.dom_ = [global];
 
                 if ('string' === typeof dom_) {
@@ -40,6 +55,8 @@ NAMESPACE('ria.dom', function () {
                     this.dom_ = dom_;
                 } else if (dom_ instanceof Node) {
                     this.dom_ = [dom_];
+                } else if (dom_ instanceof SELF) {
+                    this.dom_ = dom_.valueOf();
                 }
             },
 
@@ -55,34 +72,33 @@ NAMESPACE('ria.dom', function () {
 
             SELF, function on(event, selector, handler_) {
                 VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
-                var events = event.split(' ');
+                var events = event.split(' ').filter(nulls);
                 if(!handler_){
                     handler_ = selector;
                     selector = undefined;
                 }
+
                 this.dom_.forEach(function(element){
                     events.forEach(function(evt){
-                        if(evt){
-                            if(selector){
-                                handler_.__domEvent = function (e){
-                                    var target = e.target;
-                                    if(__is(target,selector)){
-                                        handler_.call(target, e);
-                                    }else{
-                                        var els = __find(selector, element);
-                                        els.forEach(function(el){
-                                            if(el.contains(target)){
-                                                handler_.call(el, e);
-                                            }
-                                        });
-                                    }
-                                };
 
-                                element.addEventListener(evt, handler_.__domEvent, false);
-                            }else{
-                                element.addEventListener(evt, handler_, false);
-                            }
-                        }
+                        handler_.__domEvent = function (e) {
+                            var target = new ria.dom.Dom(e.target);
+                            if(selector === undefined)
+                                return checkEventHandlerResult(e, handler_(target, e));
+
+                            if (target.is(selector))
+                                return checkEventHandlerResult(e, handler_(target, e));
+
+                            var selectorTarget = new ria.dom.Dom(element)
+                                .find(selector)
+                                .filter(function (_) { return _.contains(e.target); })
+                                .valueOf()
+                                .pop();
+
+                            return checkEventHandlerResult(e, handler_(new ria.dom.Dom(selectorTarget), e));
+                        };
+
+                        element.addEventListener(evt, handler_.__domEvent, false);
                     })
                 });
                 return this;
@@ -90,22 +106,16 @@ NAMESPACE('ria.dom', function () {
 
             SELF, function off(event, selector, handler_) {
                 VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
-                var events = event.split(' ');
+                var events = event.split(' ').filter(nulls);
                 if(!handler_){
                     handler_ = selector;
                     selector = undefined;
                 }
+                VALIDATE_ARG('handler', [Function], handler_.__domEvent);
+
                 this.dom_.forEach(function(element){
                     events.forEach(function(evt){
-                        if(evt){
-                            if(selector){
-                                if(!handler_.__domEvent)
-                                    throw "there should be another handler function";
-                                element.removeEventListener(evt, handler_.__domEvent, false);
-                            }else{
-                                element.removeEventListener(evt, handler_, false);
-                            }
-                        }
+                        element.removeEventListener(evt, handler_, false);
                     })
                 });
                 return this;
@@ -176,7 +186,28 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function last(selector_) {},
             [[String]],
-            Boolean, function is(selector_) {},
+            Boolean, function is(selector) {
+                return this.dom_.some(function (el) {
+                    return __is(el, selector);
+                });
+            },
+            [[Object]],
+            Boolean, function contains(node) {
+                VALIDATE_ARG('node', [Node, SELF, ArrayOf(Node)], node);
+
+                var nodes = [];
+                if (node instanceof Node) {
+                    nodes = [node];
+                } else if (Array.isArray(node)) {
+                    nodes = node;
+                } else if (node instanceof SELF) {
+                    nodes = node.valueOf();
+                }
+
+                return this.dom_.some(function (el) {
+                    return nodes.some(function (_) { return el.contains(_); });
+                });
+            },
 
             /* attributes */
 
@@ -232,6 +263,7 @@ NAMESPACE('ria.dom', function () {
                 this.dom_ = this.dom_.filter(function (_) {
                     return iterator(SELF(_));
                 });
+                return this;
             },
 
             Number, function count() {
