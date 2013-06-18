@@ -1,6 +1,7 @@
 REQUIRE('ria.mvc.MvcException');
 REQUIRE('ria.mvc.Activity');
 REQUIRE('ria.dom.Dom');
+REQUIRE('ria.mvc.DomEventBind');
 
 REQUIRE('ria.reflection.ReflectionFactory');
 
@@ -10,11 +11,6 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         [[String]],
         function DomAppendTo(node) {});
-
-    /** @class ria.mvc.DomEventBind */
-    ANNOTATION(
-        [[String, String]],
-        function DomEventBind(event, selector_) {});
 
     /** @class ria.mvc.DomActivity */
     CLASS(
