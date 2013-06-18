@@ -123,25 +123,38 @@ NAMESPACE('ria.dom', function () {
 
             /* append/prepend */
 
-            [[SELF]],
             SELF, function appendTo(dom) {
+                VALIDATE_ARG('dom', [SELF, String, Node], dom);
+
                 if(typeof dom == "string")
-                    dom = __find(dom);
+                    dom = new SELF(dom);
+
+                var dest = dom instanceof Node ? dom : dom.valueOf().shift();
+                VALIDATE_ARG('dest', [Node], dest);
+
                 this.dom_.forEach(function(item){
-                    dom.valueOf().forEach(function(element){
-                        element.appendChild(item);
-                    });
+                    dest.appendChild(item);
                 });
                 return this;
             },
 
-            [[SELF]],
             SELF, function prependTo(dom) {
+                VALIDATE_ARG('dom', [SELF, String, Node], dom);
+
                 if(typeof dom == "string")
-                    dom = __find(dom);
+                    dom = new SELF(dom);
+
+                var dest = dom instanceof Node ? dom : dom.valueOf().shift();
+                VALIDATE_ARG('dest', [Node], dest);
+
+                var first = dest.firstChild;
+                if (!first)
+                    return this.appendTo(dest);
+
                 this.dom_.forEach(function(item){
-                    dom.insertBefore(item, dom.firstChild);
+                    dest.insertBefore(item, first);
                 });
+
                 return this;
             },
 
