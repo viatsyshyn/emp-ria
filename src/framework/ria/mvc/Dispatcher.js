@@ -1,13 +1,14 @@
 REQUIRE('ria.mvc.MvcException');
-
 REQUIRE('ria.mvc.IContext');
 REQUIRE('ria.mvc.State');
 REQUIRE('ria.mvc.IStateSerializer');
 REQUIRE('ria.mvc.IDispatchPlugin');
-
 REQUIRE('ria.mvc.Controller');
+REQUIRE('ria.mvc.Control');
+
 REQUIRE('ria.async.Future');
 REQUIRE('ria.async.wait');
+
 REQUIRE('ria.reflection.ReflectionFactory');
 
 NAMESPACE('ria.mvc', function () {
@@ -50,6 +51,7 @@ NAMESPACE('ria.mvc', function () {
                 this.dispatching = false;
                 this.controllers = {};
                 this.cache = {};
+                this.controls = [];
             },
 
             [[ria.mvc.IDispatchPlugin]],
@@ -75,7 +77,7 @@ NAMESPACE('ria.mvc', function () {
                             name = controllerNameToUri(name);
 
                         try {
-                            onAppStartFutures.push(controllerRef.instantiate([]).onAppStart());
+                            onAppStartFutures.push(controllerRef.instantiate().onAppStart());
                             this.controllers[name] = controllerRef;
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
@@ -90,6 +92,38 @@ NAMESPACE('ria.mvc', function () {
 
             ria.async.Future, function loadControllers() {
                 return this.loadControllers_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
+            },
+
+            [[ria.reflection.ReflectionClass]],
+            ria.async.Future, function loadControl_(baseRef) {
+                var onAppStartFutures = [];
+                baseRef.getChildrenReflector().forEach(function (controlRef) {
+                    var name = controlRef.getShortName();
+                    if (name.match(/.*Control$/)) {
+                        try {
+                            this.controls.push(controlRef);
+                            onAppStartFutures.push(controlRef.instantiate().onAppStart());
+                        } catch (e) {
+                            throw new ria.mvc.MvcException('Error intializing control ' + controlRef.getName(), e);
+                        }
+                    }
+
+                    this.loadControllers_(controlRef);
+                }.bind(this));
+
+                return ria.async.wait(onAppStartFutures);
+            },
+
+            ria.async.Future, function loadControls() {
+                return this.loadControl_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
+            },
+
+            [[ria.mvc.IContext]],
+            VOID, function initControls(context) {
+                var getC = this.prepareInstance_;
+                this.controls.forEach(function (_) {
+                    getC(_, context).init();
+                })
             },
 
             [[Function, ria.mvc.IContext]],
@@ -111,7 +145,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
-            ria.mvc.Controller, function prepareController_(ref, context) {
+            Object, function prepareInstance_(ref, context) {
                 var instanse = ref.instantiate();
 
                 ref.getPropertiesReflector().forEach(function (_) {
@@ -159,7 +193,7 @@ NAMESPACE('ria.mvc', function () {
                                 throw new ria.mvc.MvcException('Controller with id "' + state.getController() + '" not found');
                             }
 
-                            var instanse = this.prepareController_(this.controllers[state.getController()], context);
+                            var instanse = this.prepareInstance_(this.controllers[state.getController()], context);
 
                             instanse.onInitialize();
                             instanse.dispatch(state);
