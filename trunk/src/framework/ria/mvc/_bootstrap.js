@@ -7,26 +7,27 @@
  */
 
 (function () {
+    "use strict";
+
     var cfg = ria.__CFG['#mvc'] || {};
 
     if (!cfg.appClass)
         throw Error('__CFG.#mvc.appClass option is required.');
 
-    // TODO: REQUIRE mvc load/require/asset plugins
-
-    // TODO: add bootstrapped callback and load cfg.appClass
+    var REQUIRE = ria.__REQUIRE.requireSymbol,
+        NAMESPACE = ria.__REQUIRE.addCurrentModuleCallback;
 
     ria.__BOOTSTRAP.onBootstrapped(function () {
-        "use strict";
-        ria.__REQUIRE.requireSymbol('ria.dom.ready');
-        ria.__REQUIRE.requireSymbol(cfg.appClass);
+        REQUIRE('ria.dom.ready');
+        REQUIRE(cfg.appClass);
 
-        ria.__REQUIRE.onReady(function () {
+        NAMESPACE('', function () {
             ria.dom.ready()
                 .then(function () {
-                    (new (eval(cfg.appClass))).run();
-                })
-                //.catchError();
+                    (new (eval(cfg.appClass)))
+                        .session(cfg.settings || {})
+                        .run();
+                });
         });
     });
 })();

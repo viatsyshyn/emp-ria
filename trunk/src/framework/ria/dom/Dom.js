@@ -27,7 +27,7 @@ NAMESPACE('ria.dom', function () {
     }
 
     function nulls(_) {
-        return _ == null;
+        return _ != null;
     }
 
     /** @class ria.dom.Event */
@@ -78,10 +78,16 @@ NAMESPACE('ria.dom', function () {
                     selector = undefined;
                 }
 
+                var hid = handler_.__domEventHandlerId = handler_.__domEventHandlerId || (Math.random().toString(36).slice(2));
+
                 this.dom_.forEach(function(element){
                     events.forEach(function(evt){
 
-                        handler_.__domEvent = function (e) {
+                        element.__domEvents = element.__domEvents || {};
+                        if (element.__domEvents[evt + hid])
+                            return ;
+
+                        var h = element.__domEvents[evt + hid] = function (e) {
                             var target = new ria.dom.Dom(e.target);
                             if(selector === undefined)
                                 return checkEventHandlerResult(e, handler_(target, e));
@@ -98,24 +104,34 @@ NAMESPACE('ria.dom', function () {
                             return checkEventHandlerResult(e, handler_(new ria.dom.Dom(selectorTarget), e));
                         };
 
-                        element.addEventListener(evt, handler_.__domEvent, false);
+                        element.addEventListener(evt, h, false);
                     })
                 });
                 return this;
             },
 
             SELF, function off(event, selector, handler_) {
+                throw Error('not supported');
+
                 VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
                 var events = event.split(' ').filter(nulls);
                 if(!handler_){
                     handler_ = selector;
                     selector = undefined;
                 }
-                VALIDATE_ARG('handler', [Function], handler_.__domEvent);
+
+                var hid = handler_.__domEventHandlerId;
+                if (!hid)
+                    return ;
 
                 this.dom_.forEach(function(element){
                     events.forEach(function(evt){
-                        element.removeEventListener(evt, handler_.__domEvent, false);
+                        if (!element.__domEvents)
+                            return ;
+
+                        var h;
+                        if (h = element.__domEvents[evt + hid])
+                            element.removeEventListener(evt, h, false);
                     })
                 });
                 return this;

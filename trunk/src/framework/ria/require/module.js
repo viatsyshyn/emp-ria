@@ -31,14 +31,16 @@
     ModuleDescriptor.prototype.addDependency = function addDependency(dep) {
         ModuleDescriptor.ensureNoCycles(dep, this);
 
+        if (this.isReady()) {
+            this.cbs = [];
+            this.state = ModuleState.Loaded;
+        }
+
         if (dep.isNotLoaded() && !dep.isLoading() && !dep.hasError()) {
             dep.state = ModuleState.Loading;
             ria.__REQUIRE.load(dep.id)
                 .done(function (content) { processDeps(dep.id, true, content); });
         }
-
-        if (this.isReady())
-            this.state = ModuleState.Loaded;
 
         this.deps.push(dep);
     };
@@ -173,9 +175,13 @@
         if (ModuleDescriptor.toArray().every(function (_) { return _.process(); })) {
 //            ria.__API._loader.isReady = true;
 //            ria.ready(ria.__EMPTY);
-
         }
     }
 
     ria.__REQUIRE.ModuleDescriptor = ModuleDescriptor;
+
+    var root = ria.__REQUIRE.ModuleDescriptor.getCurrentModule();
+
+    if (root.isNotLoaded())
+        root.state = 2; // this is a hack
 })();
