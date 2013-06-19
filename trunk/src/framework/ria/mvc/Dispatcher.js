@@ -108,14 +108,14 @@ NAMESPACE('ria.mvc', function () {
                         }
                     }
 
-                    this.loadControllers_(controlRef);
+                    this.loadControl_(controlRef);
                 }.bind(this));
 
                 return ria.async.wait(onAppStartFutures);
             },
 
             ria.async.Future, function loadControls() {
-                return this.loadControl_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
+                return this.loadControl_(ria.reflection.ReflectionFactory(ria.mvc.Control));
             },
 
             [[ria.mvc.IContext]],

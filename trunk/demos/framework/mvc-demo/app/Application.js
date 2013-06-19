@@ -1,6 +1,8 @@
 REQUIRE('ria.mvc.Application');
 REQUIRE('ria.dom.Dom');
 
+REQUIRE('app.controls.ActionLinkControl');
+
 REQUIRE('app.controllers.NotesController');
 
 NAMESPACE('app', function (){
