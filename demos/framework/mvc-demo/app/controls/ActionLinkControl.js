@@ -23,8 +23,7 @@ NAMESPACE('app.controls', function () {
             [ria.mvc.DomEventBind('click', 'A[data-link]')],
             [[ria.dom.Dom, ria.dom.Event]],
             Boolean, function onActionLinkClick(node, event) {
-                var link = node.getData('data-link');
-                alert(link);
+                var link = node.getData('link');
                 var args = this.parseLink_(link);
                 var controller = args.shift(),
                     action = args.shift();
@@ -35,7 +34,7 @@ NAMESPACE('app.controls', function () {
                 state.setParams(args);
                 state.setPublic(false);
 
-                this.context.stateUpdate();
+                this.context.stateUpdated();
 
                 return false;
             }
