@@ -147,7 +147,7 @@ NAMESPACE('ria.dom', function () {
                     dom = new SELF(dom);
 
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
-                VALIDATE_ARG('dest', [Node], dest);
+                VALIDATE_ARG('dom', [Node], dest);
 
                 this.dom_.forEach(function(item){
                     dest.appendChild(item);
@@ -243,7 +243,10 @@ NAMESPACE('ria.dom', function () {
 
             Object, function getAllAttrs() {},
             [[String]],
-            Object, function getAttr(name) {},
+            Object, function getAttr(name) {
+                var node = this.dom_[0];
+                return node ? node.getAttribute(name) : null;
+            },
             [[Object]],
             SELF, function setAllAttrs(obj) {},
             [[String, Object]],
@@ -253,7 +256,9 @@ NAMESPACE('ria.dom', function () {
 
             Object, function getAllData() {},
             [[String]],
-            Object, function getData(name) {},
+            Object, function getData(name) {
+                return this.getAttr('data-' + name);
+            },
             [[Object]],
             SELF, function setAllData(obj) {},
             [[String, Object]],

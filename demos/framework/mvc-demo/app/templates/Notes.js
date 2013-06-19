@@ -1,4 +1,4 @@
-REQUIRE('ria.templates.CompiledTemplate');
+REQUIRE('app.templates.JadeTemplate');
 
 REQUIRE('app.model.Notes');
 
@@ -10,7 +10,7 @@ NAMESPACE('app.templates', function () {
     CLASS(
         [ria.templates.TemplateBind('~/assets/jade/activities/notes.jade')],
         [ria.templates.ModelBind(app.model.PaginatedList)],
-        'Notes', EXTENDS(ria.templates.CompiledTemplate), [
+        'Notes', EXTENDS(app.templates.JadeTemplate), [
             [ria.templates.ModelBind],
             ArrayOf(app.model.Note), 'items',
 

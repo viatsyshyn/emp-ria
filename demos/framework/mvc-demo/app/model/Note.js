@@ -3,6 +3,7 @@ NAMESPACE('app.model', function () {
     /** @class app.model.Note*/
     CLASS(
         'Note', [
+            Number, 'id',
             [ria.serialize.SerializeProperty('Title')],
             String, 'title',
             [ria.serialize.SerializeProperty('Description')],

@@ -33,7 +33,6 @@ NAMESPACE('ria.templates', function () {
         'Template', [
             Number, 'collectionIndex',
             Array, 'collection',
-            Function, 'block',
 
             function $() {
                 this._modelClass = null;

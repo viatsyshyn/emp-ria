@@ -4,5 +4,6 @@
         = self.description + ' '
         span= self.title
         = ' ' + self.description
-    div
-        +ActionLink('index', 'details', self.title) Details
+    if self.renderLink
+        div
+            +ActionLink('index', 'details', self.id) Details

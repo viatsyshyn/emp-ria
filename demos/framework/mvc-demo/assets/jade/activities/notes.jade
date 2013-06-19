@@ -1,3 +1,4 @@
 h3 Notes (page #{self.page}, page size #{self.pageSize}, total #{self.count})
 .notes
-    !=self.renderWith(self.items, app.templates.Note)
+    +RenderWith(self.items, app.templates.Note)(
+        renderLink = true)

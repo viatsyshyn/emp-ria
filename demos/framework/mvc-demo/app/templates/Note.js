@@ -1,4 +1,4 @@
-REQUIRE('ria.templates.CompiledTemplate');
+REQUIRE('app.templates.JadeTemplate');
 
 REQUIRE('app.model.Note');
 
@@ -8,10 +8,14 @@ NAMESPACE('app.templates', function () {
     CLASS(
         [ria.templates.TemplateBind('~/assets/jade/activities/note.jade')],
         [ria.templates.ModelBind(app.model.Note)],
-        'Note', EXTENDS(ria.templates.CompiledTemplate), [
+        'Note', EXTENDS(app.templates.JadeTemplate), [
+            [ria.templates.ModelBind],
+            Number, 'id',
             [ria.templates.ModelBind],
             String, 'title',
             [ria.templates.ModelBind],
-            String, 'description'
+            String, 'description',
+
+            Boolean, 'renderLink'
         ])
 });
