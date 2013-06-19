@@ -57,5 +57,10 @@ NAMESPACE('app.controllers', function () {
                 /* Put activity in stack and render when result is ready */
                 return this.PushView(app.activities.Notes, result);
             },
+
+            [[Number]],
+            function detailsAction(id) {
+                alert('Note with id #' + id);
+            }
         ]);
 })

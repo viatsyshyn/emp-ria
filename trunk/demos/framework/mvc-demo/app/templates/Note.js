@@ -10,7 +10,7 @@ NAMESPACE('app.templates', function () {
         [ria.templates.ModelBind(app.model.Note)],
         'Note', EXTENDS(app.templates.JadeTemplate), [
             [ria.templates.ModelBind],
-            Number, 'id',
+            app.model.NoteId, 'id',
             [ria.templates.ModelBind],
             String, 'title',
             [ria.templates.ModelBind],
