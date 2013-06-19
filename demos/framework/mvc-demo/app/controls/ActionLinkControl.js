@@ -6,6 +6,7 @@ NAMESPACE('app.controls', function () {
     CLASS(
         'ActionLinkControl', EXTENDS(ria.mvc.DomControl), [
             OVERRIDE, VOID, function onCreate_() {
+                BASE();
                 ASSET('~/assets/jade/controls/action-link.jade')(this);
             },
 
@@ -22,7 +23,20 @@ NAMESPACE('app.controls', function () {
             [ria.mvc.DomEventBind('click', 'A[data-link]')],
             [[ria.dom.Dom, ria.dom.Event]],
             Boolean, function onActionLinkClick(node, event) {
-                alert(node.getData('data-link'));
+                var link = node.getData('data-link');
+                alert(link);
+                var args = this.parseLink_(link);
+                var controller = args.shift(),
+                    action = args.shift();
+
+                var state = this.context.getState();
+                state.setController(controller);
+                state.setAction(action);
+                state.setParams(args);
+                state.setPublic(false);
+
+                this.context.stateUpdate();
+
                 return false;
             }
         ]);
