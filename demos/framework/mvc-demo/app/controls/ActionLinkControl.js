@@ -11,10 +11,12 @@ NAMESPACE('app.controls', function () {
 
             [[Array]],
             String, function getLink(values) {
-                return values
-                    .map(function (_) { return _.valueOf ? _.valueOf() : _})
-                    .map(function (_) { return encodeURIComponent(_)})
-                    .join(',');
+                return encodeURIComponent(values.map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _) }).join(','));
+            },
+
+            [[String]],
+            Array, function parseLink_(link) {
+                return JSON.parse(String('[' + decodeURIComponent(link) + ']'));
             },
 
             [ria.mvc.DomEventBind('click', 'A[data-link]')],
