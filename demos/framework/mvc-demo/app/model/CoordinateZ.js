@@ -20,17 +20,4 @@ NAMESPACE('app.model', function () {
             String, 'desc',
             app.model.CoordinateZ, 'field3'
         ]);
-
-    /** @class app.model.GeneralList */
-    CLASS(
-        'GeneralList', [
-            Function, 'modelClass',
-            ArrayOf(Object), 'items',
-            Number, 'page',
-            Number, 'count',
-
-            Object, function asArrayStore() {
-
-            }
-        ])
 });
