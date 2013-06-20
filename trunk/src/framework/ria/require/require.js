@@ -81,7 +81,8 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
             while(m = ASSET_REGEX.exec(fn)) {
                 root.addDependency(R.getById(resolve(m[1])));
-                fn = fn.substring(m.index + m[1].length);
+                //fn = fn.substring(m.index + m[1].length);
+
             }
         });
 

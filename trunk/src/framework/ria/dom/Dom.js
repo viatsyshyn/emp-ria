@@ -15,6 +15,8 @@
 NAMESPACE('ria.dom', function () {
     "use strict";
 
+
+    ASSET('lib/sizzle.js');
     var global = ('undefined' !== typeof window ? window.document : null),
         __find = Sizzle,
         __is = Sizzle.matchesSelector;
