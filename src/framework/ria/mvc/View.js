@@ -37,7 +37,7 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.IActivity]],
             VOID, function onActivityClosed_(activity) {
                 while (this.getCurrent() != null) {
-                    if (this.getCurrent() === activity) {
+                    if (this.getCurrent().equals(activity)) {
                         this.pop(); // stop and start under
                         break;
                     } else {

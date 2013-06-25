@@ -224,7 +224,7 @@
         Class.prototype.getHashCode = function () { return this.hashCode; };
         ria.__API.method(Class, Class.prototype.getHashCode, 'getHashCode', String, [], [], []);
 
-        Class.prototype.equals = function (other) { return this.getHashCode() === other.getHasCode(); };
+        Class.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
         ria.__API.method(Class, Class.prototype.equals, 'equals', Boolean, [Class], ['other'], []);
 
         ria.__API.compile(Class);
