@@ -54,7 +54,7 @@ NAMESPACE('ria.mvc', function () {
              */
             VOID, function stop() {
                 if (!this._stopped) {
-                    !this._paused && this.onPause();
+                    !this._paused && this.onPause_();
                     this.onStop_();
                 }
 

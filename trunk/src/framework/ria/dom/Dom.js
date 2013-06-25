@@ -25,6 +25,7 @@ NAMESPACE('ria.dom', function () {
         if (result === false) {
             event.stopPropagation && event.stopPropagation();
             event.cancelBubble && event.cancelBubble();
+            event.preventDefault && event.preventDefault();
         }
     }
 

@@ -21,8 +21,8 @@ NAMESPACE('ria.mvc', function () {
             Boolean, function isSameActivityGroup_(a1, a2) {
                 var ref1 = ria.reflection.ReflectionFactory(a1.getClass());
                 var ref2 = ria.reflection.ReflectionFactory(a2.getClass());
-                var v1 = ref1.getAnnotation(ria.mvc.ActivityGroup);
-                var v2 = ref2.getAnnotation(ria.mvc.ActivityGroup);
+                var v1 = ref1.findAnnotation(ria.mvc.ActivityGroup)[0];
+                var v2 = ref2.findAnnotation(ria.mvc.ActivityGroup)[0];
                 return v1 != null && v2 != null && v1.name == v2.name;
             },
 
