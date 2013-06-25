@@ -15,6 +15,8 @@
 NAMESPACE('ria.dom', function () {
     "use strict";
 
+    var HTML_ATTRS = {
+    };
 
     ASSET('lib/sizzle.js');
     var global = ('undefined' !== typeof window ? window.document : null),
@@ -115,8 +117,6 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function off(event, selector, handler_) {
-                throw Error('not supported');
-
                 VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
                 var events = event.split(' ').filter(nulls);
                 if(!handler_){
@@ -248,12 +248,16 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             Object, function getAttr(name) {
                 var node = this.dom_[0];
-                return node ? node.getAttribute(name) : null;
+                return node ? node.getAttribute(HTML_ATTRS[name] || name) : null;
             },
             [[Object]],
             SELF, function setAllAttrs(obj) {},
             [[String, Object]],
-            SELF, function setAttr(name, value) {},
+            SELF, function setAttr(name, value) {
+                var node = this.dom_[0];
+                node ? node.setAttribute(HTML_ATTRS[name] || name, value) : null;
+                return this;
+            },
 
             /* data attributes */
 
@@ -270,13 +274,35 @@ NAMESPACE('ria.dom', function () {
             /* classes */
 
             [[String]],
-            Boolean, function hasClass(clazz) {},
+            Boolean, function hasClass(clazz) {
+                return (' ' + this.getAttr('class') + ' ').replace(/\s+/g, ' ').indexOf(' ' + clazz + ' ') >= 0;
+            },
             [[String]],
-            SELF, function addClass(clazz) {},
+            SELF, function addClass(clazz) {
+                return this.toggleClass(clazz, true);
+            },
             [[String]],
-            SELF, function removeClass(clazz) {},
+            SELF, function removeClass(clazz) {
+               return this.toggleClass(clazz, false);
+            },
+
             [[String, Boolean]],
-            SELF, function toggleClass(clazz, toggleOn_) {},
+            SELF, function toggleClass(clazz, toggleOn_) {
+                var hasClass = this.hasClass(clazz);
+                toggleOn_ = (toggleOn_ === undefined ? !hasClass : toggleOn_);
+
+                if (toggleOn_ && !hasClass) {
+                    this.setAttr('class', this.getAttr('class') + " " + clazz);
+                    return this;
+                }
+
+                if (!toggleOn_ && hasClass) {
+                    this.setAttr('class', this.getAttr('class').split(/\s+/).filter(function(_){ return _ != clazz;}).join(' '));
+                    return this;
+                }
+
+                return this;
+            },
 
             /* css */
 
