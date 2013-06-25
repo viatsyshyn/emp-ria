@@ -40,7 +40,7 @@ NS('ria.reflection', function () {
                 VALIDATE_ARG('instance', [this.clazz], instance);
                 VALIDATE_ARGS(this.method.argsNames, this.method.argsTypes, args_ || []);
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.method.impl.apply(instance, args_ || []);
+                return this.method.impl.apply(instance, args_ || []);
             }
         ]);
 });
