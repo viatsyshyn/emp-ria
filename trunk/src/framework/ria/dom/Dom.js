@@ -47,6 +47,15 @@ NAMESPACE('ria.dom', function () {
         [[Object, ria.dom.Event]],
         Boolean, function DomEventHandler(node, event) {});
 
+    var GID = new Date().getTime();
+    /**
+     * @class ria.dom.NewGID
+     * @returns {String}
+     */
+    ria.dom.NewGID = function () {
+        return 'gid-' + (GID++).toString(36);
+    };
+
     /** @class ria.dom.Dom */
     CLASS(
         'Dom', [

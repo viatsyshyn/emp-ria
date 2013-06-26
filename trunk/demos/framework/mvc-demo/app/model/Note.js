@@ -11,6 +11,7 @@ NAMESPACE('app.model', function () {
             [ria.serialize.SerializeProperty('Title')],
             String, 'title',
             [ria.serialize.SerializeProperty('Description')],
-            String, 'description'
+            String, 'description',
+            Date, 'date'
         ]);
 });

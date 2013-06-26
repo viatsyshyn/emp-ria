@@ -38,6 +38,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             def.argsNames);
     };
 
+    /**
+     * @function
+     */
     function DELEGATE() {
         var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
         ria.__SYNTAX.validateDelegateDecl(def);

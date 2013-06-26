@@ -15,6 +15,8 @@ NAMESPACE('app.templates', function () {
             String, 'title',
             [ria.templates.ModelBind],
             String, 'description',
+            [ria.templates.ModelBind],
+            Date, 'date',
 
             Boolean, 'renderLink'
         ])

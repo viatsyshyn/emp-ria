@@ -14,7 +14,8 @@ NAMESPACE('ria.mvc', function () {
         'View', IMPLEMENTS(ria.mvc.IView), [
             function $() {
                 BASE();
-                this.stack = [];
+                this._stack = [];
+                this._refreshEvents = [];
             },
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
@@ -29,9 +30,10 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.IActivity]],
             VOID, function push_(activity){
                 activity.addCloseCallback(this.onActivityClosed_);
+                activity.addRefreshCallback(this.onActivityRefreshed_);
                 activity.show();
 
-                this.stack.unshift(activity);
+                this._stack.unshift(activity);
             },
 
             [[ria.mvc.IActivity]],
@@ -47,7 +49,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ria.mvc.IActivity, function pop_() {
-                return this.stack.shift() || null;
+                return this._stack.shift() || null;
             },
 
             /**
@@ -108,7 +110,7 @@ NAMESPACE('ria.mvc', function () {
              * @return {ria.mvc.Activity}
              */
             ria.mvc.IActivity, function getCurrent() {
-                return this.stack[0] || null;
+                return this._stack[0] || null;
             },
 
             /**
@@ -120,7 +122,18 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ArrayOf(ria.mvc.IActivity), function getStack_() {
-                return this.stack.slice();
+                return this._stack.slice();
+            },
+
+            [[ria.mvc.IActivity, Object]],
+            VOID, function onActivityRefreshed_(activity, model) {
+                this._refreshEvents.forEach(function (_) { _(activity, model); });
+                this._refreshEvents = [];
+            },
+
+            [[ria.mvc.ActivityRefreshedEvent]],
+            VOID, function onActivityRefreshed(callback) {
+                this._refreshEvents.push(callback);
             }
         ]);
 });

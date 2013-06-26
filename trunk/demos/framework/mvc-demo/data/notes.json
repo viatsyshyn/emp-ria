@@ -3,7 +3,8 @@
         {
             "id": 1,
             "Title": "First Note",
-            "Description": "Description of Note 1"
+            "Description": "Description of Note 1",
+            "date": "2013-06-26"
         },
         {
             "id": 2,

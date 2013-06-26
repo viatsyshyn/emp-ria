@@ -5,6 +5,16 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         function ActivityGroup(name) {});
 
+    /** @class ria.mvc.ActivityClosedEvent */
+    DELEGATE(
+        [[Object]],
+        VOID, function ActivityClosedEvent(activity) {});
+
+    /** @class ria.mvc.ActivityRefreshedEvent */
+    DELEGATE(
+        [[Object, Object]],
+        VOID, function ActivityRefreshedEvent(activity, model) {});
+
     /**
      * Base Activity Interface
      *
@@ -46,10 +56,16 @@ NAMESPACE('ria.mvc', function () {
         /**
          * Configure Close Event
          */
-        [[Function]],
+        [[ria.mvc.ActivityClosedEvent]],
         VOID, function addCloseCallback(callback) {},
 
         [[Object]],
-        VOID, function refresh(model) {}
+        VOID, function refresh(model) {},
+
+        /**
+         * Configure Refresh Event
+         */
+        [[ria.mvc.ActivityRefreshedEvent]],
+        VOID, function addRefreshCallback(callback) {}
     ]);
 });

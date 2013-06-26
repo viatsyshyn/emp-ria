@@ -2,6 +2,7 @@ REQUIRE('ria.mvc.Application');
 REQUIRE('ria.dom.Dom');
 
 REQUIRE('app.controls.ActionLinkControl');
+REQUIRE('app.controls.DatePickerControl');
 
 REQUIRE('app.controllers.NotesController');
 

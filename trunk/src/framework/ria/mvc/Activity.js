@@ -3,6 +3,12 @@ REQUIRE('ria.mvc.IActivity');
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
+    function defer(fn, args_, scope_) {
+        setTimeout(function () {
+            fn.apply(scope_ || this, args_ || []);
+        }, 1);
+    }
+
     /**
      * Abstract Activity class
      * @class ria.mvc.Activity
@@ -16,6 +22,7 @@ NAMESPACE('ria.mvc', function () {
                 this._paused = false;
                 this._stopped = false;
                 this._onClose = [];
+                this._onRefresh = [];
             },
 
             /**
@@ -74,6 +81,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function refresh(model) {
                 this.onModelReady_(model);
                 this.onRender_(model);
+                defer(this.onRefresh_, [model], this);
             },
 
             ABSTRACT, VOID, function onCreate_() {},
@@ -86,6 +94,11 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onModelReady_(data) {},
             [[Object]],
             VOID, function onRender_(data) {},
+            [[Object]],
+            VOID, function onRefresh_(data) {
+                var me = this;
+                this._onRefresh.forEach(function (_) { _(me, data); });
+            },
 
             VOID, function onDispose_() {
                 this.stop();
@@ -99,9 +112,17 @@ NAMESPACE('ria.mvc', function () {
             /**
              * Configure Close Event
              */
-            [[Function]],
+            [[ria.mvc.ActivityClosedEvent]],
             VOID, function addCloseCallback(callback) {
                 this._onClose.unshift(callback);
+            },
+
+            /**
+             * Configure Refresh Event
+             */
+            [[ria.mvc.ActivityRefreshedEvent]],
+            VOID, function addRefreshCallback(callback) {
+                this._onRefresh.unshift(callback);
             }
         ]);
 });
