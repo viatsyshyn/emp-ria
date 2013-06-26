@@ -39,6 +39,9 @@ NAMESPACE('ria.mvc', function () {
             /**
              * Init engine, stop all activities and empty stack
              */
-            VOID, function reset() {}
+            VOID, function reset() {},
+
+            [[ria.mvc.ActivityRefreshedEvent]],
+            VOID, function onActivityRefreshed(callback) {}
         ]);
 });

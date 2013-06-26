@@ -69,6 +69,7 @@
     }
 
     /**
+     * @function
      * Ensure argument is of correct types
      * @param {String} name
      * @param {Array} type
@@ -97,6 +98,7 @@
     };
 
     /**
+     * @function
      * Ensure arguments are of correct types
      * @param {String[]} names
      * @param {Array} types
