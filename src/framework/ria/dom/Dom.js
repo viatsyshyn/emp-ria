@@ -64,7 +64,7 @@ NAMESPACE('ria.dom', function () {
                 this.dom_ = [global];
 
                 if ('string' === typeof dom_) {
-                    this.find(dom_);
+                    this.dom_  = this.find(dom_).valueOf();
                 } else if (Array.isArray(dom_)) {
                     this.dom_ = dom_;
                 } else if (dom_ instanceof Node) {
@@ -78,8 +78,7 @@ NAMESPACE('ria.dom', function () {
 
             [[String]],
             SELF, function find(selector) {
-                this.dom_ = __find(selector, this.dom_[0]);
-                return this;
+                return new ria.dom.Dom(__find(selector, this.dom_[0]));
             },
 
             /* Events */
@@ -218,7 +217,47 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function descendants(selector__) {},
             [[String]],
-            SELF, function parent(selector_) {},
+            SELF, function parent(selector_) {
+                if(selector_){
+                    var parents = new ria.dom.Dom(selector_);
+                    if(parents.count() == 0)
+                        return null;
+                    if(parents.count() == 1)
+                        if(parents.contains(this)){
+                            return parents;
+                        }else{
+                            return null;
+                        }
+                    parents.forEach(function(parent){
+                        if(parent.contains(this))
+                            return parent;
+                    })
+                }
+            },
+
+            Object, function offset() {
+                if(!this.dom_[0])
+                    return null;
+
+                var box = this.dom_[0].getBoundingClientRect();
+                var body = document.body;
+                var docElem = document.documentElement;
+
+                var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+                var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+
+                var clientTop = docElem.clientTop || body.clientTop || 0;
+                var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+
+                var top  = box.top +  scrollTop - clientTop;
+                var left = box.left + scrollLeft - clientLeft;
+
+                return { top: Math.round(top), left: Math.round(left) }
+            },
+
+            Number, function height() {
+                return this.dom_[0] ? this.dom_[0].getBoundingClientRect().height : null;
+            },
             [[String]],
             SELF, function next(selector_) {},
             [[String]],
