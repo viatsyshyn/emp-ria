@@ -28,7 +28,7 @@ NAMESPACE('ria.async', function () {
 
                 if (counter == size) {
                     complete = true;
-                    completer.complete(data);
+                    completer.complete(results.slice(1));
                 } else {
                     completer.progress(counter);
                 }
