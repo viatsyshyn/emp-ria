@@ -1334,6 +1334,54 @@
 
             assertEquals(3, first.getValue());
             assertEquals(6, second.getValue());
+        },
+
+        test$$: function () {
+            "use strict";
+
+            var baseClassDef = ClassDef([
+                'BaseClass', [
+                    function $$(instance, clazz, ctor, args) {
+                        //assertNotUndefined(instance);
+                        assertFunction(clazz);
+                        assertEquals(BaseClass, clazz);
+                        assertFunction(ctor);
+                        assertEquals(BaseClass.prototype.$, ctor);
+                        assertEquals([1,2,'3'], args);
+                        assertEquals(BaseClass, SELF);
+
+                        return ria.__API.init(instance, clazz, ctor, ria.__API.clone(args).map(Number));
+                    },
+
+                    [[Number, Number, Number]],
+                    function $(a,b,c) {
+                        this.value = a + b + c;
+                    },
+
+                    Number, 'value',
+
+                    Number, function getValue() {
+                        return this.value;
+                    }
+                ]]);
+
+            var BaseClass;
+            assertNoException(function () {
+                BaseClass = MakeClass('BaseClass', baseClassDef);
+            });
+
+            var instance;
+            assertNoException(function () {
+                instance = BaseClass(1,2,'3');
+            });
+
+            assertEquals(6, instance.getValue());
+
+            assertNoException(function () {
+                instance = new BaseClass(1,2,'3');
+            });
+
+            assertEquals(6, instance.getValue());
         }
     };
 

@@ -10,13 +10,14 @@
      * @param {Function[]} ifcs
      * @param {Annotation[]} anns
      */
-    function ClassDescriptor(name, base, ifcs, anns) {
+    function ClassDescriptor(name, base, ifcs, anns, isAbstract) {
         this.name = name;
         this.base = base;
         //noinspection JSUnusedGlobalSymbols
         this.ifcs = [].concat.call(base ? base.__META.ifcs : []).concat(ifcs);
         //noinspection JSUnusedGlobalSymbols
         this.anns = anns;
+        this.isAbstract = isAbstract;
         this.properties = base ? ria.__API.clone(base.__META.properties) : {};
         this.methods = base ? ria.__API.clone(base.__META.methods) : {};
         this.ctor = null;
@@ -76,11 +77,12 @@
      * @param {Function} [base_]
      * @param {Function[]} [ifcs_]
      * @param {Annotation[]} [anns_]
+     * @param {Boolean} [isAbstract_]
      */
-    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_) {
+    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_) {
         clazzRegister[name] = clazz;
 
-        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_);
+        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false);
         if (base_) {
             ria.__API.extend(clazz, base_);
             base_.__META.addChild(clazz);
@@ -148,6 +150,9 @@
      * @return {Object}
      */
     ria.__API.init = function (instance, clazz, ctor, args) {
+        if (clazz.__META.isAbstract)
+            throw Error('Can NOT instantiate asbtract class ' + clazz.__META.name);
+
         if (!(instance instanceof clazz))
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
 

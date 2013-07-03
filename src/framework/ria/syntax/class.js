@@ -423,19 +423,28 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.compileClass = function (name, def) {
 
-        var ClassProxy = function ClassProxy() {
-            return ria.__API.init(this, ClassProxy, ClassProxy.prototype.$, arguments);
-        };
+        var processedMethods = [];
 
-        if(def.flags.isAbstract)
-            ClassProxy = function ClassProxy() { throw Error('Can NOT instantiate abstract class ' + def.name); };
+        var $$Def = def.methods.filter(function (_1) { return _1.name == '$$'}).pop();
+        var $$ = $$Def ? $$Def.body.value : ria.__API.init;
+        processedMethods.push('$$');
+
+        var ClassProxy = function ClassProxy() {
+            var _old_SELF = window.SELF;
+            try {
+                window.SELF = ClassProxy;
+                return $$.call(undefined, this, ClassProxy, ClassProxy.prototype.$, arguments);
+            } finally {
+                window.SELF = _old_SELF;
+            }
+        };
 
         ria.__API.clazz(ClassProxy, name,
             def.base.value,
             def.ifcs.values,//.map(function (_) { return _.value }),
-            def.annotations.map(function (_) { return _.value }));
+            def.annotations.map(function (_) { return _.value }),
+            def.flags.isAbstract);
 
-        var processedMethods = [];
         def.properties.forEach(
             /**
              * @param {PropertyDescriptor} property
