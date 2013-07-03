@@ -8,9 +8,31 @@ REQUIRE('ria.reflection.ReflectionInterface');
 NS('ria.reflection', function () {
     "use strict";
 
+    var cache = {};
+
     /** @class ria.reflection.ReflectionClass */
     CLASS(
         FINAL, 'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
+
+            // $$ - instance factory
+            function $$(instance, Clazz, ctor, args) {
+                var clazz = args[0];
+                if (clazz instanceof ria.__API.Class)
+                    clazz = clazz.getClass();
+
+                if (clazz instanceof ria.__API.ClassDescriptor)
+                    clazz = clazz.ctor;
+
+                if (!ria.__API.isClassConstructor(clazz))
+                    throw new ria.reflection.Exception('ReflectionFactory works only on CLASS');
+
+                var name = clazz.__META.name;
+                if (cache.hasOwnProperty(name))
+                    return cache[name];
+
+                return cache[name] = new ria.__API.init(instance, Clazz, ctor, args);
+            },
+
             READONLY, Function, 'clazz',
 
             function $(clazz) {
@@ -21,7 +43,7 @@ NS('ria.reflection', function () {
             String, function getName() { return this.clazz.__META.name; },
             String, function getShortName() { return this.clazz.__META.name.split('.').pop(); },
 
-            //Boolean, function isAbstract() { return this.clazz.__META.flags.isAbstract; },
+            Boolean, function isAbstract() { return this.clazz.__META.isAbstract; },
             //Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
             OVERRIDE, Array, function getAnnotations() { return this.clazz.__META.anns; },

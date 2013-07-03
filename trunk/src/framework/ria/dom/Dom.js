@@ -15,13 +15,11 @@
 NAMESPACE('ria.dom', function () {
     "use strict";
 
-    var HTML_ATTRS = {
-    };
-
-    ASSET('lib/sizzle.js');
     var global = ('undefined' !== typeof window ? window.document : null),
-        __find = Sizzle,
-        __is = Sizzle.matchesSelector;
+        docElem = global.documentElement,
+        __find = function (s, n) { return n.querySelectorAll(s); },
+        __is = docElem ? (docElem.webkitMatchesSelector || docElem.mozMatchesSelector
+            || docElem.oMatchesSelector || docElem.msMatchesSelector) : function () { return false };
 
     function checkEventHandlerResult(event, result) {
         if (result === false) {
@@ -59,18 +57,25 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.Dom */
     CLASS(
         'Dom', [
+            // $$ - instance factory
+            function $$(instance, clazz, ctor, args) {
+                instance = DomImpl.apply(undefined, args);
+                ria.__SYNTAX && ria.__SYNTAX.checkReturn(ria.dom.Dom, instance);
+                return instance;
+            },
+
             function $(dom_) {
                 VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF], dom_);
-                this.dom_ = [global];
+                this._dom = [global];
 
                 if ('string' === typeof dom_) {
-                    this.dom_  = this.find(dom_).valueOf();
+                    this._dom  = this.find(dom_).valueOf();
                 } else if (Array.isArray(dom_)) {
-                    this.dom_ = dom_;
+                    this._dom = dom_;
                 } else if (dom_ instanceof Node) {
-                    this.dom_ = [dom_];
+                    this._dom = [dom_];
                 } else if (dom_ instanceof SELF) {
-                    this.dom_ = dom_.valueOf();
+                    this._dom = dom_.valueOf();
                 }
             },
 
@@ -78,7 +83,7 @@ NAMESPACE('ria.dom', function () {
 
             [[String]],
             SELF, function find(selector) {
-                return new ria.dom.Dom(__find(selector, this.dom_[0]));
+                return new ria.dom.Dom(__find(selector, this._dom[0]));
             },
 
             /* Events */
@@ -93,7 +98,7 @@ NAMESPACE('ria.dom', function () {
 
                 var hid = handler_.__domEventHandlerId = handler_.__domEventHandlerId || (Math.random().toString(36).slice(2));
 
-                this.dom_.forEach(function(element){
+                this._dom.forEach(function(element){
                     events.forEach(function(evt){
 
                         element.__domEvents = element.__domEvents || {};
@@ -136,7 +141,7 @@ NAMESPACE('ria.dom', function () {
                 if (!hid)
                     return ;
 
-                this.dom_.forEach(function(element){
+                this._dom.forEach(function(element){
                     events.forEach(function(evt){
                         if (!element.__domEvents)
                             return ;
@@ -155,12 +160,12 @@ NAMESPACE('ria.dom', function () {
                 VALIDATE_ARG('dom', [SELF, String, Node], dom);
 
                 if(typeof dom == "string")
-                    dom = new SELF(dom);
+                    dom = new ria.dom.Dom(dom);
 
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
                 VALIDATE_ARG('dom', [Node], dest);
 
-                this.dom_.forEach(function(item){
+                this._dom.forEach(function(item){
                     dest.appendChild(item);
                 });
                 return this;
@@ -170,7 +175,7 @@ NAMESPACE('ria.dom', function () {
                 VALIDATE_ARG('dom', [SELF, String, Node], dom);
 
                 if(typeof dom == "string")
-                    dom = new SELF(dom);
+                    dom = new ria.dom.Dom(dom);
 
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
                 VALIDATE_ARG('dest', [Node], dest);
@@ -179,7 +184,7 @@ NAMESPACE('ria.dom', function () {
                 if (!first)
                     return this.appendTo(dest);
 
-                this.dom_.forEach(function(item){
+                this._dom.forEach(function(item){
                     dest.insertBefore(item, first);
                 });
 
@@ -190,14 +195,14 @@ NAMESPACE('ria.dom', function () {
 
             [[String]],
             SELF, function fromHTML(html) {
-                this.dom_ = [];
+                this._dom = [];
 
                 var div = document.createElement('div');
                 div.innerHTML = html;
                 var count = div.childElementCount;
                 for(var i=0; i<count; i++){
                     var node = div.removeChild(div.childNodes[0]);
-                    node && this.dom_.push(node);
+                    node && this._dom.push(node);
                 }
 
                 return this;
@@ -206,7 +211,7 @@ NAMESPACE('ria.dom', function () {
             /* DOM manipulations & navigation */
 
             SELF, function empty() {
-                this.dom_.forEach(function(element){
+                this._dom.forEach(function(element){
                     element.innerHTML = '';
                 });
                 return this;
@@ -236,10 +241,10 @@ NAMESPACE('ria.dom', function () {
             },
 
             Object, function offset() {
-                if(!this.dom_[0])
+                if(!this._dom[0])
                     return null;
 
-                var box = this.dom_[0].getBoundingClientRect();
+                var box = this._dom[0].getBoundingClientRect();
                 var body = document.body;
                 var docElem = document.documentElement;
 
@@ -256,7 +261,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             Number, function height() {
-                return this.dom_[0] ? this.dom_[0].getBoundingClientRect().height : null;
+                return this._dom[0] ? this._dom[0].getBoundingClientRect().height : null;
             },
             [[String]],
             SELF, function next(selector_) {},
@@ -268,7 +273,7 @@ NAMESPACE('ria.dom', function () {
             SELF, function last(selector_) {},
             [[String]],
             Boolean, function is(selector) {
-                return this.dom_.some(function (el) {
+                return this._dom.some(function (el) {
                     return __is(el, selector);
                 });
             },
@@ -285,7 +290,7 @@ NAMESPACE('ria.dom', function () {
                     nodes = node.valueOf();
                 }
 
-                return this.dom_.some(function (el) {
+                return this._dom.some(function (el) {
                     return nodes.some(function (_) { return el.contains(_); });
                 });
             },
@@ -295,14 +300,14 @@ NAMESPACE('ria.dom', function () {
             Object, function getAllAttrs() {},
             [[String]],
             Object, function getAttr(name) {
-                var node = this.dom_[0];
+                var node = this._dom[0];
                 return node ? node.getAttribute(HTML_ATTRS[name] || name) : null;
             },
             [[Object]],
             SELF, function setAllAttrs(obj) {},
             [[String, Object]],
             SELF, function setAttr(name, value) {
-                var node = this.dom_[0];
+                var node = this._dom[0];
                 node ? node.setAttribute(HTML_ATTRS[name] || name, value) : null;
                 return this;
             },
@@ -365,27 +370,33 @@ NAMESPACE('ria.dom', function () {
 
             [[ria.dom.DomIterator]],
             SELF, function forEach(iterator) {
-                this.dom_.forEach(function (_) {
+                this._dom.forEach(function (_) {
                     iterator(SELF(_));
                 });
             },
 
             [[ria.dom.DomIterator]],
             SELF, function filter(iterator) {
-                this.dom_ = this.dom_.filter(function (_) {
+                this._dom = this._dom.filter(function (_) {
                     return iterator(SELF(_));
                 });
                 return this;
             },
 
             Number, function count() {
-                return this.dom_.length;
+                return this._dom.length;
             },
 
             /* raw nodes */
 
             ArrayOf(Node), function valueOf() {
-                return this.dom_.slice();
+                return this._dom.slice();
             }
         ]);
+
+    var DomImpl = ria.dom.Dom;
+
+    ria.dom.setDomImpl = function (impl) {
+        DomImpl = impl;
+    };
 });

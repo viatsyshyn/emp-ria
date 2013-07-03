@@ -1,5 +1,5 @@
 REQUIRE('ria.mvc.Application');
-REQUIRE('ria.dom.Dom');
+REQUIRE('ria.dom.jQueryDom');
 
 REQUIRE('app.controls.ActionLinkControl');
 REQUIRE('app.controls.DatePickerControl');
@@ -14,10 +14,9 @@ NAMESPACE('app', function (){
             OVERRIDE, ria.async.Future, function onStart_() {
                 return BASE()
                     .then(function (data) {
-                        var html = new ria.dom.Dom();
-                        html.fromHTML(ASSET('~/assets/jade/index.jade')());
-                        var main = new ria.dom.Dom('#main');
-                        html.appendTo(main);
+                        new ria.dom.Dom()
+                            .fromHTML(ASSET('~/assets/jade/index.jade')())
+                            .appendTo('#main');
                         return data;
                     });
             }
