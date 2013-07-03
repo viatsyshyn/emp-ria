@@ -23,7 +23,7 @@ NAMESPACE('ria.async', function () {
             },
 
             ria.async.Future, function run() {
-                setTimeout(this.do_, 0); // defer start
+                ria.__API.defer(this, this.do_, 0);
                 return this._completer.getFuture();
             }
         ])
