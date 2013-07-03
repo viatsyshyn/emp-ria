@@ -6,11 +6,6 @@ NAMESPACE('ria.async', function () {
     function DefaultDataHanlder(data) { return data; }
     function DefaultErrorHandler(e) { this.RETHROW(e); }
 
-    // todo replace with ria.async.Time.run
-    function defer(scope, method, args_) {
-        setTimeout(function () { method.apply(scope, args_ || []); }, 1);
-    }
-
     /** @class ria.async.FutureDataDelegate */
     DELEGATE(
         [[Object]],
@@ -106,7 +101,7 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function updateProgress_(data) {
-                defer(this, function () {
+                ria.__API.defer(this, function () {
                     try {
                         this.onProgress && this.onProgress();
                     } finally {
@@ -116,7 +111,7 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function complete_(data) {
-                defer(this, function () {
+                ria.__API.defer(this, function () {
                     try {
                         var result = (this.onData || DefaultDataHanlder).call(this, data);
                         if (this.broke) {
@@ -138,7 +133,7 @@ NAMESPACE('ria.async', function () {
                 if (!this.next)
                     this.RETHROW(error);
 
-                defer(this, function () {
+                ria.__API.defer(this, function () {
                     try {
                         var result = (this.onError || DefaultErrorHandler).call(this, error);
                         this.doCallNext_('complete_', result === undefined ? null : result);
@@ -151,7 +146,7 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function completeBreak_() {
-                defer(this, function () {
+                ria.__API.defer(this, function () {
                     try {
                         this.onComplete && this.onComplete();
                     } finally {
@@ -186,7 +181,7 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.DeferredAction*/
     ria.async.DeferredAction = ria.async.DeferredData = function (data_) {
         var future = new ria.async.Future;
-        defer(null, (future.__PROTECTED || future).complete_, [data_ || null]);
+        ria.__API.defer(null, (future.__PROTECTED || future).complete_, [data_ || null]);
         return future;
     };
 });

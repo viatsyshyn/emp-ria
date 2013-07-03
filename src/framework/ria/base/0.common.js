@@ -139,6 +139,11 @@ ria.__API = ria.__API || {};
         return 'Object';
     };
 
+    /**
+     * Clone object/array
+     * @param {*} obj
+     * @returns {*}
+     */
     ria.__API.clone = function clone(obj) {
         switch(typeof obj) {
             case 'number':
@@ -162,5 +167,15 @@ ria.__API = ria.__API || {};
 
                 return result;
         }
-    }
+    };
+
+    /**
+     * Run method in next tick
+     * @param {Object} scope
+     * @param {Function} method
+     * @param {Array} [args_]
+     */
+    ria.__API.defer = function defer(scope, method, args_) {
+        setTimeout(function () { method.apply(scope, args_ || []); }, 1);
+    };
 })();
