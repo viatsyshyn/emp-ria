@@ -6,12 +6,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-NAMESPACE('ria.async', function () {
+REQUIRE('ria.async.IObservable');
 
-    /** @class ria.async.Observer */
-    DELEGATE(
-        [[Object]],
-        Boolean, function Observer(data_) {});
+NAMESPACE('ria.async', function () {
 
     /** @class ria.async.Observable */
     CLASS(
@@ -21,14 +18,14 @@ NAMESPACE('ria.async', function () {
             },
 
             [[ria.async.Observer]],
-            SELF, function on(handler) {
+            ria.async.IObservable, function on(handler) {
                 this.off(handler);
                 this._handlers.push(handler);
                 return this;
             },
 
             [[ria.async.Observer]],
-            SELF, function off(handler) {
+            ria.async.IObservable, function off(handler) {
                 this._handlers = this._handlers
                     .filter(function (_) { return handler !== _});
                 return this;
