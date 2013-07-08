@@ -434,6 +434,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             try {
                 window.SELF = ClassProxy;
                 return $$.call(undefined, this, ClassProxy, ClassProxy.prototype.$, arguments);
+            } catch (e) {
+                throw new Exception('Error instantiating class ' + name, e);
             } finally {
                 window.SELF = _old_SELF;
             }

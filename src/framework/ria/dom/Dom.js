@@ -59,13 +59,16 @@ NAMESPACE('ria.dom', function () {
         'Dom', [
             // $$ - instance factory
             function $$(instance, clazz, ctor, args) {
+                if (DomImpl == SELF)
+                    throw Error('');
+
                 instance = DomImpl.apply(undefined, args);
                 ria.__SYNTAX && ria.__SYNTAX.checkReturn(ria.dom.Dom, instance);
                 return instance;
             },
 
             function $(dom_) {
-                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF], dom_);
+                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, NodeList], dom_);
                 this._dom = [global];
 
                 if ('string' === typeof dom_) {
@@ -74,6 +77,8 @@ NAMESPACE('ria.dom', function () {
                     this._dom = dom_;
                 } else if (dom_ instanceof Node) {
                     this._dom = [dom_];
+                } else if (dom_ instanceof NodeList) {
+                    this._dom = ria.__API.clone(dom_);
                 } else if (dom_ instanceof SELF) {
                     this._dom = dom_.valueOf();
                 }
@@ -217,6 +222,18 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            [[SELF]],
+            Boolean, function areEquals(el){
+                var val1 = this.valueOf(), val2 = el.valueOf(), len = val1.length;
+                if(len != val2.valueOf().length)
+                    return false;
+                for(var i = 0; i < len; i++){
+                    if(val1[i] != val2[i])
+                        return false;
+                }
+                return true;
+            },
+
             // reference https://github.com/julienw/dollardom
 
             [[String]],
@@ -263,6 +280,9 @@ NAMESPACE('ria.dom', function () {
             Number, function height() {
                 return this._dom[0] ? this._dom[0].getBoundingClientRect().height : null;
             },
+            Number, function width() {
+                return this._dom[0] ? this._dom[0].getBoundingClientRect().width : null;
+            },
             [[String]],
             SELF, function next(selector_) {},
             [[String]],
@@ -274,7 +294,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             Boolean, function is(selector) {
                 return this._dom.some(function (el) {
-                    return __is(el, selector);
+                    return __is.call(el, selector);
                 });
             },
             [[Object]],
@@ -295,20 +315,52 @@ NAMESPACE('ria.dom', function () {
                 });
             },
 
+            Object, function getValue() {
+                return this.valueOf()[0].value;
+            },
+            [[Object]],
+            SELF, function setValue(value) {
+                this.valueOf()[0].value = value;
+                return this;
+            },
+            [[Object]],
+            SELF, function setFormValues(values) {
+                for(var valueName in values){
+                    if(values.hasOwnProperty(valueName)){
+                        this.find('[name="' + valueName + '"]').setValue(values[valueName]);
+                    }
+                }
+                return this;
+            },
+            [[String]],
+            SELF, function triggerEvent(event) {
+                var node = this.valueOf()[0];
+                if ( document.createEvent ) {
+                    var evt = document.createEvent('Event');
+                    evt.initEvent('submit', true, false);
+                    node.dispatchEvent(evt);
+                } else if( document.createEventObject ) {
+                    node.fireEvent('onsubmit') ;
+                } else if (typeof node.onsubmit == 'function' ) {
+                    node.onsubmit();
+                }
+                return this;
+            },
+
             /* attributes */
 
             Object, function getAllAttrs() {},
             [[String]],
             Object, function getAttr(name) {
                 var node = this._dom[0];
-                return node ? node.getAttribute(HTML_ATTRS[name] || name) : null;
+                return node ? node.getAttribute(name) : null;
             },
             [[Object]],
             SELF, function setAllAttrs(obj) {},
             [[String, Object]],
             SELF, function setAttr(name, value) {
                 var node = this._dom[0];
-                node ? node.setAttribute(HTML_ATTRS[name] || name, value) : null;
+                node ? node.setAttribute(name, value) : null;
                 return this;
             },
 
@@ -362,7 +414,13 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             Object, function getCss(property) {},
             [[String, Object]],
-            VOID, function setCss(property, value) {},
+            SELF, function setCss(property, value) {
+                for(var i=0; i < this._dom.length; i++){
+                    this._dom[i].style[property] = value + 'px';
+                }
+
+                return this;
+            },
             [[Object]],
             SELF, function updateCss(props) {},
 
@@ -394,7 +452,15 @@ NAMESPACE('ria.dom', function () {
             }
         ]);
 
-    var DomImpl = ria.dom.Dom;
+    /** @class ria.dom.SimpleDom */
+    CLASS(
+        'SimpleDom', EXTENDS(ria.dom.Dom), [
+            function $(dom_) {
+                dom_ ? BASE(dom_) : BASE();
+            }
+        ]);
+
+    var DomImpl = ria.dom.SimpleDom;
 
     ria.dom.setDomImpl = function (impl) {
         DomImpl = impl;
