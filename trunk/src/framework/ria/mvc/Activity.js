@@ -126,13 +126,28 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onResume_() {},
             VOID, function onPause_() {},
             VOID, function onStop_() {},
-            [[Object]],
-            VOID, function onModelReady_(data) {},
+            [[String]],
+            VOID, function onModelWait_(msg_) {},
+            [[Object, String]],
+            VOID, function onModelProgress_(data, msg_) {},
+            [[Object, String]],
+            VOID, function onModelError_(data, msg_) {},
+            [[Object, String]],
+            VOID, function onModelReady_(data, msg_) {},
+            [[String]],
+            VOID, function onModelComplete_(msg_) {},
             [[Object]],
             VOID, function onRender_(data) {},
+            [[Object, String]],
+            VOID, function onPartialRender_(data, msg_) {},
             [[Object]],
             VOID, function onRefresh_(data) {
                 this._onRefresh.nofity([this, data]);
+            },
+            [[Object]],
+            VOID, function onPartialRefresh_(data) {
+                var me = this;
+                this._onRefresh.forEach(function (_) { _(me, data); });
             },
 
             VOID, function onDispose_() {
