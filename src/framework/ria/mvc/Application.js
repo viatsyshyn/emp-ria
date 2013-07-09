@@ -64,6 +64,11 @@ NAMESPACE('ria.mvc', function () {
             return context;
         },
 
+        [[HashChangeEvent]],
+        VOID, function onHashChanged_(event) {
+            this.dispatch(event.newUrl);
+        },
+
         SELF, function session(obj) {
             var session = this.context.getSession();
             for(var key in obj) if (obj.hasOwnProperty(key)) {
@@ -92,6 +97,10 @@ NAMESPACE('ria.mvc', function () {
                     return me.onStart_();
                 })
                 .then(function() {
+                    me.onResume_();
+                    return null;
+                })
+                .then(function() {
                     me.dispatch();
                     return null;
                 })
@@ -100,20 +109,29 @@ NAMESPACE('ria.mvc', function () {
                 });
         },
 
-        VOID, function dispatch() {
-            var state = this.serializer.deserialize('');
+        [[String]],
+        VOID, function dispatch(route_) {
+            var state = this.serializer.deserialize(route_ || window.location.hash.substr(1));
             state.setPublic(true);
             this._dispatcher.dispatch(state, this.context);
         },
 
         ria.async.Future, function onInitialize_() {
+            window.addEventListener("hashchange", this.onHashChanged_, false);
+            //window.addEventListener("beforeunload", this.onBeforeUnload_, false);
+            //window.addEventListener("pagehide", this.onStop_, false); !?!?!?
+            //window.addEventListener("unload", this.onDispose_, false);
+
+            //window.addEventListener("activate", this.onResume_, false);
+            //window.addEventListener("unload", this.onDispose_, false);
+
             return ria.async.DeferredAction();
         },
-        ria.async.Future, function onStart_() {
-            return ria.async.DeferredAction();
-        },
-        ria.async.Future, function onStop_() {
-            return ria.async.DeferredAction();
-        }
+
+        ria.async.Future, function onStart_() { return ria.async.DeferredAction(); },
+        VOID, function onResume_() {},
+        VOID, function onPause_() {},
+        VOID, function onStop_() { return ria.async.DeferredAction(); },
+        VOID, function onDispose_() {}
     ]);
 });
