@@ -1,6 +1,5 @@
 REQUIRE('ria.mvc.IActivity');
 
-REQUIRE('ria.async.Future');
 REQUIRE('ria.async.Observable');
 
 NAMESPACE('ria.mvc', function () {
@@ -83,22 +82,22 @@ NAMESPACE('ria.mvc', function () {
             ria.async.Future, function getModelEvents_(msg_) {
                 var me = this;
                 return new ria.async.Future()
-                    .progress(function(progress) { me.onModelProgress(progress, msg_); })
+                    .handleProgress(function(progress) { me.onModelProgress(progress, msg_); })
                     .complete(function () { me.onModelComplete_(msg_); })
                     .catchError(function (error) {
                         me.onModelError(progress, msg_);
                         this.RETHROW(error);
                     })
-                    .next(function (data) { me.onModelReady_(model, msg_); })
-            }
+                    .then(function (model) { me.onModelReady_(model, msg_); return model })
+            },
 
             [[ria.async.Future]],
             ria.async.Future, function refreshD(future) {
                 var me = this;
                 return future
                     .attach(this.getModelEvents_())
-                    .next(function (data) { me.onRender_(model); return data; })
-                    .next(function (data) { me.onRefresh_(model); return data; })
+                    .then(function (model) { me.onRender_(model); return model; })
+                    .then(function (model) { me.onRefresh_(model); return model; })
             },
 
             [[ria.async.Future, String]],
@@ -107,8 +106,8 @@ NAMESPACE('ria.mvc', function () {
                 var me = this;
                 return future
                     .attach(this.getModelEvents_(msg))
-                    .next(function (data) { me.onPartialRender_(model, msg); return data; })
-                    .next(function (data) { me.onPartialRefresh_(model, msg); return data; })
+                    .then(function (model) { me.onPartialRender_(model, msg); return model; })
+                    .then(function (model) { me.onPartialRefresh_(model, msg); return model; })
             },
 
             /** @deprecated */
@@ -142,12 +141,11 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onPartialRender_(data, msg_) {},
             [[Object]],
             VOID, function onRefresh_(data) {
-                this._onRefresh.nofity([this, data]);
+                this._onRefresh.notifyAndClear([this, data]);
             },
-            [[Object]],
-            VOID, function onPartialRefresh_(data) {
-                var me = this;
-                this._onRefresh.forEach(function (_) { _(me, data); });
+            [[Object, String]],
+            VOID, function onPartialRefresh_(data, msg_) {
+                this._onRefresh.notifyAndClear([this, data, msg_]);
             },
 
             VOID, function onDispose_() {
@@ -155,7 +153,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             VOID, function close() {
-                this._onClose.nofity([this]);
+                this._onClose.notifyAndClear([this]);
             },
 
             /**

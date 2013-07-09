@@ -11,14 +11,26 @@ NAMESPACE('ria.mvc', function () {
             /**
              * Push Activity over current and stop current
              */
-            [ria.mvc.IActivity],
+            [[ria.mvc.IActivity]],
             VOID, function push(activity) {},
+
+            /**
+             * Push Activity over current and stop current
+             */
+            [[ria.mvc.IActivity, ria.async.Future]],
+            VOID, function pushD(activity, data) {},
 
             /**
              * Shade current with new Activity (background current)
              */
-            [ria.mvc.IActivity],
+            [[ria.mvc.IActivity]],
             VOID, function shade(activity) {},
+
+            /**
+             * Shade current with new Activity (background current)
+             */
+            [[ria.mvc.IActivity, ria.async.Future]],
+            VOID, function shadeD(activity, data) {},
 
             /**
              * Shade current with new Activity and callback on pop (background current)
@@ -30,6 +42,9 @@ NAMESPACE('ria.mvc', function () {
              * Pop current Activity and foreground previous
              */
             ria.mvc.IActivity, function pop() {},
+
+            [[Function, ria.async.Future]],
+            VOID, function updateD(activityClass, data) {},
 
             /**
              * Return active Activity
