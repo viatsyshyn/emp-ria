@@ -2,6 +2,8 @@ REQUIRE('ria.mvc.MvcException');
 
 REQUIRE('ria.mvc.IView');
 
+REQUIRE('ria.async.Observable');
+
 REQUIRE('ria.reflection.ReflectionFactory');
 
 NAMESPACE('ria.mvc', function () {
@@ -15,7 +17,7 @@ NAMESPACE('ria.mvc', function () {
             function $() {
                 BASE();
                 this._stack = [];
-                this._refreshEvents = [];
+                this._refreshEvents = new ria.async.Observable();
             },
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
@@ -52,6 +54,12 @@ NAMESPACE('ria.mvc', function () {
                 return this._stack.shift() || null;
             },
 
+            [[ria.mvc.IActivity, ria.async.Future]],
+            VOID, function pushD(activity, data) {
+                this.push(activity);
+                activity.refreshD(data);
+            },
+
             /**
              * Push activity at the top of stack and hide previous
              * @param {ria.mvc.Activity} activity
@@ -67,6 +75,12 @@ NAMESPACE('ria.mvc', function () {
                 }
 
                 this.push_(activity);
+            },
+
+            [[ria.mvc.IActivity, ria.async.Future]],
+            VOID, function shadeD(activity, data) {
+                this.shade(activity);
+                activity.refreshD(data);
             },
 
             /**
@@ -105,6 +119,14 @@ NAMESPACE('ria.mvc', function () {
                 return pop;
             },
 
+            [[Function, ria.async.Future]],
+            VOID, function updateD(activityClass, data) {
+                this._stack.forEach(function (_) {
+                    if (_ instanceof activityClass)
+                        _.partialRefreshD(data);
+                })
+            },
+
             /**
              * Return current top of stack
              * @return {ria.mvc.Activity}
@@ -125,15 +147,14 @@ NAMESPACE('ria.mvc', function () {
                 return this._stack.slice();
             },
 
-            [[ria.mvc.IActivity, Object]],
-            VOID, function onActivityRefreshed_(activity, model) {
-                this._refreshEvents.forEach(function (_) { _(activity, model); });
-                this._refreshEvents = [];
+            [[ria.mvc.IActivity, Object, String]],
+            VOID, function onActivityRefreshed_(activity, model, msg_) {
+                this._refreshEvents.notifyAndClear([activity, model, msg_]);
             },
 
             [[ria.mvc.ActivityRefreshedEvent]],
             VOID, function onActivityRefreshed(callback) {
-                this._refreshEvents.push(callback);
+                this._refreshEvents.on(callback);
             }
         ]);
 });

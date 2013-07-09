@@ -138,6 +138,29 @@ NAMESPACE('ria.mvc', function () {
                     return ;
 
                 this.postDispatchAction_();
+            },
+
+            [[String, String, Array]],
+            function Redirect(controller, action, arg_) {},
+
+            [[String, String, Array]],
+            function Forward(controller, action, arg_) {},
+
+            [[Function, ria.async.Future]],
+            function PushView(clazz, data) {
+                var instance = new clazz();
+                this.view.pushD(instance, data);
+            },
+
+            [[Function, ria.async.Future]],
+            function ShadeView(clazz, data) {
+                var instance = new clazz();
+                this.view.shadeD(instance, data);
+            },
+
+            [[Function, ria.async.Future, String]],
+            function UpdateView(clazz, data, msg_) {
+                this.view.updateD(clazz, data, msg_ || '');
             }
         ]);
 });

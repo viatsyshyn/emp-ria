@@ -1,3 +1,5 @@
+REQUIRE('ria.async.Future');
+
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
@@ -61,6 +63,12 @@ NAMESPACE('ria.mvc', function () {
 
         [[Object]],
         VOID, function refresh(model) {},
+
+        [[ria.async.Future]],
+        VOID, function refreshD(model) {},
+
+        [[ria.async.Future]],
+        VOID, function partialRefreshD(model) {},
 
         /**
          * Configure Refresh Event

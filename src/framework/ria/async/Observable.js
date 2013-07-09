@@ -31,7 +31,7 @@ NAMESPACE('ria.async', function () {
                 return this;
             },
 
-            [[Object]],
+            [[Array]],
             VOID, function notify(data_) {
                 var me = this;
                 this._handlers
@@ -39,7 +39,7 @@ NAMESPACE('ria.async', function () {
                         ria.__API.defer(me, function (handler) {
                             var result = true;
                             try {
-                                result = handler(data_);
+                                result = handler.apply(undefined, data_ || []);
                             } catch (e) {
                                 throw new Exception('Unhandled error occurred while notifying observer', e);
                             } finally {
@@ -48,12 +48,20 @@ NAMESPACE('ria.async', function () {
                             }
                         }, [handler]);
                     });
+            },
 
-                this._handlers = [];
+            [[Array]],
+            VOID, function notifyAndClear(data_) {
+                this.notify(data_);
+                this.clear();
             },
 
             Number, function count() {
                 return this._handlers.length;
+            },
+
+            VOID, function clear() {
+                this._handlers = [];
             }
         ]);
 });
