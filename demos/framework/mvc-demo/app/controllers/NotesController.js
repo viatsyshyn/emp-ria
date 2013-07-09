@@ -52,6 +52,7 @@ NAMESPACE('app.controllers', function () {
             function indexAction() {
                 var result = this.service
                     .getNotes()
+                    //.then(function (data) { return ria.async.DeferredData(data, 10000)})
                     .attach(this.validateResponse_());
 
                 /* Put activity in stack and render when result is ready */

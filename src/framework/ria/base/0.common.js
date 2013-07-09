@@ -175,7 +175,7 @@ ria.__API = ria.__API || {};
      * @param {Function} method
      * @param {Array} [args_]
      */
-    ria.__API.defer = function defer(scope, method, args_) {
-        setTimeout(function () { method.apply(scope, args_ || []); }, 1);
+    ria.__API.defer = function defer(scope, method, args_, delay_) {
+        setTimeout(function () { method.apply(scope, args_ || []); }, delay_ || 1);
     };
 })();
