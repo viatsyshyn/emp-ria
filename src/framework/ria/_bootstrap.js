@@ -26,6 +26,10 @@ var _RELEASE = false;
         }
     }
 
+    var siteRoot = ria.__CFG["#require"].siteRoot;
+    if (siteRoot === undefined) {
+        siteRoot = window.location.toString().split(window.location.pathname).shift();
+    }
     var appDir = "";
     var root = ria.__CFG["#require"].appRoot;
     if (root === undefined) {
@@ -38,6 +42,7 @@ var _RELEASE = false;
 
     // configuring ria.require.js
     ria.__CFG["#require"].appRoot = root;
+    ria.__CFG["#require"].siteRoot = siteRoot;
     ria.__CFG["#require"].appCodeDir = appDir;
     var libs = ria.__CFG["#require"].libs = ria.__CFG["#require"].libs || {};
 

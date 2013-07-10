@@ -103,7 +103,7 @@ NAMESPACE('ria.async', function () {
             VOID, function updateProgress_(data) {
                 ria.__API.defer(this, function () {
                     try {
-                        this.onProgress && this.onProgress();
+                        this.onProgress && this.onProgress(data);
                     } finally {
                         this.doCallNext_('updateProgress_', data);
                     }
