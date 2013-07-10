@@ -63,7 +63,7 @@ NAMESPACE('ria.ajax', function () {
             [[Object]],
             SELF, function params(obj) {
                 var p = this._params;
-                for(var key in obj) if (obj.hasOwnProperty(key)) {
+                for(var key in obj) if (obj.hasOwnProperty(key) && (obj[key] != undefined) && (obj[key] != null)) {
                     p[key] = obj[key];
                 }
                 return this;
