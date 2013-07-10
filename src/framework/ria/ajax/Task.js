@@ -84,7 +84,7 @@ NAMESPACE('ria.ajax', function () {
             FINAL, String, function getParamsAsQueryString_() {
                 var p = this._params, r = [];
                 for(var key in p) if (p.hasOwnProperty(key)) {
-                    r.push([key, p[key].map(encodeURIComponent).join('=')]);
+                    r.push([key, p[key]].map(encodeURIComponent).join('='));
                 }
                 return r.join('&');
             },
