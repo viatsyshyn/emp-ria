@@ -90,7 +90,7 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function updateProgress_(oEvent) {
-                this._completer.progress(event);
+                this._completer.progress(oEvent);
             },
 
             VOID, function transferComplete_(evt) {
