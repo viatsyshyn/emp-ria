@@ -81,7 +81,8 @@ NAMESPACE('ria.mvc', function () {
 
             ria.async.Future, function getModelEvents_(msg_) {
                 var me = this;
-                return new ria.async.Future()
+                var head = new ria.async.Future();
+                head
                     .handleProgress(function(progress) { me.onModelProgress(progress, msg_); })
                     .complete(function () { me.onModelComplete_(msg_); })
                     .catchError(function (error) {
@@ -89,6 +90,8 @@ NAMESPACE('ria.mvc', function () {
                         this.RETHROW(error);
                     })
                     .then(function (model) { me.onModelReady_(model, msg_); return model })
+
+                return head;
             },
 
             [[ria.async.Future]],
