@@ -89,7 +89,7 @@ NAMESPACE('ria.mvc', function () {
                     })
                     .complete(function () { me.onModelComplete_(msg_); })
                     .catchError(function (error) {
-                        me.onModelError_(progress, msg_);
+                        me.onModelError_(error, msg_);
                         this.RETHROW(error);
                     })
                     .then(function (model) { me.onModelReady_(model, msg_); return model })
