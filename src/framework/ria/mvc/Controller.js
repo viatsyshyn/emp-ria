@@ -121,11 +121,11 @@ NAMESPACE('ria.mvc', function () {
 
                 var min = actionRef.getRequiredArguments().length;
                 if (min > c)
-                    throw new ria.mvc.MvcException('Method ' + method.getName() + ' requires at least ' + min + ' arguments.');
+                    throw new ria.mvc.MvcException('Method ' + actionRef.getName() + ' requires at least ' + min + ' arguments.');
 
                 var max = actionRef.getArguments().length;
                 if (max < c)
-                    throw new ria.mvc.MvcException('Method ' + method.getName() + ' requires at most ' + max + ' arguments.');
+                    throw new ria.mvc.MvcException('Method ' + actionRef.getName() + ' requires at most ' + max + ' arguments.');
             },
 
             [[Array, ria.reflection.ReflectionMethod]],
