@@ -3,7 +3,7 @@ REQUIRE('ria.mvc.Activity');
 REQUIRE('ria.dom.Dom');
 REQUIRE('ria.mvc.DomEventBind');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
 
@@ -26,7 +26,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             VOID, function processAnnotations_() {
-                var ref = ria.reflection.ReflectionFactory(this.getClass());
+                var ref = new ria.reflection.ReflectionClass(this.getClass());
                 if (!ref.isAnnotatedWith(ria.mvc.DomAppendTo))
                     throw new ria.mvc.MvcException('ria.mvc.DomActivity expects annotation ria.mvc.DomAppendTo');
 

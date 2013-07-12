@@ -3,7 +3,7 @@ REQUIRE('ria.async.Future');
 
 REQUIRE('ria.serialize.JsonSerializer');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -96,7 +96,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.State]],
             VOID, function callAction_(state) {
-                var ref = ria.reflection.ReflectionFactory(this.getClass()),
+                var ref = new ria.reflection.ReflectionClass(this.getClass()),
                     action = toCamelCase(state.getAction()) + 'Action',
                     all = ref.getMethodsReflector(),
                     params = state.getParams();

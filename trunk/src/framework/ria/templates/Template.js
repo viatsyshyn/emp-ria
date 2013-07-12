@@ -2,7 +2,7 @@ REQUIRE('ria.templates.Exception');
 REQUIRE('ria.templates.ConverterFactories');
 REQUIRE('ria.dom.Dom');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 /** @namespace hwax.templates */
 NAMESPACE('ria.templates', function () {
@@ -44,7 +44,7 @@ NAMESPACE('ria.templates', function () {
             },
 
             VOID, function bind_() {
-                var self = ria.reflection.ReflectionFactory(this.getClass());
+                var self = ria.reflection.ReflectionClass(this.getClass());
 
                 // Bind template
                 if (!self.isAnnotatedWith(ria.templates.TemplateBind))
@@ -65,7 +65,7 @@ NAMESPACE('ria.templates', function () {
                 if (!ria.__API.isClassConstructor(this._modelClass))
                     return ;
 
-                var model = ria.reflection.ReflectionFactory(this._modelClass);
+                var model = ria.reflection.ReflectionClass(this._modelClass);
 
                 var selfProperties = self.getPropertiesReflector(),
                     bindings = this._bindings;
@@ -81,7 +81,7 @@ NAMESPACE('ria.templates', function () {
 
                         var converter = modelBind.converter_;
                         if (converter !== undefined) {
-                            var ref = ria.reflection.ReflectionFactory(converter.converter);
+                            var ref = ria.reflection.ReflectionClass(converter.converter);
                             if (!ref.implementsIfc(ria.templates.IConverter))
                                 throw new ria.templates.Exception('Converter class ' + ref.getName() + ' expected to implement '
                                     + ria.__API.getIdentifierOfType(ria.templates.IConverter));
@@ -141,7 +141,7 @@ NAMESPACE('ria.templates', function () {
                 }
                 delete options.collectionIndex;
 
-                var ref = ria.reflection.ReflectionFactory(this.getClass()), scope = this;
+                var ref = ria.reflection.ReflectionClass(this.getClass()), scope = this;
                 var handled = {};
                 options = ria.__API.clone(options);
                 ref.getPropertiesReflector()

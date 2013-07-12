@@ -7,7 +7,7 @@
  * @fileoverview MVC Application basis
  */
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 REQUIRE('ria.mvc.MvcException');
 

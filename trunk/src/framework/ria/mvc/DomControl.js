@@ -2,7 +2,7 @@ REQUIRE('ria.mvc.Control');
 REQUIRE('ria.dom.Dom');
 REQUIRE('ria.mvc.DomEventBind');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -32,7 +32,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             VOID, function bind_() {
-                var ref = ria.reflection.ReflectionFactory(this.getClass());
+                var ref = new ria.reflection.ReflectionClass(this.getClass());
 
                 this._domEvents = ref.getMethodsReflector()
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.DomEventBind)})

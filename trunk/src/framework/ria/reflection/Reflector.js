@@ -9,13 +9,6 @@ NS('ria.reflection', function () {
     CLASS(
         ABSTRACT, 'Reflector', [
 
-            SELF, function getCached(clazz, value) {
-                if (ria.reflection.ReflectionFactory)
-                    return ria.reflection.ReflectionFactory(value, clazz);
-
-                return new clazz(value);
-            },
-
             ABSTRACT, Array, function getAnnotations() {},
 
             Boolean, function isAnnotatedWith(ann) {
