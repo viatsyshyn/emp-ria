@@ -9,7 +9,7 @@ REQUIRE('ria.mvc.Control');
 REQUIRE('ria.async.Future');
 REQUIRE('ria.async.wait');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -91,7 +91,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ria.async.Future, function loadControllers() {
-                return this.loadControllers_(ria.reflection.ReflectionFactory(ria.mvc.Controller));
+                return this.loadControllers_(new ria.reflection.ReflectionClass(ria.mvc.Controller));
             },
 
             [[ria.reflection.ReflectionClass]],
@@ -115,7 +115,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ria.async.Future, function loadControls() {
-                return this.loadControl_(ria.reflection.ReflectionFactory(ria.mvc.Control));
+                return this.loadControl_(new ria.reflection.ReflectionClass(ria.mvc.Control));
             },
 
             [[ria.mvc.IContext]],
@@ -128,7 +128,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[Function, ria.mvc.IContext]],
             Object, function getCached_(type, context) {
-                var ref = ria.reflection.ReflectionFactory(type);
+                var ref = new ria.reflection.ReflectionClass(type);
                 var name = ref.getName();
 
                 if (this.cache.hasOwnProperty(name)) {

@@ -1,4 +1,4 @@
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 REQUIRE('ria.serialize.Exception');
 REQUIRE('ria.serialize.SerializeProperty');
@@ -67,7 +67,7 @@ NAMESPACE('ria.serialize', function () {
                 if (raw === null || raw === undefined)
                     return null;
 
-                var ref = ria.reflection.ReflectionFactory(clazz);
+                var ref = new ria.reflection.ReflectionClass(clazz);
                 value = ref.instantiate();
 
                 if (ref.implementsIfc(ria.serialize.IDeserializable)) {

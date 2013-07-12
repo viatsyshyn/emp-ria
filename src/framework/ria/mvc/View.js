@@ -4,7 +4,7 @@ REQUIRE('ria.mvc.IView');
 
 REQUIRE('ria.async.Observable');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
     "use strict";
@@ -22,8 +22,8 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
             Boolean, function isSameActivityGroup_(a1, a2) {
-                var ref1 = ria.reflection.ReflectionFactory(a1.getClass());
-                var ref2 = ria.reflection.ReflectionFactory(a2.getClass());
+                var ref1 = new ria.reflection.ReflectionClass(a1.getClass());
+                var ref2 = new ria.reflection.ReflectionClass(a2.getClass());
                 var v1 = ref1.findAnnotation(ria.mvc.ActivityGroup)[0];
                 var v2 = ref2.findAnnotation(ria.mvc.ActivityGroup)[0];
                 return v1 != null && v2 != null && v1.name == v2.name;

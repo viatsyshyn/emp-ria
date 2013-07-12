@@ -1,7 +1,7 @@
 REQUIRE('ria.templates.Exception');
 REQUIRE('ria.templates.IConverterFactory');
 
-REQUIRE('ria.reflection.ReflectionFactory');
+REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.templates', function () {
 

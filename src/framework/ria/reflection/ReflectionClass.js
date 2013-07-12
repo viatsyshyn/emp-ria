@@ -51,14 +51,14 @@ NS('ria.reflection', function () {
 
             SELF, function getBaseClassReflector() {
                 var base = this.getBaseClass();
-                return base ? this.getCached(SELF, base) : null;
+                return base ? new SELF(base) : null;
             },
 
             ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
 
             ArrayOf(ria.reflection.ReflectionInterface), function getInterfacesReflector() {
                 return this.getInterfaces()
-                    .map(function (_) { return this.getCached(ria.reflection.ReflectionInterface, _); }.bind(this));
+                    .map(function (_) { return new ria.reflection.ReflectionInterface(_); }.bind(this));
             },
 
             ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
@@ -94,7 +94,7 @@ NS('ria.reflection', function () {
 
             ArrayOf(SELF), function getChildrenReflector() {
                 return this.getChildren()
-                    .map(function (_) { return this.getCached(SELF, _);}.bind(this))
+                    .map(function (_) { return new SELF(_);}.bind(this))
             },
 
             ria.reflection.ReflectionCtor, function getCtorReflector() {
@@ -113,7 +113,7 @@ NS('ria.reflection', function () {
 
             ArrayOf(SELF), function getParentsReflector() {
                 return this.getParents()
-                    .map(function (_) { return this.getCached(SELF, _)}.bind(this));
+                    .map(function (_) { return new SELF(_)}.bind(this));
             },
 
             Boolean, function extendsClass(parent) {

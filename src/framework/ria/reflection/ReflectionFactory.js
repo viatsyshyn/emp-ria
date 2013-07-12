@@ -6,6 +6,8 @@ NAMESPACE('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionFactory */
     ria.reflection.ReflectionFactory = function (clazz, reflector) {
+        console && console.warn && console.warn('ria.reflection.ReflectionFactory is deprecated. Please use ' + ria.__API.getIdentifierOfType(reflector));
+
         if (reflector == undefined)
             reflector = ria.reflection.ReflectionClass;
 
