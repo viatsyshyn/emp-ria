@@ -49,31 +49,31 @@ NAMESPACE('ria.async', function () {
                 this._canceler && this._canceler.cancel();
             },
 
-            [[ria.async.FutureDataDelegate]],
-            SELF, function then(handler) {
-                this._onData = handler;
+            [[ria.async.FutureDataDelegate, Object]],
+            SELF, function then(handler, scope_) {
+                this._onData = handler.bind(scope_);
                 return this.attach(new SELF);
             },
 
-            [[ria.async.FutureProgressDelegate]],
-            SELF, function handleProgress(handler) {
-                this._onProgress = handler;
+            [[ria.async.FutureProgressDelegate, Object]],
+            SELF, function handleProgress(handler, scope_) {
+                this._onProgress = handler.bind(scope_);
                 return this.attach(new SELF);
             },
 
-            [[ria.async.FutureErrorDelegate]],
-            SELF, function catchError(handler) {
-                this._onError = handler;
+            [[ria.async.FutureErrorDelegate, Object]],
+            SELF, function catchError(handler, scope_) {
+                this._onError = handler.bind(scope_);
                 return this.attach(new SELF);
             },
 
             // ClassOf(Exception)
-            [[Function, ria.async.FutureErrorDelegate]],
-            SELF, function catchException(exception, handler) {
+            [[Function, ria.async.FutureErrorDelegate, Object]],
+            SELF, function catchException(exception, handler, scope_) {
                 var me = this;
                 this._onError = function (error) {
                     if (error instanceof exception)
-                        return handler.call(me, error);
+                        return handler.call(scope_, error);
 
                     throw error;
                 };
@@ -81,9 +81,9 @@ NAMESPACE('ria.async', function () {
                 return this.attach(new SELF);
             },
 
-            [[ria.async.FutureCompleteDelegate]],
-            SELF, function complete(handler) {
-                this._onComplete = handler;
+            [[ria.async.FutureCompleteDelegate, Object]],
+            SELF, function complete(handler, scope_) {
+                this._onComplete = handler.bind(scope_);
                 return this.attach(new SELF);
             },
 
