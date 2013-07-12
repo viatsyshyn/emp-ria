@@ -123,7 +123,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function updateD(activityClass, data, msg_) {
                 this._stack.forEach(function (_) {
                     if (_ instanceof activityClass)
-                        _.partialRefreshD(data);
+                        _.partialRefreshD(data, msg_);
                 })
             },
 
