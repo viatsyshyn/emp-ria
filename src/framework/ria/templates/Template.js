@@ -97,6 +97,10 @@ NAMESPACE('ria.templates', function () {
                     });
             },
 
+            Function, function getModelClass() {
+                return this._modelClass;
+            },
+
             VOID, function assign(model) {
 
                 if (ria.__API.isArrayOfDescriptor(this._modelClass) && !Array.isArray(model)) {
