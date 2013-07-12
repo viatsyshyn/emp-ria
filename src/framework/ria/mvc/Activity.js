@@ -85,12 +85,11 @@ NAMESPACE('ria.mvc', function () {
                 head
                     .handleProgress(function(progress) {
                         me.onModelProgress_(progress, msg_);
-
                     })
                     .complete(function () { me.onModelComplete_(msg_); })
                     .catchError(function (error) {
                         me.onModelError_(error, msg_);
-                        this.RETHROW(error);
+                        throw error;
                     })
                     .then(function (model) { me.onModelReady_(model, msg_); return model })
 
