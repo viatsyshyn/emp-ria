@@ -38,11 +38,11 @@ NAMESPACE('app.controllers', function () {
                         return data;
                     })
                     .catchException(app.services.DataException, function (error) {
-                        this.BREAK(); // failed with exception, stop further processing
-
                         console.error(error.toString());
                         // todo: scoping !?
                         //me.view.showAlertBox(error.getMessage());
+
+                        return ria.async.BREAK;
                     });
 
                 return head;

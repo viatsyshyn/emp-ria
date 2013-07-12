@@ -4,7 +4,12 @@ NAMESPACE('ria.async', function () {
     "use strict";
 
     function DefaultDataHanlder(data) { return data; }
-    function DefaultErrorHandler(e) { this.RETHROW(e); }
+    function DefaultErrorHandler(e) { throw e; }
+
+    function FutureBreaker() {}
+
+    ria.async.BREAK = new FutureBreaker();
+    Object.defineProperty(ria.async, 'BREAK', { writable: false, configurable: false, enumerable: true });
 
     /** @class ria.async.FutureDataDelegate */
     DELEGATE(
@@ -31,35 +36,34 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
-                this.canceler = canceler_;
-                this.next = null;
+                this._canceler = canceler_;
+                this._next = null;
 
-                this.onData = null;
-                this.onProgress = null;
-                this.onError = null;
-                this.onComplete = null;
-                this.broke = false;
+                this._onData = null;
+                this._onProgress = null;
+                this._onError = null;
+                this._onComplete = null;
             },
 
             VOID, function cancel() {
-                this.canceler && this.canceler.cancel();
+                this._canceler && this._canceler.cancel();
             },
 
             [[ria.async.FutureDataDelegate]],
             SELF, function then(handler) {
-                this.onData = handler;
+                this._onData = handler;
                 return this.attach(new SELF);
             },
 
             [[ria.async.FutureProgressDelegate]],
             SELF, function handleProgress(handler) {
-                this.onProgress = handler;
+                this._onProgress = handler;
                 return this.attach(new SELF);
             },
 
             [[ria.async.FutureErrorDelegate]],
             SELF, function catchError(handler) {
-                this.onError = handler;
+                this._onError = handler;
                 return this.attach(new SELF);
             },
 
@@ -67,11 +71,11 @@ NAMESPACE('ria.async', function () {
             [[Function, ria.async.FutureErrorDelegate]],
             SELF, function catchException(exception, handler) {
                 var me = this;
-                this.onError = function (error) {
+                this._onError = function (error) {
                     if (error instanceof exception)
                         return handler.call(me, error);
 
-                    this.RETHROW(error);
+                    throw error;
                 };
 
                 return this.attach(new SELF);
@@ -79,23 +83,15 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.FutureCompleteDelegate]],
             SELF, function complete(handler) {
-                this.onComplete = handler;
+                this._onComplete = handler;
                 return this.attach(new SELF);
-            },
-
-            VOID, function BREAK() {
-                this.broke = true;
-            },
-
-            VOID, function RETHROW(e) {
-                throw e; //Exception('Unhandled deferred error', e);
             },
 
             [[String, Object]],
             function doCallNext_(method, arg_) {
-                if (!this.next) return ;
+                if (!this._next) return ;
 
-                var next_protected = (this.next.__PROTECTED || this.next); // this is hack
+                var next_protected = (this._next.__PROTECTED || this._next); // this is hack
                 var args = []; arg_ !== undefined && args.push(arg_);
                 return next_protected[method].apply(next_protected, args);
             },
@@ -103,7 +99,7 @@ NAMESPACE('ria.async', function () {
             VOID, function updateProgress_(data) {
                 ria.__API.defer(this, function () {
                     try {
-                        this.onProgress && this.onProgress(data);
+                        this._onProgress && this._onProgress(data);
                     } finally {
                         this.doCallNext_('updateProgress_', data);
                     }
@@ -113,8 +109,8 @@ NAMESPACE('ria.async', function () {
             VOID, function complete_(data) {
                 ria.__API.defer(this, function () {
                     try {
-                        var result = (this.onData || DefaultDataHanlder).call(this, data);
-                        if (this.broke) {
+                        var result = (this._onData || DefaultDataHanlder).call(this, data);
+                        if (result === ria.async.BREAK) {
                             this.doCallNext_('completeBreak_');
                         } else if (result instanceof ria.async.Future) {
                             this.attach(result);
@@ -124,23 +120,23 @@ NAMESPACE('ria.async', function () {
                     } catch (e) {
                         this.doCallNext_('completeError_', e);
                     } finally {
-                        this.onComplete && this.onComplete();
+                        this._onComplete && this._onComplete();
                     }
                 });
             },
 
             VOID, function completeError_(error) {
-                if (!this.next)
-                    this.RETHROW(error);
+                if (!this._next)
+                    throw error;
 
                 ria.__API.defer(this, function () {
                     try {
-                        var result = (this.onError || DefaultErrorHandler).call(this, error);
+                        var result = (this._onError || DefaultErrorHandler).call(this, error);
                         this.doCallNext_('complete_', result === undefined ? null : result);
                     } catch (e) {
                         this.doCallNext_('completeError_', e);
                     } finally {
-                        this.onComplete && this.onComplete();
+                        this._onComplete && this._onComplete();
                     }
                 });
             },
@@ -148,7 +144,7 @@ NAMESPACE('ria.async', function () {
             VOID, function completeBreak_() {
                 ria.__API.defer(this, function () {
                     try {
-                        this.onComplete && this.onComplete();
+                        this._onComplete && this._onComplete();
                     } finally {
                         this.doCallNext_('completeBreak_');
                     }
@@ -157,22 +153,22 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             VOID, function setCanceler_(canceler) {
-                this.canceler = canceler;
+                this._canceler = canceler;
             },
 
             [[SELF]],
             SELF, function attach(future) {
-                var old_next = this.next;
-                this.next = future;
+                var old_next = this._next;
+                this._next = future;
                 this.doCallNext_('setCanceler_', this);
                 return this.attachEnd_(old_next || null);
             },
 
             [[SELF]],
             SELF, function attachEnd_(future) {
-                return this.next
+                return this._next
                     ? this.doCallNext_('attachEnd_', future)
-                    : (future ? (this.next = future) : this);
+                    : (future ? (this._next = future) : this);
             }
         ]);
 

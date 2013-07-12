@@ -104,7 +104,7 @@
                         return data + 1
                     }))
                     .then(function (data) {
-                        this.BREAK();
+                        return ria.async.BREAK;
                     })
                     .complete(callbacks.noop())
                     .catchError(function (error) {
