@@ -89,6 +89,14 @@ NAMESPACE('ria.ajax', function () {
                 return r.join('&');
             },
 
+            FINAL, String, function getParamsString_(){
+                var p = this._params, r = [];
+                for(var key in p) if (p.hasOwnProperty(key)) {
+                    r.push([key, p[key]].join('='));
+                }
+                return r.join('&');
+            },
+
             VOID, function updateProgress_(oEvent) {
                 this._completer.progress(oEvent);
             },
@@ -98,7 +106,7 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function transferFailed_(evt) {
-                this._completer.completeError(evt);
+                this._completer.completeError(Error(evt));
             },
 
             VOID, function transferCanceled_(evt) {
@@ -113,13 +121,18 @@ NAMESPACE('ria.ajax', function () {
             },
 
             String, function getBody_() {
-                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : '';
+                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : this.getParamsString_();
             },
 
             FINAL, OVERRIDE, VOID, function do_() {
                 try {
                     BASE();
                     this._xhr.open(this._method.valueOf(), this.getUrl_(), true);
+                    if (this._method != ria.ajax.Method.GET){
+                        if (this._params){
+                            this._xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        }
+                    }
                     this._xhr.send(this.getBody_());
                 } catch (e) {
                     this._completer.completeError(e);

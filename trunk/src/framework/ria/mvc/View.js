@@ -119,8 +119,8 @@ NAMESPACE('ria.mvc', function () {
                 return pop;
             },
 
-            [[Function, ria.async.Future]],
-            VOID, function updateD(activityClass, data) {
+            [[Function, ria.async.Future, String]],
+            VOID, function updateD(activityClass, data, msg_) {
                 this._stack.forEach(function (_) {
                     if (_ instanceof activityClass)
                         _.partialRefreshD(data);
