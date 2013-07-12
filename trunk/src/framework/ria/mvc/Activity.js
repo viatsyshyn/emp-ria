@@ -146,11 +146,11 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onPartialRender_(data, msg_) {},
             [[Object]],
             VOID, function onRefresh_(data) {
-                this._onRefresh.notifyAndClear([this, data]);
+                this._onRefresh.notify([this, data]);
             },
             [[Object, String]],
             VOID, function onPartialRefresh_(data, msg_) {
-                this._onRefresh.notifyAndClear([this, data, msg_]);
+                this._onRefresh.notify([this, data, msg_]);
             },
 
             VOID, function onDispose_() {

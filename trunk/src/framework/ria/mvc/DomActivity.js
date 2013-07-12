@@ -7,6 +7,14 @@ REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
 
+    var MODEL_WAIT_CLASS = 'activity-model-wait';
+
+    function camel2dashed(_) {
+        return _.replace(/[a-z][A-Z]/g, function(str, offset) {
+           return str[0] + '-' + str[1].toLowerCase();
+        });
+    }
+
     /** @class ria.mvc.DomAppendTo */
     ANNOTATION(
         [[String]],
@@ -20,13 +28,16 @@ NAMESPACE('ria.mvc', function () {
             function $() {
                 BASE();
 
+                this._actitivyClass = null;
                 this._domAppendTo = null;
                 this._domEvents = [];
-                this.processAnnotations_();
+                this.processAnnotations_(new ria.reflection.ReflectionClass(this.getClass()));
             },
 
-            VOID, function processAnnotations_() {
-                var ref = new ria.reflection.ReflectionClass(this.getClass());
+            [[ria.reflection.ReflectionClass]],
+            VOID, function processAnnotations_(ref) {
+                this._actitivyClass = camel2dashed(ref.getShortName());
+
                 if (!ref.isAnnotatedWith(ria.mvc.DomAppendTo))
                     throw new ria.mvc.MvcException('ria.mvc.DomActivity expects annotation ria.mvc.DomAppendTo');
 
@@ -52,7 +63,7 @@ NAMESPACE('ria.mvc', function () {
             OVERRIDE, VOID, function onCreate_() {
                 BASE();
 
-                var dom = this.dom = this.onDomCreate_().appendTo(this._domAppendTo);
+                var dom = this.dom = this.onDomCreate_().appendTo(this._domAppendTo).addClass(this._actitivyClass);
 
                 var instance = this;
                 this._domEvents.forEach(function (_) {
@@ -60,6 +71,11 @@ NAMESPACE('ria.mvc', function () {
                         return _.methodRef.invokeOn(instance, ria.__API.clone(arguments));
                     });
                 })
-            }
+            },
+
+            [[String]],
+            OVERRIDE, VOID, function onModelWait_(msg_) { this.dom.addClass(MODEL_WAIT_CLASS); },
+            [[String]],
+            OVERRIDE, VOID, function onModelComplete_(msg_) { this.dom.removeClass(MODEL_WAIT_CLASS); },
         ]);
 });

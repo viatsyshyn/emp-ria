@@ -6,7 +6,7 @@ REQUIRE('app.templates.Note');
 
 NAMESPACE('app.templates', function () {
 
-    /** @class app.templates.Note */
+    /** @class app.templates.Notes */
     CLASS(
         [ria.templates.TemplateBind('~/assets/jade/activities/notes.jade')],
         [ria.templates.ModelBind(app.model.PaginatedList)],
