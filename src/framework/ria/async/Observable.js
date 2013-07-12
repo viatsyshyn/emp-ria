@@ -17,43 +17,48 @@ NAMESPACE('ria.async', function () {
                 this._handlers = [];
             },
 
-            [[ria.async.Observer]],
-            ria.async.IObservable, function on(handler) {
+            [[ria.async.Observer, Object]],
+            ria.async.IObservable, function on(handler, scope_) {
                 this.off(handler);
-                this._handlers.push(handler);
+                this._handlers.push([handler, scope_]);
                 return this;
             },
 
             [[ria.async.Observer]],
             ria.async.IObservable, function off(handler) {
                 this._handlers = this._handlers
-                    .filter(function (_) { return handler !== _});
+                    .filter(function (_) { return handler[0] !== _});
                 return this;
             },
 
-            [[Array]],
-            VOID, function notify(data_) {
+            [[Array, Boolean]],
+            VOID, function notify_(data, once) {
                 var me = this;
-                this._handlers
-                    .forEach(function (handler) {
-                        ria.__API.defer(me, function (handler) {
-                            var result = true;
-                            try {
-                                result = handler.apply(undefined, data_ || []);
-                            } catch (e) {
-                                throw new Exception('Unhandled error occurred while notifying observer', e);
-                            } finally {
-                                if (result !== false)
-                                    this._handlers.push(handler);
-                            }
-                        }, [handler]);
-                    });
+                this._handlers.forEach(function (_) {
+                    ria.__API.defer(me, function (handler, scope) {
+                        var result = true;
+                        try {
+                            result = handler.apply(scope, data);
+                        } catch (e) {
+                            throw new Exception('Unhandled error occurred while notifying observer', e);
+                        } finally {
+                            if (!once && result !== false)
+                                this._handlers.push(_);
+                        }
+                    }, _);
+                });
+
+                this._handlers = [];
+            },
+
+            [[Array, Boolean]],
+            VOID, function notify(data_, once_) {
+                this.notify_(data_ || [], false);
             },
 
             [[Array]],
             VOID, function notifyAndClear(data_) {
-                this.notify(data_);
-                this.clear();
+                this.notify_(data_ || [], true);
             },
 
             Number, function count() {

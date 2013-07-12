@@ -16,8 +16,8 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.IObservable */
     INTERFACE(
         'IObservable', [
-            [[ria.async.Observer]],
-            SELF, function on(handler) {},
+            [[ria.async.Observer, Object]],
+            SELF, function on(handler, scope_) {},
 
             [[ria.async.Observer]],
             SELF, function off(handler) {}
