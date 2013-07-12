@@ -66,10 +66,13 @@ NAMESPACE('app.controllers', function () {
                 var result = this.service
                     .getNotes()
                     //.then(function (data) { return ria.async.DeferredData(data, 10000)})
-                    .attach(this.validateResponse_());
+                    .attach(this.validateResponse_())
+                    .then(function (data) {
+                        return data.getItems()[0]
+                    });
 
                 /* Put activity in stack and render when result is ready */
-                return this.UpdateView(app.activities.Notes, result);
+                return this.UpdateView(app.activities.Notes, result, 'append');
             }
         ]);
 })
