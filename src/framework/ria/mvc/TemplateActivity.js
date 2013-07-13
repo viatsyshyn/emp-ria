@@ -39,7 +39,7 @@ NAMESPACE('ria.mvc', function () {
                 if (!Array.isArray(tpls))
                     tpls = [tpls];
 
-                if (tpls.some(function (_) { _ === undefined; }))
+                if (tpls.some(function (_) { return _ === undefined; }))
                     throw new ria.mvc.MvcException(ref.getName() + " is annotated with ria.mvc.TemplateBind"
                         + ', but some templates classes appears to be not loaded: ['
                         + tpls.map(function (_) { return ria.__API.getIdentifierOfType(_); }) + ']');
