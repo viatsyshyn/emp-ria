@@ -71,6 +71,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             return impl();
         }
 
+        // TODO: handle ImplementerOf(SELF)
+
         var methods = def.methods.map(
             /**
              * @param {MethodDescriptor} method

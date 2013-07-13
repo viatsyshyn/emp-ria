@@ -126,7 +126,7 @@ NAMESPACE('ria.mvc', function () {
                 })
             },
 
-            [[Function, ria.mvc.IContext]],
+            [[ClassOf(Class), ria.mvc.IContext]],
             Object, function getCached_(type, context) {
                 var ref = new ria.reflection.ReflectionClass(type);
                 var name = ref.getName();

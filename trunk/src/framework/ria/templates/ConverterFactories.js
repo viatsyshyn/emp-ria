@@ -31,13 +31,13 @@ NAMESPACE('ria.templates', function () {
                 delete this._map[factory.getHashCode()];
             },
 
-            [[Function]],
+            [[ImplementerOf(ria.templates.IConverter)]],
             ria.templates.IConverter, function create(converterClass) {
                 var name = ria.__API.getIdentifierOfType(converterClass);
                 if (this._cache.hasOwnProperty(name))
                     return this._cache[name];
 
-                for (var key in this._map) {
+                for (var key in this._map) if(this._map.hasOwnProperty(key)) {
                     var factory = this._map[key];
                     if (factory.canCreate(converterClass))
                         return this._cache[name] = factory.create(converterClass);

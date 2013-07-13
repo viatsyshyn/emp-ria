@@ -206,6 +206,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             method.retType = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ArrayOf(ClassProxy));
         }
 
+        if (method.retType
+            && method.retType.value instanceof ria.__API.ClassOfDescriptor
+            && method.retType.value.clazz == ria.__SYNTAX.Modifiers.SELF) {
+            method.retType = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(ClassProxy));
+        }
+
         method.argsTypes.forEach(function (t, index) {
             if (method.argsTypes[index] instanceof ria.__SYNTAX.Tokenizer.SelfToken)
                 method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
@@ -214,6 +220,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     && method.argsTypes[index].value instanceof ria.__API.ArrayOfDescriptor
                     && method.argsTypes[index].value.clazz == ria.__SYNTAX.Modifiers.SELF) {
                 method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ArrayOf(ClassProxy));
+            }
+
+            if (method.argsTypes[index]
+                && method.argsTypes[index].value instanceof ria.__API.ClassOfDescriptor
+                && method.argsTypes[index].value.clazz == ria.__SYNTAX.Modifiers.SELF) {
+                method.argsTypes[index] = new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(ClassProxy));
             }
         });
 
@@ -261,6 +273,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (property.type instanceof ria.__SYNTAX.Tokenizer.SelfToken) {
             property.type = new ria.__SYNTAX.Tokenizer.RefToken(ClassProxy);
         }
+
+        // TODO: handle ArrayOf(SELF) and ClassOf(SELF)
 
         var getter = getterDef ? getterDef.body : getDefaultGetter(property.name, getterName);
         ClassProxy.prototype[getterName] = getter.value;

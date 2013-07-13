@@ -9,13 +9,14 @@ NAMESPACE('app.templates', function () {
         [ria.templates.TemplateBind('~/assets/jade/activities/note.jade')],
         [ria.templates.ModelBind(app.model.Note)],
         'Note', EXTENDS(app.templates.JadeTemplate), [
-            [ria.templates.ModelBind],
+
+            [ria.templates.ModelPropertyBind],
             app.model.NoteId, 'id',
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             String, 'title',
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             String, 'description',
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             Date, 'date',
 
             Boolean, 'renderLink'

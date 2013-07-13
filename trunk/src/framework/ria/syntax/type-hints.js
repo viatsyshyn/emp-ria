@@ -4,6 +4,8 @@
 (function () {
     "use strict";
 
+
+
     function checkDelegate(value, type) {
         return true;
     }
@@ -24,10 +26,6 @@
             case 'number': return type === Number;
             case 'string': return type === String;
             case 'boolean': return type === Boolean;
-            case 'function':
-                return ria.__API.isDelegate(type)
-                    ? checkDelegate(value, type)
-                    : type === Function;
 
             default:
                 if ( value === Boolean
@@ -38,8 +36,25 @@
                     return value == type;
                 }
 
-                if (ria.__API.isInterface(type))
-                    return 'object' === typeof value;
+                if (ria.__API.isDelegate(type))
+                    return checkDelegate(value, type);
+
+                if (type === Function)
+                    return 'function' === typeof value;
+
+                if (type === ria.__API.Interface) {
+                    return value === ria.__API.Interface || ria.__API.isInterface(value);
+                }
+
+                if (ria.__API.isInterface(type)) {
+                    if (ria.__API.isInterface(value))
+                        return value === type;
+
+                    if (!(value instanceof ria.__API.Class))
+                        return false;
+
+                    return ria.__API.getConstructorOf(value).__META.ifcs.indexOf(type.valueOf()) >= 0;
+                }
 
                 if (ria.__API.isArrayOfDescriptor(type)) {
                     if (ria.__API.isArrayOfDescriptor(value))
@@ -56,12 +71,29 @@
                     return true;
                 }
 
-                // check is type is Interface
-                if (ria.__API.isInterface(type)) {
-                    if (ria.__API.isInterface(value))
-                        return type.__META == value.__META;
+                if (ria.__API.isClassOfDescriptor(type)) {
+                    if (ria.__API.isClassOfDescriptor(value))
+                        return type.valueOf() == value.valueOf();
 
-                    return type.implementedBy(value);
+                    var v = value;
+                    while (v) {
+                        if (v === type.valueOf())
+                            return true;
+
+                        v = v.__META.base;
+                    }
+
+                    return false;
+                }
+
+                if (ria.__API.isImplementerOfDescriptor(type)) {
+                    if (ria.__API.isImplementerOfDescriptor(value))
+                        return type.valueOf() == value.valueOf();
+
+                    if (!ria.__API.isClassConstructor(value))
+                        return false;
+
+                    return value.__META.ifcs.indexOf(type.valueOf()) >= 0;
                 }
 
                 return value === type || value instanceof type;

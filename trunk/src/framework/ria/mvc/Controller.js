@@ -172,19 +172,19 @@ NAMESPACE('ria.mvc', function () {
             [[String, String, Array]],
             function Forward(controller, action, arg_) {},
 
-            [[Function, ria.async.Future]],
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             function PushView(clazz, data) {
                 var instance = new clazz();
                 this.view.pushD(instance, data);
             },
 
-            [[Function, ria.async.Future]],
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             function ShadeView(clazz, data) {
                 var instance = new clazz();
                 this.view.shadeD(instance, data);
             },
 
-            [[Function, ria.async.Future, String]],
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             function UpdateView(clazz, data, msg_) {
                 this.view.updateD(clazz, data, msg_ || '');
             }

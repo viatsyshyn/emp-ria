@@ -12,7 +12,7 @@ NAMESPACE('ria.async', function () {
 
     /** @class ria.async.Observable */
     CLASS(
-        'Observable', [
+        'Observable', IMPLEMENTS(ria.async.IObservable), [
             function $() {
                 this._handlers = [];
             },
