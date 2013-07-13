@@ -20,8 +20,8 @@
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
   * ~~[ArrayOf]~~
-  * [ClassOf]
-  * [ImplementorOf]
+  * ~~[ClassOf]~~
+  * ~~[ImplementorOf]~~
 
 == Fix ==
 
