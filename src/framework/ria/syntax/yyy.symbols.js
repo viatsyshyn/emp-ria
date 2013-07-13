@@ -9,6 +9,7 @@ var FINAL = ria.__SYNTAX.Modifiers.FINAL;
 var READONLY = ria.__SYNTAX.Modifiers.READONLY;
 
 var Class = ria.__API.Class;
+var Interface = ria.__API.Interface;
 var Exception = ria.__API.Exception;
 
 /** @type {Function} */
@@ -43,4 +44,8 @@ window.VALIDATE_ARG = ria.__SYNTAX.checkArg;
 window.VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
 /** @type {Function} */
 window.ArrayOf = ria.__API.ArrayOf;
+/** @type {Function} */
+window.ClassOf = ria.__API.ClassOf;
+/** @type {Function} */
+window.ImplementerOf = ria.__API.ImplementerOf;
 

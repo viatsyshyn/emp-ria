@@ -8,10 +8,10 @@ NS('ria.reflection', function () {
     /** @class ria.reflection.ReflectionInterface */
     CLASS(
         FINAL, 'ReflectionInterface', EXTENDS(ria.reflection.Reflector), [
-            READONLY, Function, 'ifc',
+            READONLY, Interface, 'ifc',
 
+            [[Interface]],
             function $(ifc) {
-                VALIDATE_ARG('clazz', [ria.__API.InterfaceDescriptor], ifc.__META);
                 this.ifc = ifc;
             },
 

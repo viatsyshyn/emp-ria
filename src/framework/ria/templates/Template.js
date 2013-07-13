@@ -15,17 +15,23 @@ NAMESPACE('ria.templates', function () {
 
     /**
      * @class ria.templates.ModelBind
-     * @param {String} name
-     * @param {Function} converter_
      */
     ANNOTATION(
-        function ModelBind(name_, converter_) {});
+        function ModelBind(model) {});
+
+    /**
+     * @class ria.templates.ModelPropertyBind
+     */
+    ANNOTATION(
+        [[String, ImplementerOf(ria.templates.IConverter)]],
+        function ModelPropertyBind(name_, converter_) {});
 
     /**
      * @class ria.templates.TemplateBind
      * @param {String} tpl
      */
     ANNOTATION(
+        [[String]],
         function TemplateBind(tpl) {});
 
     /** @class ria.templates.Template */
@@ -58,7 +64,7 @@ NAMESPACE('ria.templates', function () {
                     throw new ria.templates.Exception('Template class is not bound to model. Please use '
                         + ria.__API.getIdentifierOfType(ria.templates.ModelBind));
 
-                this._modelClass = self.findAnnotation(ria.templates.ModelBind).pop().name_;
+                this._modelClass = self.findAnnotation(ria.templates.ModelBind).pop().model;
                 if (this._modelClass === undefined)
                     throw new ria.templates.Exception('Template class is bound to model. But model not loaded');
 
@@ -71,9 +77,9 @@ NAMESPACE('ria.templates', function () {
                     bindings = this._bindings;
 
                 selfProperties
-                    .filter(function (_) { return _.isAnnotatedWith(ria.templates.ModelBind); })
+                    .filter(function (_) { return _.isAnnotatedWith(ria.templates.ModelPropertyBind); })
                     .forEach(function (property) {
-                        var modelBind = property.findAnnotation(ria.templates.ModelBind).pop();
+                        var modelBind = property.findAnnotation(ria.templates.ModelPropertyBind).pop();
                         var modelPropertyName = modelBind.name_ || property.getShortName();
                         var modelProperty = model.getPropertyReflector(modelPropertyName);
                         if (modelProperty == null)
@@ -97,7 +103,7 @@ NAMESPACE('ria.templates', function () {
                     });
             },
 
-            Function, function getModelClass() {
+            ClassOf(Class), function getModelClass() {
                 return this._modelClass;
             },
 
@@ -194,7 +200,7 @@ NAMESPACE('ria.templates', function () {
                 return tpl;
             },
 
-            [[Object, Function, Object]],
+            [[Object, ClassOf(SELF), Object]],
             String, function renderWith(data, tplClass, options_) {
                 var tpl = this.getInstanceOfTemplate_(tplClass, options_ || {});
 
@@ -213,7 +219,7 @@ NAMESPACE('ria.templates', function () {
                 return tpl.flushBuffer();
             },
 
-            [[Object, Function]],
+            [[Object, ImplementerOf(ria.templates.IConverter)]],
             Object, function convertWith(value, clazz) {
                 return ria.templates.ConverterFactories.create(clazz).convert(clazz);
             },

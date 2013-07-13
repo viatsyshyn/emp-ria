@@ -7,11 +7,11 @@ NS('ria.reflection', function () {
     /** @class ria.reflection.ReflectionCtor */
     CLASS(FINAL,
         'ReflectionCtor', EXTENDS(ria.reflection.Reflector), [
-            READONLY, Function, 'clazz',
+            READONLY, ClassOf(Class), 'clazz',
             READONLY, String, 'name',
 
+            [[ClassOf(Class)]],
             function $(clazz) {
-                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
 
                 this.method = clazz.__META.ctor;

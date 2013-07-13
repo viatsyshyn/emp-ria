@@ -11,14 +11,14 @@ NAMESPACE('app.templates', function () {
         [ria.templates.TemplateBind('~/assets/jade/activities/notes.jade')],
         [ria.templates.ModelBind(app.model.PaginatedList)],
         'Notes', EXTENDS(app.templates.JadeTemplate), [
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             ArrayOf(app.model.Note), 'items',
 
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             Number, 'count',
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             Number, 'pageSize',
-            [ria.templates.ModelBind],
+            [ria.templates.ModelPropertyBind],
             Number, 'page'
         ])
 });

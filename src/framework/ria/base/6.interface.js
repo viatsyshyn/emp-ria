@@ -41,6 +41,8 @@
         ifc.__META = new InterfaceDescriptor(name, methods);
     };
 
+    ria.__API.Interface = new (function Interface() {});
+
     ria.__API.isInterface = function (ifc) {
         return ifc.__META instanceof InterfaceDescriptor;
     };

@@ -7,13 +7,12 @@ NS('ria.reflection', function () {
     /** @class ria.reflection.ReflectionProperty */
     CLASS(
         FINAL, 'ReflectionProperty', EXTENDS(ria.reflection.Reflector), [
-            READONLY, Function, 'clazz',
+            READONLY, ClassOf(Class), 'clazz',
             READONLY, String, 'name',
 
+            [[ClassOf(Class), String]],
             function $(clazz, name) {
-                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
-
                 this.property = clazz.__META.properties[name];
                 this.name = name;
             },

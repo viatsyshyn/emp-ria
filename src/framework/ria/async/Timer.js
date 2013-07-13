@@ -38,7 +38,7 @@ NAMESPACE('ria.async', function () {
             */
 
             /*
-            [[Function, Array, Object]],
+            [[ria.async.TimerDelegate, Array, Object]],
             STATIC, VOID, function run(handler, args_, scope_) {
                 ria.__API.defer(scope_ || window, handler, args_ || []);
             }

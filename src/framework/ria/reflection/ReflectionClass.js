@@ -33,10 +33,10 @@ NS('ria.reflection', function () {
                 return cache[name] = new ria.__API.init(instance, Clazz, ctor, args);
             },
 
-            READONLY, Function, 'clazz',
+            READONLY, ClassOf(Class), 'clazz',
 
+            [[ClassOf(Class)]],
             function $(clazz) {
-                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
             },
 
@@ -47,14 +47,14 @@ NS('ria.reflection', function () {
             //Boolean, function isFinal() { return this.clazz.__META.flags.isFinal; },
 
             OVERRIDE, Array, function getAnnotations() { return this.clazz.__META.anns; },
-            Function, function getBaseClass() { return this.clazz.__META.base || null; },
+            ClassOf(Class), function getBaseClass() { return this.clazz.__META.base || null; },
 
             SELF, function getBaseClassReflector() {
                 var base = this.getBaseClass();
                 return base ? new SELF(base) : null;
             },
 
-            ArrayOf(Function), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
+            ArrayOf(Interface), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
 
             ArrayOf(ria.reflection.ReflectionInterface), function getInterfacesReflector() {
                 return this.getInterfaces()
@@ -88,7 +88,7 @@ NS('ria.reflection', function () {
             },
 
             // TODO: fast way to get children
-            ArrayOf(Function), function getChildren() {
+            ArrayOf(ClassOf(Class)), function getChildren() {
                 return this.clazz.__META.children.slice();
             },
 
@@ -101,7 +101,7 @@ NS('ria.reflection', function () {
                 return new ria.reflection.ReflectionCtor(this.clazz);
             },
 
-            ArrayOf(Function), function getParents() {
+            ArrayOf(ClassOf(Class)), function getParents() {
                 var parents = [];
                 var root = this.getBaseClass();
                 while (root != null) {

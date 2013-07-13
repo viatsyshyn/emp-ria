@@ -67,8 +67,7 @@ NAMESPACE('ria.async', function () {
                 return this.attach(new SELF);
             },
 
-            // ClassOf(Exception)
-            [[Function, ria.async.FutureErrorDelegate, Object]],
+            [[ClassOf(Exception), ria.async.FutureErrorDelegate, Object]],
             SELF, function catchException(exception, handler, scope_) {
                 var me = this;
                 this._onError = function (error) {

@@ -6,6 +6,7 @@ NAMESPACE('ria.mvc', function () {
 
     /** @class ria.mvc.TemplateBind */
     ANNOTATION(
+        [[ClassOf(ria.templates.Template)]],
         function TemplateBind(tpl) {});
 
     /** @class ria.mvc.PartialUpdateRuleActions */
@@ -17,7 +18,7 @@ NAMESPACE('ria.mvc', function () {
 
     /** @class ria.mvc.PartialUpdateRule */
     ANNOTATION(
-        [[Function, String, String, ria.mvc.PartialUpdateRuleActions]],
+        [[ClassOf(ria.templates.Template), String, String, ria.mvc.PartialUpdateRuleActions]],
         function PartialUpdateRule(tpl, msg_, selector_, action_) {});
 
     /** @class ria.mvc.TemplateActivity */

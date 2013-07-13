@@ -43,7 +43,7 @@ NAMESPACE('ria.mvc', function () {
              */
             ria.mvc.IActivity, function pop() {},
 
-            [[Function, ria.async.Future]],
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             VOID, function updateD(activityClass, data) {},
 
             /**

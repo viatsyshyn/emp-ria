@@ -93,7 +93,7 @@ ria.__API = ria.__API || {};
         if (type === Array) return 'Array';
         if (type === Object) return 'Object';
 
-        if (ria.__API.isArrayOfDescriptor(type))
+        if (ria.__API.isArrayOfDescriptor(type) || ria.__API.isClassOfDescriptor(type) || ria.__API.isImplementerOfDescriptor(type))
             return type.toString();
 
         if (type.__META)

@@ -7,13 +7,12 @@ NS('ria.reflection', function () {
     /** @class ria.reflection.ReflectionMethod */
     CLASS(
         FINAL, 'ReflectionMethod', EXTENDS(ria.reflection.Reflector), [
-            READONLY, Function, 'clazz',
+            READONLY, ClassOf(Class), 'clazz',
             READONLY, String, 'name',
 
+            [[ClassOf(Class), String]],
             function $(clazz, name) {
-                VALIDATE_ARG('clazz', [ria.__API.ClassDescriptor], clazz.__META);
                 this.clazz = clazz;
-
                 this.method = clazz.__META.methods[name];
                 this.name = name;
             },

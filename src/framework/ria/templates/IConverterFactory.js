@@ -6,10 +6,10 @@ NAMESPACE('ria.templates', function () {
     /** @class ria.templates.IConverterFactory */
     INTERFACE(
         'IConverterFactory', [
-            [[Function]],
+            [[ImplementerOf(ria.templates.IConverter)]],
             Boolean, function canCreate(converterClass) {},
 
-            [[Function]],
+            [[ImplementerOf(ria.templates.IConverter)]],
             ria.templates.IConverter, function create(converterClass) {}
         ]);
 });

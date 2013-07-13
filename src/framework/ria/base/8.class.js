@@ -218,7 +218,7 @@
         ria.__API.clazz(Class, 'Class', null, [], []);
 
         Class.prototype.$ = function () {
-            this.hashCode = Math.random().toString(36);
+            this.__hashCode = Math.random().toString(36);
             _DEBUG && Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
         };
         ria.__API.ctor(Class, Class.prototype.$, [], [], []);
@@ -226,7 +226,7 @@
         Class.prototype.getClass = function () { return ria.__API.getConstructorOf(this); };
         ria.__API.method(Class, Class.prototype.getClass, 'getClass', Function, [], [], []);
 
-        Class.prototype.getHashCode = function () { return this.hashCode; };
+        Class.prototype.getHashCode = function () { return this.__hashCode; };
         ria.__API.method(Class, Class.prototype.getHashCode, 'getHashCode', String, [], [], []);
 
         Class.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
