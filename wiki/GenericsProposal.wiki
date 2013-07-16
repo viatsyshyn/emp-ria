@@ -15,40 +15,47 @@ Generic class
 
 DELEGATE(
   GENERIC('T'),
-  [T, T],
+  [[T, T]],
   Boolean, function Comparator(_1, _2) {});
 
+// Map<TKey, TValue>
+CLASS(
+  GENERIC('TKey', 'TValue'),
+  'MyBaseMap', [
+     [[T, T]],
+     ABSTRACT, T, function (t1, t2)
+  ]);
+
 INTERFACE(
-  GENERIC('T', EXTENDS(MyBaseParam)),
+  GENERIC('T', EXTENDS(MyBase)), // may interfaces be GENERIC ?
   'MyIfc', [
      T, 'param' // not a property, but a shortcut ?
   ]);
 
+// Dictionary<T>
 CLASS(
-  GENERIC('T'),
-  'MyGenericClass', 
-      EXTENDS(SPECIFY(MyBase, T, Number)), // MyBase<T1,T2> is generic also
-      IMPLEMENTS(SPECIFY(MyIfc, T)), [ 
+  GENERIC('TValue'),
+  'MyDictionary', 
+      EXTENDS(MyBase.OF(String, TValue)),
+      IMPLEMENTS(MyIfc.OF(SELF)), [ 
 
     T, 'param',
 
-    [T],
+    [[T]],
     function $(param) {},
 
-    [T, T],
+    [[T, T]],
     T, function add(_1, _2) { return _1 + _2; },
 
-    READONLY, SPECIFY(Comparator, T), 'comparator'
+    READONLY, Comparator.OF(T), 'comparator'
   ]);
 }}}
-
-TODO: required a good syntax for specialization of generics in type hints
 
 Instantiation
 
 {{{
-var instance = MyGenericClass(1); // Generalized version, equivalent to specification with Object
-var instance2 = SPECIFY(MyGenericClass, Number)(1); // specified with Number
+// first one arg is generalization of generic MyGenericClass<T>
+var instance = MyGenericClass(Number, 1); // specified with Number
 }}}
 
 Generics typing is check only in DEBUG mode. Generics typing is available via reflection
