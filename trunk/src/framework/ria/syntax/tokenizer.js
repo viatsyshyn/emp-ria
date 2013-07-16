@@ -63,7 +63,7 @@
         var body = fn.toString().substring(8);
         var start = body.indexOf('(');
         var params = body.substring(start + 1, body.indexOf(')', start));
-        return params.length > 0 ? params.replace(/ /g, '').split(',') : [];
+        return params.length > 0 ? params.replace(/\s+/g, '').split(',') : [];
     }
 
     var Modifiers = function () {

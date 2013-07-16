@@ -15,11 +15,12 @@ NAMESPACE('ria.async', function () {
 
     /** @class ria.async.IObservable */
     INTERFACE(
+        //TEMPLATE('T')
         'IObservable', [
-            [[ria.async.Observer, Object]],
+            [[Function, Object]],
             SELF, function on(handler, scope_) {},
 
-            [[ria.async.Observer]],
+            [[Function]],
             SELF, function off(handler) {}
         ]);
 });

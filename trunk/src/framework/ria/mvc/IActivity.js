@@ -14,8 +14,8 @@ NAMESPACE('ria.mvc', function () {
 
     /** @class ria.mvc.ActivityRefreshedEvent */
     DELEGATE(
-        [[Object, Object]],
-        VOID, function ActivityRefreshedEvent(activity, model) {});
+        [[Object, Object, String]],
+        VOID, function ActivityRefreshedEvent(activity, model, msg_) {});
 
     /**
      * Base Activity Interface

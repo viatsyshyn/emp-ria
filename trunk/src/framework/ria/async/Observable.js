@@ -12,20 +12,26 @@ NAMESPACE('ria.async', function () {
 
     /** @class ria.async.Observable */
     CLASS(
+        //TEMPLATE('T'),
         'Observable', IMPLEMENTS(ria.async.IObservable), [
-            function $() {
+
+            [[Function]],
+            function $(T) {
+                this.T = T;
                 this._handlers = [];
             },
 
-            [[ria.async.Observer, Object]],
+            [[Function, Object]],
             ria.async.IObservable, function on(handler, scope_) {
+                VALIDATE_ARG('handler', this.T, handler);
                 this.off(handler);
                 this._handlers.push([handler, scope_]);
                 return this;
             },
 
-            [[ria.async.Observer]],
+            [[Function]],
             ria.async.IObservable, function off(handler) {
+                VALIDATE_ARG('handler', this.T, handler);
                 this._handlers = this._handlers
                     .filter(function (_) { return handler[0] !== _});
                 return this;
@@ -43,7 +49,7 @@ NAMESPACE('ria.async', function () {
                             throw new Exception('Unhandled error occurred while notifying observer', e);
                         } finally {
                             if (!once && result !== false)
-                                this._handlers.push(_);
+                                me._handlers.push(_);
                         }
                     }, _);
                 });
@@ -52,7 +58,7 @@ NAMESPACE('ria.async', function () {
             },
 
             [[Array, Boolean]],
-            VOID, function notify(data_, once_) {
+            VOID, function notify(data_) {
                 this.notify_(data_ || [], false);
             },
 

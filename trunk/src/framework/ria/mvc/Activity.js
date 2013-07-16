@@ -5,12 +5,6 @@ REQUIRE('ria.async.Observable');
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
-    function defer(fn, args_, scope_) {
-        setTimeout(function () {
-            fn.apply(scope_ || this, args_ || []);
-        }, 1);
-    }
-
     /**
      * Abstract Activity class
      * @class ria.mvc.Activity
@@ -23,8 +17,8 @@ NAMESPACE('ria.mvc', function () {
                 this._started = false;
                 this._paused = false;
                 this._stopped = false;
-                this._onClose = new ria.async.Observable();
-                this._onRefresh = new ria.async.Observable();
+                this._onClose = new ria.async.Observable(ria.mvc.ActivityClosedEvent);
+                this._onRefresh = new ria.async.Observable(ria.mvc.ActivityRefreshedEvent);
             },
 
             /**

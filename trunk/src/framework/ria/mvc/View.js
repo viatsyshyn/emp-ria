@@ -17,7 +17,7 @@ NAMESPACE('ria.mvc', function () {
             function $() {
                 BASE();
                 this._stack = [];
-                this._refreshEvents = new ria.async.Observable();
+                this._refreshEvents = new ria.async.Observable(ria.mvc.ActivityRefreshedEvent);
             },
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
