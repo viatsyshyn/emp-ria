@@ -4,9 +4,34 @@
 (function () {
     "use strict";
 
-
+    var IS_OPTIONAL = /^.+_$/;
 
     function checkDelegate(value, type) {
+        if ('function' !== typeof value)
+            return false;
+
+        var method = value.__META;
+        if (method) {
+            var delegate = type.__META;
+
+            try {
+                method.argsNames.forEach(function (name, index) {
+                    if (!IS_OPTIONAL.test(name)) {
+                        if (delegate.argsNames[index] == undefined) {
+                            throw new Exception('Lambda required arguments ' + name + ' that delegate does not supply');
+                        }
+                    }
+
+                    if (!checkTypeHint(method.argsTypes[index], delegate.argsTypes[index])) {
+                         throw new Exception('Lambda accepts ' + ria.__API.getIdentifierOfType(method.argsTypes[index]) + ' for argument ' + name
+                             + ', but delegate supplies ' + ria.__API.getIdentifierOfType(delegate.argsTypes[index]));
+                    }
+                });
+            } catch (e) {
+                throw new Exception('Delegate validation error', e);
+            }
+        }
+
         return true;
     }
 
@@ -108,7 +133,7 @@
      * @param {*} value
      */
     ria.__SYNTAX.checkArg = function (name, type, value) {
-        var isOptional = /^.+_$/.test(name);
+        var isOptional = IS_OPTIONAL.test(name);
         if (isOptional && value === undefined)
             return;
 
@@ -118,15 +143,20 @@
         if (!Array.isArray(type))
             type = [type];
 
+        var error;
         var t = type.slice();
         while (t.length > 0) {
             var t_ = t.pop();
-            if (checkTypeHint(value, t_))
-                return;
+            try {
+                if (checkTypeHint(value, t_))
+                    return;
+            } catch (e) {
+                error = e;
+            }
         }
 
-        throw Error('Argument ' + name + ' expected to be ' + type.map(ria.__API.getIdentifierOfType).join(' or ')
-            + ' but received ' + ria.__API.getIdentifierOfValue(value));
+        throw new Exception('Argument ' + name + ' expected to be ' + type.map(ria.__API.getIdentifierOfType).join(' or ')
+            + ' but received ' + ria.__API.getIdentifierOfValue(value), error);
     };
 
     /**
