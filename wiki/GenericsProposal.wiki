@@ -56,6 +56,7 @@ Instantiation
 {{{
 // first one arg is generalization of generic MyGenericClass<T>
 var instance = MyGenericClass(Number, 1); // specified with Number
+var instance = MyGenericClass.OF(Number)(1); // OR less "sweet"
 }}}
 
 Generics typing is check only in DEBUG mode. Generics typing is available via reflection
