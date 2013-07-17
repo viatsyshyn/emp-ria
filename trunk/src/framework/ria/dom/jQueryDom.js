@@ -120,6 +120,12 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            [[SELF]],
+            OVERRIDE, SELF, function remove(node) {
+                node._dom.remove();
+                return this;
+            },
+
             // reference https://github.com/julienw/dollardom
 
             [[String]],
