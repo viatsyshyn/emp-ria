@@ -76,6 +76,7 @@ NAMESPACE('ria.mvc', function () {
             ria.async.Future, function getModelEvents_(msg_) {
                 var me = this;
                 var head = new ria.async.Future();
+                me.onModelWait_(msg_);
                 head
                     .handleProgress(function(progress) {
                         me.onModelProgress_(progress, msg_);
@@ -137,7 +138,9 @@ NAMESPACE('ria.mvc', function () {
             [[Object]],
             VOID, function onRender_(data) {},
             [[Object, String]],
-            VOID, function onPartialRender_(data, msg_) {},
+            VOID, function onPartialRender_(data, msg_) {
+                this.dom.removeClass('loading');
+            },
             [[Object]],
             VOID, function onRefresh_(data) {
                 this._onRefresh.notify([this, data]);

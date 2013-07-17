@@ -22,6 +22,9 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         function Inject() {});
 
+
+
+
     function toCamelCase(str) {
         return str.replace(/(\-[a-z])/g, function($1){
             return $1.substring(1).toUpperCase();
@@ -94,18 +97,25 @@ NAMESPACE('ria.mvc', function () {
 
             VOID, function postDispatchAction_() {},
 
-            [[ria.mvc.State]],
-            VOID, function callAction_(state) {
-                var ref = new ria.reflection.ReflectionClass(this.getClass()),
-                    action = toCamelCase(state.getAction()) + 'Action',
-                    all = ref.getMethodsReflector(),
-                    params = state.getParams();
+
+
+            ria.reflection.ReflectionMethod, function resolveRoleAction_(state){
+                var ref = new ria.reflection.ReflectionClass(this.getClass());
+                var action = toCamelCase(state.getAction()) + 'Action';
 
                 var method = ref.getMethodReflector(action);
-                if (!method)
-                    throw new ria.mvc.MvcException('Controller ' + ref.getName() + ' has no method ' + action
-                        + ' for action ' + state.getAction());
 
+                if (!method)
+                        throw new ria.mvc.MvcException('Controller ' + ref.getName() + ' has no method ' + action
+                            + ' for action ' + state.getAction());
+
+                return method;
+            },
+
+            [[ria.mvc.State]],
+            VOID, function callAction_(state) {
+                var params = state.getParams();
+                var method = this.resolveRoleAction_(state);
                 this.validateActionCall_(method, params);
 
                 try {

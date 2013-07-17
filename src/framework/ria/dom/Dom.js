@@ -226,6 +226,14 @@ NAMESPACE('ria.dom', function () {
             },
 
             [[SELF]],
+            SELF, function remove(node) {
+                this.forEach(function(element){
+                    element.removeChild(node);
+                });
+                return this;
+            },
+
+            [[SELF]],
             Boolean, function areEquals(el){
                 var val1 = this.valueOf(), val2 = el.valueOf(), len = val1.length;
                 if(len != val2.valueOf().length)
