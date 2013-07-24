@@ -13,7 +13,7 @@ NAMESPACE('ria.dom', function () {
 
             [[String]],
             ria.dom.Dom, function setUrl(url) {
-                ria.dom.Dom('head link[rel=shortcut icon]').removeSelf();
+                ria.dom.Dom('head link[rel=~icon]').removeSelf();
 
                 return ria.dom.Dom()
                     .fromHTML('<link/>')
