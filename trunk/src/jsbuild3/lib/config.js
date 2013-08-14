@@ -35,6 +35,7 @@ function ModuleConfiguration(params, config) {
     this.outFile = params['out'];
     this.appDir = params.appDir ? PATH.resolve(config.getBasePath() + (params.appDir || 'app')) + '/' : null;
     this.assetDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetDir || 'assets')) + '/' : null;
+    this.libs = params.libs || {};
 }
 
 ModuleConfiguration.prototype = {
@@ -53,7 +54,9 @@ ModuleConfiguration.prototype = {
     /** @returns String */
     getAppDir: function () { return this.appDir; },
     /** @returns String */
-    getAssetDir: function () { return this.assetDir; }
+    getAssetDir: function () { return this.assetDir; },
+    /** @returns Object */
+    getLibs: function () { return this.libs; }
 };
 
 /**
@@ -67,6 +70,8 @@ function Configuration(config, path) {
 
     this.appDir = PATH.resolve(this.basePath + (config.appDir || 'app')) + '/';
     this.assetDir = PATH.resolve(this.basePath + (config.assetDir || 'assets')) + '/';
+
+    this.libs = config.libs || {};
 
     this.options = merge({}, config.options || {});
     this.moduleConfig = null;
@@ -83,6 +88,8 @@ Configuration.prototype = {
     getAppDir: function () { return this.moduleConfig.getAppDir() || this.appDir; },
     /** @returns String */
     getAssetDir: function () { return this.moduleConfig.getAssetDir() || this.assetDir; },
+    /** @returns Object */
+    getLibs: function () { return merge(merge({}, this.moduleConfig.getLibs()), this.libs); },
     /** @returns ModuleConfiguration[] */
     getModules: function () { return [].slice.call(this.modules); },
     /** @returns PluginConfiguration[] */

@@ -28,6 +28,16 @@ function load_global(file) {
     ([
         "../lib/jsbuild3.js",
         "../../framework/ria/base/0.common.js",
+        "../../framework/ria/base/5.annotations.js",
+        "../../framework/ria/base/5.delegates.js",
+        "../../framework/ria/base/5.enum.js",
+        "../../framework/ria/base/5.identifier.js",
+        "../../framework/ria/base/6.interface.js",
+        "../../framework/ria/base/8.class.js",
+        "../../framework/ria/base/9.arrayof.js",
+        "../../framework/ria/base/9.classof.js",
+        "../../framework/ria/base/9.exception.js",
+        "../../framework/ria/base/9.implementerof.js",
         "../../framework/ria/syntax/type-hints.js",
         "../lib/syntax/tokenizer.js",
         "../../framework/ria/syntax/parser2.js",
@@ -36,14 +46,16 @@ function load_global(file) {
         "../../framework/ria/syntax/delegate.js",
         "../../framework/ria/syntax/exception.js",
         "../../framework/ria/syntax/interface.js",
+        "../lib/syntax/common.js",
         "../lib/syntax/compiler.js",
         "../lib/syntax/ns.js",
         "../lib/syntax/identifier.js",
         "../lib/syntax/enum.js",
-        "../lib/syntax/delegate.js",
+        //"../lib/syntax/delegate.js",
         "../lib/syntax/annotation.js",
-        "../lib/syntax/interface.js",
-        "../lib/syntax/class.js"
+        //"../lib/syntax/interface.js",
+        //"../lib/syntax/class.js",
+        "../lib/require/deps.js"
         ])
     .map(function(file){
             return path.join(path.dirname(fs.realpathSync(__filename)), file);

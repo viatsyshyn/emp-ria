@@ -1,5 +1,7 @@
 "use strict";
 
+var _DEBUG = false;
+
 /**
  * @param {String} path
  * @param {CodeBlockDescriptor[]} deps
@@ -136,7 +138,7 @@ function loadModule(path, config, memoization) {
     });
 
     deps = deps.map(function (dep) {
-        return JsBuild.loadModule(dep, config, memoization);
+        return loadModule(dep, config, memoization);
     });
 
     return memoization[path] = new CodeBlockDescriptor(path, deps);
@@ -159,17 +161,40 @@ function compile(path, config) {
 
     astPreProcessors.forEach(function (processor) { topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor)); });
 
+    var currentBody = [].slice.call(topLevel.body);
+    topLevel = make_node(UglifyJS.AST_Toplevel, topLevel, {
+        body: [
+            make_node(UglifyJS.AST_SimpleStatement, null, {
+                body: make_node(UglifyJS.AST_Call, null, {
+                    expression: make_node(UglifyJS.AST_Function, null, {
+                        argnames: [],
+                        body: [].concat([
+                                make_node(UglifyJS.AST_Var, null, {
+                                    definitions: globalNsRoots.map(function (name) {
+                                        return make_node(UglifyJS.AST_VarDef, null, {
+                                            name: new UglifyJS.AST_SymbolVar({ name: name })
+                                        });
+                                    })
+                                })
+                            ], currentBody)
+                    }),
+                    args: []
+                })
+            })
+        ]
+    })
+
     var uglifyjsParams = config.getPluginConfiguration('uglifyjs');
 
     topLevel.figure_out_scope();
-    topLevel.scope_warnings();
+    //topLevel.scope_warnings();
 
-    if (uglifyjsParams.mangle) {
+    /*if (uglifyjsParams.mangle) {
         topLevel.compute_char_frequency();
         topLevel.mangle(uglifyjsParams.mangle);
     }
     if (uglifyjsParams.squeeze)
-        topLevel = topLevel.transform(UglifyJS.Compressor(uglifyjsParams.squeeze));
+        topLevel = topLevel.transform(UglifyJS.Compressor(uglifyjsParams.squeeze));*/
 
     astPostProcessors.forEach(function (processor) { topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor)); });
 
