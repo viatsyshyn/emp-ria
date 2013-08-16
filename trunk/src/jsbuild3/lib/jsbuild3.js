@@ -178,11 +178,16 @@ function compile(path, config) {
     var code = this.loadModule(path, config, {});
 
     // add runtime
-    var runtime = ['0.common', '0.pipeline', '0.stacktrace', '5.annotations', '5.delegates', '5.enum', '5.identifier', '6.interface'
-    , '8.class', '9.arrayof', '9.classof', '9.exception', '9.implementerof']
+    var runtime = ['0.common', '0.pipeline', '0.stacktrace', '5.annotations', '5.delegates', '5.enum', '5.identifier'
+        , '6.interface', '8.class', '9.arrayof', '9.classof', '9.exception', '9.implementerof']
         .map(function (_) {
             return loadModule(resolve('ria/base/' + _ + '.js', config), config, {});
         });
+    runtime.concat(['annotations', 'assert', 'class', 'delegate', 'enum', 'exception', 'identifier', 'interface'
+        , 'parser2', 'registry', 'tokenizer', 'zzz.init']
+        .map(function (_) {
+            return loadModule(resolve('ria/syntax/' + _ + '.js', config), config, {});
+        }))
 
     code.prependRuntime(runtime);
 
@@ -220,7 +225,7 @@ function compile(path, config) {
                 })
             })
         ]
-    })
+    });
 
     var uglifyjsParams = config.getPluginConfiguration('uglifyjs');
 

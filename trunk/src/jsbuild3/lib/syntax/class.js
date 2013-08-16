@@ -6,20 +6,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-function AccessNS(parts, top, node) {
-    if (typeof parts === 'string')
-        parts = parts.split('.');
-
-    if (parts.length < 1)
-        return top;
-
-    var name = parts.shift();
-
-    return AccessNS(parts, top
-        ? make_node(UglifyJS.AST_Dot, node, {expression: top, property: name})
-        : make_node(UglifyJS.AST_SymbolVar, node, { name: name }), node);
-}
-
 function ClassCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == 'CLASS') {
 
@@ -41,7 +27,8 @@ function ClassCompiler(ns, node, descend) {
             right: make_node(UglifyJS.AST_Call, node, {
                 expression: make_node(UglifyJS.AST_Function, node, {
                     argnames: [],
-                    body: []
+                    body: [
+                    ]
                 })
             })
         });
