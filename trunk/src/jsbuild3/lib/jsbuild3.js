@@ -172,13 +172,16 @@ function loadModule(path, config, memoization) {
 
 function prepareRiaConfig() {
     (ria = ria || {}).__CFG = [].slice.call(document.getElementsByTagName('script'))
-        .filter(function (script) {
-            console.info(script.innerHTML);
-            return script.innerHTML.match(/ria\.__CFG\s=\s\\{/)
-        })
         .map(function (_) {
-            return JSON.parse(script.innerHTML.split(/ria\.__CFG\s=\s\\/).pop());
-        }).pop();
+            return _.innerText || _.innerHTML;
+        })
+        .filter(function (text) {
+            return text.match(/ria\.__CFG\s=\s\\{/)
+        })
+        .map(function (text) {
+            return JSON.parse(text.split('=').pop());
+        })
+        .pop();
 }
 
 /**
