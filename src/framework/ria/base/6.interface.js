@@ -34,11 +34,12 @@
      * @param {Function} ifc
      * @param {String} name
      * @param {Array} methods
+     * @returns Function
      */
     ria.__API.ifc = function(ifc, name, methods) {
         ifcRegister[name] = ifc;
-
         ifc.__META = new InterfaceDescriptor(name, methods);
+        return ifc;
     };
 
     ria.__API.Interface = new (function Interface() {});
