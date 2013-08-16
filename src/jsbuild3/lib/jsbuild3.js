@@ -144,7 +144,9 @@ function loadModule(path, config, memoization) {
 
     //try {
         //console.info('Parsing content of "' + path + '" content: ' + content);
-        var ast = UglifyJS.parse(content);
+        var ast = UglifyJS.parse(content, {
+            filename: path
+        });
         //console.info('Done');
     //} catch (e) {
         //console.error('Can not parse content of "' + path + '" due: ' + e);
@@ -166,6 +168,17 @@ function loadModule(path, config, memoization) {
         console.error(JSON.stringify(e));
         throw e;
     }
+}
+
+function prepareRiaConfig() {
+    (ria = ria || {}).__CFG = [].slice.call(document.getElementsByTagName('script'))
+        .filter(function (script) {
+            console.info(script.innerHTML);
+            return script.innerHTML.match(/ria\.__CFG\s=\s\\{/)
+        })
+        .map(function (_) {
+            return JSON.parse(script.innerHTML.split(/ria\.__CFG\s=\s\\/).pop());
+        }).pop();
 }
 
 /**
@@ -203,6 +216,9 @@ function compile(path, config) {
 
     var currentBody = [].slice.call(topLevel.body);
     var globals = config.getGlobals();
+
+    console.info(UglifyJS.parse(prepareRiaConfig.toString()).body[0].body);
+
     topLevel = make_node(UglifyJS.AST_Toplevel, topLevel, {
         body: [
             make_node(UglifyJS.AST_SimpleStatement, topLevel, {
@@ -218,6 +234,16 @@ function compile(path, config) {
                                                 name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: name })
                                             });
                                         })
+                                })
+                            ], [
+                                make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                    body: make_node(UglifyJS.AST_Call, topLevel, {
+                                        expression: make_node(UglifyJS.AST_Function, topLevel, {
+                                            argnames: [],
+                                            body: UglifyJS.parse(prepareRiaConfig.toString()).body[0].body
+                                        }),
+                                        args: []
+                                    })
                                 })
                             ], currentBody)
                     }),
