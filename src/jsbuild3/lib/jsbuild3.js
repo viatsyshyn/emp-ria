@@ -176,7 +176,7 @@ function prepareRiaConfig() {
             return _.innerText || _.innerHTML;
         })
         .filter(function (text) {
-            return text.match(/ria\.__CFG\s=\s\\{/)
+            return text.match(/ria\.__CFG\s+=\s+\\{/)
         })
         .map(function (text) {
             return JSON.parse(text.split('=').pop());
