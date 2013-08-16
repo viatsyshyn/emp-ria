@@ -187,7 +187,7 @@ function compile(path, config) {
         , 'parser2', 'registry', 'tokenizer', 'zzz.init']
         .map(function (_) {
             return loadModule(resolve('ria/syntax/' + _ + '.js', config), config, {});
-        }))
+        }));
 
     code.prependRuntime(runtime);
 
