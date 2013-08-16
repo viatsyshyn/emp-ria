@@ -231,7 +231,8 @@ function compile(path, config) {
                                         .filter(function (_) { return _ != 'ria'; })
                                         .map(function (name) {
                                             return make_node(UglifyJS.AST_VarDef, null, {
-                                                name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: name })
+                                                name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: name }),
+                                                value: make_node(UglifyJS.AST_Object, topLevel, {properties:[]})
                                             });
                                         })
                                 }),
