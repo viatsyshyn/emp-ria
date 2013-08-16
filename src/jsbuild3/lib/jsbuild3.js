@@ -217,7 +217,7 @@ function compile(path, config) {
     var currentBody = [].slice.call(topLevel.body);
     var globals = config.getGlobals();
 
-    console.info(UglifyJS.parse(prepareRiaConfig.toString()).body[0].body);
+    //console.info(UglifyJS.parse(prepareRiaConfig.toString()).body[0].body);
 
     topLevel = make_node(UglifyJS.AST_Toplevel, topLevel, {
         body: [
@@ -234,6 +234,13 @@ function compile(path, config) {
                                                 name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: name })
                                             });
                                         })
+                                }),
+                                make_node(UglifyJS.AST_Var, topLevel, {
+                                    definitions: [
+                                        make_node(UglifyJS.AST_VarDef, null, {
+                                            name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: '_DEBUG' })
+                                        })
+                                    ]
                                 })
                             ], [
                                 make_node(UglifyJS.AST_SimpleStatement, topLevel, {
