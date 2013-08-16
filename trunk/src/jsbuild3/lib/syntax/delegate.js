@@ -18,16 +18,16 @@ function DelegateCompiler(ns, node, descend) {
 
         console.info('Found delegate ' + method.name + ' in ' + ns);
 
-        return new UglifyJS.AST_Assign({
+        return make_node(UglifyJS.AST_Assign, node, {
             left: getNameTraversed(ns.split('.'), method.name),
             operator: '=',
-            right: new UglifyJS.AST_Call({
+            right: make_node(UglifyJS.AST_Call, null, {
                 expression: getNameTraversed('ria.__API'.split('.'), 'delegate'),
                 args: [
-                    new UglifyJS.AST_String({value: ns + '.' + method.name}),
-                    method.retType.raw,
-                    new UglifyJS.AST_Array({elements: method.argsTypes.map(function (_) { return _.raw; })}),
-                    new UglifyJS.AST_Array({elements: method.argsNames.map(function (_) { return new UglifyJS.AST_String({ value: _})})})
+                    make_node(UglifyJS.AST_String, null, {value: ns + '.' + method.name}),
+                    method.retType.raw || make_node(UglifyJS.AST_Null, null, {}),
+                    make_node(UglifyJS.AST_Array, null, {elements: method.argsTypes.map(function (_) { return _.raw; })}),
+                    make_node(UglifyJS.AST_Array, null, {elements: method.argsNames.map(function (_) { return new UglifyJS.AST_String({ value: _})})})
                 ]
             })
         });

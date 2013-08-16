@@ -8,7 +8,8 @@ var JsBuild3 = vm.createContext({
     console       : console,
     Path          : path,
     fs            : fs,
-    UglifyJS      : require("../node_modules/uglify-js/tools/node")
+    UglifyJS      : require("../node_modules/uglify-js/tools/node"),
+    Jade      : require("../node_modules/jade/lib/jade")
 });
 
 function load_global(file) {
@@ -46,16 +47,18 @@ function load_global(file) {
         "../../framework/ria/syntax/delegate.js",
         "../../framework/ria/syntax/exception.js",
         "../../framework/ria/syntax/interface.js",
-        "../lib/syntax/common.js",
         "../lib/syntax/compiler.js",
+        "../lib/syntax/common.js",
         "../lib/syntax/ns.js",
         "../lib/syntax/identifier.js",
         "../lib/syntax/enum.js",
-        //"../lib/syntax/delegate.js",
+        "../lib/syntax/delegate.js",
         "../lib/syntax/annotation.js",
-        //"../lib/syntax/interface.js",
-        //"../lib/syntax/class.js",
-        "../lib/require/deps.js"
+        "../lib/syntax/interface.js",
+        "../lib/syntax/class.js",
+        "../lib/require/deps.js",
+        "../lib/require/assets.js",
+        "../lib/assets/jade.js"
         ])
     .map(function(file){
             return path.join(path.dirname(fs.realpathSync(__filename)), file);

@@ -21,7 +21,7 @@ function InterfaceCompiler(ns, node, descend) {
         var items = def.methods.map(function (_) {
             return new UglifyJS.AST_Array({elements: [
                 new UglifyJS.AST_String({value:_.name}),
-                _.retType.raw,
+                _.retType.raw || make_node(UglifyJS.AST_Null, null, {}),
                 new UglifyJS.AST_Array({elements: _.argsTypes.map(function (_) { return _.raw; })}),
                 new UglifyJS.AST_Array({elements: _.argsNames.map(function (_) { return new UglifyJS.AST_String({ value: _})})})
             ]})

@@ -14,26 +14,24 @@ function TraverseNS(parts, top, right) {
 
     var name = parts.shift();
 
-    right = right ? new UglifyJS.AST_Dot({
-        expression: right,
-        property: name
-    }) : new UglifyJS.AST_SymbolRef({ name: name });
+    right = right
+        ? make_node(UglifyJS.AST_Dot, null, { expression: right, property: name })
+        : make_node(UglifyJS.AST_SymbolRef, null, { name: name });
 
     if (!top && globalNsRoots.indexOf(name) < 0)
         globalNsRoots.push(name);
 
     return TraverseNS(
         parts,
-        new UglifyJS.AST_Assign({
-            left: top ? new UglifyJS.AST_Dot({
-                expression: top,
-                property: name
-            }) : new UglifyJS.AST_SymbolVar({ name: name }),
+        make_node(UglifyJS.AST_Assign, null, {
+            left: top
+                ? make_node(UglifyJS.AST_Dot, null, {expression: top, property: name})
+                : make_node(UglifyJS.AST_SymbolVar, null, { name: name }),
             operator: "=",
-            right: new UglifyJS.AST_Binary({
+            right: make_node(UglifyJS.AST_Binary, null, {
                 left: right,
                 operator: '||',
-                right: new UglifyJS.AST_Object({properties:[]})
+                right: make_node(UglifyJS.AST_Object, null, {properties:[]})
             })
         }),
         right);
@@ -42,8 +40,6 @@ function TraverseNS(parts, top, right) {
 function NsCompiler(node, descend) {
     if (node instanceof UglifyJS.AST_Call && (node.expression.print_to_string() == 'NS' || node.expression.print_to_string() == 'NAMESPACE')) {
         var ns = node.args[0].value;
-
-        //console.log('ns called: ' + ns);
 
         var body = node.args[1].transform(new UglifyJS.TreeTransformer(function (node, descend) {
             return SyntaxCompile(ns, node, descend);

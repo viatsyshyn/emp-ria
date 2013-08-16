@@ -29,14 +29,7 @@ CFG.getModules().forEach(/** @param {ModuleConfiguration} module */ function (mo
     //Env.print('Processing: ' + module.getName());
     var inPath = CFG.resolveFilePath(module.getInFile());
 
-    var fileContents = [];
-    module.getPrepend().forEach(function (prepend) {
-      var path = config.resolveFilePath(prepend);
-      fileContents.push('/** @path ' + prepend + ' */');
-      fileContents.push(fs.readFileSync(path));
-    });
-
-    fileContents.push(JsBuild3.compile(inPath, CFG));
+    var fileContents = JsBuild3.compile(inPath, CFG);
 
     var outPath = Path.resolve(CFG.getBasePath() + module.getOutFile());
 
