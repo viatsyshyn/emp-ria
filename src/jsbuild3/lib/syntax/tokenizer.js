@@ -146,7 +146,7 @@
 
     Tokenizer.prototype.ensure = function(type) {
         if (!this.check(type))
-            throw Error('Expected ' + type.name);
+            throw Error('Expected ' + type.name + ', got: ' + this.data[0].constructor.name + ', value: ' + JSON.stringify(this.data[0]));
     };
 
     Tokenizer.prototype.eot = function () {

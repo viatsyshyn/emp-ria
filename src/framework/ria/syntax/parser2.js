@@ -121,7 +121,10 @@
         var flags = ria.__SYNTAX.parseModifiers(tkz);
 
         var retType = null;
-        if (tkz.check(ria.__SYNTAX.Tokenizer.RefToken) || tkz.check(ria.__SYNTAX.Tokenizer.VoidToken) || tkz.check(ria.__SYNTAX.Tokenizer.SelfToken))
+        if (tkz.check(ria.__SYNTAX.Tokenizer.RefToken)
+                || tkz.check(ria.__SYNTAX.Tokenizer.FunctionCallToken)
+                || tkz.check(ria.__SYNTAX.Tokenizer.VoidToken)
+                || tkz.check(ria.__SYNTAX.Tokenizer.SelfToken))
             retType = tkz.next();
 
         if (tkz.check(ria.__SYNTAX.Tokenizer.StringToken))

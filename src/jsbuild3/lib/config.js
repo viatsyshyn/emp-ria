@@ -36,6 +36,7 @@ function ModuleConfiguration(params, config) {
     this.appDir = params.appDir ? PATH.resolve(config.getBasePath() + (params.appDir || 'app')) + '/' : null;
     this.assetDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetDir || 'assets')) + '/' : null;
     this.libs = params.libs || {};
+    this.globals = [].slice.call(params.globals || []);
 }
 
 ModuleConfiguration.prototype = {
@@ -56,7 +57,9 @@ ModuleConfiguration.prototype = {
     /** @returns String */
     getAssetDir: function () { return this.assetDir; },
     /** @returns Object */
-    getLibs: function () { return this.libs; }
+    getLibs: function () { return this.libs; },
+    /** @returns String[] */
+    getGlobals: function () { return this.globals; }
 };
 
 /**
@@ -90,6 +93,8 @@ Configuration.prototype = {
     getAssetDir: function () { return this.moduleConfig.getAssetDir() || this.assetDir; },
     /** @returns Object */
     getLibs: function () { return merge(merge({}, this.moduleConfig.getLibs()), this.libs); },
+    getGlobals: function () { return [].concat(this.moduleConfig.getGlobals(), this.globals || []); },
+    getPrepend: function () { return [].concat(this.moduleConfig.getPrepend(), this.prepend || []); },
     /** @returns ModuleConfiguration[] */
     getModules: function () { return [].slice.call(this.modules); },
     /** @returns PluginConfiguration[] */

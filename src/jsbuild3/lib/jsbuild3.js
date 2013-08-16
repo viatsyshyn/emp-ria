@@ -6,14 +6,18 @@ var _DEBUG = false;
  * @param {String} path
  * @param {CodeBlockDescriptor[]} deps
  */
-function CodeBlockDescriptor(path, deps) {
+function CodeBlockDescriptor(path, deps, ast) {
     /** @var String */
     this.path = path;
     /** @var CodeBlockDescriptor[] */
     this.deps = [].slice.call(deps);
+
+    this.ast = ast;
 }
 
 CodeBlockDescriptor.prototype = {
+    getAst: function () { return this.ast; },
+
     /**
      * @param {AST_TopLevel} topLevel
      * @returns AST_Toplevel
@@ -36,13 +40,25 @@ CodeBlockDescriptor.prototype = {
 
             memory[module.path] = true;
 
-            return UglifyJS.parse(fs.readFileSync(module.path, "utf8"), {
+            if (!topLevel)
+                return module.getAst();
+
+            return make_node(UglifyJS.AST_Toplevel, topLevel, {
+                body: [].concat(topLevel.body, module.getAst().body)
+            });
+
+            /*return UglifyJS.parse(fs.readFileSync(module.path, "utf8"), {
                 filename: module.path,
                 toplevel: topLevel
-            });
+            });*/
+
         }(this, topLevel));
 
         return topLevel;
+    },
+
+    prependRuntime: function (runtime) {
+        this.deps = [].concat(runtime, this.deps);
     }
 };
 
@@ -127,21 +143,29 @@ function loadModule(path, config, memoization) {
     }
 
     //try {
+        //console.info('Parsing content of "' + path + '" content: ' + content);
         var ast = UglifyJS.parse(content);
+        //console.info('Done');
     //} catch (e) {
-        //throw Error('Can not parse content of "' + path + '" due: ' + e);
+        //console.error('Can not parse content of "' + path + '" due: ' + e);
+        //throw e;
     //}
 
-    var deps = [];
-    depsCollectors.forEach(function (collector) {
-        deps = [].concat.apply(deps, collector(ast, config, path));
-    });
+    try {
+        var deps = [];
+        depsCollectors.forEach(function (collector) {
+            deps = [].concat.apply(deps, collector(ast, config, path));
+        });
 
-    deps = deps.map(function (dep) {
-        return loadModule(dep, config, memoization);
-    });
+        deps = deps.map(function (dep) {
+            return loadModule(dep, config, memoization);
+        });
 
-    return memoization[path] = new CodeBlockDescriptor(path, deps);
+        return memoization[path] = new CodeBlockDescriptor(path, deps, ast);
+    } catch (e) {
+        console.error(JSON.stringify(e));
+        throw e;
+    }
 }
 
 /**
@@ -153,32 +177,46 @@ function loadModule(path, config, memoization) {
 function compile(path, config) {
     var code = this.loadModule(path, config, {});
 
+    // add runtime
+    var runtime = ['0.common', '0.pipeline', '0.stacktrace', '5.annotations', '5.delegates', '5.enum', '5.identifier', '6.interface'
+    , '8.class', '9.arrayof', '9.classof', '9.exception', '9.implementerof']
+        .map(function (_) {
+            return loadModule(resolve('ria/base/' + _ + '.js', config), config, {});
+        });
+
+    code.prependRuntime(runtime);
+
     /**
      *
      * @type {AST_Toplevel}
      */
     var topLevel = code.getGluedAst();
 
-    astPreProcessors.forEach(function (processor) { topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor)); });
+    astPreProcessors.forEach(function (processor) {
+        topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor));
+    });
 
     var currentBody = [].slice.call(topLevel.body);
+    var globals = config.getGlobals();
     topLevel = make_node(UglifyJS.AST_Toplevel, topLevel, {
         body: [
-            make_node(UglifyJS.AST_SimpleStatement, null, {
-                body: make_node(UglifyJS.AST_Call, null, {
-                    expression: make_node(UglifyJS.AST_Function, null, {
-                        argnames: [],
+            make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                body: make_node(UglifyJS.AST_Call, topLevel, {
+                    expression: make_node(UglifyJS.AST_Function, topLevel, {
+                        argnames: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolFunarg, topLevel, {name: _}); }),
                         body: [].concat([
-                                make_node(UglifyJS.AST_Var, null, {
-                                    definitions: globalNsRoots.map(function (name) {
-                                        return make_node(UglifyJS.AST_VarDef, null, {
-                                            name: new UglifyJS.AST_SymbolVar({ name: name })
-                                        });
-                                    })
+                                make_node(UglifyJS.AST_Var, topLevel, {
+                                    definitions: globalNsRoots
+                                        .filter(function (_) { return _ != 'ria'; })
+                                        .map(function (name) {
+                                            return make_node(UglifyJS.AST_VarDef, null, {
+                                                name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: name })
+                                            });
+                                        })
                                 })
                             ], currentBody)
                     }),
-                    args: []
+                    args: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolVar, topLevel, {name: _}); })
                 })
             })
         ]
@@ -187,22 +225,34 @@ function compile(path, config) {
     var uglifyjsParams = config.getPluginConfiguration('uglifyjs');
 
     topLevel.figure_out_scope();
-    //topLevel.scope_warnings();
+    topLevel.scope_warnings();
 
-    /*if (uglifyjsParams.mangle) {
+    if (uglifyjsParams.mangle) {
         topLevel.compute_char_frequency();
-        topLevel.mangle(uglifyjsParams.mangle);
+        topLevel.mangle_names(uglifyjsParams.mangle_options);
     }
-    if (uglifyjsParams.squeeze)
-        topLevel = topLevel.transform(UglifyJS.Compressor(uglifyjsParams.squeeze));*/
+
+    if (uglifyjsParams.squeeze) {
+        topLevel = topLevel.transform(UglifyJS.Compressor(uglifyjsParams.squeeze_options));
+    }
 
     astPostProcessors.forEach(function (processor) { topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor)); });
 
-    var output = UglifyJS.OutputStream(uglifyjsParams.output || {beautify: true});
+    var output = UglifyJS.OutputStream(uglifyjsParams.output || {beautify: uglifyjsParams.beautify});
 
     topLevel.print(output);
 
-    return output.get();
+    var fileContents = [];
+    config.getPrepend().forEach(function (prepend) {
+        var path = resolve(prepend, config);
+        console.info('Prepending: ' + path);
+        fileContents.push('/** @path ' + prepend + ' */');
+        fileContents.push(fs.readFileSync(path));
+    });
+
+    fileContents.push(output.get());
+
+    return fileContents;
 }
 
 /*filterFunctionCallStatement: function (ast, fnName, handler) {
