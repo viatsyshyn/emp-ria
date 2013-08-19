@@ -33,6 +33,7 @@ function InterfaceCompiler(ns, node, descend) {
             right: new UglifyJS.AST_Call({
                 expression: getNameTraversed('ria.__API'.split('.'), 'ifc'),
                 args: [
+                    make_node(UglifyJS.AST_Function, node, {argnames: [], body: []}),
                     new UglifyJS.AST_String({value: ns + '.' + def.name}),
                     new UglifyJS.AST_Array({elements: items})
                 ]

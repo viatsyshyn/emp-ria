@@ -26,11 +26,9 @@ var JsBuild3 = require("../tools/jsbuild");
 CFG.getModules().forEach(/** @param {ModuleConfiguration} module */ function (module) {
     CFG.setModuleConfig(module);
 
-    //Env.print('Processing: ' + module.getName());
-    var inPath = CFG.resolveFilePath(module.getInFile());
+    console.info('Processing: ' + module.getName());
 
-    var fileContents = JsBuild3.compile(inPath, CFG);
-
+    var fileContents = JsBuild3.compile(module.getInFile() || module.getAppClass(), CFG, module.getAppClass());
     var outPath = Path.resolve(CFG.getBasePath() + module.getOutFile());
 
     var jsbuildParams = CFG.getPluginConfiguration("jsbuild");

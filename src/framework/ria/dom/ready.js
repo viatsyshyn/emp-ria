@@ -1,4 +1,5 @@
 REQUIRE('ria.async.Task');
+REQUIRE('ria.dom.Dom');
 
 /**
  * ria.dom.ready()
@@ -82,5 +83,5 @@ NAMESPACE('ria.dom', function () {
         return !isPageReady
                 ? new ria.dom.DomReadyTask().run()
                 : ria.async.DeferredAction();
-    }
+    };
 });

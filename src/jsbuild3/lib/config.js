@@ -33,6 +33,7 @@ function ModuleConfiguration(params, config) {
     this.name = params.name;
     this.inFile = params['in'];
     this.outFile = params['out'];
+    this.appClass = params['app'];
     this.appDir = params.appDir ? PATH.resolve(config.getBasePath() + (params.appDir || 'app')) + '/' : null;
     this.assetDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetDir || 'assets')) + '/' : null;
     this.libs = params.libs || {};
@@ -50,6 +51,8 @@ ModuleConfiguration.prototype = {
     getName: function () { return this.name; },
     /** @returns String */
     getInFile: function () { return this.inFile; },
+    /** @returns String */
+    getAppClass: function () { return this.appClass; },
     /** @returns String */
     getOutFile: function () { return this.outFile; },
     /** @returns String */

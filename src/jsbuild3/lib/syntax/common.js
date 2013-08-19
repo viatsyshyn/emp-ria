@@ -8,6 +8,8 @@
 
 var globalNsRoots = [];
 
+var globalFunctions = [];
+
 var Exception = ria.__API.Exception;
 
 function AccessNS(parts, top, node) {
@@ -52,65 +54,3 @@ function TraverseNS(parts, top, right) {
         }),
         right);
 }
-
-function SymbolsCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
-        var name = node.name;
-        if (['Class', 'Interface', 'Exception'].indexOf(name) >= 0) {
-            return AccessNS('ria.__API.' + name, null, node);
-        }
-    }
-}
-
-compilers.push(SymbolsCompiler);
-
-
-function XxxOfCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_Call) {
-        var name = node.expression.print_to_string();
-        if (['ArrayOf', 'ClassOf', 'ImplementerOf'].indexOf(name) >= 0) {
-            return make_node(UglifyJS.AST_Call, node, {
-                expression: AccessNS('ria.__API.' + name, null, node),
-                args: node.args
-            })
-        }
-    }
-}
-
-compilers.push(XxxOfCompiler);
-
-function SyntaxCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_Call) {
-        var name = node.expression.print_to_string();
-        if (['ANNOTATION', 'Assert', 'CLASS', 'DELEGATE', 'ENUM', 'EXCEPTION', 'IDENTIFIER', 'INTERFACE', 'NS', 'NAMESPACE', 'IMPLEMENTS', 'EXTENDS'].indexOf(name) >= 0) {
-            return make_node(UglifyJS.AST_Call, node, {
-                expression: AccessNS('ria.__SYNTAX.' + name, null, node),
-                args: node.args
-            })
-        }
-    }
-}
-
-compilers.push(SyntaxCompiler);
-
-function ValidatorCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_Call) {
-        var name = node.expression.print_to_string();
-        if (['VALIDATE_ARG', 'VALIDATE_ARGS'].indexOf(name) >= 0) {
-            return make_node(UglifyJS.AST_Null, node, {})
-        }
-    }
-}
-
-compilers.push(ValidatorCompiler);
-
-function ModifiersCompiler(ns, node, descend) {
-    if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
-        var name = node.name;
-        if (['OVERRIDE', 'ABSTRACT', 'VOID', 'SELF', 'FINAL', 'READONLY'].indexOf(name) >= 0) {
-            return AccessNS('ria.__SYNTAX.Modifiers.' + name, null, node);
-        }
-    }
-}
-
-compilers.push(ModifiersCompiler);
