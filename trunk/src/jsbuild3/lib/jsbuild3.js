@@ -176,12 +176,18 @@ function prepareRiaConfig() {
             return _.innerText || _.innerHTML;
         })
         .filter(function (text) {
-            return text.match(/ria\.__CFG\s+=\s+\\{/)
+            return text.match(/ria\.__CFG\s+=\s+\{/)
         })
         .map(function (text) {
             return JSON.parse(text.split('=').pop());
         })
         .pop();
+}
+
+function appStart() {
+    new AppClass()
+        .session(ria.__CFG['#mvc'].settings || {})
+        .run();
 }
 
 /**
@@ -190,8 +196,8 @@ function prepareRiaConfig() {
  * @param {Configuration} config
  * @returns string
  */
-function compile(path, config) {
-    var code = this.loadModule(path, config, {});
+function compile(path, config, appClass) {
+    var code = this.loadModule(resolve(path, config), config, {});
 
     // add runtime
     var runtime = ['0.common', '0.pipeline', '0.stacktrace', '5.annotations', '5.delegates', '5.enum', '5.identifier'
@@ -200,7 +206,7 @@ function compile(path, config) {
             return loadModule(resolve('ria/base/' + _ + '.js', config), config, {});
         });
     runtime = runtime.concat(['annotations', 'assert', 'class', 'delegate', 'enum', 'exception', 'identifier', 'interface'
-        , 'parser2', 'registry', 'tokenizer', 'zzz.init']
+        , 'ns', 'parser2', 'registry', 'type-hints', 'tokenizer', 'zzz.init']
         .map(function (_) {
             return loadModule(resolve('ria/syntax/' + _ + '.js', config), config, {});
         }));
@@ -256,7 +262,17 @@ function compile(path, config) {
                                         args: []
                                     })
                                 })
-                            ], currentBody)
+                            ], globalFunctions, currentBody, [
+                                make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                    body: make_node(UglifyJS.AST_Call, topLevel, {
+                                        expression: make_node(UglifyJS.AST_Function, topLevel, {
+                                            argnames: [],
+                                            body: UglifyJS.parse(appStart.toString().replace('AppClass', appClass)).body[0].body
+                                        }),
+                                        args: []
+                                    })
+                                })
+                            ])
                     }),
                     args: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolVar, topLevel, {name: _}); })
                 })

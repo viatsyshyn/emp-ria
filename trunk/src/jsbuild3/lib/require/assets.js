@@ -23,7 +23,7 @@ function resolveAsset(path, config) {
     return path;
 }
 
-var AssetsAliases = ['ASSET'];
+var AssetsAliases = ['ASSET', 'ria.templates.TemplateBind'];
 
 var AssetsCache = {}, AssetsCache2 = {};
 
@@ -55,16 +55,14 @@ function AssetCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call
         && AssetsAliases.indexOf(node.expression.print_to_string()) >= 0
         && node.args.length == 1
-        && node.args[0] instanceof UglifyJS.AST_String) {
+        && node.args[0] instanceof UglifyJS.AST_String
+        && AssetsCache2[node.args[0].value]) {
 
-        if (!AssetsCache2[node.args[0].value])
-            throw Error('cache not found for asset ' + node.args[0].value);
-
-        return make_node(UglifyJS.AST_Dot, node, {
-            expression: make_node(UglifyJS.AST_SymbolVar, node, {name: '__ASSETS'}),
-            property: AssetsCache2[node.args[0].value]
-        });
+        node.args[0].value = AssetsCache2[node.args[0].value];
+        return node;
     }
 }
 
 compilers.push(AssetCompiler);
+
+globalFunctions.push(UglifyJS.parse(function ASSET(id) { return __ASSETS[id];}.toString()).body[0]);

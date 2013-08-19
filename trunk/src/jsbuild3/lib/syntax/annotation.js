@@ -16,7 +16,7 @@ function AnnotationCompiler(ns, node, descend) {
 
         ria.__SYNTAX.validateAnnotationDecl(method);
 
-        console.info('Found annotation ' + method.name + ' in ' + ns);
+        //console.info('Found annotation ' + method.name + ' in ' + ns);
 
         return new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), method.name),

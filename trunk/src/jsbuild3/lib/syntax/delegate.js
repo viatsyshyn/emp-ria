@@ -16,7 +16,7 @@ function DelegateCompiler(ns, node, descend) {
 
         ria.__SYNTAX.validateDelegateDecl(method);
 
-        console.info('Found delegate ' + method.name + ' in ' + ns);
+        //console.info('Found delegate ' + method.name + ' in ' + ns);
 
         return make_node(UglifyJS.AST_Assign, node, {
             left: getNameTraversed(ns.split('.'), method.name),
