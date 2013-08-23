@@ -13,6 +13,8 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.State, function getState() {},
             ria.mvc.IView, function getDefaultView() {},
             ria.mvc.ISession, function getSession() {},
+            [[ClassOf(Class)]],
+            Class, function getService(clazz) {},
             VOID, function stateUpdated() {}
         ]);
 });

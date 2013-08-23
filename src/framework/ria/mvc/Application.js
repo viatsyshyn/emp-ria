@@ -61,6 +61,7 @@ NAMESPACE('ria.mvc', function () {
             context.setDispatcher(this._dispatcher);
             context.setSession(this.initSession_());
             context.setDefaultView(this.initView_());
+            context.setServiceCreateDelegate(this._dispatcher.createService);
             return context;
         },
 

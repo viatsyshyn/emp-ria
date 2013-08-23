@@ -127,7 +127,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[ClassOf(Class), ria.mvc.IContext]],
-            Object, function getCached_(type, context) {
+            Class, function getCached_(type, context) {
                 var ref = new ria.reflection.ReflectionClass(type);
                 var name = ref.getName();
 
@@ -145,7 +145,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
-            Object, function prepareInstance_(ref, context) {
+            Class, function prepareInstance_(ref, context) {
                 var instanse = ref.instantiate();
 
                 ref.getPropertiesReflector().forEach(function (_) {
@@ -159,6 +159,11 @@ NAMESPACE('ria.mvc', function () {
                     ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
                 }
                 return instanse;
+            },
+
+            [[ClassOf(Class), ria.mvc.IContext]],
+            Class, function createService(clazz, context) {
+                return this.getCached_(clazz, context);
             },
 
             /**
