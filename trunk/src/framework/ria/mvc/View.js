@@ -40,6 +40,9 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.IActivity]],
             VOID, function onActivityClosed_(activity) {
+                if (this._stack.filter(function (_) { return _ && _.equals(activity)}) < 0)
+                    return;
+
                 while (this.getCurrent() != null) {
                     if (this.getCurrent().equals(activity)) {
                         this.pop(); // stop and start under
