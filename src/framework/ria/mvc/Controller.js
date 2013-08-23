@@ -177,10 +177,14 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[String, String, Array]],
-            function Redirect(controller, action, arg_) {},
+            function Redirect(controller, action_, arg_) {
+                return this.redirect_(controller, action_ || null, arg_ || null);
+            },
 
             [[String, String, Array]],
-            function Forward(controller, action, arg_) {},
+            function Forward(controller, action_, arg_) {
+                return this.forward_(controller, action_ || null, arg_ || null);
+            },
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             function PushView(clazz, data) {
