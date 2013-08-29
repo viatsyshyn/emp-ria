@@ -54,12 +54,12 @@ function EnumCompiler(ns, node, descend) {
             if (!(n.value instanceof UglifyJS.AST_String
                 || n.value instanceof UglifyJS.AST_Number
                 || n.value instanceof UglifyJS.AST_Boolean))
-                throw Error('Value expected to be string, number or boolean, got ' + n.value.print_to_string());
+                throw Error('Value of enum ' + name + ' expected to be string, number or boolean, got ' + n.value.print_to_string());
 
             body[n.key] = n.value;
         }
 
-        console.info('Found enum ' + name + ' in ' + ns);
+        //console.info('Found enum ' + name + ' in ' + ns);
 
         return new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), name),

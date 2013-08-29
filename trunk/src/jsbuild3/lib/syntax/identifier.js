@@ -36,7 +36,7 @@ function IdentifierCompiler(ns, node, descend) {
 
         var name = node.args[0].value;
 
-        console.info('Found identifier ' + name + ' in ' + ns);
+        //console.info('Found identifier ' + name + ' in ' + ns);
 
         return new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), name),

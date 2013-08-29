@@ -16,7 +16,7 @@ function InterfaceCompiler(ns, node, descend) {
 
         ria.__SYNTAX.validateInterfaceDecl(def);
 
-        console.info('Found interface ' + def.name + ' in ' + ns);
+        //console.info('Found interface ' + def.name + ' in ' + ns);
 
         var items = def.methods.map(function (_) {
             return new UglifyJS.AST_Array({elements: [

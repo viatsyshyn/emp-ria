@@ -43,7 +43,7 @@ function SyntaxCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(SyntaxCompiler);
+//compilers.push(SyntaxCompiler);
 
 function NamespaceSyntaxCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call) {
