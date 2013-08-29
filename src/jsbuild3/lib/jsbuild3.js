@@ -205,11 +205,11 @@ function compile(path, config, appClass) {
         .map(function (_) {
             return loadModule(resolve('ria/base/' + _ + '.js', config), config, {});
         });
-    runtime = runtime.concat(['annotations', 'assert', 'class', 'delegate', 'enum', 'exception', 'identifier', 'interface'
+    /*runtime = runtime.concat(['annotations', 'assert', 'class', 'delegate', 'enum', 'exception', 'identifier', 'interface'
         , 'ns', 'parser2', 'registry', 'type-hints', 'tokenizer', 'zzz.init']
         .map(function (_) {
             return loadModule(resolve('ria/syntax/' + _ + '.js', config), config, {});
-        }));
+        }));*/
 
     code.prependRuntime(runtime);
 
