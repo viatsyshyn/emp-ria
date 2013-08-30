@@ -4,16 +4,16 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
-    function getDefaultGetter(property, name) {
-        return {value: new Function ('return ' + function getPropertyProxy() { return this.name; }.toString().replace('name', property).replace('getProperty', name))()};
+    function getDefaultGetter(property) {
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function () { return this.name; }.toString().replace('name', property))());
     }
 
-    function getDefaultSetter(property, name) {
-        return {value: new Function ('return ' + function setPropertyProxy(value) { this.name = value; }.toString().replace('name', property).replace('setProperty', name))()};
+    function getDefaultSetter(property) {
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function (value) { this.name = value; }.toString().replace('name', property))());
     }
 
-    function getDefaultCtor(name) {
-        return {value: new Function ('return ' + function ConstructorProxy(value) { BASE(); }.toString().replace('Constructor', name))() };
+    function getDefaultCtor() {
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function $() { BASE(); }.toString())());
     }
 
     /**
@@ -368,9 +368,53 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
     }
 
-    ria.__SYNTAX.validateClassDecl = function (def, baseClass) {
+    ria.__SYNTAX.precalcClassOptionalsAndBaseRefs = function (def, baseClass) {
         // validate if base is descendant on Class
         def.base = def.base === null ? new ria.__SYNTAX.Tokenizer.RefToken(baseClass) : def.base;
+
+        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
+
+        // add omitted default constructor
+        var classCtorDef = def.methods.filter(function (_) {return _.name === '$'; }).pop();
+        if (!classCtorDef) {
+            classCtorDef = new ria.__SYNTAX.MethodDescriptor('$', [], [], null, {}, getDefaultCtor(), []);
+            def.methods.unshift(classCtorDef);
+        }
+
+        // add omitted getter/setter of properties
+        def.properties
+            .forEach(function (property) {
+                var name = property.name;
+                var getterName = property.getGetterName();
+                var getterDef = def.methods.filter(function (_) {return _.name === getterName; }).pop();
+                if (!getterDef) {
+                    getterDef = new ria.__SYNTAX.MethodDescriptor(getterName, [], [], property.type, getDefaultGetter(name), []);
+                    def.methods.push(getterDef);
+                }
+
+                var setterName = property.getSetterName();
+                var setterDef = def.methods.filter(function (_) {return _.name === setterName; }).pop();
+                if (!setterDef) {
+                    setterDef = new ria.__SYNTAX.MethodDescriptor(setterName, ['value'], [property.type]
+                        , new ria.__SYNTAX.Tokenizer.VoidToken(), getDefaultSetter(name), []);
+                    def.methods.push(setterDef);
+                }
+            });
+
+        // TODO: ensure optional type hints
+        /*def.methods
+            .forEach(function (method) {
+
+            });*/
+
+        // find BASE for each method (including ctor, getters & setters)
+        def.methods
+            .forEach(function (method) {
+                method.__BASE_META = findParentMethod(def, method.name);
+            });
+    };
+
+    ria.__SYNTAX.validateClassDecl = function (def, baseClass) {
 
         if(!ria.__SYNTAX.isDescendantOf(def.base.value, baseClass))
             throw Error('Base class must be descendant of ' + baseClass.__META.name);
@@ -513,6 +557,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.CLASS = function () {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
         ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.compileClass(name, def);
