@@ -17,6 +17,7 @@
                 ]]));
 
             assertNoException(function () {
+                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(MyExceptionDef, ria.__API.Exception);
                 ria.__SYNTAX.validateException(MyExceptionDef);
             });
 
@@ -33,6 +34,7 @@
                 ]]));
 
             assertNoException(function () {
+                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseExceptionDef, ria.__API.Exception);
                 ria.__SYNTAX.validateException(baseExceptionDef);
             });
 
@@ -44,6 +46,7 @@
                 ]]));
 
             assertNoException(function () {
+                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(childExceptionDef, ria.__API.Exception);
                 ria.__SYNTAX.validateException(childExceptionDef);
             });
 
@@ -62,6 +65,7 @@
                     function $() {}
                 ]]));
 
+            ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseClassDef, ria.__API.Class);
             ria.__SYNTAX.validateClassDecl(baseClassDef, ria.__API.Class);
 
             var BaseClass = ria.__SYNTAX.compileClass('BaseClass', baseClassDef);
@@ -77,6 +81,7 @@
                 ]]));
 
             assertException('Expects invalid parent error.', function () {
+                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(childExceptionDef, ria.__API.Exception);
                 ria.__SYNTAX.validateException(childExceptionDef);
             });
         }
