@@ -18,8 +18,6 @@
             Boolean, function equals(other) {}
         ]]));
 
-    ria.__SYNTAX.Registry.registry('Class', ClassMeta);
-
     var ExceptionMeta = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
         'Exception', [
             [[String, Object]],
@@ -30,5 +28,10 @@
             Array, function getStack() {}
         ]]));
 
-    ria.__SYNTAX.Registry.registry('Exception', ExceptionMeta);
+    ria.__SYNTAX.registerSymbolsMeta = function () {
+        ria.__SYNTAX.Registry.registry('Class', ClassMeta);
+        ria.__SYNTAX.Registry.registry('Exception', ExceptionMeta);
+    };
+
+    ria.__SYNTAX.registerSymbolsMeta();
 })();

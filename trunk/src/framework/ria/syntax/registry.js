@@ -15,6 +15,8 @@
 
     ria.__SYNTAX.Registry = {};
 
+    ria.__SYNTAX.Registry.cleanUp = function () { registry = {}; };
+
     ria.__SYNTAX.Registry.find = function (name) {
         if ('string' !== typeof name)
             throw Error('String is only acceptable type for name');

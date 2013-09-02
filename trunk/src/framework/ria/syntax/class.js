@@ -39,33 +39,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @param {String} name
      * @return {PropertyDescriptor}
      */
-    function findParentProperty(def, name){
-        var base = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
-        var baseProperty = null;
-        while(base){
-            baseProperty = base.properties.filter(function(property){ return property.name == name }).pop();
-            if(baseProperty)
-                break;
-            base = base.base && ria.__SYNTAX.Registry.find(base.base.value.__META.name);
-        }
-        return baseProperty;
-    }
+    function findParentPropertyFixed(def, name){
+        var base = def.base && ria.__SYNTAX.Registry.find(def.base.value.__META.name);
 
-    /**
-     * @param {ClassDescriptor} def
-     * @param {String} name
-     * @return {PropertyDescriptor}
-     */
-    function findParentPropertyFromMeta(def, name){
-        var base = def.base && def.base.__META;
-        var baseProperty;
-        while(base){
-            baseProperty = base.properties[name];
-            if(baseProperty)
-                break;
-            base = base.base && base.base.__META;
-        }
-        return baseProperty;
+        return base &&
+            (base.properties.filter(function(property){ return property.name == name }).pop()
+            || findParentPropertyFixed(base, name));
     }
 
     /**
@@ -145,6 +124,66 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
     }
 
+    function validatePropertyDeclaration(property, def, processedMethods) {
+        var getterName = property.getGetterName();
+        var setterName = property.getSetterName();
+
+        var getterDef = property.__GETTER_DEF;
+        if (!isSameFlags(property, getterDef))
+            throw Error('The flags of getter ' + getterName + ' should be the same with property flags');
+
+        var setterDef = property.__SETTER_DEF;
+        if (property.flags.isReadonly) {
+            if (setterDef) throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
+        } else if (!isSameFlags(property, setterDef)) {
+            throw Error('The flags of setter ' + setterName + ' should be the same with property flags');
+        }
+
+        processedMethods.push(getterName);
+        processedMethods.push(setterName);
+    }
+
+    function validateBaseClassMethodDeclaration(def, baseMethod) {
+        var childMethod = def.methods.filter(function (method) { return method.name == baseMethod.name; }).pop();
+        if (baseMethod.flags.isFinal) {
+            if (childMethod)
+                throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
+
+        } else if (baseMethod.flags.isAbstract) {
+            if (!childMethod)
+                throw Error('The abstract method ' + baseMethod.name + ' have to be overridden in ' + def.name + ' class');
+
+            if (!childMethod.flags.isOverride)
+                throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+
+        } else {
+            if (childMethod && !childMethod.flags.isOverride)
+                throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+        }
+    }
+
+    function validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def) {
+        if (baseProperty.flags.isFinal) {
+            if (childGetter || childSetter)
+                throw Error('There is no ability to override getter or setter of final property '
+                    + baseProperty.name + ' in ' + def.name + ' class');
+
+        } else if (baseProperty.flags.isAbstract) {
+            if (!childGetter || !childSetter)
+                throw Error('The setter and getter of abstract property ' + baseProperty.name
+                    + ' have to be overridden in ' + def.name + ' class');
+
+            if (!childGetter.flags.isOverride || !childSetter.flags.isOverride)
+                throw Error('The overridden setter and getter of property' + baseProperty.name
+                    + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+
+        } else {
+            if (childGetter && !childGetter.flags.isOverride || childSetter && !childSetter.flags.isOverride)
+                throw Error('The overridden getter or setter of property ' + baseProperty.name
+                    + ' have to be marked as OVERRIDE in ' + def.name + ' class');
+        }
+    }
+
     function compileMethodDeclaration(def, method, ClassProxy) {
         var parentMethod = method.__BASE_META;
         if (method.flags.isOverride) {
@@ -163,25 +202,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             method.argsTypes.map(function (_) { return _.value }),
             method.argsNames,
             method.annotations.map(function(_) { return _.value }));
-    }
-
-    function validatePropertyDeclaration(property, def, processedMethods) {
-        var getterName = property.getGetterName();
-        var setterName = property.getSetterName();
-
-        var getterDef = property.__GETTER_DEF;
-        if (!isSameFlags(property, getterDef))
-            throw Error('The flags of getter ' + getterName + ' should be the same with property flags');
-
-        var setterDef = property.__SETTER_DEF;
-        if (property.flags.isReadonly) {
-            if (setterDef) throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
-        } else if (!isSameFlags(property, setterDef)) {
-            throw Error('The flags of setter ' + setterName + ' should be the same with property flags');
-        }
-
-        processedMethods.push(getterName);
-        processedMethods.push(setterName);
     }
 
     function compilePropertyDeclaration(property, ClassProxy, processedMethods) {
@@ -228,47 +248,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 return item.value
             })
         );
-    }
-
-    function validateBaseClassMethodDeclaration(def, baseMethod) {
-        var childMethod = def.methods.filter(function (method) { return method.name == baseMethod.name; }).pop();
-        if (baseMethod.flags.isFinal) {
-            if (childMethod)
-                throw Error('There is no ability to override final method ' + childMethod.name + ' in ' + def.name + ' class');
-
-        } else if (baseMethod.flags.isAbstract) {
-            if (!childMethod)
-                throw Error('The abstract method ' + baseMethod.name + ' have to be overridden in ' + def.name + ' class');
-
-            if (!childMethod.flags.isOverride)
-                throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-
-        } else {
-            if (childMethod && !childMethod.flags.isOverride)
-                throw Error('The overridden method ' + childMethod.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-        }
-    }
-
-    function validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def) {
-        if (baseProperty.flags.isFinal) {
-            if (childGetter || childSetter)
-                throw Error('There is no ability to override getter or setter of final property '
-                    + baseProperty.name + ' in ' + def.name + ' class');
-
-        } else if (baseProperty.flags.isAbstract) {
-            if (!childGetter || !childSetter)
-                throw Error('The setter and getter of abstract property ' + baseProperty.name
-                    + ' have to be overridden in ' + def.name + ' class');
-
-            if (!childGetter.flags.isOverride || !childSetter.flags.isOverride)
-                throw Error('The overridden setter and getter of property' + baseProperty.name
-                    + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-
-        } else {
-            if (childGetter && !childGetter.flags.isOverride || childSetter && !childSetter.flags.isOverride)
-                throw Error('The overridden getter or setter of property ' + baseProperty.name
-                    + ' have to be marked as OVERRIDE in ' + def.name + ' class');
-        }
     }
 
     ria.__SYNTAX.precalcClassOptionalsAndBaseRefs = function (def, baseClass) {
@@ -389,14 +368,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     throw Error('Duplicate property declaration "' + name + '"');
             });
 
-        // TODO: validate methods overrides
-
+        var processedMethods = [];
         var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
 
         if (baseSyntaxMeta.flags.isFinal)
             throw Error('Can NOT extend final class ' + def.base.value.__META.name);
 
-        // validate properties
+        // validate properties overrides
         baseSyntaxMeta.properties.forEach(function(baseProperty){
             var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
                 childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
@@ -404,7 +382,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
         });
 
-        var processedMethods = [];
+        // validate properties
         def.properties.forEach(
             /**
              * @param {PropertyDescriptor} property
@@ -413,7 +391,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if (property.isOverride)
                     return;
 
-                if(findParentProperty(def, property.name))
+                if(findParentPropertyFixed(def, property.name))
                     throw Error('There is defined property ' + property.name + ' in one of the base classes');
 
                 validatePropertyDeclaration(property, def, processedMethods);
@@ -422,7 +400,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         // TODO: validate ctor declaration
         processedMethods.push('$');
 
-        // validate methods
+        // validate methods overrides
         baseSyntaxMeta.methods.forEach(function(baseMethod) {
             if(baseMethod.name == "$")
                 return;
@@ -430,6 +408,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             validateBaseClassMethodDeclaration(def, baseMethod);
         });
 
+        // validate methods
         def.methods
             .forEach(
             /**
