@@ -34,7 +34,7 @@
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
         ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
-        return ria.__SYNTAX.compileClass(def.name, def);
+        return ria.__SYNTAX.compileClass('test.' + def.name, def);
     }
 
     /**
@@ -46,11 +46,22 @@
 
         assertException(function () {
             ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
-            ria.__SYNTAX.compileClass(def.name, def);
+            ria.__SYNTAX.compileClass('test.' + def.name, def);
         })
     }
 
     TestCase("ClassTestCase").prototype = {
+
+        /*setUp: function () {
+            ria.__SYNTAX.Registry.cleanUp();
+            ria.__SYNTAX.registerSymbolsMeta();
+        },*/
+
+        tearDown: function () {
+            ria.__SYNTAX.Registry.cleanUp();
+            ria.__SYNTAX.registerSymbolsMeta();
+        },
+
         testSelf: function () {
             var BaseClass =
                 CLASS('BaseClass', [
