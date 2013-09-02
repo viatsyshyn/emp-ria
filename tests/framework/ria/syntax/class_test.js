@@ -1,49 +1,80 @@
 (function (ria) {
+    "use strict";
 
-    function ClassDef(def) {
-        return ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(def)));
-    }
+    var OVERRIDE = ria.__SYNTAX.Modifiers.OVERRIDE;
+    var ABSTRACT = ria.__SYNTAX.Modifiers.ABSTRACT;
+    var VOID = ria.__SYNTAX.Modifiers.VOID;
+    var SELF = ria.__SYNTAX.Modifiers.SELF;
+    var FINAL = ria.__SYNTAX.Modifiers.FINAL;
+    var READONLY = ria.__SYNTAX.Modifiers.READONLY;
 
-    function MakeClass(name, def) {
-        "use strict";
+    var Class = ria.__API.Class;
+    var Interface = ria.__API.Interface;
+    var Exception = ria.__API.Exception;
+
+    var IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
+    /** @type {Function} */
+    var EXTENDS = ria.__SYNTAX.EXTENDS;
+    /** @type {Function} */
+    var VALIDATE_ARG = ria.__SYNTAX.checkArg;
+    /** @type {Function} */
+    var VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
+    /** @type {Function} */
+    var ArrayOf = ria.__API.ArrayOf;
+    /** @type {Function} */
+    var ClassOf = ria.__API.ClassOf;
+    /** @type {Function} */
+    var ImplementerOf = ria.__API.ImplementerOf;
+
+    /**
+     * @param [arg*]
+     * @returns {Function|ClassDescriptor}
+     */
+    function CLASS(arg) {
+        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
         ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
-        return ria.__SYNTAX.compileClass(name, def);
+        return ria.__SYNTAX.compileClass(def.name, def);
+    }
+
+    /**
+     * @param [arg*]
+     */
+    function CLASS_E(arg) {
+        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
+
+        assertException(function () {
+            ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+            ria.__SYNTAX.compileClass(def.name, def);
+        })
     }
 
     TestCase("ClassTestCase").prototype = {
         testSelf: function () {
-            var baseClassDef = ClassDef([
-                'BaseClass', [
+            var BaseClass =
+                CLASS('BaseClass', [
                     function $() {},
 
-                    [[ria.__SYNTAX.Modifiers.SELF]],
+                    [[SELF]],
                     Number, function method2(a) {
                         return 3;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     },
 
-                    [[ria.__API.ArrayOf(ria.__SYNTAX.Modifiers.SELF)]],
-                    ria.__API.ArrayOf(ria.__SYNTAX.Modifiers.SELF), function me1(a) {
+                    [[ArrayOf(SELF)]],
+                    ArrayOf(SELF), function me1(a) {
                         return new BaseClass();
                     },
 
-                    [[ria.__SYNTAX.Modifiers.SELF]],
-                    ria.__SYNTAX.Modifiers.SELF, function me2(a) {
+                    [[SELF]],
+                    SELF, function me2(a) {
                         return new BaseClass();
                     }
-                ]]);
-
-
-            //assertNoException(function () {
-                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseClassDef, ria.__API.Class);
-                ria.__SYNTAX.validateClassDecl(baseClassDef, ria.__API.Class);
-            //});
-
-            var BaseClass = ria.__SYNTAX.compileClass('BaseClass', baseClassDef);
+                ]);
 
             assertEquals(BaseClass, BaseClass.__META.methods['me'].retType);
             assertInstanceOf(ria.__API.ArrayOfDescriptor, BaseClass.__META.methods['me1'].retType);
@@ -56,7 +87,7 @@
         },
 
         testExtending: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -70,42 +101,32 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var childClassDef = ClassDef([
-                ria.__SYNTAX.Modifiers.FINAL, 'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var ChildClass = CLASS(
+                FINAL, 'ChildClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     }
-                ]]);
-
-            var ChildClass;
-            //assertNoException(function () {
-                ChildClass = MakeClass('MyClass', childClassDef);
-            //});
+                ]);
 
             assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, ria.__API.Class));
             assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, BaseClass));
@@ -113,8 +134,8 @@
         },
 
         testFinalClassExtending: function () {
-            var baseClassDef = ClassDef([
-                ria.__SYNTAX.Modifiers.FINAL, 'BaseClass', [
+            var BaseClass = CLASS(
+                FINAL, 'BaseClass', [
                     function $() {},
 
                     [[Number]],
@@ -127,64 +148,46 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var childClassDef = ClassDef([
-                ria.__SYNTAX.Modifiers.FINAL, 'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                FINAL, 'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('MyClass', childClassDef);
-            });
+                ]);
         },
 
         testAbstractClassInstantiating: function(){
-            var baseClassDef = ClassDef([
-                ria.__SYNTAX.Modifiers.ABSTRACT, 'BaseClass', [
+            var BaseClass = CLASS(
+                ABSTRACT, 'BaseClass', [
                     function $() {},
 
                     [[Number]],
                     Number, function method1(a) {
                         return 2 * a;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            assertException(function () {
-                new BaseClass();
-            });
-
-            var baseClass2Def = ClassDef([
+            var BaseClass2 = CLASS(
                 'BaseClass2', [
                     function $() {},
 
@@ -192,20 +195,14 @@
                     Number, function method1(a) {
                         return 2 * a;
                     }
-                ]]);
+                ]);
 
-            var BaseClass2;
-            assertNoException(function () {
-                BaseClass2 = MakeClass('BaseClass2', baseClass2Def);
-            });
-
-            assertNoException(function () {
-                new BaseClass2();
-            });
+            assertException(function () { new BaseClass(); });
+            assertNoException(function () { new BaseClass2(); });
         },
 
         testFinalMethodExtending: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -219,26 +216,21 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var childClassDef = ClassDef([
-                'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
@@ -249,15 +241,11 @@
                     Boolean, function isMyComputerOn() {
                         return true;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('MyClass', childClassDef);
-            });
+                ]);
         },
 
         testAbstractMethodExtending: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -271,37 +259,28 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var childClassDef = ClassDef([
-                'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('MyClass', childClassDef);
-            });
+                ]);
         },
 
         testOverrideMethodExtending: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -315,22 +294,17 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var childClassDef = ClassDef([
-                'MyClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
@@ -338,36 +312,28 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     }
-                ]]);
+                ]);
 
-            assertException(function () {
-                MakeClass('MyClass', childClassDef);
-            });
+            CLASS_E(
+                'MyClass2', EXTENDS(BaseClass), [
+                function $() {},
 
-            var childClassDef2 = ClassDef([
-                'MyClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
-                    function $() {},
+                [[Number]],
+                OVERRIDE, Number, function method2(a) {
+                    return 3 * a;
+                },
 
-                    [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
-                        return 3 * a;
-                    },
-
-                    Boolean, function isMyComputerOn() {
-                        return true;
-                    }
-                ]]);
-
-            assertException(function () {
-                MakeClass('MyClass2', childClassDef2);
-            });
+                Boolean, function isMyComputerOn() {
+                    return true;
+                }
+            ]);
         },
 
         testTwoExtending: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -381,26 +347,21 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var firstClassDef = ClassDef([
-                'FirstClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var FirstClass = CLASS(
+                'FirstClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
@@ -414,58 +375,50 @@
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method1(a) {
+                    OVERRIDE, Number, function method1(a) {
                         return 2 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isItToday() {
+                    ABSTRACT, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-            var FirstClass;
-            assertNoException(function () {
-                FirstClass = MakeClass('FirstClass', firstClassDef);
-            });
+                ]);
 
-            var secondClassDef = ClassDef([
-                ria.__SYNTAX.Modifiers.ABSTRACT, 'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+            var SecondClass = CLASS(
+                ABSTRACT, 'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method3(a) {
+                    OVERRIDE, Number, function method3(a) {
                         return 4 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Boolean, function isMyComputerOn() {
+                    OVERRIDE, FINAL, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isItToday() {
+                    OVERRIDE, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-
-            assertNoException(function () {
-                MakeClass('SecondClass', secondClassDef);
-            });
+                ]);
         },
 
         testTwoExtendingWithFinal: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -479,26 +432,21 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var firstClassDef = ClassDef([
-                'FirstClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var FirstClass = CLASS(
+                'FirstClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
@@ -512,63 +460,55 @@
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method1(a) {
+                    OVERRIDE, Number, function method1(a) {
                         return 2 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isItToday() {
+                    ABSTRACT, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-            var FirstClass;
-            assertNoException(function () {
-                FirstClass = MakeClass('FirstClass', firstClassDef);
-            });
+                ]);
 
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+            CLASS_E(
+                'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method3(a) {
+                    OVERRIDE, Number, function method3(a) {
                         return 4 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function hello() {
+                    OVERRIDE, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Boolean, function isMyComputerOn() {
+                    OVERRIDE, FINAL, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isItToday() {
+                    OVERRIDE, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('SecondClass', secondClassDef);
-            });
+                ]);
         },
 
         testTwoExtendingWithOverride: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -582,26 +522,21 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var firstClassDef = ClassDef([
-                'FirstClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var FirstClass = CLASS(
+                'FirstClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
@@ -615,34 +550,30 @@
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method1(a) {
+                    OVERRIDE, Number, function method1(a) {
                         return 2 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isItToday() {
+                    ABSTRACT, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-            var FirstClass;
-            assertNoException(function () {
-                FirstClass = MakeClass('FirstClass', firstClassDef);
-            });
+                ]);
 
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+            CLASS_E(
+                'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method3(a) {
+                    OVERRIDE, Number, function method3(a) {
                         return 4 * a;
                     },
 
@@ -651,22 +582,18 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Boolean, function isMyComputerOn() {
+                    OVERRIDE, FINAL, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isItToday() {
+                    OVERRIDE, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('SecondClass', secondClassDef);
-            });
+                ]);
         },
 
         testTwoExtendingWithAbstract: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
@@ -680,26 +607,21 @@
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, String, function hello() {
+                    FINAL, String, function hello() {
                         return 'Hello';
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isMyComputerOn() {
+                    ABSTRACT, Boolean, function isMyComputerOn() {
                         return false;
                     },
 
-                    ria.__SYNTAX.Modifiers.SELF, function me() {
+                    SELF, function me() {
                         return new BaseClass();
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var firstClassDef = ClassDef([
-                'FirstClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var FirstClass = CLASS(
+                'FirstClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     [[Number]],
@@ -713,176 +635,143 @@
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method1(a) {
+                    OVERRIDE, Number, function method1(a) {
                         return 2 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method2(a) {
+                    OVERRIDE, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isMyComputerOn() {
+                    OVERRIDE, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function isItToday() {
+                    ABSTRACT, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-            var FirstClass;
-            assertNoException(function () {
-                FirstClass = MakeClass('FirstClass', firstClassDef);
-            });
+                ]);
 
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+            CLASS_E(
+                'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method3(a) {
+                    OVERRIDE, Number, function method3(a) {
                         return 4 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.ABSTRACT, Number, function method2(a) {
+                    OVERRIDE, ABSTRACT, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Boolean, function isMyComputerOn() {
+                    OVERRIDE, FINAL, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isItToday() {
+                    OVERRIDE, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
+                ]);
 
-            assertException(function () {
-                MakeClass('SecondClass', secondClassDef);
-            });
-
-            var thirdClassDef = ClassDef([
-                'ThirdClass', ria.__SYNTAX.EXTENDS(FirstClass), [
+            CLASS_E(
+                'ThirdClass', EXTENDS(FirstClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function method3(a) {
+                    OVERRIDE, Number, function method3(a) {
                         return 4 * a;
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Number, function method2(a) {
+                    ABSTRACT, Number, function method2(a) {
                         return 3 * a;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Boolean, function isMyComputerOn() {
+                    OVERRIDE, FINAL, Boolean, function isMyComputerOn() {
                         return true;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function isItToday() {
+                    OVERRIDE, Boolean, function isItToday() {
                         return false;
                     }
-                ]]);
-
-            assertException(function () {
-                MakeClass('ThirdClass', thirdClassDef);
-            });
+                ]);
         },
 
         testBASE: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'value',
+                    READONLY, Number, 'value',
 
                     function $(value) {
                         this.value = value;
                     },
 
-                    ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                    VOID, function method(value) {
                         this.value = value;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            //assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            //});
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var SecondClass = CLASS(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {
                         BASE(5);
                     },
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                    OVERRIDE, VOID, function method(value) {
                         BASE(value);
                     }
-                ]]);
-
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
+                ]);
 
 
-            var instance;
-            //assertNoException(function () {
-                instance = new SecondClass();
-            //});
+            var instance = new SecondClass();
 
             assertEquals(instance.getValue(), 5);
 
-            assertNoException(function () {
-                instance.method(7);
-            });
+            assertNoException(function () { instance.method(7); });
 
             assertEquals(instance.getValue(), 7);
         },
 
         testSELF: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     Number, 'value',
 
                     function $() {
-                        assertEquals(BaseClass, SELF);
+                        assertEquals(BaseClass, window.SELF);
                     },
 
-                    ria.__SYNTAX.Modifiers.VOID, function method() {
-                        assertEquals(BaseClass, SELF);
+                    VOID, function method() {
+                        assertEquals(BaseClass, window.SELF);
                     }
-                ]]);
-
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
+                ]);
 
             assertNotEquals(BaseClass, SELF);
+
             var instance = new BaseClass();
+
             assertNotEquals(BaseClass, SELF);
+
             instance.method();
+
             assertNotEquals(BaseClass, SELF);
         },
 
         testPropertyInheritance: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     Number, 'value',
 
                     function $() { this.value = null; },
 
-                    ria.__SYNTAX.Modifiers.VOID, function method(value) {
+                    VOID, function method(value) {
                         this.value = value;
                     }
-                ]]);
-
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
+                ]);
 
             assertNotNull(BaseClass.__META.properties['value']);
             assertFunction(BaseClass.__META.properties['value'].getter);
@@ -899,16 +788,14 @@
             assertEquals(5, instance.getValue());
 
             assertUndefined(instance.value);
-            assertNoException(function (){
-                instance.setValue(6);
-            });
+            assertNoException(function (){ instance.setValue(6); });
             assertUndefined(instance.value);
 
             assertEquals(6, instance.getValue());
         },
 
         testPropertyFlags: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.abstractString = null;
@@ -916,129 +803,94 @@
                         this.selfValue = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, String, 'abstractString',
+                    ABSTRACT, String, 'abstractString',
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, String, function getAbstractString() {
+                    ABSTRACT, String, function getAbstractString() {
                         return this.abstractString;
                     },
 
                     [[String]],
-                    ria.__SYNTAX.Modifiers.ABSTRACT, ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                    ABSTRACT, VOID, function setAbstractString(string) {
                         this.abstractString = string;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+                    FINAL, Number, 'value',
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                    FINAL, Number, function getValue() {
                         return this.value;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value2'
-                ]]);
+                    FINAL, Number, 'value2'
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var SecondClass = CLASS(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                    OVERRIDE, String, function getAbstractString() {
                         return this.abstractString;
                     },
 
                     [[String]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                    OVERRIDE, VOID, function setAbstractString(string) {
                         this.abstractString = string;
                     }
-                ]]);
-
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
+                ]);
         },
 
         testPropertyFlags_redefining: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {},
 
                     Number, 'value'
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, 'value'
-                ]]);
+                    OVERRIDE, Number, 'value'
+                ]);
 
-            var SecondClass;
-            assertException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
-
-            var secondClass2Def = ClassDef([
-                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
                     Number, 'value'
-                ]]);
-
-            var SecondClass2;
-            assertException(function () {
-                SecondClass2 = MakeClass('SecondClass2', secondClass2Def);
-            });
+                ]);
         },
 
         testPropertyFlags_differentFlagsToGettersSetters: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.value = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+                    FINAL, Number, 'value',
 
-                    Number, function getValue() {
+                    FINAL, Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var baseClass2Def = ClassDef([
+            CLASS_E(
                 'BaseClass2', [
                     function $() {
                         this.value = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+                    FINAL, Number, 'value',
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, Number, function getValue() {
+                    ABSTRACT, Number, function getValue() {
                         return this.value;
                     }
-                ]]);
-
-            var BaseClass2;
-            assertException(function () {
-                BaseClass2 = MakeClass('BaseClass2', baseClass2Def);
-            });
+                ]);
         },
 
         testPropertyFlags_abstractGettersSetters: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.abstractString = null;
@@ -1046,60 +898,40 @@
                         this.selfValue = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.ABSTRACT, String, 'abstractString'
-                ]]);
+                    ABSTRACT, String, 'abstractString'
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {}
-                ]]);
+                ]);
 
-            var SecondClass;
-            assertException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
-
-            var secondClass2Def = ClassDef([
-                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                    OVERRIDE, String, function getAbstractString() {
                         return this.abstractString + "_";
                     }
-                ]]);
+                ]);
 
-            var SecondClass2;
-            assertException(function () {
-                SecondClass2 = MakeClass('SecondClass2', secondClass2Def);
-            });
-
-            var secondClass3Def = ClassDef([
-                'SecondClass3', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass3', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, String, function getAbstractString() {
+                    OVERRIDE, String, function getAbstractString() {
                         return this.abstractString + "_";
                     },
 
                     [[String]],
-                    ria.__SYNTAX.Modifiers.VOID, function setAbstractString(string) {
+                    VOID, function setAbstractString(string) {
                         this.abstractString = string;
                     }
-                ]]);
-
-            var SecondClass3;
-            assertException(function () {
-                SecondClass3 = MakeClass('SecondClass2', secondClass3Def);
-            });
+                ]);
         },
 
         testPropertyFlags_overriddenGettersSetters: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.value = null;
@@ -1110,109 +942,75 @@
                     Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var SecondClass = CLASS(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {}
-                ]]);
+                ]);
 
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
-
-            var thirdClassDef = ClassDef([
-                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+            CLASS_E(
+                'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
                     Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var ThirdClass;
-            assertException(function () {
-                ThirdClass = MakeClass('ThirdClass', thirdClassDef);
-            });
-
-            var thirdClass2Def = ClassDef([
-                'ThirdClass2', ria.__SYNTAX.EXTENDS(SecondClass), [
+            CLASS_E(
+                'ThirdClass2', EXTENDS(SecondClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.VOID, function setValue(value) {
+                    VOID, function setValue(value) {
                         this.value = value;
                     }
-                ]]);
+                ]);
 
-            var ThirdClass2;
-            assertException(function () {
-                ThirdClass2 = MakeClass('ThirdClass2', thirdClass2Def);
-            });
-
-            var thirdClass3Def = ClassDef([
-                'ThirdClass3', ria.__SYNTAX.EXTENDS(SecondClass), [
+            var ThirdClass3 = CLASS(
+                'ThirdClass3', EXTENDS(SecondClass), [
                     function $() {},
 
                     [[Number]],
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.VOID, function setValue(value) {
+                    OVERRIDE, VOID, function setValue(value) {
                         this.value = value;
                     }
-                ]]);
+                ]);
 
-            var ThirdClass3;
-            assertNoException(function () {
-                ThirdClass3 = MakeClass('ThirdClass3', thirdClass3Def);
-            });
 
-            var thirdClass4Def = ClassDef([
-                'ThirdClass4', ria.__SYNTAX.EXTENDS(SecondClass), [
+            var ThirdClass4 = CLASS(
+                'ThirdClass4', EXTENDS(SecondClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                    OVERRIDE, Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var ThirdClass4;
-            assertNoException(function () {
-                ThirdClass4 = MakeClass('ThirdClass4', thirdClass4Def);
-            });
-
-            var thirdClass5Def = ClassDef([
-                'ThirdClass5', ria.__SYNTAX.EXTENDS(SecondClass), [
+            CLASS_E(
+                'ThirdClass5', EXTENDS(SecondClass), [
                     function $() {
                         this.value2 = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
+                    OVERRIDE, Number, function getValue2() {
                         return this.value2;
                     }
-                ]]);
-
-            var ThirdClass5;
-            assertException(function () {
-                ThirdClass5 = MakeClass('ThirdClass5', thirdClass5Def);
-            });
+                ]);
         },
 
         testPropertyFlags_finalGettersSetters: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.value = null;
                         this.value2 = null;
                     },
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, 'value',
+                    FINAL, Number, 'value',
 
-                    ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                    FINAL, Number, function getValue() {
                         return this.value;
                     },
 
@@ -1221,68 +1019,43 @@
                     Number, function getValue2() {
                         return this.value2;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var SecondClass = CLASS(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {}
-                ]]);
+                ]);
 
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
-
-            var secondClass2Def = ClassDef([
-                'SecondClass2', ria.__SYNTAX.EXTENDS(BaseClass), [
+            CLASS_E(
+                'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                    OVERRIDE, Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var SecondClass2;
-            assertException(function () {
-                SecondClass2 = MakeClass('SecondClass2', secondClass2Def);
-            });
-
-            var thirdClassDef = ClassDef([
-                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+            CLASS_E(
+                'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                    OVERRIDE, Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var ThirdClass;
-            assertException(function () {
-                ThirdClass = MakeClass('ThirdClass', thirdClassDef);
-            });
-
-            var thirdClass2Def = ClassDef([
-                'ThirdClass2', ria.__SYNTAX.EXTENDS(SecondClass), [
+            var ThirdClass2 = CLASS(
+                'ThirdClass2', EXTENDS(SecondClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.FINAL, ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue2() {
+                    FINAL, OVERRIDE, Number, function getValue2() {
                         return this.value2;
                     }
-                ]]);
-
-            var ThirdClass2;
-            assertNoException(function () {
-                ThirdClass2 = MakeClass('ThirdClass2', thirdClass2Def);
-            });
+                ]);
         },
 
         testPropertyFlags_overriddenAndFinal: function () {
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
                         this.value = null;
@@ -1293,40 +1066,25 @@
                     Number, function getValue() {
                         return this.value;
                     }
-                ]]);
+                ]);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [
+            var SecondClass = CLASS(
+                'SecondClass', EXTENDS(BaseClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, ria.__SYNTAX.Modifiers.FINAL, Number, function getValue() {
+                    OVERRIDE, FINAL, Number, function getValue() {
                         return this.value * 2;
                     }
-                ]]);
+                ]);
 
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('SecondClass', secondClassDef);
-            });
-
-            var thirdClassDef = ClassDef([
-                'ThirdClass', ria.__SYNTAX.EXTENDS(SecondClass), [
+            CLASS_E(
+                'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
-                    ria.__SYNTAX.Modifiers.OVERRIDE, Number, function getValue() {
+                    OVERRIDE, Number, function getValue() {
                         return this.value * 3;
                     }
-                ]]);
-
-            var ThirdClass;
-            assertException(function () {
-                ThirdClass = MakeClass('ThirdClass', thirdClassDef);
-            });
+                ]);
 
             var first = new BaseClass();
             first.setValue(3);
@@ -1339,9 +1097,7 @@
         },
 
         test$$: function () {
-            "use strict";
-
-            var baseClassDef = ClassDef([
+            var BaseClass = CLASS(
                 'BaseClass', [
                     function $$(instance, clazz, ctor, args) {
                         //assertNotUndefined(instance);
@@ -1350,7 +1106,7 @@
                         assertFunction(ctor);
                         assertEquals(BaseClass.prototype.$, ctor);
                         assertEquals([1,2,'3'], args);
-                        assertEquals(BaseClass, SELF);
+                        assertEquals(BaseClass, window.SELF);
 
                         return ria.__API.init(instance, clazz, ctor, ria.__API.clone(args).map(Number));
                     },
@@ -1360,28 +1116,15 @@
                         this.value = a + b + c;
                     },
 
-                    Number, 'value',
-
-                    Number, function getValue() {
-                        return this.value;
-                    }
-                ]]);
-
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
+                    Number, 'value'
+                ]);
 
             var instance;
-            assertNoException(function () {
-                instance = BaseClass(1,2,'3');
-            });
+            instance = BaseClass(1,2,'3');
 
             assertEquals(6, instance.getValue());
 
-            assertNoException(function () {
-                instance = new BaseClass(1,2,'3');
-            });
+            instance = new BaseClass(1,2,'3');
 
             assertEquals(6, instance.getValue());
         }

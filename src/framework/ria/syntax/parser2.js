@@ -88,11 +88,12 @@
         return str.replace(/\w/,function (_1){ return _1.toUpperCase(); });
     }
 
-    function PropertyDescriptor(name, type, annotations, flags) {
+    function PropertyDescriptor(name, type, annotations, flags, isOverride) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
         this.flags = flags;
+        this.isOverride = isOverride === true;
     }
 
     PropertyDescriptor.prototype.getGetterName = function () {
