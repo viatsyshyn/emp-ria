@@ -28,7 +28,7 @@
 
     /**
      * @param [arg*]
-     * @returns {Function|ClassDescriptor}
+
      */
     function CLASS(arg) {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
@@ -38,16 +38,34 @@
     }
 
     /**
+     * @param {Error} error
      * @param [arg*]
+     * @return {*}
      */
-    function CLASS_E(arg) {
-        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
-        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
+    function CLASS_E(error, arg) {
+        var args = ria.__API.clone(arguments);
+        if (error instanceof Error)
+            args.shift();
+        else
+            error = null;
 
-        assertException(function () {
+        try {
+            var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
+            ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
             ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
             ria.__SYNTAX.compileClass('test.' + def.name, def);
-        })
+        } catch (e) {
+            if (e.name == 'AssertError')
+                throw e;
+
+            if (error && e.message != error.message) {
+                fail('Expected error "' + error.message + ", actual: " + e);
+            }
+
+            return null;
+        }
+
+        fail('Expected error ' + (error ? error.message : null));
     }
 
     TestCase("ClassTestCase").prototype = {
@@ -172,7 +190,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Can NOT extend final class test.BaseClass'),
                 FINAL, 'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -236,7 +254,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('There is no ability to override final method hello in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -279,7 +297,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The abstract method isMyComputerOn have to be overridden in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -314,7 +332,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -328,7 +346,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method isMyComputerOn have to be marked as OVERRIDE in MyClass2 class'),
                 'MyClass2', EXTENDS(BaseClass), [
                 function $() {},
 
@@ -489,7 +507,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Final method hello can\'t be overridden in SecondClass class'),
                 'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
@@ -579,7 +597,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in SecondClass class'),
                 'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
@@ -664,7 +682,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Method method2 can\'t be abstract, because there is method with the same name in one of the base classes'),
                 'SecondClass', EXTENDS(FirstClass), [
                     function $() {},
 
@@ -687,7 +705,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in ThirdClass class'),
                 'ThirdClass', EXTENDS(FirstClass), [
                     function $() {},
 
@@ -736,7 +754,6 @@
                         BASE(value);
                     }
                 ]);
-
 
             var instance = new SecondClass();
 
@@ -857,14 +874,14 @@
                     Number, 'value'
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method getValue have to be marked as OVERRIDE in SecondClass class'),
                 'SecondClass', EXTENDS(BaseClass), [
                     function $() {},
 
                     OVERRIDE, Number, 'value'
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method getValue have to be marked as OVERRIDE in SecondClass2 class'),
                 'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -886,7 +903,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The flags of getter getValue should be the same with property flags'),
                 'BaseClass2', [
                     function $() {
                         this.value = null;
@@ -912,12 +929,12 @@
                     ABSTRACT, String, 'abstractString'
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The abstract method getAbstractString have to be overridden in SecondClass class'),
                 'SecondClass', EXTENDS(BaseClass), [
                     function $() {}
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Method setAbstractString can\'t be abstract, because there is method with the same name in one of the base classes'),
                 'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -926,7 +943,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('The overridden method setAbstractString have to be marked as OVERRIDE in SecondClass3 class'),
                 'SecondClass3', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -960,7 +977,7 @@
                     function $() {}
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Method getValue of ThirdClass should be marked with OVERRIDE as one base classes has same method'),
                 'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
@@ -969,7 +986,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Method setValue of ThirdClass2 should be marked with OVERRIDE as one base classes has same method'),
                 'ThirdClass2', EXTENDS(SecondClass), [
                     function $() {},
 
@@ -989,7 +1006,6 @@
                     }
                 ]);
 
-
             var ThirdClass4 = CLASS(
                 'ThirdClass4', EXTENDS(SecondClass), [
                     function $() {},
@@ -999,7 +1015,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('There is no getValue2 method in base classes of ThirdClass5 class'),
                 'ThirdClass5', EXTENDS(SecondClass), [
                     function $() {
                         this.value2 = null;
@@ -1037,7 +1053,7 @@
                     function $() {}
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('There is no ability to override final method getValue in SecondClass2 class'),
                 'SecondClass2', EXTENDS(BaseClass), [
                     function $() {},
 
@@ -1046,7 +1062,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('Final method getValue can\'t be overridden in ThirdClass class'),
                 'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
@@ -1088,7 +1104,7 @@
                     }
                 ]);
 
-            CLASS_E(
+            CLASS_E(Error('There is no ability to override final method getValue in ThirdClass class'),
                 'ThirdClass', EXTENDS(SecondClass), [
                     function $() {},
 
