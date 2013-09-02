@@ -41,7 +41,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     function findParentPropertyFixed(def, name){
         var base = def.base && ria.__SYNTAX.Registry.find(def.base.value.__META.name);
-
         return base &&
             (base.properties.filter(function(property){ return property.name == name }).pop()
             || findParentPropertyFixed(base, name));
@@ -73,12 +72,19 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      *
      * @param {Function} body
      * @param SELF
-     * @param [BASE]
+     * @param [method]
      * @returns {Function}
      */
-    function addSelfAndBaseBody(body, SELF, BASE) {
+    function addSelfAndBaseBody(body, SELF, method) {
         body.__SELF = SELF;
-        body.__BASE_BODY = BASE;
+        if (method && method.__BASE_META) {
+            if (method.flags.isOverride) {
+                body.__BASE_BODY = method.__BASE_META.body.value;
+            }
+
+            body.__BASE_BODY = method.__BASE_META.body.value;
+        }
+
         return body;
     }
 
@@ -115,8 +121,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
         }
 
+        if (!method.flags.isOverride && parentMethod) {
+            throw Error('Method ' + method.name + ' of ' + def.name + ' should be marked with OVERRIDE as one base classes has same method');
+        }
+
         if (method.flags.isAbstract && parentMethod) {
-            throw Error(method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
+            throw Error('Method ' + method.name + ' can\'t be abstract, because there is method with the same name in one of the base classes');
         }
 
         if (parentMethod && parentMethod.flags.isFinal) {
@@ -185,15 +195,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function compileMethodDeclaration(def, method, ClassProxy) {
-        var parentMethod = method.__BASE_META;
-        if (method.flags.isOverride) {
-            method.body.value.__BASE_BODY = parentMethod.body.value;
-        }
-
         method.retType = processSelf(method.retType, ClassProxy);
         method.argsTypes = processSelf(method.argsTypes, ClassProxy);
 
-        var impl = ClassProxy.prototype[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy, parentMethod && parentMethod.body.value);
+        var impl = ClassProxy.prototype[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy, method);
         ria.__API.method(
             ClassProxy,
             impl,
@@ -216,10 +221,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         property.type = processSelf(property.type, ClassProxy);
 
-        var getter = ClassProxy.prototype[getterName] = addSelfAndBaseBody(getterDef.body.value, ClassProxy);
+        var getter = ClassProxy.prototype[getterName] = addSelfAndBaseBody(getterDef.body.value, ClassProxy, getterDef);
 
         if (!property.flags.isReadonly) {
-            var setter = ClassProxy.prototype[setterName] = addSelfAndBaseBody(setterDef.body.value, ClassProxy);
+            var setter = ClassProxy.prototype[setterName] = addSelfAndBaseBody(setterDef.body.value, ClassProxy, setterDef);
         }
 
         ria.__API.property(
@@ -269,11 +274,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 return findParentPropertyByGetterOrSetterFixed(def, method.name);
             })
             .filter(function (_) { return _; })
-            .reduce(function (_, node) {
-                if (_.indexOf(node.name) < 0)
-                    _.push(node);
+            .reduce(function (list, node) {
+                if (list.indexOf(node) < 0)
+                    list.push(node);
 
-                return _;
+                return list;
             }, [])
             .forEach(function (baseProperty) {
                 def.properties.push(new ria.__SYNTAX.PropertyDescriptor(
@@ -290,7 +295,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 var name = property.name;
                 var getterName = property.getGetterName();
                 var flags = ria.__API.clone(property.flags);
-                flags.isOverride = true;
+                flags.isOverride = property.isOverride;
                 var getterDef = def.methods.filter(function (_) {return _.name === getterName; }).pop();
                 if (!getterDef) {
                     getterDef = new ria.__SYNTAX.MethodDescriptor(
@@ -374,29 +379,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (baseSyntaxMeta.flags.isFinal)
             throw Error('Can NOT extend final class ' + def.base.value.__META.name);
 
-        // validate properties overrides
-        baseSyntaxMeta.properties.forEach(function(baseProperty){
-            var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
-                childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
-
-            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
-        });
-
-        // validate properties
-        def.properties.forEach(
-            /**
-             * @param {PropertyDescriptor} property
-             */
-            function (property) {
-                if (property.isOverride)
-                    return;
-
-                if(findParentPropertyFixed(def, property.name))
-                    throw Error('There is defined property ' + property.name + ' in one of the base classes');
-
-                validatePropertyDeclaration(property, def, processedMethods);
-            });
-
         // TODO: validate ctor declaration
         processedMethods.push('$');
 
@@ -420,6 +402,29 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                     return;
 
                 validateMethodDeclaration(def, method);
+            });
+
+        // validate properties overrides
+        baseSyntaxMeta.properties.forEach(function(baseProperty){
+            var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
+                childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
+
+            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
+        });
+
+        // validate properties
+        def.properties.forEach(
+            /**
+             * @param {PropertyDescriptor} property
+             */
+            function (property) {
+                if (property.isOverride)
+                    return;
+
+                if(findParentPropertyFixed(def, property.name))
+                    throw Error('There is defined property ' + property.name + ' in one of the base classes');
+
+                validatePropertyDeclaration(property, def, processedMethods);
             });
     };
 
