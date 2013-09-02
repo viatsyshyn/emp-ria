@@ -6,6 +6,7 @@
 
     function MakeClass(name, def) {
         "use strict";
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
         ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
         return ria.__SYNTAX.compileClass(name, def);
     }
@@ -38,6 +39,7 @@
 
 
             //assertNoException(function () {
+                ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseClassDef, ria.__API.Class);
                 ria.__SYNTAX.validateClassDecl(baseClassDef, ria.__API.Class);
             //});
 
@@ -803,9 +805,9 @@
                 ]]);
 
             var BaseClass;
-            assertNoException(function () {
+            //assertNoException(function () {
                 BaseClass = MakeClass('BaseClass', baseClassDef);
-            });
+            //});
 
             var secondClassDef = ClassDef([
                 'SecondClass', ria.__SYNTAX.EXTENDS(BaseClass), [

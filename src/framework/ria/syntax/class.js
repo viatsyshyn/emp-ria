@@ -106,6 +106,19 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return true;
     }
 
+    /**
+     *
+     * @param {Function} body
+     * @param SELF
+     * @param [BASE]
+     * @returns {Function}
+     */
+    function addSelfAndBaseBody(body, SELF, BASE) {
+        body.__SELF = SELF;
+        body.__BASE_BODY = BASE;
+        return body;
+    }
+
     function validateGetterSetterOverride(method, def, baseSearchResult, processedMethods) {
         if (!method.flags.isOverride)
             throw Error('Method' + method.name + ' have to be marked as OVERRIDE in ' + def.name + ' class');
@@ -176,7 +189,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function validateMethodDeclaration(def, method) {
-        var parentMethod = findParentMethod(def, method.name);
+        var parentMethod = method.__BASE_META;
         if (method.flags.isOverride && !parentMethod) {
             throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
         }
@@ -191,7 +204,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function compileMethodDeclaration(def, method, ClassProxy) {
-        var parentMethod = findParentMethod(def, method.name);
+        var parentMethod = method.__BASE_META;
         if (method.flags.isOverride) {
             method.body.value.__BASE_BODY = parentMethod.body.value;
         }
@@ -241,9 +254,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             }
         });
 
-        var impl = ClassProxy.prototype[method.name] = method.body.value;
-        impl.__SELF = ClassProxy;
-        ria.__API.method(ClassProxy, impl, method.name,
+        var impl = ClassProxy.prototype[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy);
+        ria.__API.method(
+            ClassProxy,
+            impl,
+            method.name,
             method.retType ? method.retType.value : null,
             method.argsTypes.map(function (_) { return _.value }),
             method.argsNames,
@@ -254,30 +269,27 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var getterName = property.getGetterName();
         var setterName = property.getSetterName();
 
-        var getterDef = def.methods.filter(function (_1) { return _1.name == getterName }).pop();
-        if (getterDef && !isSameFlags(property, getterDef))
-            throw Error('The flags of getter ' + getterDef.name + ' should be the same with property flags');
+        var getterDef = property.__GETTER_DEF;
+        if (!isSameFlags(property, getterDef))
+            throw Error('The flags of getter ' + getterName + ' should be the same with property flags');
 
-        var setterDef = def.methods.filter(function (_1) { return _1.name == setterName }).pop();
-        if (setterDef && property.flags.isReadonly)
-            throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
-
-        if (setterDef && !isSameFlags(property, setterDef))
-            throw Error('The flags of setter ' + setterDef.name + ' should be the same with property flags');
+        var setterDef = property.__SETTER_DEF;
+        if (property.flags.isReadonly) {
+            if (setterDef) throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
+        } else if (!isSameFlags(property, setterDef)) {
+            throw Error('The flags of setter ' + setterName + ' should be the same with property flags');
+        }
 
         processedMethods.push(getterName);
         processedMethods.push(setterName);
-
-        property.getterDef = getterDef;
-        property.setterDef = setterDef;
     }
 
     function compilePropertyDeclaration(property, ClassProxy, processedMethods) {
         var getterName = property.getGetterName();
         var setterName = property.getSetterName();
 
-        var getterDef = property.getterDef;
-        var setterDef = property.setterDef;
+        var getterDef = property.__GETTER_DEF;
+        var setterDef = property.__SETTER_DEF;
 
         processedMethods.push(getterName);
         processedMethods.push(setterName);
@@ -290,41 +302,38 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         // TODO: handle ArrayOf(SELF) and ClassOf(SELF)
 
-        var getter = getterDef ? getterDef.body : getDefaultGetter(property.name, getterName);
-        ClassProxy.prototype[getterName] = getter.value;
-        ClassProxy.prototype[getterName].__SELF = ClassProxy;
+        var getter = ClassProxy.prototype[getterName] = addSelfAndBaseBody(getterDef.body.value, ClassProxy);
 
-        var setter = null;
         if (!property.flags.isReadonly) {
-            setter = setterDef ? setterDef.body : getDefaultSetter(property.name, setterName);
-            ClassProxy.prototype[setterName] = setter.value;
-            ClassProxy.prototype[setterName].__SELF = ClassProxy;
+            var setter = ClassProxy.prototype[setterName] = addSelfAndBaseBody(setterDef.body.value, ClassProxy);
         }
 
-        ria.__API.property(ClassProxy, property.name,
+        ria.__API.property(
+            ClassProxy,
+            property.name,
             property.type.value,
             property.annotations.map(function (_) { return _.value }),
-            getter.value, setter ? setter.value : null);
+            getter,
+            setter || null);
     }
 
     function compileCtorDeclaration(def, ClassProxy, processedMethods) {
         var ctorDef = def.methods.filter(function (_1) { return _1.name == '$'}).pop();
 
-        var ctor = ctorDef ? ctorDef.body.value : getDefaultCtor(def.name).value;
-        var argsTypes = ctorDef ? ctorDef.argsTypes : [];
-        var argsNames = ctorDef ? ctorDef.argsNames : [];
-        var anns = ctorDef ? ctorDef.annotations.map(function(item){
-            return item.value
-        }) : [];
-
-        ClassProxy.prototype.$ = ctor;
-        ClassProxy.prototype.$.__BASE_BODY = def.base ? def.base.value.__META.ctor.impl : undefined;
-        ClassProxy.prototype.$.__SELF = ClassProxy;
-        ria.__API.ctor(ClassProxy, ClassProxy.prototype.$,
-            argsTypes.map(function (_) { return _.value }),
-            argsNames, anns);
-
         processedMethods.push('$');
+
+        ClassProxy.prototype.$ = ctorDef.body.value;
+        ClassProxy.prototype.$.__BASE_BODY = def.base.value.__META.ctor.impl;
+        ClassProxy.prototype.$.__SELF = ClassProxy;
+        ria.__API.ctor(
+            ClassProxy,
+            ClassProxy.prototype.$,
+            ctorDef.argsTypes.map(function (_) { return _.value }),
+            ctorDef.argsNames,
+            ctorDef.annotations.map(function(item){
+                return item.value
+            })
+        );
     }
 
     function validateBaseClassMethodDeclaration(def, baseMethod) {
@@ -388,17 +397,22 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 var getterName = property.getGetterName();
                 var getterDef = def.methods.filter(function (_) {return _.name === getterName; }).pop();
                 if (!getterDef) {
-                    getterDef = new ria.__SYNTAX.MethodDescriptor(getterName, [], [], property.type, getDefaultGetter(name), []);
+                    getterDef = new ria.__SYNTAX.MethodDescriptor(getterName, [], [], property.type, property.flags, getDefaultGetter(name), []);
                     def.methods.push(getterDef);
                 }
 
-                var setterName = property.getSetterName();
-                var setterDef = def.methods.filter(function (_) {return _.name === setterName; }).pop();
-                if (!setterDef) {
-                    setterDef = new ria.__SYNTAX.MethodDescriptor(setterName, ['value'], [property.type]
-                        , new ria.__SYNTAX.Tokenizer.VoidToken(), getDefaultSetter(name), []);
-                    def.methods.push(setterDef);
+                if (!property.flags.isReadonly) {
+                    var setterName = property.getSetterName();
+                    var setterDef = def.methods.filter(function (_) {return _.name === setterName; }).pop();
+                    if (!setterDef) {
+                        setterDef = new ria.__SYNTAX.MethodDescriptor(setterName, ['value'], [property.type]
+                            , new ria.__SYNTAX.Tokenizer.VoidToken(), property.flags, getDefaultSetter(name), []);
+                        def.methods.push(setterDef);
+                    }
                 }
+
+                property.__GETTER_DEF = getterDef;
+                property.__SETTER_DEF = setterDef;
             });
 
         // TODO: ensure optional type hints
