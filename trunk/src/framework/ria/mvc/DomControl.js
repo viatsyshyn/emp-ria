@@ -37,8 +37,8 @@ NAMESPACE('ria.mvc', function () {
                 this._domEvents = ref.getMethodsReflector()
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.DomEventBind)})
                     .map(function(_) {
-                        if (_.getArguments().length != 2)
-                            throw new ria.mvc.MvcException('Methods, annotated with ria.mvc.DomBindEvent, are expected to accept two arguments (node, event)');
+                        if (_.getArguments().length < 2)
+                            throw new ria.mvc.MvcException('Methods, annotated with ria.mvc.DomBindEvent, are expected to accept at least two arguments (node, event)');
 
                         var annotation = _.findAnnotation(ria.mvc.DomEventBind).pop();
                         return {
