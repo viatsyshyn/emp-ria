@@ -126,7 +126,7 @@ NAMESPACE('ria.async', function () {
 
             VOID, function completeError_(error) {
                 if (!this._next)
-                    throw error;
+                    throw new Exception('Uncaught error', error);
 
                 ria.__API.defer(this, function () {
                     try {
