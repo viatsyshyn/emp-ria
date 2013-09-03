@@ -96,8 +96,12 @@
         this.isOverride = isOverride === true;
     }
 
+    PropertyDescriptor.prototype.isOfBooleanType = function () {
+        return (this.type.value === Boolean);
+    };
+
     PropertyDescriptor.prototype.getGetterName = function () {
-        return ((this.type.value === Boolean) ? 'is' : 'get') + capitalize(this.name);
+        return (this.isOfBooleanType() ? 'is' : 'get') + capitalize(this.name);
     };
 
     PropertyDescriptor.prototype.getSetterName = function () {

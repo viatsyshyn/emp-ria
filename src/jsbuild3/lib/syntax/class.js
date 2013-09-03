@@ -102,7 +102,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                         [ToAst(ClassCtor)],
                         [make_node(UglifyJS.AST_SimpleStatement, node, {
                             body: make_node(UglifyJS.AST_Call, node, {
-                                expression: AccessNS('ria.__API.class', null, node),
+                                expression: AccessNS('ria.__API.clazz', null, node),
                                 args: [
                                     AccessNS('ClassCtor'),
                                     make_node(UglifyJS.AST_String, node, {value: ns + '.' + def.name}),
@@ -121,7 +121,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 return make_node(UglifyJS.AST_Assign, node, {
                                     left: AccessNS('ClassCtor.$$'),
                                     operator: '=',
-                                    right: $$Def ? $$Def.body.raw : make_node(UglifyJS.AST_Null, node)
+                                    right: $$Def ? ProcessSELF($$Def.body, 'ClassCtor') : make_node(UglifyJS.AST_Null, node)
                                 })
                             }()
                         })],
@@ -173,8 +173,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 var setterDef = def.methods.filter(function (_) { return _.name == setterName }).pop();
                                 processedMethods.push(setterName);
 
-                                var getterBody = getterDef ? getterDef.body.raw : ToAst('function getter() { return this["' + property.name + '"];}'),
-                                    setterBody = setterDef ? setterDef.body.raw : ToAst('function setter(value) { this["' + property.name + '"] = value;}');
+                                var getterBody = getterDef ? getterDef.body.raw : ToAst('function g() { return this["' + property.name + '"];}'),
+                                    setterBody = setterDef ? setterDef.body.raw : ToAst('function s(v) { this["' + property.name + '"] = v;}');
 
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {

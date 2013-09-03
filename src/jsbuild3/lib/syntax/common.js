@@ -12,6 +12,10 @@ var globalFunctions = [];
 
 var Exception = ria.__API.Exception;
 
+ria.__SYNTAX.PropertyDescriptor.prototype.isOfBooleanType = function () {
+    return this.type.raw.print_to_string() === 'Boolean';
+};
+
 function AccessNS(parts, top, node) {
     if (typeof parts === 'string')
         parts = parts.split('.');
@@ -79,7 +83,7 @@ function XxxOfCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(XxxOfCompiler);
+//compilers.push(XxxOfCompiler);
 
 function SyntaxCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call) {
