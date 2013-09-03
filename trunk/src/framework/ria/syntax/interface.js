@@ -4,6 +4,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
+    function checkXxxOfIsSELF(token, descriptor) {
+        return token.value instanceof descriptor
+            && token.value.clazz == ria.__SYNTAX.Modifiers.SELF;
+    }
+
     function processSelf(token, SELF) {
         if (Array.isArray(token))
             return token.map(function (_) { return processSelf(_, SELF); });
