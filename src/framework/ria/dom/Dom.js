@@ -48,6 +48,20 @@ NAMESPACE('ria.dom', function () {
         [[Object, ria.dom.Event]],
         Boolean, function DomEventHandler(node, event) {});
 
+    /** @class ria.dom.Keys */
+    ENUM(
+        'Keys', {
+            LEFT: 37,
+            UP: 38,
+            RIGHT: 39,
+            DOWN: 40,
+            ENTER: 13,
+            BACKSPACE: 8,
+            DELETE: 46,
+            ESC: 27,
+            SPACE: 32
+        });
+
     var GID = new Date().getTime();
     /**
      * @class ria.dom.NewGID
@@ -131,7 +145,7 @@ NAMESPACE('ria.dom', function () {
                                 return checkEventHandlerResult(e, handler_(new ria.dom.Dom(selectorTarget), e));
                         };
 
-                        element.addEventListener(evt, h, false);
+                        element.addEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
                     })
                 });
                 return this;
@@ -156,7 +170,7 @@ NAMESPACE('ria.dom', function () {
 
                         var h;
                         if (h = element.__domEvents[evt + hid])
-                            element.removeEventListener(evt, h, false);
+                            element.removeEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
                     })
                 });
                 return this;
@@ -333,6 +347,9 @@ NAMESPACE('ria.dom', function () {
                     return nodes.some(function (_) { return el.contains(_); });
                 });
             },
+            Boolean, function exists() {
+                return !!this._dom[0];
+            },
 
             Object, function getValue() {
                 return this.valueOf()[0].value;
@@ -356,10 +373,10 @@ NAMESPACE('ria.dom', function () {
                 var node = this.valueOf()[0];
                 if ( document.createEvent ) {
                     var evt = document.createEvent('Event');
-                    evt.initEvent('submit', true, false);
+                    evt.initEvent(event, true, false);
                     node.dispatchEvent(evt);
                 } else if( document.createEventObject ) {
-                    node.fireEvent('onsubmit') ;
+                    node.fireEvent('on' + event) ;
                 } else if (typeof node.onsubmit == 'function' ) {
                     node.onsubmit();
                 }

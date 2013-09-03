@@ -58,6 +58,19 @@ ria.__API = ria.__API || {};
     };
 
     /**
+     * Merge the content of second object into the first object.
+     * @param {Object} first
+     * @param {Object} second
+     */
+    ria.__API.extendWithDefault = function (first, second){
+        for(var prop in second){
+            if(!first.hasOwnProperty(prop))
+                first[prop] = second[prop];
+        }
+        return first;
+    };
+
+    /**
      * Instantiate object from ctor without call to ctor
      * @param {Function} ctor
      * @param {String} [name_]

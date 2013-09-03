@@ -54,6 +54,18 @@ NAMESPACE('ria.mvc', function () {
                     return tplRef.instantiate();
                 });
 
+                var partialUpdateWithMethods = ref.getMethodsReflector()
+                    .filter(function (_) { return _.isAnnotatedWith(ria.mvc.PartialUpdateRule)})
+                    .map(function(_) {
+                        var annotation = _.findAnnotation(ria.mvc.PartialUpdateRule).pop();
+                        var tplRef = new ria.reflection.ReflectionClass(annotation.tpl);
+                        return {
+                            tpl: tplRef.instantiate(),
+                            msg: _.msg_ || null,
+                            methodRef: _
+                        }
+                    });
+
                 this._partialUpdateRules = ref.findAnnotation(ria.mvc.PartialUpdateRule)
                     .map(function (_) {
                         if (_.tpl === undefined)
@@ -71,7 +83,9 @@ NAMESPACE('ria.mvc', function () {
                             selector: _.selector_ || null,
                             action: _.action_ || ria.mvc.PartialUpdateRuleActions.Replace
                         };
-                    });
+                    }).concat(partialUpdateWithMethods);
+
+
 
                 if (this._partialUpdateRules.length < 1 && this._templateClasses.length == 1) {
                     this._partialUpdateRules.push({
@@ -132,20 +146,23 @@ NAMESPACE('ria.mvc', function () {
             OVERRIDE, VOID, function onPartialRender_(model, msg_) {
                 BASE(model, msg_);
                 var rule = this.doFindTemplateForPartialModel_(model, msg_ || '');
-
                 var tpl = rule.tpl;
                 this.onPrepareTemplate_(tpl, model, msg_);
                 tpl.assign(model);
-                var dom = new ria.dom.Dom().fromHTML(tpl.render());
+                if(rule.methodRef){
+                    rule.methodRef.invokeOn(this, [tpl, model, msg_]);
+                }else{
+                    var dom = new ria.dom.Dom().fromHTML(tpl.render());
 
-                var target = this.dom;
-                if (rule.selector)
-                    target = target.find(rule.selector);
+                    var target = this.dom;
+                    if (rule.selector)
+                        target = target.find(rule.selector);
 
-                switch (rule.action) {
-                    case ria.mvc.PartialUpdateRuleActions.Prepend: dom.prependTo(target); break;
-                    case ria.mvc.PartialUpdateRuleActions.Append: dom.appendTo(target); break;
-                    default: dom.appendTo(target.empty());
+                    switch (rule.action) {
+                        case ria.mvc.PartialUpdateRuleActions.Prepend: dom.prependTo(target); break;
+                        case ria.mvc.PartialUpdateRuleActions.Append: dom.appendTo(target); break;
+                        default: dom.appendTo(target.empty());
+                    }
                 }
             }
         ]);

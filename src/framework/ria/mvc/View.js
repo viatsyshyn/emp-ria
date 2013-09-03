@@ -40,7 +40,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.IActivity]],
             VOID, function onActivityClosed_(activity) {
-                if (this._stack.filter(function (_) { return _ && _.equals(activity)}) < 0)
+                if (!this._stack.filter(function (_) { return _ && _.equals(activity)}).length)
                     return;
 
                 while (this.getCurrent() != null) {
@@ -69,14 +69,15 @@ NAMESPACE('ria.mvc', function () {
              */
             [[ria.mvc.IActivity]],
             VOID, function push(activity) {
-                var top = this.getCurrent();
+                /*var top = this.getCurrent();
                 if (top) {
                     top.stop();
 
                     if (this.isSameActivityGroup_(top, activity))
                         this.pop_().stop();
-                }
+                }*/
 
+                this.reset();
                 this.push_(activity);
             },
 
@@ -127,6 +128,22 @@ NAMESPACE('ria.mvc', function () {
                 this._stack.forEach(function (_) {
                     if (_ instanceof activityClass)
                         _.partialRefreshD(data, msg_);
+                })
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            VOID, function startLoading(activityClass) {
+                this._stack.forEach(function (_) {
+                    if (_ instanceof activityClass)
+                        _.startLoading();
+                })
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            VOID, function stopLoading(activityClass) {
+                this._stack.forEach(function (_) {
+                    if (_ instanceof activityClass)
+                        _.stopLoading();
                 })
             },
 

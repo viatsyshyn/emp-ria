@@ -1,4 +1,5 @@
 REQUIRE('ria.mvc.IContext');
+REQUIRE('ria.mvc.IContextable');
 REQUIRE('ria.async.Future');
 
 REQUIRE('ria.serialize.JsonSerializer');
@@ -53,6 +54,15 @@ NAMESPACE('ria.mvc', function () {
              * Use either global var or session
              */
             ria.async.Future, function onAppStart() {
+                return ria.async.DeferredAction();
+            },
+
+            /**
+             * Method is called once Application pre dispatch
+             * A magic method 'cause you can load required resources but can not use this to store them
+             * Use either global var or session
+             */
+            ria.async.Future, function onAppInit() {
                 return ria.async.DeferredAction();
             },
 
@@ -146,7 +156,7 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     return params.map(function (_, index) {
                         try {
-                            return jsonSerializer.deserialize(_, types[index]);
+                            return (_ === null || _ === undefined) ? _ : jsonSerializer.deserialize(_, types[index]);
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error deserializing action param ' + names[index], e);
                         }
@@ -201,6 +211,16 @@ NAMESPACE('ria.mvc', function () {
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             function UpdateView(clazz, data, msg_) {
                 this.view.updateD(clazz, data, msg_ || '');
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            function StartLoading(clazz) {
+                this.view.startLoading(clazz);
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            function StopLoading(clazz) {
+                this.view.stopLoading(clazz);
             }
         ]);
 });
