@@ -30,6 +30,7 @@
             || ria.__API.isInterface(type)
             || ria.__API.isEnum(type)
             || ria.__API.isIdentifier(type)
+            || ria.__API.isDelegate(type)
             //|| ArrayOfDescriptor.isArrayOfDescriptor(type)
             ;
     }
@@ -77,7 +78,7 @@
         Modifiers.SELF = new ModifiersImpl('SELF');
         Modifiers.FINAL = new ModifiersImpl('FINAL');
         Modifiers.READONLY = new ModifiersImpl('READONLY');
-        Object.freeze(Modifiers);
+        //Object.freeze(Modifiers);
         return Modifiers;
     }();
 

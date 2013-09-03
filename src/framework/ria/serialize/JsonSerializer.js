@@ -24,11 +24,21 @@ NAMESPACE('ria.serialize', function () {
             if (clazz === Object)
                 return raw || {};
 
-            if (clazz === Array && (Array.isArray(raw) || raw == null))
+            if (clazz === Array && (Array.isArray(raw) || raw == null)) {
                 return raw || [];
+			}
 
-            if (clazz === Number || clazz === Boolean || clazz === String)
+            if (clazz === Boolean) {
+                return raw === 'true' || raw === true;
+            }
+
+			if(clazz === Number && (raw === '' || raw === null)) {
+                return null;
+			}
+
+            if (clazz === Number || clazz === String) {                
                 return clazz(raw || '');
+            }
 
             if (ria.__API.isIdentifier(clazz))
                 return raw !== undefined ? clazz(raw) : null;
