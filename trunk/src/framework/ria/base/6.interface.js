@@ -42,7 +42,7 @@
         return ifc;
     };
 
-    ria.__API.Interface = new (function Interface() {});
+    ria.__API.Interface = new (function InterfaceBase() {});
 
     ria.__API.isInterface = function (ifc) {
         return ifc.__META instanceof InterfaceDescriptor;

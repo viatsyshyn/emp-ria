@@ -117,8 +117,8 @@
             return PipelineMethodCall(body, meta, scope, [].slice.call(arguments));
         };
 
-        if (ria.__CFG.checkedMode)
-            f_.__META = meta;
+      
+        f_.__META = meta;
 
         _DEBUG && Object.freeze(f_);
 

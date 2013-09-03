@@ -97,6 +97,9 @@ NAMESPACE('ria.mvc', function () {
                 .then(function () {
                     return me.onStart_();
                 })
+                .then(function () {
+                    return me._dispatcher.initControllers(me.context);
+                })
                 .then(function() {
                     me.onResume_();
                     return null;

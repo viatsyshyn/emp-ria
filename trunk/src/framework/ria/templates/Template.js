@@ -85,20 +85,10 @@ NAMESPACE('ria.templates', function () {
                         if (modelProperty == null)
                             throw ria.templates.Exception('Property "' + modelPropertyName + '" not found in model ' + model.getName());
 
-                        var converter = modelBind.converter_;
-                        if (converter !== undefined) {
-                            var ref = ria.reflection.ReflectionClass(converter.converter);
-                            if (!ref.implementsIfc(ria.templates.IConverter))
-                                throw new ria.templates.Exception('Converter class ' + ref.getName() + ' expected to implement '
-                                    + ria.__API.getIdentifierOfType(ria.templates.IConverter));
-
-                            converter = bind.converter;
-                        }
-
                         bindings.push({
                             sourceProp: modelProperty,
                             destProp: property,
-                            converter: converter
+                            converter: modelBind.converter_
                         });
                     });
             },
@@ -129,7 +119,13 @@ NAMESPACE('ria.templates', function () {
                     if (_.converter) {
                         value = convertWith(value, _.converter);
                     }
-                    _.destProp.invokeSetterOn(scope, value);
+                    try{
+                        _.destProp.invokeSetterOn(scope, value);
+                    }
+                    catch(e){
+                        throw new ria.templates.Exception("Error assigning property " + _destProp.getName(), e);
+                    }
+
                 });
             },
 
@@ -221,7 +217,7 @@ NAMESPACE('ria.templates', function () {
 
             [[Object, ImplementerOf(ria.templates.IConverter)]],
             Object, function convertWith(value, clazz) {
-                return ria.templates.ConverterFactories.create(clazz).convert(clazz);
+                return ria.templates.ConverterFactories.create(clazz).convert(value);
             },
 
             Object, function getContext_() {

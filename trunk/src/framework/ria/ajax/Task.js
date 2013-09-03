@@ -120,20 +120,22 @@ NAMESPACE('ria.ajax', function () {
                 return this._url + ((/\?/).test(this._url) ? "&" : "?") + this.getParamsAsQueryString_();
             },
 
-            String, function getBody_() {
-                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : this.getParamsString_();
+            Object, function getBody_() {
+                return this._method != ria.ajax.Method.GET ? JSON.stringify(this._params) : this.getParamsString_();
             },
 
-            FINAL, OVERRIDE, VOID, function do_() {
+            // todo : was final
+            OVERRIDE, VOID, function do_() {
                 try {
                     BASE();
                     this._xhr.open(this._method.valueOf(), this.getUrl_(), true);
                     if (this._method != ria.ajax.Method.GET){
                         if (this._params){
-                            this._xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            this._xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
                         }
                     }
                     this._xhr.send(this.getBody_());
+
                 } catch (e) {
                     this._completer.completeError(e);
                 }

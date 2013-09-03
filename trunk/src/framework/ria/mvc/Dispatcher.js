@@ -77,8 +77,10 @@ NAMESPACE('ria.mvc', function () {
                             name = controllerNameToUri(name);
 
                         try {
-                            onAppStartFutures.push(controllerRef.instantiate().onAppStart());
-                            this.controllers[name] = controllerRef;
+                            if (!controllerRef.isAbstract()){
+                                onAppStartFutures.push(controllerRef.instantiate().onAppStart());
+                                this.controllers[name] = controllerRef;
+                            }
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error intializing controller ' + controllerRef.getName(), e);
                         }
@@ -92,6 +94,16 @@ NAMESPACE('ria.mvc', function () {
 
             ria.async.Future, function loadControllers() {
                 return this.loadControllers_(new ria.reflection.ReflectionClass(ria.mvc.Controller));
+            },
+
+            [[ria.mvc.IContext]],
+            ria.async.Future, function initControllers(context) {
+                var onAppInitFutures = [];
+                for(var name in this.controllers) if (this.controllers.hasOwnProperty(name)) {
+                    onAppInitFutures.push(this.prepareInstance_(this.controllers[name], context).onAppInit());
+                }
+
+                return ria.async.wait(onAppInitFutures);
             },
 
             [[ria.reflection.ReflectionClass]],

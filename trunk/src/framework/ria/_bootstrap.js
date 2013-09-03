@@ -22,7 +22,8 @@ var _RELEASE = false;
         var script = scripts[index];
 
         if (script.src.toString().match(/ria\/_bootstrap\.js$/i)) {
-            ria.__CFG = JSON.parse(script.innerText.toString().split('=').pop());
+            var text = script.innerText || script.innerHTML;
+            ria.__CFG = JSON.parse(text.toString().split('=').pop());
         }
     }
 
@@ -30,6 +31,22 @@ var _RELEASE = false;
     if (siteRoot === undefined) {
         siteRoot = window.location.toString().split(window.location.pathname).shift();
     }
+
+    var serviceRoot = ria.__CFG["#require"].serviceRoot;
+    if (serviceRoot === undefined) {
+        serviceRoot = "/";
+    }
+
+    if (serviceRoot[serviceRoot.length - 1] != '/'){
+        serviceRoot += '/';
+    }
+
+    if (siteRoot[siteRoot.length - 1] != '/' && serviceRoot[0] != '/'){
+        siteRoot += '/';
+    }
+
+
+
     var appDir = "";
     var root = ria.__CFG["#require"].appRoot;
     if (root === undefined) {
@@ -43,6 +60,7 @@ var _RELEASE = false;
     // configuring ria.require.js
     ria.__CFG["#require"].appRoot = root;
     ria.__CFG["#require"].siteRoot = siteRoot;
+    ria.__CFG["#require"].serviceRoot = serviceRoot;
     ria.__CFG["#require"].appCodeDir = appDir;
     var libs = ria.__CFG["#require"].libs = ria.__CFG["#require"].libs || {};
 

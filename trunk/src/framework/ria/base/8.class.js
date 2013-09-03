@@ -214,25 +214,25 @@
     };
 
     ria.__API.Class = (function () {
-        function Class() { ria.__API.init(this, Class, Class.prototype.$, arguments); }
-        ria.__API.clazz(Class, 'Class', null, [], []);
+        function ClassBase() { ria.__API.init(this, ClassBase, ClassBase.prototype.$, arguments); }
+        ria.__API.clazz(ClassBase, 'Class', null, [], []);
 
-        Class.prototype.$ = function () {
+        ClassBase.prototype.$ = function () {
             this.__hashCode = Math.random().toString(36);
             _DEBUG && Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
         };
-        ria.__API.ctor(Class, Class.prototype.$, [], [], []);
+        ria.__API.ctor(ClassBase, ClassBase.prototype.$, [], [], []);
 
-        Class.prototype.getClass = function () { return ria.__API.getConstructorOf(this); };
-        ria.__API.method(Class, Class.prototype.getClass, 'getClass', Function, [], [], []);
+        ClassBase.prototype.getClass = function () { return ria.__API.getConstructorOf(this); };
+        ria.__API.method(ClassBase, ClassBase.prototype.getClass, 'getClass', Function, [], [], []);
 
-        Class.prototype.getHashCode = function () { return this.__hashCode; };
-        ria.__API.method(Class, Class.prototype.getHashCode, 'getHashCode', String, [], [], []);
+        ClassBase.prototype.getHashCode = function () { return this.__hashCode; };
+        ria.__API.method(ClassBase, ClassBase.prototype.getHashCode, 'getHashCode', String, [], [], []);
 
-        Class.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
-        ria.__API.method(Class, Class.prototype.equals, 'equals', Boolean, [Class], ['other'], []);
+        ClassBase.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
+        ria.__API.method(ClassBase, ClassBase.prototype.equals, 'equals', Boolean, [ClassBase], ['other'], []);
 
-        ria.__API.compile(Class);
-        return Class;
+        ria.__API.compile(ClassBase);
+        return ClassBase;
     })();
 })();

@@ -3,17 +3,17 @@
     /** @class ria.__API.Exception */
     ria.__API.Exception = (function () {
         "use strict";
-        function Exception() { ria.__API.init(this, Exception, Exception.prototype.$, arguments); }
-        ria.__API.clazz(Exception, 'Exception', null, [], []);
+        function ExceptionBase() { ria.__API.init(this, ExceptionBase, ExceptionBase.prototype.$, arguments); }
+        ria.__API.clazz(ExceptionBase, 'Exception', null, [], []);
 
-        Exception.prototype.$ = function (msg, inner_) {
+        ExceptionBase.prototype.$ = function (msg, inner_) {
             this.msg = msg;
             this.stack = ria.__API.getStackTrace(Error(msg));
             this.inner_ = inner_;
         };
-        ria.__API.ctor(Exception, Exception.prototype.$, [String, [Error, Exception]], ['msg', 'inner_'], []);
+        ria.__API.ctor(ExceptionBase, ExceptionBase.prototype.$, [String, [Error, ExceptionBase]], ['msg', 'inner_'], []);
 
-        Exception.prototype.toString = function () {
+        ExceptionBase.prototype.toString = function () {
             var msg = this.stack.join('\n  ').replace('Error:', ria.__API.getIdentifierOfValue(this) + ':');
 
             if (this.inner_) {
@@ -27,15 +27,15 @@
 
             return msg;
         };
-        ria.__API.method(Exception, Exception.prototype.toString, 'toString', String, [], [], []);
+        ria.__API.method(ExceptionBase, ExceptionBase.prototype.toString, 'toString', String, [], [], []);
 
-        Exception.prototype.getMessage = function () { return this.msg; };
-        ria.__API.method(Exception, Exception.prototype.getMessage, 'getMessage', String, [], [], []);
+        ExceptionBase.prototype.getMessage = function () { return this.msg; };
+        ria.__API.method(ExceptionBase, ExceptionBase.prototype.getMessage, 'getMessage', String, [], [], []);
 
-        Exception.prototype.getStack = function () { return this.stack; };
-        ria.__API.method(Exception, Exception.prototype.getStack, 'getStack', Array, [], [], []);
+        ExceptionBase.prototype.getStack = function () { return this.stack; };
+        ria.__API.method(ExceptionBase, ExceptionBase.prototype.getStack, 'getStack', Array, [], [], []);
 
-        ria.__API.compile(Exception);
-        return Exception;
+        ria.__API.compile(ExceptionBase);
+        return ExceptionBase;
     })();
 })();
