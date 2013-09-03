@@ -391,9 +391,7 @@ NAMESPACE('ria.dom', function () {
                 var node = this._dom[0];
                 return node ? node.getAttribute(name) : null;
             },
-            Object, function getValue() {
-                return this._dom.value;
-            },
+
             [[Object]],
             SELF, function setAllAttrs(obj) {
                 for(var k in obj) if (obj.hasOwnProperty(k))
@@ -405,11 +403,6 @@ NAMESPACE('ria.dom', function () {
             SELF, function setAttr(name, value) {
                 var node = this._dom[0];
                 node ? node.setAttribute(name, value) : null;
-                return this;
-            },
-            [[Object]],
-            SELF, function setValue(value) {
-                this._dom.value = value;
                 return this;
             },
 

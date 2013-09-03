@@ -23,6 +23,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.EXCEPTION = function () {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Exception);
         ria.__SYNTAX.validateException(def);
         var name = ria.__SYNTAX.getFullName(def.name);
         var exception = ria.__SYNTAX.compileClass(name, def);

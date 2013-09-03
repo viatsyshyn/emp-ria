@@ -46,6 +46,18 @@ NAMESPACE('ria.dom', function () {
                 }
             },
 
+            OVERRIDE, Boolean, function exists() {
+                return !!this._dom.valueOf()[0];
+            },
+
+            /* DatePicker */
+            [[Object, Date]],
+            SELF, function datepicker(options, value_){
+                this._dom.datepicker(options);
+                value_ && this._dom.datepicker('setDate', value_);
+                return this;
+            },
+
             /* Search tree */
 
             [[String]],
@@ -57,21 +69,54 @@ NAMESPACE('ria.dom', function () {
 
             // TODO: need a good way of implementing off()
 
-            OVERRIDE, SELF, function on(event, selector, handler_) {
+            /*OVERRIDE, SELF, function on(event, selector, handler_) {
                 var old_dom = this._dom;
                 this._dom = this.valueOf();
                 BASE(event, selector, handler_);
                 this._dom = old_dom;
+                return this;
+            }, */
+
+            [[Number]],
+            SELF, function show(time_){
+                time_ ? this._dom.show(time_) : this._dom.show();
+                return this;
+            },
+
+            [[Number]],
+            SELF, function hide(time_){
+                time_ ? this._dom.hide(time_) : this._dom.hide();
+                return this;
+            },
+
+            OVERRIDE, SELF, function on(event, selector, handler_) {
+                VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
+                if(!handler_){
+                    handler_ = selector;
+                    selector = undefined;
+                }
+
+                this._dom.on(event, selector, handler_.__wrapper__ || (handler_.__wrapper__ = function () {
+                    var args = [].slice.call(arguments);
+                    args.unshift(new ria.dom.Dom(this));
+                    return handler_.apply(this, args);
+                }));
                 return this;
             },
 
             OVERRIDE, SELF, function off(event, selector, handler_) {
+                VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
+                this._dom.off(event, selector, handler_ && handler_.__wrapper__);
+                return this;
+            },
+
+            /*OVERRIDE, SELF, function off(event, selector, handler_) {
                 var old_dom = this._dom;
                 this._dom = this.valueOf();
                 BASE(event, selector, handler_);
                 this._dom = old_dom;
                 return this;
-            },
+            },*/
 
             /* append/prepend */
 
@@ -86,6 +131,21 @@ NAMESPACE('ria.dom', function () {
                     VALIDATE_ARG('dom', [Node], dest);
 
                     this._dom.appendTo(dest);
+                }
+                return this;
+            },
+
+            SELF, function appendChild(dom) {
+                VALIDATE_ARG('dom', [SELF, String, Node], dom);
+
+                if(typeof dom == "string")
+                    dom = new SELF(dom);
+
+                var el = dom instanceof Node ? dom : dom.valueOf().shift();
+                if(el){
+                    VALIDATE_ARG('dom', [Node], el);
+
+                    this._dom.append(el);
                 }
                 return this;
             },
@@ -113,6 +173,16 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            [[String]],
+            SELF, function setHTML(html) {
+                this._dom.html(html);
+                return this;
+            },
+
+            String, function getHTML() {
+                return this._dom.html();
+            },
+
             /* DOM manipulations & navigation */
 
             OVERRIDE, SELF, function empty() {
@@ -121,8 +191,8 @@ NAMESPACE('ria.dom', function () {
             },
 
             [[SELF]],
-            OVERRIDE, SELF, function remove(node) {
-                node._dom.remove();
+            OVERRIDE, SELF, function remove(node_) {
+                node_ ? node_._dom.remove() : this._dom.remove();
                 return this;
             },
 
@@ -132,12 +202,16 @@ NAMESPACE('ria.dom', function () {
             OVERRIDE, SELF, function descendants(selector__) {},
             [[String]],
             OVERRIDE, SELF, function parent(selector_) {
-                return new ria.dom.Dom(this._dom.parent(selector_));
+                return selector_ ? new ria.dom.Dom(this._dom.parents(selector_)) : new ria.dom.Dom(this._dom.parent());
             },
             [[String]],
-            OVERRIDE, SELF, function next(selector_) {},
+            OVERRIDE, SELF, function next(selector_) {
+                return new ria.dom.Dom(this._dom.next(selector_));
+            },
             [[String]],
-            OVERRIDE, SELF, function previous(selector_) {},
+            OVERRIDE, SELF, function previous(selector_) {
+                return new ria.dom.Dom(this._dom.prev(selector_));
+            },
             [[String]],
             OVERRIDE, SELF, function first(selector_) {},
             [[String]],
@@ -172,7 +246,7 @@ NAMESPACE('ria.dom', function () {
             OVERRIDE, Object, function getAllAttrs() {},
             [[String]],
             OVERRIDE, Object, function getAttr(name) {
-                return this._dom.attr(name);
+                return this._dom.attr(name) || null;
             },
             OVERRIDE, Object, function getValue() {
                 return this._dom.val();
@@ -184,10 +258,28 @@ NAMESPACE('ria.dom', function () {
                 this._dom.attr(name, value);
                 return this;
             },
+
+
+            [[String]],
+            SELF, function removeAttr(name) {
+                this._dom.removeAttr(name);
+                return this;
+            },
+
+
             [[Object]],
             OVERRIDE, SELF, function setValue(value) {
                 this._dom.val(value);
                 return this;
+            },
+
+            [[Object]],
+            OVERRIDE, Object, function height(value_) {
+                return value_ ? this._dom.height(value_) : this._dom.height();
+            },
+            [[Object]],
+            OVERRIDE, Object, function width(value_) {
+                return value_ ? this._dom.width(value_) : this._dom.width();
             },
 
             /* data attributes */
@@ -195,12 +287,15 @@ NAMESPACE('ria.dom', function () {
             OVERRIDE, Object, function getAllData() {},
             [[String]],
             OVERRIDE, Object, function getData(name) {
-                return this._dom.data(name) || null;
+                return this._dom.data(name) === undefined ? null : this._dom.data(name);
             },
             [[Object]],
             OVERRIDE, SELF, function setAllData(obj) {},
             [[String, Object]],
-            OVERRIDE, SELF, function setData(name, value) {},
+            OVERRIDE, SELF, function setData(name, value) {
+                this._dom.data(name, value);
+                return this;
+            },
 
             /* classes */
 
@@ -242,6 +337,7 @@ NAMESPACE('ria.dom', function () {
                 this._dom.each(function () {
                     iterator(SELF(this));
                 });
+                return this;
             },
 
             [[ria.dom.DomIterator]],
@@ -260,6 +356,34 @@ NAMESPACE('ria.dom', function () {
 
             OVERRIDE, ArrayOf(Node), function valueOf() {
                 return ria.__API.clone(this._dom);
+            },
+
+            [[String, Object]],
+            SELF, function trigger(event, params_) {
+                this._dom.trigger(event, params_);
+                return this;
+            },
+
+            Boolean, function checked() {
+                return this.parent().find('.hidden-checkbox').getData('value') || false;
+            },
+
+            /* Form */
+
+            Object, function serialize(){
+                var o = {};
+                var array = this.dom.serializeArray();
+                array.forEach(function() {
+                    if (o[this.name] !== undefined) {
+                        if (!o[this.name].push) {
+                            o[this.name] = [o[this.name]];
+                        }
+                        o[this.name].push(this.value || '');
+                    } else {
+                        o[this.name] = this.value || '';
+                    }
+                });
+                return o;
             }
         ]);
 
