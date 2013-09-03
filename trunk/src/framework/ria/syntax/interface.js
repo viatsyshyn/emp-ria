@@ -4,6 +4,28 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
+    function processSelf(token, SELF) {
+        if (Array.isArray(token))
+            return token.map(function (_) { return processSelf(_, SELF); });
+
+        if (!token)
+            return token;
+
+        if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
+            return new ria.__SYNTAX.Tokenizer.RefToken(SELF);
+
+        if (checkXxxOfIsSELF(token, ria.__API.ArrayOfDescriptor))
+            return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ArrayOf(SELF));
+
+        if (checkXxxOfIsSELF(token, ria.__API.ClassOfDescriptor))
+            return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(SELF));
+
+        if (checkXxxOfIsSELF(token, ria.__API.ClassOfDescriptor))
+            return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(SELF));
+
+        return token;
+    }
+
     /**
      * @param {ClassDescriptor} def
      */
@@ -78,13 +100,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              * @param {MethodDescriptor} method
              */
             function (method) {
-                var types = method.argsTypes
-                    .map(function (_) { return _ instanceof ria.__SYNTAX.Tokenizer.SelfToken ? InterfaceProxy : _.value; });
+                method.argsTypes = processSelf(method.argsTypes, InterfaceProxy);
+                method.retType = processSelf(method.retType, InterfaceProxy);
 
                 return [
                     method.name,
-                    method.retType instanceof ria.__SYNTAX.Tokenizer.SelfToken ? InterfaceProxy : method.retType.value,
-                    types,
+                    method.retType ? method.retType.value : null,
+                    method.argsTypes.map(function (_) { return _.value; }),
                     method.argsNames
                 ];
             });

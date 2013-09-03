@@ -57,7 +57,7 @@ function NamespaceSyntaxCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(NamespaceSyntaxCompiler);
+//compilers.push(NamespaceSyntaxCompiler);
 
 function ValidatorCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call) {
@@ -79,4 +79,4 @@ function ModifiersCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(ModifiersCompiler);
+//compilers.push(ModifiersCompiler);
