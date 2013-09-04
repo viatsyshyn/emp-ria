@@ -9,12 +9,16 @@ NAMESPACE('ria.mvc', function() {
             String, 'controller',
             String, 'action',
             Array, 'params',
-            Boolean, 'public',
             Boolean, 'dispatched',
 
             function $() {
                 this.dispatched = false;
-                this.public = false;
+            },
+
+            function setPublic(val){
+                //todo: remove this
             }
+
+
         ]);
 });

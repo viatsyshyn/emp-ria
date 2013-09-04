@@ -73,6 +73,8 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     var AssetAliases = [/ASSET\('([^']+)'\)/g];
 
     ria.__REQUIRE.addCurrentModuleCallback = function (ns, callback) {
+        ns && ns.split('.').forEach(ria.__SYNTAX.validateVarName);
+
         var R = ria.__REQUIRE.ModuleDescriptor,
             root = R.getCurrentModule();
 
