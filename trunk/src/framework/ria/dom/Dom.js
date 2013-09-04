@@ -402,7 +402,7 @@ NAMESPACE('ria.dom', function () {
             [[String, Object]],
             SELF, function setAttr(name, value) {
                 var node = this._dom[0];
-                node ? node.setAttribute(name, value) : null;
+                node && node.setAttribute(name, value);
                 return this;
             },
 
