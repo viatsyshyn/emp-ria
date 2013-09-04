@@ -10,10 +10,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {Function}
      */
     ria.__SYNTAX.validateEnumDecl = function (name, val) {
+        ria.__SYNTAX.validateVarName(name);
+
         if (typeof name !== 'string')
             throw Error('String is expected as enum name');
 
         for (var prop in val) if (val.hasOwnProperty(prop)) {
+            ria.__SYNTAX.validateVarName(prop);
             var value_ = val[prop];
             switch (typeof value_) {
                 case 'number':

@@ -8,6 +8,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @param {MethodDescriptor} def
      */
     ria.__SYNTAX.validateAnnotationDecl = function (def) {
+        ria.__SYNTAX.validateVarName(def.name);
+
         if(def.annotations.length)
             throw Error('Annotations are not supported in annotations');
 

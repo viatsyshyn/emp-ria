@@ -4,22 +4,26 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
+    ria.__SYNTAX.toAst = function (x) {
+        return new Function ('return ' + x)();
+    };
+
     function getDefaultGetter(property, isOverride) {
         if (isOverride)
-            return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function () { return BASE(); }.toString().replace('name', property))());
+            return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function g() { return BASE(); }.toString().replace('name', property)));
 
-        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function () { return this.name; }.toString().replace('name', property))());
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function g() { return this.name; }.toString().replace('name', property)));
     }
 
     function getDefaultSetter(property, isOverride) {
         if (isOverride)
-            return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function (value) { return BASE(value); }.toString().replace('name', property))());
+            return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function s(value) { return BASE(value); }.toString().replace('name', property)));
 
-        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function (value) { this.name = value; }.toString().replace('name', property))());
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function s(value) { this.name = value; }.toString().replace('name', property)));
     }
 
     function getDefaultCtor() {
-        return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function $() { BASE(); }.toString())());
+        return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function $() { BASE(); }.toString()));
     }
 
     ria.__SYNTAX.resolveNameFromToken = function (x) {
@@ -100,6 +104,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.properties
             .forEach(function (property) {
                 var name = property.name;
+                ria.__SYNTAX.validateVarName(name);
                 var getterName = property.getGetterName();
                 var flags = ria.__API.clone(property.flags);
                 flags.isOverride = property.isOverride;
@@ -277,6 +282,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(!isDescendantOf(def.base, ria.__SYNTAX.Registry.find(rootClassName)))
             throw Error('Base class must be descendant of ' + rootClassName);
 
+        ria.__SYNTAX.validateVarName(def.name);
+
         // validate class flags
         if(def.flags.isOverride)
             throw Error('Modifier OVERRIDE is not supported in classes');
@@ -291,6 +298,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.methods
             .forEach(function (_) {
                 var name = _.name;
+                ria.__SYNTAX.validateVarName(name);
                 if (def.methods.filter(function (_) { return _.name === name}).length > 1)
                     throw Error('Duplicate method declaration "' + name + '"');
             });

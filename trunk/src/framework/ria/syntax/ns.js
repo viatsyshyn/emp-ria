@@ -15,14 +15,18 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         while (p.length) {
             var n = p.shift();
-            if (!root.hasOwnProperty(n))
+            if (!root.hasOwnProperty(n)) {
+                ria.__SYNTAX.validateVarName(n);
                 Object.defineProperty(root, n, { writable: false, configurable: false, value: {} });
+            }
 
             root = root[n];
         }
 
-        if (!root.hasOwnProperty(name))
+        if (!root.hasOwnProperty(name)) {
+            ria.__SYNTAX.validateVarName(name);
             Object.defineProperty(root, name, { writable: false, configurable: false, value: value });
+        }
     }
 
     ria.__SYNTAX.getFullName = function (name) {

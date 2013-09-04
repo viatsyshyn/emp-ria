@@ -33,6 +33,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     };
 
     ria.__SYNTAX.IDENTIFIER = function (n) {
+        ria.__SYNTAX.validateVarName(n);
         var name = ria.__SYNTAX.getFullName(n);
         var identifier = ria.__SYNTAX.compileIdentifier(name);
         ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, identifier);

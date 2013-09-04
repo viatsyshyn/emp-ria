@@ -4,26 +4,45 @@
 (function () {
     "use strict";
 
+    ria.__SYNTAX.isValidIdentifierName = function (name) {
+        return /^[$_a-z]([$_a-z0-9])*$/i.test(name);
+    };
+
+    var KEYWORDS = ('break else new var case finally return void catch for switch while continue function this with '
+        + 'default if throw delete in try do instanceof typeof true false null undefined').split(' ');
+    ria.__SYNTAX.isKeyword = function (name) {
+        return KEYWORDS.indexOf(name) >= 0;
+    };
+
+    var RIA_KEYWORDS = ('ANNOTATION CLASS EXTENDS IMPLEMENTS DELEGATE ENUM EXCEPTION IDENTIFIER INTERFACE NS '
+        + 'NAMESPACE SELF BASE VOID OVERRIDE ClassOf ArrayOf ImplementerOf Assert').split(' ');
+    ria.__SYNTAX.isRiaKeyword = function (name) {
+        return RIA_KEYWORDS.indexOf(name) >= 0;
+    };
+
+    var RESERVED = ('abstract enum int short boolean export interface static byte extends long super char final native '
+        + 'synchronized class float package throws const goto private transient debugger implements protected volatile '
+        + 'double import public').split(' ');
+
+    ria.__SYNTAX.isReservedIdentifier = function (name) {
+        return RESERVED.indexOf(name) >= 0;
+    };
+
+    ria.__SYNTAX.isValidVarName = function (name) {
+        return ria.__SYNTAX.isValidIdentifierName(name)
+            && !ria.__SYNTAX.isKeyword(name)
+            && !ria.__SYNTAX.isRiaKeyword(name)
+            && !ria.__SYNTAX.isReservedIdentifier(name);
+    };
+
+    ria.__SYNTAX.validateVarName = function (name) {
+        if (!ria.__SYNTAX.isValidVarName(name))
+            throw Error('Invalid variable name ' + name);
+    };
+
     ria.__SYNTAX.isProtected = function (name) {
         return /^.+_$/.test(name);
     };
-
-    /**var Modifiers = function () {
-        function Modifiers() { throw Error(); }
-        //ria.__API.enum(Modifiers, 'Modifiers');
-        function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
-        ria.__API.extend(ModifiersImpl, Modifiers);
-        Modifiers.OVERRIDE = new ModifiersImpl(1);
-        Modifiers.ABSTRACT = new ModifiersImpl(2);
-        Modifiers.VOID = new ModifiersImpl(3);
-        Modifiers.SELF = new ModifiersImpl(4);
-        Modifiers.FINAL = new ModifiersImpl(5);
-        Modifiers.READONLY = new ModifiersImpl(6);
-        Object.freeze(Modifiers);
-        return Modifiers;
-    }();
-
-    ria.__SYNTAX.Modifiers = Modifiers;**/
 
     /**
      * @param {ria.__SYNTAX.Tokenizer} tkz

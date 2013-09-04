@@ -35,6 +35,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @param {ClassDescriptor} def
      */
     ria.__SYNTAX.validateInterfaceDecl = function (def) {
+        ria.__SYNTAX.validateVarName(def.name);
+
         // throw Error if any flags
         if (def.flags.isFinal)
             throw Error('Interface can NOT be marked with FINAL');
