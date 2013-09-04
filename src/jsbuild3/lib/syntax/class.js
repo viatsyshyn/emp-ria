@@ -6,6 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+ria.__SYNTAX.resolveNameFromToken = function (x) {
+    return x.value;
+};
+
 function isProtected(name) {
     //console.info(name + 'is protected ' + (/^.+_$/.test(name) ? 'true' : 'false'));
     return /^.+_$/.test(name);
@@ -85,7 +89,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
 
         var def = ria.__SYNTAX.parseClassDef(tkz);
 
-        //ria.__SYNTAX.validateClassDecl(def);
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, AccessNS(baseClass));
+        //ria.__SYNTAX.validateClassDecl(def, baseClass);
 
         //console.info('found class ' + def.name + ' in ' + ns);
 

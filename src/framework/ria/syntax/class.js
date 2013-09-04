@@ -22,13 +22,17 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new ria.__SYNTAX.Tokenizer.FunctionToken(new Function ('return ' + function $() { BASE(); }.toString())());
     }
 
+    ria.__SYNTAX.resolveNameFromToken = function (x) {
+        return x.value.__META.name;
+    };
+
     /**
      * @param {ClassDescriptor} def
      * @param {String} name
      * @return {MethodDescriptor}
      */
     function findParentMethodFixed(def, name){
-        var base = def.base && ria.__SYNTAX.Registry.find(def.base.value.__META.name);
+        var base = def.base && ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(def.base));
         return base && (
             base.methods.filter(function(method){ return method.name == name }).pop()
             || findParentMethodFixed(base, name));
@@ -40,7 +44,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {PropertyDescriptor}
      */
     function findParentPropertyFixed(def, name){
-        var base = def.base && ria.__SYNTAX.Registry.find(def.base.value.__META.name);
+        var base = def.base && ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(def.base));
         return base &&
             (base.properties.filter(function(property){ return property.name == name }).pop()
             || findParentPropertyFixed(base, name));
@@ -52,41 +56,98 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {Object}
      */
     function findParentPropertyByGetterOrSetterFixed(def, name){
-        var base = def.base && ria.__SYNTAX.Registry.find(def.base.value.__META.name);
+        var base = def.base && ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(def.base));
         return base &&
             (base.properties.filter(function (_) { return _.getSetterName() == name || _.getGetterName() == name;}).pop()
             || findParentPropertyByGetterOrSetterFixed(base, name));
     }
 
-    function isSameFlags(def1, def2){
-        for(var flag in def1.flags)  {
-            if (flag == 'isReadonly') continue;
-            if (flag == 'isOverride') continue;
-            if (def1.flags.hasOwnProperty(flag) && def1.flags[flag] != def2.flags[flag])
-                return false;
-        }
-        return true;
-    }
+    ria.__SYNTAX.precalcClassOptionalsAndBaseRefs = function (def, baseClass) {
+        // validate if base is descendant on Class
+        def.base = def.base === null ? new ria.__SYNTAX.Tokenizer.RefToken(baseClass) : def.base;
 
-    /**
-     *
-     * @param {Function} body
-     * @param SELF
-     * @param [method]
-     * @returns {Function}
-     */
-    function addSelfAndBaseBody(body, SELF, method) {
-        body.__SELF = SELF;
-        if (method && method.__BASE_META) {
-            if (method.flags.isOverride) {
-                body.__BASE_BODY = method.__BASE_META.body.value;
-            }
+        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(def.base));
 
-            body.__BASE_BODY = method.__BASE_META.body.value;
+        // add omitted default constructor
+        var classCtorDef = def.methods.filter(function (_) {return _.name === '$'; }).pop();
+        if (!classCtorDef) {
+            classCtorDef = new ria.__SYNTAX.MethodDescriptor('$', [], [], null, {}, getDefaultCtor(), []);
+            def.methods.unshift(classCtorDef);
         }
 
-        return body;
-    }
+        // defined override properties
+        def.methods
+            .map(function (method) {
+                return findParentPropertyByGetterOrSetterFixed(def, method.name);
+            })
+            .filter(function (_) { return _; })
+            .reduce(function (list, node) {
+                if (list.indexOf(node) < 0)
+                    list.push(node);
+
+                return list;
+            }, [])
+            .forEach(function (baseProperty) {
+                def.properties.push(new ria.__SYNTAX.PropertyDescriptor(
+                    baseProperty.name,
+                    baseProperty.type,
+                    baseProperty.annotations,
+                    baseProperty.flags,
+                    true));
+            });
+
+        // add omitted getter/setter of properties
+        def.properties
+            .forEach(function (property) {
+                var name = property.name;
+                var getterName = property.getGetterName();
+                var flags = ria.__API.clone(property.flags);
+                flags.isOverride = property.isOverride;
+                var getterDef = def.methods.filter(function (_) {return _.name === getterName; }).pop();
+                if (!getterDef) {
+                    getterDef = new ria.__SYNTAX.MethodDescriptor(
+                        getterName,
+                        [],
+                        [],
+                        property.type,
+                        flags,
+                        getDefaultGetter(name, property.isOverride),
+                        []);
+                    def.methods.push(getterDef);
+                }
+
+                if (!property.flags.isReadonly) {
+                    var setterName = property.getSetterName();
+                    var setterDef = def.methods.filter(function (_) {return _.name === setterName; }).pop();
+                    if (!setterDef) {
+                        setterDef = new ria.__SYNTAX.MethodDescriptor(
+                            setterName,
+                            ['value'],
+                            [property.type],
+                            new ria.__SYNTAX.Tokenizer.VoidToken(),
+                            flags,
+                            getDefaultSetter(name, property.isOverride),
+                            []);
+                        def.methods.push(setterDef);
+                    }
+                }
+
+                property.__GETTER_DEF = getterDef;
+                property.__SETTER_DEF = setterDef;
+            });
+
+        // TODO: ensure optional type hints
+        /*def.methods
+         .forEach(function (method) {
+
+         });*/
+
+        // find BASE for each method (including ctor, getters & setters)
+        def.methods
+            .forEach(function (method) {
+                method.__BASE_META = findParentMethodFixed(def, method.name);
+            });
+    };
 
     function checkXxxOfIsSELF(token, descriptor) {
         return token.value instanceof descriptor
@@ -113,6 +174,18 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(SELF));
 
         return token;
+    }
+
+    /* VALIDATE */
+
+    function isSameFlags(def1, def2){
+        for(var flag in def1.flags)  {
+            if (flag == 'isReadonly') continue;
+            if (flag == 'isOverride') continue;
+            if (def1.flags.hasOwnProperty(flag) && def1.flags[flag] != def2.flags[flag])
+                return false;
+        }
+        return true;
     }
 
     function validateMethodDeclaration(def, method) {
@@ -194,6 +267,119 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
     }
 
+    function isDescendantOf(token, rootClassMeta) {
+        var meta = ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(token));
+        return meta === rootClassMeta || meta.base && isDescendantOf(meta.base, rootClassMeta);
+    }
+
+    ria.__SYNTAX.validateClassDecl = function (def, rootClassName) {
+
+        if(!isDescendantOf(def.base, ria.__SYNTAX.Registry.find(rootClassName)))
+            throw Error('Base class must be descendant of ' + rootClassName);
+
+        // validate class flags
+        if(def.flags.isOverride)
+            throw Error('Modifier OVERRIDE is not supported in classes');
+
+        if(def.flags.isReadonly)
+            throw Error('Modifier READONLY is not supported in classes');
+
+        if(def.flags.isAbstract && def.flags.isFinal)
+            throw Error('Class can not be ABSTRACT and FINAL simultaneously');
+
+        // validate no duplicate members
+        def.methods
+            .forEach(function (_) {
+                var name = _.name;
+                if (def.methods.filter(function (_) { return _.name === name}).length > 1)
+                    throw Error('Duplicate method declaration "' + name + '"');
+            });
+
+        // validate no duplicate properties
+        def.properties
+            .forEach(function (_) {
+                var name = _.name;
+                if (def.properties.filter(function (_) { return _.name === name}).length > 1)
+                    throw Error('Duplicate property declaration "' + name + '"');
+            });
+
+        var processedMethods = [];
+        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(ria.__SYNTAX.resolveNameFromToken(def.base));
+
+        if (baseSyntaxMeta.flags.isFinal)
+            throw Error('Can NOT extend final class ' + ria.__SYNTAX.resolveNameFromToken(def.base));
+
+        // TODO: validate ctor declaration
+        processedMethods.push('$');
+
+        // validate methods overrides
+        baseSyntaxMeta.methods.forEach(function(baseMethod) {
+            if(baseMethod.name == "$")
+                return;
+
+            validateBaseClassMethodDeclaration(def, baseMethod);
+        });
+
+        // validate methods
+        def.methods
+            .forEach(
+            /**
+             * @param {MethodDescriptor} method
+             */
+                function (method) {
+                // skip processed methods
+                if (processedMethods.indexOf(method.name) >= 0)
+                    return;
+
+                validateMethodDeclaration(def, method);
+            });
+
+        // validate properties overrides
+        baseSyntaxMeta.properties.forEach(function(baseProperty){
+            var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
+                childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
+
+            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
+        });
+
+        // validate properties
+        def.properties.forEach(
+            /**
+             * @param {PropertyDescriptor} property
+             */
+                function (property) {
+                if (property.isOverride)
+                    return;
+
+                if(findParentPropertyFixed(def, property.name))
+                    throw Error('There is defined property ' + property.name + ' in one of the base classes');
+
+                validatePropertyDeclaration(property, def, processedMethods);
+            });
+    };
+
+    /* COMPILE */
+
+    /**
+     *
+     * @param {Function} body
+     * @param SELF
+     * @param [method]
+     * @returns {Function}
+     */
+    function addSelfAndBaseBody(body, SELF, method) {
+        body.__SELF = SELF;
+        if (method && method.__BASE_META) {
+            if (method.flags.isOverride) {
+                body.__BASE_BODY = method.__BASE_META.body.value;
+            }
+
+            body.__BASE_BODY = method.__BASE_META.body.value;
+        }
+
+        return body;
+    }
+
     function compileMethodDeclaration(def, method, ClassProxy) {
         method.retType = processSelf(method.retType, ClassProxy);
         method.argsTypes = processSelf(method.argsTypes, ClassProxy);
@@ -254,179 +440,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             })
         );
     }
-
-    ria.__SYNTAX.precalcClassOptionalsAndBaseRefs = function (def, baseClass) {
-        // validate if base is descendant on Class
-        def.base = def.base === null ? new ria.__SYNTAX.Tokenizer.RefToken(baseClass) : def.base;
-
-        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
-
-        // add omitted default constructor
-        var classCtorDef = def.methods.filter(function (_) {return _.name === '$'; }).pop();
-        if (!classCtorDef) {
-            classCtorDef = new ria.__SYNTAX.MethodDescriptor('$', [], [], null, {}, getDefaultCtor(), []);
-            def.methods.unshift(classCtorDef);
-        }
-
-        // defined override properties
-        def.methods
-            .map(function (method) {
-                return findParentPropertyByGetterOrSetterFixed(def, method.name);
-            })
-            .filter(function (_) { return _; })
-            .reduce(function (list, node) {
-                if (list.indexOf(node) < 0)
-                    list.push(node);
-
-                return list;
-            }, [])
-            .forEach(function (baseProperty) {
-                def.properties.push(new ria.__SYNTAX.PropertyDescriptor(
-                    baseProperty.name,
-                    baseProperty.type,
-                    baseProperty.annotations,
-                    baseProperty.flags,
-                    true));
-            });
-
-        // add omitted getter/setter of properties
-        def.properties
-            .forEach(function (property) {
-                var name = property.name;
-                var getterName = property.getGetterName();
-                var flags = ria.__API.clone(property.flags);
-                flags.isOverride = property.isOverride;
-                var getterDef = def.methods.filter(function (_) {return _.name === getterName; }).pop();
-                if (!getterDef) {
-                    getterDef = new ria.__SYNTAX.MethodDescriptor(
-                        getterName,
-                        [],
-                        [],
-                        property.type,
-                        flags,
-                        getDefaultGetter(name, property.isOverride),
-                        []);
-                    def.methods.push(getterDef);
-                }
-
-                if (!property.flags.isReadonly) {
-                    var setterName = property.getSetterName();
-                    var setterDef = def.methods.filter(function (_) {return _.name === setterName; }).pop();
-                    if (!setterDef) {
-                        setterDef = new ria.__SYNTAX.MethodDescriptor(
-                            setterName,
-                            ['value'],
-                            [property.type],
-                            new ria.__SYNTAX.Tokenizer.VoidToken(),
-                            flags,
-                            getDefaultSetter(name, property.isOverride),
-                            []);
-                        def.methods.push(setterDef);
-                    }
-                }
-
-                property.__GETTER_DEF = getterDef;
-                property.__SETTER_DEF = setterDef;
-            });
-
-        // TODO: ensure optional type hints
-        /*def.methods
-            .forEach(function (method) {
-
-            });*/
-
-        // find BASE for each method (including ctor, getters & setters)
-        def.methods
-            .forEach(function (method) {
-                method.__BASE_META = findParentMethodFixed(def, method.name);
-            });
-    };
-
-    ria.__SYNTAX.validateClassDecl = function (def, baseClass) {
-
-        if(!ria.__SYNTAX.isDescendantOf(def.base.value, baseClass))
-            throw Error('Base class must be descendant of ' + baseClass.__META.name);
-
-        // validate class flags
-        if(def.flags.isOverride)
-            throw Error('Modifier OVERRIDE is not supported in classes');
-
-        if(def.flags.isReadonly)
-            throw Error('Modifier READONLY is not supported in classes');
-
-        if(def.flags.isAbstract && def.flags.isFinal)
-            throw Error('Class can not be ABSTRACT and FINAL simultaneously');
-
-        // validate no duplicate members
-        def.methods
-            .forEach(function (_) {
-                var name = _.name;
-                if (def.methods.filter(function (_) { return _.name === name}).length > 1)
-                    throw Error('Duplicate method declaration "' + name + '"');
-            });
-
-        // validate no duplicate properties
-        def.properties
-            .forEach(function (_) {
-                var name = _.name;
-                if (def.properties.filter(function (_) { return _.name === name}).length > 1)
-                    throw Error('Duplicate property declaration "' + name + '"');
-            });
-
-        var processedMethods = [];
-        var baseSyntaxMeta = ria.__SYNTAX.Registry.find(def.base.value.__META.name);
-
-        if (baseSyntaxMeta.flags.isFinal)
-            throw Error('Can NOT extend final class ' + def.base.value.__META.name);
-
-        // TODO: validate ctor declaration
-        processedMethods.push('$');
-
-        // validate methods overrides
-        baseSyntaxMeta.methods.forEach(function(baseMethod) {
-            if(baseMethod.name == "$")
-                return;
-
-            validateBaseClassMethodDeclaration(def, baseMethod);
-        });
-
-        // validate methods
-        def.methods
-            .forEach(
-            /**
-             * @param {MethodDescriptor} method
-             */
-            function (method) {
-                // skip processed methods
-                if (processedMethods.indexOf(method.name) >= 0)
-                    return;
-
-                validateMethodDeclaration(def, method);
-            });
-
-        // validate properties overrides
-        baseSyntaxMeta.properties.forEach(function(baseProperty){
-            var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
-                childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
-
-            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
-        });
-
-        // validate properties
-        def.properties.forEach(
-            /**
-             * @param {PropertyDescriptor} property
-             */
-            function (property) {
-                if (property.isOverride)
-                    return;
-
-                if(findParentPropertyFixed(def, property.name))
-                    throw Error('There is defined property ' + property.name + ' in one of the base classes');
-
-                validatePropertyDeclaration(property, def, processedMethods);
-            });
-    };
 
     /**
      * @param {String} name
@@ -492,7 +505,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.CLASS = function () {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+        ria.__SYNTAX.validateClassDecl(def, 'Class');
         var name = ria.__SYNTAX.getFullName(def.name);
         var clazz = ria.__SYNTAX.compileClass(name, def);
         ria.__SYNTAX.isProtected(name) || ria.__SYNTAX.define(name, clazz);

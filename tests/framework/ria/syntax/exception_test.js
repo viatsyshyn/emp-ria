@@ -66,7 +66,7 @@
                 ]]));
 
             ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseClassDef, ria.__API.Class);
-            ria.__SYNTAX.validateClassDecl(baseClassDef, ria.__API.Class);
+            ria.__SYNTAX.validateClassDecl(baseClassDef, 'Class');
 
             var BaseClass = ria.__SYNTAX.compileClass('BaseClass', baseClassDef);
 

@@ -9,7 +9,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.validateException = function (def) {
 
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Exception);
+        ria.__SYNTAX.validateClassDecl(def, 'Exception');
 
         if(def.annotations.length)
             throw Error('Annotations are not supported in delegates');

@@ -33,7 +33,7 @@
     function CLASS(arg) {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+        ria.__SYNTAX.validateClassDecl(def, 'Class');
         return ria.__SYNTAX.compileClass('test.' + def.name, def);
     }
 
@@ -52,7 +52,7 @@
         try {
             var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
             ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-            ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+            ria.__SYNTAX.validateClassDecl(def, 'Class');
             ria.__SYNTAX.compileClass('test.' + def.name, def);
         } catch (e) {
             if (e.name == 'AssertError')
