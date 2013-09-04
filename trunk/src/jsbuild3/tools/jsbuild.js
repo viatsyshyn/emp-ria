@@ -41,6 +41,7 @@ function load_global(file) {
         "../../framework/ria/base/9.implementerof.js",
         "../../framework/ria/syntax/type-hints.js",
         "../lib/syntax/tokenizer.js",
+        "../../framework/ria/syntax/registry.js",
         "../../framework/ria/syntax/parser2.js",
         "../../framework/ria/syntax/annotations.js",
         "../../framework/ria/syntax/class.js",
