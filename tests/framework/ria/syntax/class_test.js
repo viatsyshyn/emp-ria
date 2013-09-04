@@ -1154,6 +1154,21 @@
             instance = new BaseClass(1,2,'3');
 
             assertEquals(6, instance.getValue());
+        },
+
+        testBadNaming: function () {
+            CLASS_E(Error('Invalid variable name 123BaseClass'),
+                '123BaseClass', []);
+
+            CLASS_E(Error('Invalid variable name 123test'),
+                'BaseClass', [
+                    String, '123test'
+                ]);
+
+            CLASS_E(Error('Invalid variable name VOID'),
+                'BaseClass', [
+                    VOID, function VOID() {}
+                ]);
         }
     };
 

@@ -63,7 +63,7 @@ function RequireCompiler(ns, node, descend) {
         && node.args.length == 1
         && node.args[0] instanceof UglifyJS.AST_String) {
 
-        return node.args[0];
+        return make_node(UglifyJS.AST_BlockStatement, node, {body: []});
     }
 }
 

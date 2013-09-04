@@ -24,6 +24,8 @@ function ToAst(fn) {
     }
 }
 
+ria.__SYNTAX.toAst = ToAst;
+
 function processAnnotation(_) {
     if (_.raw instanceof UglifyJS.AST_Call)
         return _.raw
@@ -135,9 +137,9 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                         function () {
                             var ctorDef = def.methods.filter(function (_) { return _.name == '$' }).pop();
                             processedMethods.push('$');
-                            var argsNames = ctorDef ? ctorDef.argsNames : [],
-                                argsTypes = ctorDef ? ctorDef.argsTypes : [],
-                                body = ctorDef ? ctorDef.body.raw : ToAst('function $() { BASE(); }');
+                            var argsNames = ctorDef.argsNames,
+                                argsTypes = ctorDef.argsTypes,
+                                body = ctorDef.body.raw;
                             return [
                                 make_node(UglifyJS.AST_SimpleStatement, node, {
                                     body: make_node(UglifyJS.AST_Assign, node, {
@@ -173,13 +175,13 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 var getterName = property.getGetterName();
                                 var setterName = property.getSetterName();
 
-                                var getterDef = def.methods.filter(function (_) { return _.name == getterName }).pop();
+                                var getterDef = property.__GETTER_DEF;
                                 processedMethods.push(getterName);
-                                var setterDef = def.methods.filter(function (_) { return _.name == setterName }).pop();
+                                var setterDef = property.__SETTER_DEF;
                                 processedMethods.push(setterName);
 
-                                var getterBody = getterDef ? getterDef.body.raw : ToAst('function g() { return this["' + property.name + '"];}'),
-                                    setterBody = setterDef ? setterDef.body.raw : ToAst('function s(v) { this["' + property.name + '"] = v;}');
+                                var getterBody = getterDef.body.raw,
+                                    setterBody = !property.flags.isReadonly ? setterDef.body.raw : null;
 
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {

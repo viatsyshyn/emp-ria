@@ -83,7 +83,7 @@
     function SelfToken() {}
 
     function ExtendsToken(base) {
-        this.value = base;
+        this.value = base.print_to_string();
         this.raw = base;
     }
 
