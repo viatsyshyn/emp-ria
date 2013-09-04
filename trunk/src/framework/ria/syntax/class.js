@@ -8,6 +8,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return new Function ('return ' + x)();
     };
 
+    function isFactoryCtor(name) {
+        return name !== '$$' && /^\$.+/i.test(name);
+    }
+
     function getDefaultGetter(property, isOverride) {
         if (isOverride)
             return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function g() { return BASE(); }.toString().replace('name', property)));
@@ -299,6 +303,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             .forEach(function (_) {
                 var name = _.name;
                 ria.__SYNTAX.validateVarName(name);
+
+                if (isFactoryCtor(name))
+                    throw Error('Factory constructors are not supported in this version.');
+
                 if (def.methods.filter(function (_) { return _.name === name}).length > 1)
                     throw Error('Duplicate method declaration "' + name + '"');
             });

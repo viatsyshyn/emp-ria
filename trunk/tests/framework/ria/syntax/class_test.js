@@ -1169,6 +1169,13 @@
                 'BaseClass', [
                     VOID, function VOID() {}
                 ]);
+        },
+
+        testFactoryCtor: function () {
+            CLASS_E(Error('Factory constructors are not supported in this version.'),
+                'BaseClass', [
+                    function $factory() {}
+                ]);
         }
     };
 
