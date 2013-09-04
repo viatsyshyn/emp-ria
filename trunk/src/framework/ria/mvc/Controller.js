@@ -174,9 +174,9 @@ NAMESPACE('ria.mvc', function () {
                 if (!state.isDispatched())
                     return ;
 
-                if (state.isPublic()) {
+                /*if (state.isPublic()) {
                     this.view.reset();
-                }
+                }*/
 
                 this.callAction_(state);
 
