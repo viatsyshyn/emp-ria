@@ -23,7 +23,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             root = root[n];
         }
 
-        if (!root.hasOwnProperty(name)) {
+        if (name && !root.hasOwnProperty(name)) {
             ria.__SYNTAX.validateVarName(name);
             Object.defineProperty(root, name, { writable: false, configurable: false, value: value });
         }
