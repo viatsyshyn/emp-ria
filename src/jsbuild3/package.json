@@ -11,7 +11,8 @@
   "man": "./jade.1",
   "dependencies": {
     "optimist": "*",
-    "uglify-js": "*"
+    "uglify-js": "*",
+    "ffi": "*"
   },
   "devDependencies": {
     "mocha": "*"

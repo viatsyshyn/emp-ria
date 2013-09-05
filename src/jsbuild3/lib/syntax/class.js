@@ -37,7 +37,7 @@ function processAnnotation(_) {
 }
 
 function ClassCtor() {
-    return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, ClassCtor.prototype.$, [].slice.call(arguments));
+    return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
 function CompileSELF(node, clazz) {
@@ -132,6 +132,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 })
                             }()
                         })],
+                        [ToAst('var _ = ClassCtor.prototype')],
                         //TODO: compile statics,
                         //TODO: compile ctor
                         function () {
@@ -143,7 +144,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                             return [
                                 make_node(UglifyJS.AST_SimpleStatement, node, {
                                     body: make_node(UglifyJS.AST_Assign, node, {
-                                        left: AccessNS('ClassCtor.prototype.$', null, node),
+                                        left: AccessNS('_.$', null, node),
                                         operator: '=',
                                         // TODO: insert properties initializations
                                         right: CompileBASE(CompileSELF(body, 'ClassCtor'),
@@ -157,7 +158,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                         expression: AccessNS('ria.__API.ctor', null, node),
                                         args: [
                                             AccessNS('ClassCtor', null, node),
-                                            AccessNS('ClassCtor.prototype.$', null, node),
+                                            AccessNS('_.$', null, node),
                                             make_node(UglifyJS.AST_Array, node, {
                                                 elements: argsTypes.map(function (_) { return ProcessSELF(_, 'ClassCtor') })
                                             }),
@@ -186,7 +187,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
-                                            left: AccessNS('ClassCtor.prototype.' + getterName, null, node),
+                                            left: AccessNS('_.' + getterName, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
                                             right: CompileBASE(CompileSELF(getterBody, 'ClassCtor'),
@@ -198,7 +199,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
 
                                     property.flags.isReadonly ? null : make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
-                                            left: AccessNS('ClassCtor.prototype.' + setterName, null, node),
+                                            left: AccessNS('_.' + setterName, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
                                             right: CompileBASE(CompileSELF(setterBody, 'ClassCtor'),
@@ -216,8 +217,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                                 make_node(UglifyJS.AST_String, node, {value: property.name}),
                                                 property.type ? ProcessSELF(property.type, 'ClassCtor') : make_node(UglifyJS.AST_Null),
                                                 make_node(UglifyJS.AST_Array, node, {elements: property.annotations.map(processAnnotation) }),
-                                                AccessNS('ClassCtor.prototype.' + getterName, null, node),
-                                                property.flags.isReadonly ? make_node(UglifyJS.AST_Null) : AccessNS('ClassCtor.prototype.' + setterName, null, node)
+                                                AccessNS('_.' + getterName, null, node),
+                                                property.flags.isReadonly ? make_node(UglifyJS.AST_Null) : AccessNS('_.' + setterName, null, node)
                                             ]
                                         })
                                     })
@@ -232,7 +233,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
-                                            left: AccessNS('ClassCtor.prototype.' + method.name, null, node),
+                                            left: AccessNS('_.' + method.name, null, node),
                                             operator: '=',
                                             right: CompileBASE(CompileSELF(method.body.raw, 'ClassCtor'),
                                                 // TODO: detect TRUE base class
@@ -245,7 +246,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             expression: AccessNS('ria.__API.method', null, node),
                                             args: [
                                                 AccessNS('ClassCtor', null, node),
-                                                AccessNS('ClassCtor.prototype.' + method.name, null, node),
+                                                AccessNS('_.' + method.name, null, node),
                                                 make_node(UglifyJS.AST_String, node, {value: method.name}),
                                                 method.retType ? ProcessSELF(method.retType, 'ClassCtor') : make_node(UglifyJS.AST_Null),
                                                 make_node(UglifyJS.AST_Array, node, {
