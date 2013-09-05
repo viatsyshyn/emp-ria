@@ -31,25 +31,27 @@
 
             queue.call('Setup thens', function(callbacks) {
 
-                completer.getFuture()
-                    .then(callbacks.add(function (data) {
-                        assertEquals(1, data);
-                        return data + 1
-                    }))
-                    .then(function (data) {
-                        throw data * 2;
-                    })
-                    .catchError(callbacks.add(function (error) {
-                        assertEquals(4, error);
-                        return error + 2
-                    }))
-                    .then(function (data) {
-                        throw new Exception('test');
-                    })
-                    .catchException(Exception, callbacks.add(function (error) {
-                        assertEquals('test', error.getMessage());
-                    }))
-                ;
+                assertNoException(function () {
+                    completer.getFuture()
+                        .then(callbacks.add(function (data) {
+                            assertEquals(1, data);
+                            return data + 1
+                        }))
+                        .then(function (data) {
+                            throw data * 2;
+                        })
+                        .catchError(callbacks.add(function (error) {
+                            assertEquals(4, error);
+                            return error + 2
+                        }))
+                        .then(function (data) {
+                            throw new Exception('test');
+                        })
+                        .catchException(Exception, callbacks.add(function (error) {
+                            assertEquals('test', error.getMessage());
+                        }))
+
+                });
             });
 
             completer.complete(1);
