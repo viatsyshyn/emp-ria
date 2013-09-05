@@ -2,14 +2,29 @@ var path = require("path");
 var fs = require("fs");
 var vm = require("vm");
 var sys = require("util");
+var FFI = require("ffi");
+
+var execSync = function() {
+  var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec.dll"), {
+    "WinExecSync": ["int32", ["string", "string"]]
+  });
+
+  return function(cmd, dir) {
+    var code = dll.WinExecSync(cmd, dir);
+    if (code) {
+      throw Error("Error " + code + " executing " + cmd)
+    }
+  };
+}();
 
 var JsBuild3 = vm.createContext({
     sys           : sys,
     console       : console,
     Path          : path,
     fs            : fs,
-    UglifyJS      : require("../node_modules/uglify-js/tools/node"),
-    Jade      : require("../node_modules/jade/lib/jade")
+    UglifyJS      : require("uglify-js"),
+    Jade          : require("jade"),
+    execSync      : execSync
 });
 
 function load_global(file) {

@@ -308,7 +308,18 @@ function compile(path, config, appClass) {
         fileContents.push(fs.readFileSync(path));
     });
 
-    fileContents.push(output.get());
+    var content = output.get();
+
+    var gcc = config.getPluginConfiguration("gcc");
+    if (gcc) {
+        fs.writeFileSync('./tmp.in.js', content, "utf-8");
+        execSync(gcc.cmd + " --js tmp.in.js --js_output_file tmp.out.js");
+        content = fs.readFileSync('./tmp.out.js', "utf8");
+        fs.unlinkSync('./tmp.in.js');
+        fs.unlinkSync('./tmp.out.js');
+    }
+
+    fileContents.push(content);
 
     return fileContents;
 }
