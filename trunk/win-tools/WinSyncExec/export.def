@@ -1,0 +1,3 @@
+LIBRARY   WINSYNCEXEC
+EXPORTS
+   WinExecSync   @1
