@@ -417,7 +417,10 @@ NAMESPACE('ria.dom', function () {
             [[Object]],
             SELF, function setAllData(obj) {},
             [[String, Object]],
-            SELF, function setData(name, value) {},
+            SELF, function setData(name, value) {
+                this.setAttr('data-' + name, value);
+                return this;
+            },
 
             /* classes */
 
