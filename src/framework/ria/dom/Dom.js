@@ -85,6 +85,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             function $(dom_) {
+                BASE();
                 VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, NodeList], dom_);
                 this._dom = [global];
 

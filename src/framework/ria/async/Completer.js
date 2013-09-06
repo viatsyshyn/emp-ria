@@ -15,6 +15,7 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
+                BASE();
                 this.future = new ria.async.FutureImpl(canceler_);
                 this.completed = false;
             },

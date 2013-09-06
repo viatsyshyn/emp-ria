@@ -17,6 +17,7 @@ NAMESPACE('ria.async', function () {
 
             [[Function]],
             function $(T) {
+                BASE();
                 this.T = T;
                 this._handlers = [];
             },

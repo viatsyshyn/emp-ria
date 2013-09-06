@@ -43,6 +43,7 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.IView, 'view',
 
             function $() {
+                BASE();
                 this.context = null;
                 this.state = null;
                 this.view = null;

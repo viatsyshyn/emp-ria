@@ -96,6 +96,10 @@
         return getParameters(this.value);
     };
 
+    FunctionToken.prototype.hasBaseCall = function () {
+        return /BASE\(/.test(this.value.toString());
+    };
+
     function FunctionCallToken(token) {
         throw Error('This token type can not be detected at RtDebug')
     }

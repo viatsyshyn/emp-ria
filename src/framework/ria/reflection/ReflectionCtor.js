@@ -12,6 +12,7 @@ NS('ria.reflection', function () {
 
             [[ClassOf(Class)]],
             function $(clazz) {
+                BASE();
                 this.clazz = clazz;
 
                 this.method = clazz.__META.ctor;

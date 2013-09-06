@@ -12,6 +12,7 @@ NAMESPACE('ria.mvc', function() {
             Boolean, 'dispatched',
 
             function $() {
+                BASE();
                 this.dispatched = false;
             },
 

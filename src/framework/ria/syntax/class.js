@@ -197,6 +197,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return true;
     }
 
+    function validateClassCtor(def, ctor) {
+        if (!ctor.body.hasBaseCall()) {
+            throw Error('Class constructor MUST call base class constructor');
+        }
+    }
+
     function validateMethodDeclaration(def, method) {
         var parentMethod = method.__BASE_META;
         if (method.flags.isOverride && !parentMethod) {
@@ -213,10 +219,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if (parentMethod && parentMethod.flags.isFinal) {
             throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
-        }
-
-        if (ria.__SYNTAX.isProtected(method.name) && method.annotations.length) {
-            throw Error('Annotations are forbidden for protected methods. Method: "' + method.name + '"');
         }
     }
 
@@ -329,7 +331,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (baseSyntaxMeta.flags.isFinal)
             throw Error('Can NOT extend final class ' + ria.__SYNTAX.resolveNameFromToken(def.base));
 
-        // TODO: validate ctor declaration
+        // validate ctor declaration
+        validateClassCtor(def, def.methods.filter(function (_) { return _.name === '$'; }).pop());
         processedMethods.push('$');
 
         // validate methods overrides

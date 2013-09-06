@@ -7,6 +7,7 @@ NAMESPACE('ria.mvc', function () {
         'Session', IMPLEMENTS(ria.mvc.ISession), [
 
             function $() {
+                BASE();
                 this.items = {};
             },
 
