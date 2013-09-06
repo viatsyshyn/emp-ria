@@ -218,7 +218,7 @@ NAMESPACE('ria.templates', function () {
 
             [[Object, ImplementerOf(ria.templates.IConverter)]],
             Object, function convertWith(value, clazz) {
-                return ria.templates.ConverterFactories.create(clazz).convert(value);
+                return ria.templates.ConverterFactories().create(clazz).convert(value);
             },
 
             Object, function getContext_() {
