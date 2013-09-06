@@ -7,6 +7,7 @@ NAMESPACE('ria.mvc', function () {
         'StateSerializer', IMPLEMENTS(ria.mvc.IStateSerializer), [
             [[String]],
             function $(separator) {
+                BASE();
                 this.separator = separator;
             },
 

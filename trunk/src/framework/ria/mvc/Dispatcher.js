@@ -45,6 +45,7 @@ NAMESPACE('ria.mvc', function () {
             READONLY, Boolean, 'dispatching',
 
             function $() {
+                BASE();
                 this.defaultControllerId = 'index';
                 this.defaultControllerAction = 'index';
                 this.plugins = [];

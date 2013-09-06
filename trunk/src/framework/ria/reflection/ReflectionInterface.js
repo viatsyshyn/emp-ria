@@ -12,6 +12,7 @@ NS('ria.reflection', function () {
 
             [[Interface]],
             function $(ifc) {
+                BASE();
                 this.ifc = ifc;
             },
 

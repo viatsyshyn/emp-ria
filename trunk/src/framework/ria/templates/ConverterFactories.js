@@ -17,6 +17,7 @@ NAMESPACE('ria.templates', function () {
             },
 
             function $() {
+                BASE();
                 this._map = {};
                 this._cache = {};
             },

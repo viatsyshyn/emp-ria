@@ -7,6 +7,7 @@ NAMESPACE('ria.async', function () {
     CLASS(ABSTRACT,
         'Task', IMPLEMENTS(ria.async.ICancelable), [
             function $() {
+                BASE();
                 this._completer = new ria.async.Completer(this);
             },
 

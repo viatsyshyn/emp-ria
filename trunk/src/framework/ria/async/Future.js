@@ -36,6 +36,8 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
+                BASE();
+
                 this._canceler = canceler_;
                 this._next = null;
 
@@ -173,6 +175,7 @@ NAMESPACE('ria.async', function () {
         FINAL, 'Future', IMPLEMENTS(ria.async.ICancelable), [
             [[ria.async.FutureImpl]],
             function $(impl_) {
+                BASE();
                 this._impl = impl_ || new ria.async.FutureImpl();
             },
 

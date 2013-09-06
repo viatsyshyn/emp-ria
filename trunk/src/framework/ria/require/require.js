@@ -16,7 +16,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         })
     };
 
-    function resolve(path) {
+    function resolve(path, isAsset) {
         var original = path;
 
         if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
@@ -24,12 +24,14 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
         var libs = ria.__CFG['#require'].libs;
         var appRoot = ria.__CFG['#require'].appRoot;
-        var appCodeDir = ria.__CFG['#require'].appCodeDir;
+        var appCodeDir = ria.__CFG['#require'][isAsset ? 'assetsDir' : 'appCodeDir'];
 
-        for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
-            if (path.substr(0, prefix.length) == prefix) {
-                path = libs[prefix] + path;
-                break;
+        if (!isAsset) {
+            for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
+                if (path.substr(0, prefix.length) == prefix) {
+                    path = libs[prefix] + path;
+                    break;
+                }
             }
         }
 
@@ -44,8 +46,8 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         return path;
     }
 
-    function requireUri(uri, cb) {
-        var dep = ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri));
+    function requireUri(uri, cb, isAsset) {
+        var dep = ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri, isAsset));
 
         var module = ria.__REQUIRE.ModuleDescriptor.getCurrentModule();
         module.addDependency(dep);
@@ -55,7 +57,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
     }
 
     ria.__REQUIRE.requireAsset = function (uri) {
-        return requireUri(uri, null);
+        return requireUri(uri, null, true);
     };
 
     ria.__REQUIRE.requireSymbol = function (symbol) {
@@ -67,7 +69,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
                 root = root[part];
             });
-        });
+        }, false);
     };
 
     var AssetAliases = [/ASSET\('([^']+)'\)/g];
@@ -82,7 +84,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
             var m, fn = callback.toString();
 
             while(m = ASSET_REGEX.exec(fn)) {
-                root.addDependency(R.getById(resolve(m[1])));
+                root.addDependency(R.getById(resolve(m[1], true)));
                 //fn = fn.substring(m.index + m[1].length);
 
             }

@@ -12,6 +12,7 @@ NS('ria.reflection', function () {
 
             [[ClassOf(Class), String]],
             function $(clazz, name) {
+                BASE();
                 this.clazz = clazz;
                 this.method = clazz.__META.methods[name];
                 this.name = name;

@@ -35,6 +35,7 @@ NAMESPACE('ria.mvc', function () {
         ria.mvc.IContext, 'context',
 
         function $() {
+            BASE();
             this.serializer = this.initSerializer_();
             this._dispatcher = this.initDispatcher_();
             this.context = this.initContext_();

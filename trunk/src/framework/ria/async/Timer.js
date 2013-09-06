@@ -13,6 +13,7 @@ NAMESPACE('ria.async', function () {
         'Timer', IMPLEMENTS(ria.async.ICancelable), [
             [[Number, ria.async.TimerDelegate]],
             function $(duration, handler) {
+                BASE();
                 var me = this;
                 var lastCall = new Date();
                 this.cleaner = clearInterval;

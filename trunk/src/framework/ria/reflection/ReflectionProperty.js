@@ -12,6 +12,7 @@ NS('ria.reflection', function () {
 
             [[ClassOf(Class), String]],
             function $(clazz, name) {
+                BASE();
                 this.clazz = clazz;
                 this.property = clazz.__META.properties[name];
                 this.name = name;
