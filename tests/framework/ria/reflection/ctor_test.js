@@ -7,7 +7,8 @@
 
     function MakeClass(name, def) {
         "use strict";
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
+        ria.__SYNTAX.validateClassDecl(def, 'Class');
         return ria.__SYNTAX.compileClass(name, def);
     }
 
@@ -20,6 +21,7 @@
                 'BugWarrior', [
                     [MyAnnotation], [[Number, String, Number]],
                     function $(a, b, c_) {
+                        BASE();
                         this.a = a;
                         this.b = b;
                     }

@@ -8,7 +8,7 @@
                 'MyException', [
                     String, 'member',
 
-                    function $() {},
+                    function $() { BASE(''); },
 
                     [String],
                     String, function method(_1) {
@@ -30,7 +30,7 @@
         testBaseException: function () {
             var baseExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'BaseException', [
-                    function $() {}
+                    function $() {BASE(''); }
                 ]]));
 
             assertNoException(function () {
@@ -42,7 +42,7 @@
 
             var childExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [
-                    function $() {}
+                    function $() {BASE();}
                 ]]));
 
             assertNoException(function () {
@@ -61,9 +61,7 @@
 
         testBadExtending: function () {
             var baseClassDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
-                'BaseClass', [
-                    function $() {}
-                ]]));
+                'BaseClass', []]));
 
             ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(baseClassDef, ria.__API.Class);
             ria.__SYNTAX.validateClassDecl(baseClassDef, 'Class');
@@ -72,8 +70,6 @@
 
             var childExceptionDef = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([
                 'MyException', ria.__SYNTAX.EXTENDS(BaseClass), [
-                    function $() {},
-
                     [String],
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;

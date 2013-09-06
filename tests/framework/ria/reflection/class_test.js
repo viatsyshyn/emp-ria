@@ -7,7 +7,8 @@
 
     function MakeClass(name, def) {
         "use strict";
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
+        ria.__SYNTAX.validateClassDecl(def, 'Class');
         return ria.__SYNTAX.compileClass(name, def);
     }
 
@@ -21,12 +22,12 @@
         return ria.__SYNTAX.compileInterface(name, def);
     }
 
-    TestCase("ReflectionTestCase").prototype = {
+    TestCase("ReflectionClassTestCase").prototype = {
         testGetName: function () {
 
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {}
+
             ]]);
 
             var cls = MakeClass('BugWarrior', baseClassDef);
@@ -40,8 +41,8 @@
         },
         testGetShortName: function() {
             var baseClassDef = ClassDef([
-                'ria.baga.na.bazi.BugWarrior', [
-                    function $() {}
+                'BugWarrior', [
+
                 ]]);
 
             var cls = MakeClass('ria.baga.na.bazi.BugWarrior', baseClassDef);
@@ -56,7 +57,7 @@
         testGetBaseClass: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {}
+
                 ]]);
 
             var BaseClass;
@@ -66,7 +67,7 @@
 
             var secondClassDef = ClassDef([
                 'BugWarriorTaras', ria.__SYNTAX.EXTENDS(BaseClass), [
-                    function $() {}
+
                 ]]);
 
             var SecondClass;
@@ -86,7 +87,7 @@
         testGetBaseClassReflector: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {}
+
                 ]]);
 
             var cls = MakeClass('BugWarrior', baseClassDef);
@@ -110,7 +111,7 @@
 
             var clsDef = ClassDef([
                 'Implementor', ria.__SYNTAX.IMPLEMENTS(Interface), [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY,  Number, 'Propertya',
                     [[Number]], function getPropertya(){
                         return 5;
@@ -151,7 +152,7 @@
 
             var clsDef = ClassDef([
                 'Implementor', ria.__SYNTAX.IMPLEMENTS(Interface), [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY,  Number, 'Propertya',
                     [[Number]], function getPropertya(){
                         return 5;
@@ -187,7 +188,7 @@
             var baseClassDef = ClassDef([
                 [WarriorAnnotation(42)],
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function methodThatReturnsNumber(){
                         return 4; //choosed by fair dice roll}
@@ -220,7 +221,7 @@
             var baseClassDef = ClassDef([
                 [WarriorAnnotation(42)],
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function methodThatReturnsNumber(){
                         return 4; //choosed by fair dice roll}
@@ -246,7 +247,7 @@
         testHasMethod: function(){
             var baseClassDef = ClassDef([
                 'Cls', [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.VOID, function test(){}
                 ]]);
 
@@ -262,7 +263,7 @@
         testHasProperty: function(){
             var baseClassDef = ClassDef([
                 'Cls', [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY, Number, 'Property',
                     function getProperty(){
                         return 42;
@@ -298,7 +299,7 @@
 
             var clsDef = ClassDef([
                 'Implementor', ria.__SYNTAX.IMPLEMENTS(Interface), [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY,  Number, 'Propertya',
                     [[Number]], function getPropertya(){
                         return 5;
@@ -325,7 +326,7 @@
         testExtendsClass: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {}
+
                 ]]);
 
             var BaseClass;
@@ -335,7 +336,7 @@
 
             var notBaseClassDef = ClassDef([
                 'No', [
-                    function $() {}
+
                 ]]);
 
             var NotBaseClass;
@@ -345,7 +346,7 @@
 
             var secondClassDef = ClassDef([
                 'BugWarriorT', ria.__SYNTAX.EXTENDS(BaseClass), [
-                    function $() {}
+
                 ]]);
 
             var SecondClass;
@@ -366,7 +367,7 @@
         testGetParents: function(){
             var aDef = ClassDef([
                 'A', [
-                    function $() {}
+
                 ]]);
 
             var A;
@@ -376,7 +377,7 @@
 
             var bDef = ClassDef([
                 'B', ria.__SYNTAX.EXTENDS(A), [
-                    function $() {}
+
                 ]]);
 
             var B;
@@ -387,7 +388,7 @@
 
             var cDef = ClassDef([
                 'C', ria.__SYNTAX.EXTENDS(B), [
-                    function $() {}
+
                 ]]);
 
             var C;
@@ -417,7 +418,7 @@
             var baseClassDef = ClassDef([
                 [WarriorAnnotation(42)],
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function methodThatReturnsNumber(){
                         return 4; //choosed by fair dice roll}
@@ -451,7 +452,7 @@
         testGetMethodsNames: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function method1(){
                         return 4; //choosed by fair dice roll}
@@ -479,7 +480,7 @@
         testGetMethodsReflector: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function method1(){
                         return 4; //choosed by fair dice roll}
@@ -509,7 +510,7 @@
         testGetMethodReflector: function(){
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function method1(){
                         return 4; //choosed by fair dice roll}
@@ -537,7 +538,7 @@
         testGetPropertyReflector: function(){
             var baseClassDef = ClassDef([
                 'Cls', [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY, Number, 'Property',
                     function getProperty(){
                         return 42;
@@ -561,7 +562,7 @@
         testGetPropertiesNames: function(){
             var baseClassDef = ClassDef([
                 'Cls', [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY, Number, 'Property1',
                     function getProperty1(){
                         return 42;
@@ -588,7 +589,7 @@
         testGetPropertiesReflector: function(){
             var baseClassDef = ClassDef([
                 'Cls', [
-                    function $() {},
+
                     ria.__SYNTAX.Modifiers.READONLY, Number, 'Property1',
                     function getProperty1(){
                         return 42;
@@ -619,7 +620,7 @@
         testGetChildren: function(){
             var aDef = ClassDef([
                 'A', [
-                    function $() {}
+
                 ]]);
 
             var A;
@@ -629,7 +630,7 @@
 
             var bDef = ClassDef([
                 'B', ria.__SYNTAX.EXTENDS(A), [
-                    function $() {}
+
                 ]]);
 
             var B;
@@ -640,7 +641,7 @@
 
             var cDef = ClassDef([
                 'C', ria.__SYNTAX.EXTENDS(B), [
-                    function $() {}
+
                 ]]);
 
             var C;
@@ -672,7 +673,7 @@
         testGetChildrenReflector: function(){
             var aDef = ClassDef([
                 'A', [
-                    function $() {}
+
                 ]]);
 
             var A;
@@ -682,7 +683,7 @@
 
             var bDef = ClassDef([
                 'B', ria.__SYNTAX.EXTENDS(A), [
-                    function $() {}
+
                 ]]);
 
             var B;
@@ -706,7 +707,7 @@
             var baseClassDef = ClassDef([
 
                 'BugWarrior', [
-                    function $() {}
+
                 ]]);
 
             var cls = MakeClass('BugWarrior', baseClassDef);
@@ -726,7 +727,7 @@
             var baseClassDef = ClassDef([
 
                 'BugWarrior', [
-                    function $() {},
+
                     [[Number]],
                     Number, function methodThatReturnsNumber(){
                         return 4; //choosed by fair dice roll}
@@ -754,7 +755,7 @@
         testParentsReflector: function(){
             var aDef = ClassDef([
                 'A', [
-                    function $() {}
+
                 ]]);
 
             var A;
@@ -764,7 +765,7 @@
 
             var bDef = ClassDef([
                 'B', ria.__SYNTAX.EXTENDS(A), [
-                    function $() {}
+
                 ]]);
 
             var B;
@@ -775,7 +776,7 @@
 
             var cDef = ClassDef([
                 'C', ria.__SYNTAX.EXTENDS(B), [
-                    function $() {}
+
                 ]]);
 
             var C;
@@ -806,7 +807,7 @@
 
             var baseClassDef = ClassDef([
                 ABSTRACT, 'BugWarrior', [
-                    function $() {}
+
                 ]]);
 
             var cls = MakeClass('BugWarrior', baseClassDef);
@@ -823,7 +824,7 @@
 
              var baseClassDef = ClassDef([
                  FINAL, 'BugWarrior', [
-                 function $() {}
+
              ]]);
 
              var cls = MakeClass('BugWarrior', baseClassDef);
