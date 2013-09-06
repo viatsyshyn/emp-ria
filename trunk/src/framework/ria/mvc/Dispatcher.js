@@ -71,7 +71,7 @@ NAMESPACE('ria.mvc', function () {
                 var onAppStartFutures = [];
                 baseRef.getChildrenReflector().forEach(function (controllerRef) {
                     var name = controllerRef.getShortName();
-                    if (name.match(/.*Controller$/)) {
+                    if (name.match(/.*Controller$/) && !controllerRef.isAbstract()) {
                         if (controllerRef.isAnnotatedWith(ria.mvc.ControllerUri))
                             name = controllerRef.findAnnotation(ria.mvc.ControllerUri).shift().value;
                         else
@@ -112,7 +112,7 @@ NAMESPACE('ria.mvc', function () {
                 var onAppStartFutures = [];
                 baseRef.getChildrenReflector().forEach(function (controlRef) {
                     var name = controlRef.getShortName();
-                    if (name.match(/.*Control$/)) {
+                    if (name.match(/.*Control$/) && !controlRef.isAbstract()) {
                         try {
                             this.controls.push(controlRef);
                             onAppStartFutures.push(controlRef.instantiate().onAppStart());

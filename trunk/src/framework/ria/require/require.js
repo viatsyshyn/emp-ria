@@ -100,7 +100,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
      * @return {*}
      */
     ria.__REQUIRE.getContent = function (uri) {
-        return ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri)).content;
+        return ria.__REQUIRE.ModuleDescriptor.getById(resolve(uri, true)).content;
     };
 
     ria.__REQUIRE.addAssetAlias = function(alias) {

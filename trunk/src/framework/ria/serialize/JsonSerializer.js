@@ -90,6 +90,9 @@ NAMESPACE('ria.serialize', function () {
                 }
 
                 ref.getPropertiesReflector().forEach(function (property) {
+                    if (property.isReadonly())
+                        return ;
+
                     var name = property.getShortName();
                     if (property.isAnnotatedWith(ria.serialize.SerializeProperty))
                         name = property.findAnnotation(ria.serialize.SerializeProperty).pop().name;
