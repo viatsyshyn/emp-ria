@@ -4,10 +4,18 @@ REQUIRE('ria.templates.IConverterFactory');
 REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.templates', function () {
+    "use strict";
 
-    /** @class ria.templates.ConverterFactoriesManager */
+    var instanceSingleton = null;
+
+    /** @class ria.templates.ConverterFactories */
     CLASS(
-        'ConverterFactoriesManager', [
+        'ConverterFactories', [
+            // $$ - instance factory
+            function $$(instance, Clazz, ctor, args) {
+                return instanceSingleton ||( instanceSingleton = new ria.__API.init(instance, Clazz, ctor, args));
+            },
+
             function $() {
                 this._map = {};
                 this._cache = {};
@@ -46,7 +54,4 @@ NAMESPACE('ria.templates', function () {
                 throw new Exception('No factory agreed to create convertor ' + name);
             }
         ]);
-
-    /** @class ria.templates.ConverterFactories */
-    ria.templates.ConverterFactories = new ria.templates.ConverterFactoriesManager;
 });
