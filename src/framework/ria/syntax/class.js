@@ -220,6 +220,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (parentMethod && parentMethod.flags.isFinal) {
             throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
         }
+
+        if (ria.__SYNTAX.isProtected(method.name) && method.annotations.length) {
+            throw Error('Annotations are forbidden for protected methods. Method: "' + method.name + '"');
+        }
     }
 
     function validatePropertyDeclaration(property, def, processedMethods) {

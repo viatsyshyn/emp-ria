@@ -25,10 +25,6 @@ NAMESPACE('ria.mvc', function () {
     CLASS(
         'TemplateActivity', EXTENDS(ria.mvc.DomActivity), [
 
-            function $(){
-                BASE();
-            },
-
             [[ria.reflection.ReflectionClass]],
             OVERRIDE, VOID, function processAnnotations_(ref) {
                 BASE(ref);
