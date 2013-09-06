@@ -83,7 +83,7 @@
         testSelf: function () {
             var BaseClass =
                 CLASS('BaseClass', [
-                    function $() {},
+
 
                     [[SELF]],
                     Number, function method2(a) {
@@ -118,8 +118,6 @@
         testExtending: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
-
                     [[Number]],
                     Number, function method1(a) {
                         return 2 * a;
@@ -145,7 +143,7 @@
 
             var ChildClass = CLASS(
                 FINAL, 'ChildClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method2(a) {
@@ -165,7 +163,7 @@
         testFinalClassExtending: function () {
             var BaseClass = CLASS(
                 FINAL, 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -192,7 +190,7 @@
 
             CLASS_E(Error('Can NOT extend final class test.BaseClass'),
                 FINAL, 'MyClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method2(a) {
@@ -208,7 +206,7 @@
         testAbstractClassInstantiating: function(){
             var BaseClass = CLASS(
                 ABSTRACT, 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -218,7 +216,7 @@
 
             var BaseClass2 = CLASS(
                 'BaseClass2', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -233,7 +231,6 @@
         testFinalMethodExtending: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
 
                     [[Number]],
                     Number, function method1(a) {
@@ -256,7 +253,7 @@
 
             CLASS_E(Error('There is no ability to override final method hello in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method2(a) {
@@ -276,7 +273,7 @@
         testAbstractMethodExtending: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -299,7 +296,7 @@
 
             CLASS_E(Error('The abstract method isMyComputerOn have to be overridden in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method2(a) {
@@ -311,7 +308,7 @@
         testOverrideMethodExtending: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -334,7 +331,7 @@
 
             CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in MyClass class'),
                 'MyClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method2(a) {
@@ -348,7 +345,7 @@
 
             CLASS_E(Error('The overridden method isMyComputerOn have to be marked as OVERRIDE in MyClass2 class'),
                 'MyClass2', EXTENDS(BaseClass), [
-                function $() {},
+
 
                 [[Number]],
                 OVERRIDE, Number, function method2(a) {
@@ -364,7 +361,7 @@
         testTwoExtending: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -391,7 +388,7 @@
 
             var FirstClass = CLASS(
                 'FirstClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method3(a) {
@@ -424,7 +421,7 @@
 
             var SecondClass = CLASS(
                 ABSTRACT, 'SecondClass', EXTENDS(FirstClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method3(a) {
@@ -449,7 +446,7 @@
         testTwoExtendingWithFinal: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -476,7 +473,7 @@
 
             var FirstClass = CLASS(
                 'FirstClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method3(a) {
@@ -509,7 +506,7 @@
 
             CLASS_E(Error('Final method hello can\'t be overridden in SecondClass class'),
                 'SecondClass', EXTENDS(FirstClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method3(a) {
@@ -539,7 +536,7 @@
         testTwoExtendingWithOverride: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -566,7 +563,7 @@
 
             var FirstClass = CLASS(
                 'FirstClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method3(a) {
@@ -599,7 +596,7 @@
 
             CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in SecondClass class'),
                 'SecondClass', EXTENDS(FirstClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method3(a) {
@@ -624,7 +621,7 @@
         testTwoExtendingWithAbstract: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method1(a) {
@@ -651,7 +648,7 @@
 
             var FirstClass = CLASS(
                 'FirstClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     [[Number]],
                     Number, function method3(a) {
@@ -684,7 +681,7 @@
 
             CLASS_E(Error('Method method2 can\'t be abstract, because there is method with the same name in one of the base classes'),
                 'SecondClass', EXTENDS(FirstClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method3(a) {
@@ -707,7 +704,7 @@
 
             CLASS_E(Error('The overridden method method2 have to be marked as OVERRIDE in ThirdClass class'),
                 'ThirdClass', EXTENDS(FirstClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, Number, function method3(a) {
@@ -735,6 +732,7 @@
                     READONLY, Number, 'value',
 
                     function $(value) {
+                        BASE();
                         this.value = value;
                     },
 
@@ -770,6 +768,7 @@
                     Number, 'value',
 
                     function $() {
+                        BASE();
                         assertEquals(BaseClass, window.SELF);
                     },
 
@@ -794,7 +793,10 @@
                 'BaseClass', [
                     Number, 'value',
 
-                    function $() { this.value = null; },
+                    function $() {
+                        BASE();
+                        this.value = null;
+                    },
 
                     VOID, function method(value) {
                         this.value = value;
@@ -826,6 +828,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.abstractString = null;
                         this.value = null;
                         this.selfValue = null;
@@ -853,7 +856,7 @@
 
             var SecondClass = CLASS(
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, String, function getAbstractString() {
                         return this.abstractString;
@@ -869,21 +872,21 @@
         testPropertyFlags_redefining: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
-                    function $() {},
+
 
                     Number, 'value'
                 ]);
 
             CLASS_E(Error('The overridden method getValue have to be marked as OVERRIDE in SecondClass class'),
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, Number, 'value'
                 ]);
 
             CLASS_E(Error('The overridden method getValue have to be marked as OVERRIDE in SecondClass2 class'),
                 'SecondClass2', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     Number, 'value'
                 ]);
@@ -893,6 +896,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.value = null;
                     },
 
@@ -906,6 +910,7 @@
             CLASS_E(Error('The flags of getter getValue should be the same with property flags'),
                 'BaseClass2', [
                     function $() {
+                        BASE();
                         this.value = null;
                     },
 
@@ -921,6 +926,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.abstractString = null;
                         this.value = null;
                         this.selfValue = null;
@@ -931,12 +937,12 @@
 
             CLASS_E(Error('The abstract method getAbstractString have to be overridden in SecondClass class'),
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {}
+
                 ]);
 
             CLASS_E(Error('Method setAbstractString can\'t be abstract, because there is method with the same name in one of the base classes'),
                 'SecondClass2', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, String, function getAbstractString() {
                         return this.abstractString + "_";
@@ -945,7 +951,7 @@
 
             CLASS_E(Error('The overridden method setAbstractString have to be marked as OVERRIDE in SecondClass3 class'),
                 'SecondClass3', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, String, function getAbstractString() {
                         return this.abstractString + "_";
@@ -962,6 +968,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.value = null;
                     },
 
@@ -974,12 +981,12 @@
 
             var SecondClass = CLASS(
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {}
+
                 ]);
 
             CLASS_E(Error('Method getValue of ThirdClass should be marked with OVERRIDE as one base classes has same method'),
                 'ThirdClass', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     Number, function getValue() {
                         return this.value;
@@ -988,7 +995,7 @@
 
             CLASS_E(Error('Method setValue of ThirdClass2 should be marked with OVERRIDE as one base classes has same method'),
                 'ThirdClass2', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     [[Number]],
                     VOID, function setValue(value) {
@@ -998,7 +1005,7 @@
 
             var ThirdClass3 = CLASS(
                 'ThirdClass3', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     [[Number]],
                     OVERRIDE, VOID, function setValue(value) {
@@ -1008,7 +1015,7 @@
 
             var ThirdClass4 = CLASS(
                 'ThirdClass4', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     OVERRIDE, Number, function getValue() {
                         return this.value;
@@ -1018,6 +1025,7 @@
             CLASS_E(Error('There is no getValue2 method in base classes of ThirdClass5 class'),
                 'ThirdClass5', EXTENDS(SecondClass), [
                     function $() {
+                        BASE();
                         this.value2 = null;
                     },
 
@@ -1031,6 +1039,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.value = null;
                         this.value2 = null;
                     },
@@ -1050,12 +1059,12 @@
 
             var SecondClass = CLASS(
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {}
+
                 ]);
 
             CLASS_E(Error('There is no ability to override final method getValue in SecondClass2 class'),
                 'SecondClass2', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, Number, function getValue() {
                         return this.value;
@@ -1064,7 +1073,7 @@
 
             CLASS_E(Error('Final method getValue can\'t be overridden in ThirdClass class'),
                 'ThirdClass', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     OVERRIDE, Number, function getValue() {
                         return this.value;
@@ -1073,7 +1082,7 @@
 
             var ThirdClass2 = CLASS(
                 'ThirdClass2', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     FINAL, OVERRIDE, Number, function getValue2() {
                         return this.value2;
@@ -1085,6 +1094,7 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     function $() {
+                        BASE();
                         this.value = null;
                     },
 
@@ -1097,7 +1107,7 @@
 
             var SecondClass = CLASS(
                 'SecondClass', EXTENDS(BaseClass), [
-                    function $() {},
+
 
                     OVERRIDE, FINAL, Number, function getValue() {
                         return this.value * 2;
@@ -1106,7 +1116,7 @@
 
             CLASS_E(Error('There is no ability to override final method getValue in ThirdClass class'),
                 'ThirdClass', EXTENDS(SecondClass), [
-                    function $() {},
+
 
                     OVERRIDE, Number, function getValue() {
                         return this.value * 3;
@@ -1140,6 +1150,7 @@
 
                     [[Number, Number, Number]],
                     function $(a,b,c) {
+                        BASE();
                         this.value = a + b + c;
                     },
 

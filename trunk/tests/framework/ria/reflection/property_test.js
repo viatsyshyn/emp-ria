@@ -7,7 +7,8 @@
 
     function MakeClass(name, def) {
         "use strict";
-        ria.__SYNTAX.validateClassDecl(def, ria.__API.Class);
+        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
+        ria.__SYNTAX.validateClassDecl(def, 'Class');
         return ria.__SYNTAX.compileClass(name, def);
     }
 
@@ -16,7 +17,7 @@
 
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {},
+
 
                     ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp1',
 
@@ -55,7 +56,7 @@
 
             var baseClassDef = ClassDef([
                 'BugWarrior', [
-                    function $() {},
+
 
                     [MyAnnotation], ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp1',
 
@@ -110,6 +111,7 @@
             var baseClassDef = ClassDef([
                 'BugWarrior', [
                     function $() {
+                        BASE();
                         this.prop = 0;
                     },
 
@@ -121,6 +123,7 @@
             var baseClassDef2 = ClassDef([
                 'BugWarrior2', [
                     function $() {
+                        BASE();
                         this.prop = 0;
                     },
 
