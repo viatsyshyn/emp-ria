@@ -35,7 +35,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     ria.__SYNTAX.compileDelegate = function (name, def) {
         return ria.__API.delegate(
             name,
-            def.retType.value,
+            def.retType ? def.retType.value : null,
             def.argsTypes.map(function (_) { return _.value; }),
             def.argsNames);
     };
