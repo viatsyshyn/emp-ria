@@ -40,6 +40,7 @@ NAMESPACE('ria.ajax', function () {
                 this._method = method_;
                 this._url = url;
                 this._params = params_ || {};
+                this._requestHeaders = {};
                 this._requestTimeout = null;
 
                 this._xhr = new XMLHttpRequest();
@@ -58,6 +59,25 @@ NAMESPACE('ria.ajax', function () {
             SELF, function method(method) {
                 this._method = method;
                 return this;
+            },
+
+            /*
+             dictionary of headers
+             */
+            [[Object]],
+            SELF, function requestHeaders(headers) {
+                this._requestHeaders = ria.__API.extendWithDefault(headers, this._requestHeaders);
+                return this;
+            },
+
+
+            function applyRequestHeaders_(){
+                for(var reqHeader in this._requestHeaders){
+                    if (this._requestHeaders.hasOwnProperty(reqHeader)){
+                        var value = this._requestHeaders[reqHeader];
+                        this._xhr.setRequestHeader(reqHeader, value);
+                    }
+                }
             },
 
             [[Object]],
@@ -89,14 +109,6 @@ NAMESPACE('ria.ajax', function () {
                 return r.join('&');
             },
 
-            FINAL, String, function getParamsString_(){
-                var p = this._params, r = [];
-                for(var key in p) if (p.hasOwnProperty(key)) {
-                    r.push([key, p[key]].join('='));
-                }
-                return r.join('&');
-            },
-
             VOID, function updateProgress_(oEvent) {
                 this._completer.progress(oEvent);
             },
@@ -121,7 +133,7 @@ NAMESPACE('ria.ajax', function () {
             },
 
             Object, function getBody_() {
-                return this._method != ria.ajax.Method.GET ? JSON.stringify(this._params) : this.getParamsString_();
+                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : '';
             },
 
             // todo : was final
@@ -129,11 +141,7 @@ NAMESPACE('ria.ajax', function () {
                 try {
                     BASE();
                     this._xhr.open(this._method.valueOf(), this.getUrl_(), true);
-                    if (this._method != ria.ajax.Method.GET){
-                        if (this._params){
-                            this._xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-                        }
-                    }
+                    this.applyRequestHeaders_();
                     this._xhr.send(this.getBody_());
 
                 } catch (e) {
