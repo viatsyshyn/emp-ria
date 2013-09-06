@@ -215,7 +215,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Final method ' + method.name + ' can\'t be overridden in ' + def.name + ' class');
         }
 
-        if (isProtected(method.name) && method.annotations.length) {
+        if (ria.__SYNTAX.isProtected(method.name) && method.annotations.length) {
             throw Error('Annotations are forbidden for protected methods. Method: "' + method.name + '"');
         }
     }
