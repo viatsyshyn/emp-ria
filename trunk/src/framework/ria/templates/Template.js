@@ -41,6 +41,7 @@ NAMESPACE('ria.templates', function () {
             Array, 'collection',
 
             function $() {
+                BASE();
                 this._modelClass = null;
                 this._bindings = [];
                 this._bundle = '';

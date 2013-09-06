@@ -28,6 +28,7 @@ NAMESPACE('ria.dom', function () {
     CLASS(
         'jQueryDom', EXTENDS(ria.dom.Dom), [
             function $(dom_) {
+                BASE(dom_);
                 VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, jQuery], dom_);
                 this._dom = jQuery(global);
 

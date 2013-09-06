@@ -25,9 +25,9 @@ NAMESPACE('ria.mvc', function () {
 
                 var instance = this;
                 this._domEvents.forEach(function (_) {
-                    dom.on(_.event, _.selector, function (node, event) {
+                    dom.on(_.event, _.selector || null, _.wrapper || (_.wrapper = function (node, event) {
                         return _.methodRef.invokeOn(instance, ria.__API.clone(arguments));
-                    });
+                    }));
                 })
             },
 
