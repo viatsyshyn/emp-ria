@@ -29,7 +29,7 @@ NAMESPACE('ria.serialize', function () {
 			}
 
             if (clazz === Boolean) {
-                return raw === 'true' || raw === true;
+                return raw === 'true' || raw === 'on' || raw === true;
             }
 
 			if(clazz === Number && (raw === '' || raw === null)) {
