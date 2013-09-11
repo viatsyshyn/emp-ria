@@ -45,9 +45,6 @@ var _RELEASE = false;
         siteRoot += '/';
     }
 
-
-
-    var appDir = "";
     var root = ria.__CFG["#require"].appRoot;
     if (root === undefined) {
         var t = window.location.pathname.split('/');
@@ -55,13 +52,15 @@ var _RELEASE = false;
         root = t.join('/') + '/';
     }
 
-    appDir = resolve(ria.__CFG["#require"].appCodeDir || "~/app/");
+    var appDir = resolve(ria.__CFG["#require"].appCodeDir || "~/app/");
+    var assetsDir = resolve(ria.__CFG["#require"].assetsDir || "~/assets/");
 
     // configuring ria.require.js
     ria.__CFG["#require"].appRoot = root;
     ria.__CFG["#require"].siteRoot = siteRoot;
     ria.__CFG["#require"].serviceRoot = serviceRoot;
     ria.__CFG["#require"].appCodeDir = appDir;
+    ria.__CFG["#require"].assetsDir = assetsDir;
     var libs = ria.__CFG["#require"].libs = ria.__CFG["#require"].libs || {};
 
     function resolve(path) {

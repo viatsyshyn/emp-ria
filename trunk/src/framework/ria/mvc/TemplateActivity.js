@@ -125,8 +125,18 @@ NAMESPACE('ria.mvc', function () {
 
             Object, function doFindTemplateForPartialModel_(model, msg) {
                 var matches = this._partialUpdateRules.filter(function (_) {
-                    return (_.msg === null || _.msg == msg)
-                        && (model instanceof _.tpl.getModelClass());
+                    if (_.msg !== null && _.msg != msg)
+                        return false;
+
+                    var modelClass = _.tpl.getModelClass();
+
+                    if (ria.__API.isArrayOfDescriptor(modelClass))
+                        return Array.isArray(model);
+
+                    if (ria.__API.isClassConstructor(modelClass))
+                        return model instanceof modelClass;
+
+                    return false;
                 });
 
                 if (matches.length == 0)

@@ -4,7 +4,7 @@ NAMESPACE('ria.async', function () {
     "use strict";
 
     /**
-     * @param {ria.async.Future} future...
+     * @param {ria.async.Future|Array} future...
      * @returns {ria.async.Future}
      */
     ria.async.wait = function (future) {
