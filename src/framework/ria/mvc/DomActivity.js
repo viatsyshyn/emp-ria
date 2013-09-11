@@ -6,21 +6,14 @@ REQUIRE('ria.mvc.DomEventBind');
 REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
+    "use strict";
 
     var MODEL_WAIT_CLASS = 'activity-model-wait';
 
     function camel2dashed(_) {
         return _.replace(/[a-z][A-Z]/g, function(str, offset) {
            return str[0] + '-' + str[1].toLowerCase();
-        });
-    }
-
-    var MODEL_WAIT_CLASS = 'activity-model-wait';
-
-    function camel2dashed(_) {
-        return _.replace(/[a-z][A-Z]/g, function(str, offset) {
-           return str[0] + '-' + str[1].toLowerCase();
-        });
+        }).toLowerCase();
     }
 
     /** @class ria.mvc.DomAppendTo */
@@ -36,10 +29,15 @@ NAMESPACE('ria.mvc', function () {
             function $() {
                 BASE();
 
-                this._actitivyClass = null;
+                this._activityClass = null;
                 this._domAppendTo = null;
                 this._domEvents = [];
                 this.processAnnotations_(new ria.reflection.ReflectionClass(this.getClass()));
+            },
+
+            [[String]],
+            ria.dom.Dom, function find(selector) {
+                return this.dom.find(selector);
             },
 
             [[ria.reflection.ReflectionClass]],
@@ -71,7 +69,7 @@ NAMESPACE('ria.mvc', function () {
             OVERRIDE, VOID, function onCreate_() {
                 BASE();
 
-                var dom = this.dom = this.onDomCreate_().addClass(this._actitivyClass);
+                var dom = this.dom = this.onDomCreate_().addClass(this._activityClass);
 
                 var instance = this;
                 this._domEvents.forEach(function (_) {

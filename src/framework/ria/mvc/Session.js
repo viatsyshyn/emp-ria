@@ -1,6 +1,11 @@
 REQUIRE('ria.mvc.ISession');
 
 NAMESPACE('ria.mvc', function () {
+    "use strict";
+
+    function def(x, d) {
+        return x === undefined ? d : x;
+    }
 
     /** @class ria.mvc.Session */
     CLASS(
@@ -13,7 +18,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[String, Object]],
             Object, function get(key, def_) {
-                return this.items.hasOwnProperty(key) ? this.items[key] : def_;
+                return def(this.items.hasOwnProperty(key) ? this.items[key] : def_, null);
             },
 
             [[String, Object, Boolean]],

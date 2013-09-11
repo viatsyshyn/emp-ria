@@ -124,10 +124,14 @@ NAMESPACE('ria.templates', function () {
                         _.destProp.invokeSetterOn(scope, value);
                     }
                     catch(e){
-                        throw new ria.templates.Exception("Error assigning property " + _destProp.getName(), e);
+                        throw new ria.templates.Exception("Error assigning property " + _.destProp.getName(), e);
                     }
 
                 });
+            },
+
+            Object, function getModel() {
+                return this._model;
             },
 
             VOID, function options(options) {
@@ -216,9 +220,14 @@ NAMESPACE('ria.templates', function () {
                 return tpl.flushBuffer();
             },
 
+            [[ImplementerOf(ria.templates.IConverter)]],
+            Object, function getConverter(clazz) {
+                return ria.templates.ConverterFactories().create(clazz);
+            },
+
             [[Object, ImplementerOf(ria.templates.IConverter)]],
             Object, function convertWith(value, clazz) {
-                return ria.templates.ConverterFactories().create(clazz).convert(value);
+                return this.getConverter(clazz).convert(value);
             },
 
             Object, function getContext_() {

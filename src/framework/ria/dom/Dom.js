@@ -36,6 +36,11 @@ NAMESPACE('ria.dom', function () {
         return _ != null;
     }
 
+    function firstOrDef(array, def) {
+        var x = array.shift();
+        return x !== undefined ? x : def;
+    }
+
     /** @class ria.dom.Event */
     ria.dom.Event = Event;
 
@@ -234,25 +239,21 @@ NAMESPACE('ria.dom', function () {
             /* DOM manipulations & navigation */
 
             SELF, function empty() {
-                this._dom.forEach(function(element){
-                    element.innerHTML = '';
-                });
+                this._dom.forEach(function(element){ element.innerHTML = ''; });
                 return this;
             },
 
             [[SELF]],
             SELF, function remove(node) {
-                this.forEach(function(element){
-                    element.removeChild(node);
+                this._dom.forEach(function(element) {
+                    node.valueOf().forEach(function (_) { element.removeChild(_); })
                 });
                 return this;
             },
 
             [[SELF]],
             SELF, function removeSelf() {
-                this.forEach(function(element){
-                    element.parentNode.removeChild(element);
-                });
+                this._dom.forEach(function(element){ element.parentNode.removeChild(element); });
                 return this;
             },
 
@@ -322,7 +323,12 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function previous(selector_) {},
             [[String]],
-            SELF, function first(selector_) {},
+            SELF, function first(selector_) {
+                if (!selector_)
+                    return this._dom[0] ? ria.dom.Dom(this._dom[0]) : null;
+
+                throw new Exception('not implemented');
+            },
             [[String]],
             SELF, function last(selector_) {},
             [[String]],
@@ -353,11 +359,11 @@ NAMESPACE('ria.dom', function () {
             },
 
             Object, function getValue() {
-                return this.valueOf()[0].value;
+                return this._dom.map(function (_) { return _.value; }).shift() || null;
             },
             [[Object]],
             SELF, function setValue(value) {
-                this.valueOf()[0].value = value;
+                this._dom.forEach(function (_) { _.value = value; });
                 return this;
             },
             [[Object]],
@@ -369,45 +375,65 @@ NAMESPACE('ria.dom', function () {
                 }
                 return this;
             },
-            [[String]],
+
+            [[ria.dom.Event]],
             SELF, function triggerEvent(event) {
-                var node = this.valueOf()[0];
-                if ( document.createEvent ) {
-                    var evt = document.createEvent('Event');
-                    evt.initEvent(event, true, false);
-                    node.dispatchEvent(evt);
-                } else if( document.createEventObject ) {
-                    node.fireEvent('on' + event) ;
-                } else if (typeof node.onsubmit == 'function' ) {
-                    node.onsubmit();
-                }
+                this.valueOf()
+                    .forEach(function (element) {
+                        if (document.createEvent) {
+                            element.dispatchEvent(event);
+                        } else {
+                            var evt = document.createEventObject();
+                            element.fireEvent("on" + evt.eventType, evt);
+                        }
+                    });
                 return this;
             },
 
             /* attributes */
 
+            [[String]],
+            Boolean, function hasAttr(name) {
+                return this._dom.some(function (_) { return _.hasAttribute(name)});
+            },
+
             Object, function getAllAttrs() {},
+
             [[String]],
             Object, function getAttr(name) {
-                var node = this._dom[0];
-                return node ? node.getAttribute(name) : null;
+                return firstOrDef(
+                    this._dom.map(function (_) { return _.getAttribute(name)}), null);
             },
 
             [[Object]],
             SELF, function setAllAttrs(obj) {
-                for(var k in obj) if (obj.hasOwnProperty(k))
-                    this.setAttr(k, obj[k]);
-
+                var f = this.setAttr;
+                Object.getOwnPropertyNames(obj).forEach(function (k) { f(k, obj[k]); });
                 return this;
             },
             [[String, Object]],
             SELF, function setAttr(name, value) {
-                var node = this._dom[0];
-                node && node.setAttribute(name, value);
+                this._dom.forEach(function (node) { node.setAttribute(name, value); });
                 return this;
             },
 
+            [[String]],
+            SELF, function removeAttr(name) {
+                this._dom.forEach(function (node) { node.removeAttribute(name); });
+                return this;
+            },
+
+            [[String]],
+            SELF, function toggleAttr(name, set_) {
+                set_ = set_ === undefined ? !this.hasAttr(name) : set_;
+                return set_ ? this.setAttr(name, name) : this.removeAttr(name);
+            },
+
             /* data attributes */
+
+            Boolean, function hasData(name) {
+                return this.hasAttr('data-' + name);
+            },
 
             Object, function getAllData() {},
             [[String]],
@@ -415,10 +441,30 @@ NAMESPACE('ria.dom', function () {
                 return this.getAttr('data-' + name);
             },
             [[Object]],
-            SELF, function setAllData(obj) {},
+            SELF, function setAllData(obj) {
+                var f = this.setData;
+                Object.getOwnPropertyNames(obj).forEach(function (_) { f(_, obj[_]); });
+                return this;
+            },
+
             [[String, Object]],
             SELF, function setData(name, value) {
-                this.setAttr('data-' + name, value);
+                return this.setAttr('data-' + name, value);
+            },
+
+            [[String]],
+            SELF, function removeData(name) {
+                return this.removeAttr('data-' + name);
+            },
+
+            /* text */
+            String, function getText() {
+                return firstOrDef(this._dom.map(function (_) { return _.innerText; }), null);
+            },
+
+            [[String]],
+            SELF, function setText(value) {
+                this._dom.forEach(function (_) {_.innerText = value; });
                 return this;
             },
 
@@ -458,33 +504,36 @@ NAMESPACE('ria.dom', function () {
             /* css */
 
             [[String]],
-            Object, function getCss(property) {},
+            Object, function getCss(property) {
+                return this._dom
+                    .map(function (_) { return window.getComputedStyle(_); })
+                    .map(function (style) { return !style ? null : style.getPropertyValue(property); })
+                    .shift() || null;
+            },
+
             [[String, Object]],
             SELF, function setCss(property, value) {
-                for(var i=0; i < this._dom.length; i++){
-                    this._dom[i].style[property] = value + 'px';
-                }
-
+                this._dom.forEach(function (_) { _.style[property] = value; });
                 return this;
             },
             [[Object]],
-            SELF, function updateCss(props) {},
+            SELF, function updateCss(props) {
+                var f = this.setCss;
+                Object.getOwnPropertyNames(props).forEach(function (_) { f(_, props[_]); });
+                return this;
+            },
 
             /* iterator */
 
             [[ria.dom.DomIterator]],
             SELF, function forEach(iterator) {
-                this._dom.forEach(function (_) {
-                    iterator(SELF(_));
-                });
+                this._dom.forEach(function (_) { iterator(ria.dom.Dom(_)); });
+                return this;
             },
 
             [[ria.dom.DomIterator]],
             SELF, function filter(iterator) {
-                this._dom = this._dom.filter(function (_) {
-                    return iterator(SELF(_));
-                });
-                return this;
+                return ria.dom.Dom(this._dom.filter(function (_) { return iterator(ria.dom.Dom(_)); }));
             },
 
             Number, function count() {

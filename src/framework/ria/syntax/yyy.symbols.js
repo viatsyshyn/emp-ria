@@ -48,4 +48,3 @@ window.ArrayOf = ria.__API.ArrayOf;
 window.ClassOf = ria.__API.ClassOf;
 /** @type {Function} */
 window.ImplementerOf = ria.__API.ImplementerOf;
-

@@ -48,4 +48,8 @@
         return ifc.__META instanceof InterfaceDescriptor;
     };
 
+    ria.__API.implements = function (value, ifc) {
+        return ria.__API.getConstructorOf(value).__META.ifcs.indexOf(ifc) >= 0;
+    };
+
 })();
