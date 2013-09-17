@@ -16,7 +16,7 @@ NAMESPACE('ria.async', function () {
                 BASE();
                 var me = this;
                 var lastCall = new Date();
-                this.cleaner = clearInterval;
+                this.cleaner = clearInterval.bind(window);
                 this.timer = setInterval(function () {
                     handler(me, -(lastCall.getTime() - (lastCall = new Date).getTime() ));
                 }, duration < 0 ? 0 : duration);

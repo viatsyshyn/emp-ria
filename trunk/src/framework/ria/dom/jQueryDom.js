@@ -263,7 +263,7 @@ NAMESPACE('ria.dom', function () {
 
 
             [[String]],
-            SELF, function removeAttr(name) {
+            OVERRIDE, SELF, function removeAttr(name) {
                 this._dom.removeAttr(name);
                 return this;
             },
@@ -367,7 +367,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             Boolean, function checked() {
-                return this.parent().find('.hidden-checkbox').getData('value') || false;
+                return !!(this.parent().find('.hidden-checkbox').getData('value')) || false;
             },
 
             /* Form */

@@ -5,6 +5,8 @@ REQUIRE('ria.mvc.DomEventBind');
 
 REQUIRE('ria.reflection.ReflectionClass');
 
+window.noLoadingMsg = 'no-loading';
+
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
@@ -33,6 +35,8 @@ NAMESPACE('ria.mvc', function () {
                 this._domAppendTo = null;
                 this._domEvents = [];
                 this.processAnnotations_(new ria.reflection.ReflectionClass(this.getClass()));
+
+                this._loaderTimer = null;
             },
 
             [[String]],
@@ -52,8 +56,8 @@ NAMESPACE('ria.mvc', function () {
                 this._domEvents = ref.getMethodsReflector()
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.DomEventBind)})
                     .map(function(_) {
-                        if (_.getArguments().length != 2)
-                            throw new ria.mvc.MvcException('Methods, annotated with ria.mvc.DomBindEvent, are expected to accept two arguments (node, event)');
+                        if (_.getArguments().length < 2)
+                            throw new ria.mvc.MvcException('Methods, annotated with ria.mvc.DomBindEvent, are expected to accept at least two arguments (node, event)');
 
                         var annotation = _.findAnnotation(ria.mvc.DomEventBind).pop();
                         return {
@@ -64,6 +68,27 @@ NAMESPACE('ria.mvc', function () {
                     })
             },
 
+            [[ria.async.Future]],
+            OVERRIDE, ria.async.Future, function refreshD(future) {
+
+                // TODO: change to ria.async.Timer.$once
+                this._loaderTimer = new ria.async.Timer(300, function (timer, lag) {
+                    this.dom.addClass(MODEL_WAIT_CLASS);
+                    this._loaderTimer = null;
+                    timer.cancel();
+                }.bind(this));
+
+                return BASE(future);
+            },
+
+            [[String]],
+            OVERRIDE, VOID, function onModelComplete_(msg_) {
+                this.dom.removeClass(MODEL_WAIT_CLASS);
+                BASE(msg_);
+
+                if (this._loaderTimer)
+                    this._loaderTimer.cancel();
+            },
             ABSTRACT, ria.dom.Dom, function onDomCreate_() {},
 
             OVERRIDE, VOID, function onCreate_() {
@@ -73,9 +98,9 @@ NAMESPACE('ria.mvc', function () {
 
                 var instance = this;
                 this._domEvents.forEach(function (_) {
-                    dom.on(_.event, _.selector, function (node, event) {
+                    dom.on(_.event, _.selector || null, _.wrapper || (_.wrapper = function (node, event) {
                         return _.methodRef.invokeOn(instance, ria.__API.clone(arguments));
-                    });
+                    }));
                 })
             },
 
@@ -87,11 +112,7 @@ NAMESPACE('ria.mvc', function () {
             OVERRIDE, VOID, function onStop_(){
                 BASE();
                 this._domAppendTo.remove(this.dom.empty());
-            },
+            }
 
-            [[String]],
-            OVERRIDE, VOID, function onModelWait_(msg_) { this.dom.addClass(MODEL_WAIT_CLASS); },
-            [[String]],
-            OVERRIDE, VOID, function onModelComplete_(msg_) { this.dom.removeClass(MODEL_WAIT_CLASS); },
         ]);
 });
