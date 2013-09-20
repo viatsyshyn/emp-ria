@@ -5,8 +5,6 @@ REQUIRE('ria.mvc.DomEventBind');
 
 REQUIRE('ria.reflection.ReflectionClass');
 
-window.noLoadingMsg = 'no-loading';
-
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
@@ -84,12 +82,24 @@ NAMESPACE('ria.mvc', function () {
             [[String]],
             OVERRIDE, VOID, function onModelComplete_(msg_) {
                 this.dom.removeClass(MODEL_WAIT_CLASS);
+
                 BASE(msg_);
 
                 if (this._loaderTimer)
                     this._loaderTimer.cancel();
             },
             ABSTRACT, ria.dom.Dom, function onDomCreate_() {},
+
+            [[String]],
+            VOID, function addPartialRefreshLoader(msg_) {},
+
+            [[ria.async.Future, String]],
+            OVERRIDE, ria.async.Future, function partialRefreshD(future, msg_) {
+
+                this.addPartialRefreshLoader(msg_);
+
+                return BASE(future, msg_);
+            },
 
             OVERRIDE, VOID, function onCreate_() {
                 BASE();
