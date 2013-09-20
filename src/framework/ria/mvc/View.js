@@ -131,22 +131,6 @@ NAMESPACE('ria.mvc', function () {
                 })
             },
 
-            [[ImplementerOf(ria.mvc.IActivity)]],
-            VOID, function startLoading(activityClass) {
-                this._stack.forEach(function (_) {
-                    if (_ instanceof activityClass)
-                        _.startLoading();
-                })
-            },
-
-            [[ImplementerOf(ria.mvc.IActivity)]],
-            VOID, function stopLoading(activityClass) {
-                this._stack.forEach(function (_) {
-                    if (_ instanceof activityClass)
-                        _.stopLoading();
-                })
-            },
-
             /**
              * Return current top of stack
              * @return {ria.mvc.Activity}
