@@ -157,7 +157,7 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     return params.map(function (_, index) {
                         try {
-                            return (_ === null || _ === undefined || _ instanceof types[index]) ? _ : jsonSerializer.deserialize(_, types[index]);
+                            return (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof types[index])) ? _ : jsonSerializer.deserialize(_, types[index]);
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error deserializing action param ' + names[index], e);
                         }

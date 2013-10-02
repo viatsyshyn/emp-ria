@@ -126,7 +126,15 @@ NAMESPACE('ria.async', function () {
                 ria.__API.defer(this, function () {
                     try {
                         var result = (this._onError || DefaultErrorHandler).call(this, error);
-                        this._next && this._next.finish(result === undefined ? null : result);
+                        if (result === ria.async.BREAK) {
+                            this._next && this._next.completeBreak();
+                        } else if (result instanceof ria.async.FutureImpl) {
+                            this.attach(result);
+                        } else if (result instanceof ria.async.Future) {
+                            this.attach(result.getImpl());
+                        } else {
+                            this._next && this._next.finish(result === undefined ? null : result);
+                        }
                     } catch (e) {
                         this._next && this._next.completeError(e);
                     } finally {
