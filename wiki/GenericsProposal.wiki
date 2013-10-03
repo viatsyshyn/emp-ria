@@ -23,7 +23,7 @@ CLASS(
   GENERIC('TKey', 'TValue'),
   'MyBaseMap', [
      [[T, T]],
-     ABSTRACT, T, function (t1, t2)
+     ABSTRACT, T, function add(t1, t2) {}
   ]);
 
 INTERFACE(
@@ -34,10 +34,10 @@ INTERFACE(
 
 // Dictionary<T>
 CLASS(
-  GENERIC('TValue'),
+  GENERIC('T'),
   'MyDictionary', 
-      EXTENDS(MyBase.OF(String, TValue)),
-      IMPLEMENTS(MyIfc.OF(SELF)), [ 
+      EXTENDS(MyBase.OF(String, T)),
+      IMPLEMENTS(MyIfc.OF(T)), [ 
 
     T, 'param',
 
@@ -55,8 +55,7 @@ Instantiation
 
 {{{
 // first one arg is generalization of generic MyGenericClass<T>
-var instance = MyGenericClass(Number, 1); // specified with Number
-var instance = MyGenericClass.OF(Number)(1); // OR less "sweet"
+var instance = MyDictionary(Number, 1); // specified with Number
 }}}
 
 Generics typing is check only in DEBUG mode. Generics typing is available via reflection
