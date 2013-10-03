@@ -59,3 +59,15 @@ var instance = MyDictionary(Number, 1); // specified with Number
 }}}
 
 Generics typing is check only in DEBUG mode. Generics typing is available via reflection
+
+=== Impelementation notes ===
+
+{{{
+function SpecializationDescriptor(ctor, args) {}
+
+var instance = new Dictinary(String, Number);
+instance.__PROTECTED.TKey === String;
+instance.__PROTECTED.TValue === Number;
+
+
+}}}
