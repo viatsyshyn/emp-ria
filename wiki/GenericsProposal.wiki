@@ -63,7 +63,7 @@ Generics typing is check only in DEBUG mode. Generics typing is available via re
 
 === Impelementation notes ===
 
-All classes are generics with zero or more params. Generalizations are readonly properties with readonly fields. If base class has generalization, children can use same name (reuse) it as its own generalization. Generalizations fields are protected as well. But public are only getters of unspecified generalizations of class.
+All classes are generics with zero or more params. Generalizations has readonly protected fields. If base class has generalization, children can use same name (reuse) it as its own generalization. Generalizations fields are protected as well. But public are only getters of unspecified generalizations of class.
 
 {{{
 CLASS(
@@ -88,8 +88,8 @@ CLASS(
 
 var instance = new StringDictionary.$fromObject(Number, {}); 
 
-instance.getTKey === undefined;
-instance.getTValue() === Number;
+instance.getSpecializationOf('TKey') === undefined;
+instance.getSpecializationOf('TValue') === String;
 }}}
 
 {{{
