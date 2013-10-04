@@ -62,6 +62,8 @@ Generics typing is check only in DEBUG mode. Generics typing is available via re
 
 === Impelementation notes ===
 
+All classes are generics with zero or more params. 
+
 {{{
 function SpecializationDescriptor(ctor, args) {}
 
