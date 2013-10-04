@@ -122,13 +122,12 @@ Dictionary = function () {
   }
 
   Dictionary.$fromObject = function () {
-var args = ria.__API.clone(arguments),
+    var args = ria.__API.clone(arguments),
         specsCount = Dictionary.__META.specsNames.length,
         specs = args.slice(0, specsCount);
-    args = args.slice(specsCount);
 
     var factory = Dictionary.$$ || ria.__API.init;
-    return factory(this, Dictionary, Dictionary.prototype.$fromObject, args, specs); 
+    return factory(this, Dictionary, Dictionary.prototype.$fromObject, args.slice(specsCount), specs); 
   }
 }();
 }}}
