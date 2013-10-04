@@ -86,7 +86,7 @@ CLASS(
     }
   ]);
 
-var instance = new StringDictionary(Number); 
+var instance = new StringDictionary.$fromObject(Number, {}); 
 
 instance.getTKey === undefined;
 instance.getTValue() === Number;
