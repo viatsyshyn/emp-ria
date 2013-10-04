@@ -104,6 +104,9 @@ instance.__PROTECTED.__SPECS.TKey === String;
 instance.__PROTECTED.__SPECS.TValue === Number;
 
 Dictionary = function () {
+  var TKey = ria.__API.generalization('TKey'),
+      TValue = ria.__API.generalization('TValue', [ClassOf(Base), ImplementerOf(MyIfc), ImplementerOf(MyIfc2)]),
+
   function Dictionary() {
     var args = ria.__API.clone(arguments),
         specsCount = Dictionary.__META.specsNames.length,
@@ -113,6 +116,8 @@ Dictionary = function () {
     var factory = Dictionary.$$ || ria.__API.init;
     return factory(this, Dictionary, Dictionary.prototype.$, args, specs); 
   }
+
+  ria.__API.clazz(..., [TKey, TValue]);
 
   Dictionary.$fromObject = function () {
     var args = ria.__API.clone(arguments),
@@ -128,6 +133,9 @@ Dictionary = function () {
     VALIDATE_ARGS(Dictionary.__META.specNames, Dictionary.__META.specTypes, specs);
     return ria.__API.specify(Dictionary, specs)
   };
+
+  Dictionary.prototupe.add = function (a,b) {},
+  ria.__API.method(Dictionary, 'add', Dictionary.prototype.add, undefined, ['a', 'b'], [TKey, TValue], []);
 
   return Dictinary
 }();
