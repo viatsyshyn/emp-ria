@@ -104,8 +104,8 @@ instance.__PROTECTED.__SPECS.TKey === String;
 instance.__PROTECTED.__SPECS.TValue === Number;
 
 Dictionary = function () {
-  var TKey = ria.__API.generalization('TKey'),
-      TValue = ria.__API.generalization('TValue', [ClassOf(Base), ImplementerOf(MyIfc), ImplementerOf(MyIfc2)]),
+  var TKey = ria.__API.generalizedType('TKey'),
+      TValue = ria.__API.generalizedType('TValue', [ClassOf(Base), ImplementerOf(MyIfc), ImplementerOf(MyIfc2)]),
 
   function Dictionary() {
     var args = ria.__API.clone(arguments),
