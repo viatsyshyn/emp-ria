@@ -149,22 +149,17 @@ if (ria.__API.isGeneralizedType(clazz)) {
 
 if (ria.__API.isSpecifyDescriptor(clazz)) {
   if (ria.__API.isClassDescriptor(value)) {
-    throw Exception('Requires ' + ... + ' but got ' + ...);
+    return false;
   }
 
   if (ria.__API.isSpecifyDescriptor(value)) {
-    if (clazz.toString() != value.toString()) { // ctors or specs are diferent
-      throw Exception('Requires ' + ... + ' but got ' + ...);      
-    }
-
-    return true;
+    return clazz.toString() === value.toString();
   }
 
   if (!(value instance of clazz.ctor)) return false;
 
   for(k in clazz.specs) if (clazz.specs.hasOwnProperty(k) {
-    if (value.getSpecsOf(k) !== clazz.specs[k])
-      throw Exception('Invalid specification of ' + k + ' requires ' + ... + ', buf got ' + ...);
+    return checkTypeHints(value.getSpecsOf(k), clazz.specs[k]);
   }
 }
 
