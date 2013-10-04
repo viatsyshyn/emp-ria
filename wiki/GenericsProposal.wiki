@@ -77,8 +77,8 @@ CLASS(
   ]);
 
 var base = new Dictionary(String, Boolean);
-child.getSpecializationOf('TKey') === String;
-child.getSpecializationOf('TValue') === Boolean;
+child.getSpecsOf('TKey') === String;
+child.getSpecsOf('TValue') === Boolean;
 
 CLASS(
   GENERIC('TValue'),
@@ -92,18 +92,43 @@ CLASS(
 
 var child = new StringDictionary.$fromObject(Number, {}); 
 
-child.getSpecializationOf('TKey') === undefined;
-child.getSpecializationOf('TValue') === String;
+child.getSpecsOf('TKey') === undefined;
+child.getSpecsOf('TValue') === String;
 
 child.add(5, '') // <-- triggers error 5 is not String
 }}}
 
 {{{
-function SpecializationDescriptor(ctor, args) {}
-
 var instance = new Dictinary(String, Number);
-instance.__PROTECTED.TKey === String;
-instance.__PROTECTED.TValue === Number;
+instance.__PROTECTED.__SPECS.TKey === String;
+instance.__PROTECTED.__SPECS.TValue === Number;
 
+Dictinary.OF = function OF(TKey, TValue) {
+  var specs = ria.__API.clone(arguments),
+      clazz = this; // this is Dictionary
+  VALIDATE_ARGS(clazz.__META.specNames, clazz.__META.specTypes, specs);
+  return ria.__API.specify(clazz, specs)
+}.bind(Dictinary);
 
+Dictionary = function () {
+  function Dictionary() {
+    var args = ria.__API.clone(arguments),
+        specsCount = Dictionary.__META.specsNames.length,
+        specs = args.slice(0, specsCount);
+    args = args.slice(specsCount);
+
+    var factory = Dictionary.$$ || ria.__API.init;
+    return factory(this, Dictionary, Dictionary.prototype.$, args, specs); 
+  }
+
+  Dictionary.$fromObject = function () {
+var args = ria.__API.clone(arguments),
+        specsCount = Dictionary.__META.specsNames.length,
+        specs = args.slice(0, specsCount);
+    args = args.slice(specsCount);
+
+    var factory = Dictionary.$$ || ria.__API.init;
+    return factory(this, Dictionary, Dictionary.prototype.$fromObject, args, specs); 
+  }
+}();
 }}}
