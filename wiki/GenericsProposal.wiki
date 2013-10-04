@@ -28,14 +28,14 @@ CLASS(
   ]);
 
 INTERFACE(
-  GENERIC('T', EXTENDS(MyBase)), // may interfaces be GENERIC ?
+  GENERIC('T', ClassOf(MyBase)), // may interfaces be GENERIC ?
   'MyIfc', [
      T, 'param' // not a property, but a shortcut ?
   ]);
 
 // Dictionary<T>
 CLASS(
-  GENERIC('T'),
+  GENERIC('T', ImplementorOf(MyIfc)),
   'MyDictionary', 
       EXTENDS(MyBase.OF(String, T)),
       IMPLEMENTS(MyIfc.OF(T)), [ 
