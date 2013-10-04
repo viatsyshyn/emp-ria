@@ -124,7 +124,8 @@ instance.getMyProp(); // 2
 
 {{{
 empx.domx.BaseComparatorImpl = function () {
-  function BaseComparatorImpl() { return ria.__API.init(this, BaseComparatorImpl
+  function BaseComparatorImpl() { var factory = Dictionary.$$ || ria.__API.init;
+    return factory(this, BaseComparatorImpl
       , BaseComparatorImpl.prototype.$, arguments); };
   ria.__API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
     , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
