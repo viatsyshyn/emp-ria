@@ -103,13 +103,6 @@ var instance = new Dictinary(String, Number);
 instance.__PROTECTED.__SPECS.TKey === String;
 instance.__PROTECTED.__SPECS.TValue === Number;
 
-Dictinary.OF = function OF(TKey, TValue) {
-  var specs = ria.__API.clone(arguments),
-      clazz = this; // this is Dictionary
-  VALIDATE_ARGS(clazz.__META.specNames, clazz.__META.specTypes, specs);
-  return ria.__API.specify(clazz, specs)
-}.bind(Dictinary);
-
 Dictionary = function () {
   function Dictionary() {
     var args = ria.__API.clone(arguments),
@@ -129,6 +122,14 @@ Dictionary = function () {
     var factory = Dictionary.$$ || ria.__API.init;
     return factory(this, Dictionary, Dictionary.prototype.$fromObject, args.slice(specsCount), specs); 
   }
+
+  Dictionary.OF = function OF(TKey, TValue) {
+    var specs = ria.__API.clone(arguments);
+    VALIDATE_ARGS(Dictionary.__META.specNames, Dictionary.__META.specTypes, specs);
+    return ria.__API.specify(Dictionary, specs)
+  };
+
+  return Dictinary
 }();
 }}}
 
