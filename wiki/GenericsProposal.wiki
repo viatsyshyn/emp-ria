@@ -158,9 +158,9 @@ if (ria.__API.isSpecifyDescriptor(clazz)) {
 
   if (!(value instance of clazz.ctor)) return false;
 
-  for(k in clazz.specs) if (clazz.specs.hasOwnProperty(k) {
-    return checkTypeHints(value.getSpecsOf(k), clazz.specs[k]);
-  }
+  return clazz.specs.all(function (genType) {
+    return checkTypeHints(value.getSpecsOf(genType.name), genType.typeHints);
+  });
 }
 
 }}}
