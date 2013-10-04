@@ -76,6 +76,10 @@ CLASS(
     VOID, function add(key, value) {}
   ]);
 
+var base = new Dictionary(String, Boolean);
+child.getSpecializationOf('TKey') === String;
+child.getSpecializationOf('TValue') === Boolean;
+
 CLASS(
   GENERIC('TValue'),
   'StringDictionary', EXTENDS(Dictionary.OF(String, TValue), [
@@ -86,10 +90,12 @@ CLASS(
     }
   ]);
 
-var instance = new StringDictionary.$fromObject(Number, {}); 
+var child = new StringDictionary.$fromObject(Number, {}); 
 
-instance.getSpecializationOf('TKey') === undefined;
-instance.getSpecializationOf('TValue') === String;
+child.getSpecializationOf('TKey') === undefined;
+child.getSpecializationOf('TValue') === String;
+
+child.add(5, '') // <-- triggers error 5 is not String
 }}}
 
 {{{
