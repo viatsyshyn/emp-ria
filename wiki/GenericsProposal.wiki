@@ -143,6 +143,10 @@ Dictionary = function () {
 
 {{{
 
+if (ria.__API.isGeneralizedType(clazz)) {
+  return checkTypeHints(value, scope.getSpecsOf(clazz.name));
+}
+
 if (ria.__API.isSpecifyDescriptor(clazz)) {
   if (ria.__API.isClassDescriptor(value)) {
     throw Exception('Requires ' + ... + ' but got ' + ...);
