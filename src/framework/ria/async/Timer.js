@@ -25,7 +25,7 @@ NAMESPACE('ria.async', function () {
             VOID, function cancel() {
                 this.timer && this.cleaner.call(window, this.timer);
                 this.timer = null;
-            }
+            },
 
             [[Number, ria.async.TimerDelegate]],
             function $once(duration, handler) {

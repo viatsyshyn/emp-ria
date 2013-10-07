@@ -16,6 +16,8 @@ NAMESPACE('ria.mvc', function () {
         Append: 'append'
     });
 
+
+
     /** @class ria.mvc.PartialUpdateRule */
     ANNOTATION(
         [[ClassOf(ria.templates.Template), String, String, ria.mvc.PartialUpdateRuleActions]],
@@ -57,7 +59,7 @@ NAMESPACE('ria.mvc', function () {
                         var tplRef = new ria.reflection.ReflectionClass(annotation.tpl);
                         return {
                             tpl: tplRef.instantiate(),
-                            msg: _.msg_ || null,
+                            msg: annotation.msg_ || null,
                             methodRef: _
                         }
                     });
@@ -122,6 +124,8 @@ NAMESPACE('ria.mvc', function () {
                 tpl.assign(model);
                 tpl.renderTo(this.dom.empty());
             },
+
+
 
             Object, function doFindTemplateForPartialModel_(model, msg) {
                 var matches = this._partialUpdateRules.filter(function (_) {
