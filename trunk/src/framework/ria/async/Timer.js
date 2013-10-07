@@ -23,26 +23,28 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function cancel() {
-                this.cleaner(this.timer);
+                this.timer && this.cleaner.call(window, this.timer);
+                this.timer = null;
             }
 
-            /*
             [[Number, ria.async.TimerDelegate]],
             function $once(duration, handler) {
                 var me = this;
                 var lastCall = new Date();
                 this.cleaner = clearTimeout;
                 this.timer = setTimeout(function () {
+                    this.timer = null;
                     handler(me, -(lastCall.getTime() - (lastCall = new Date).getTime() ));
                 }, duration < 0 ? 0 : duration);
             }
-            */
 
             /*
             [[ria.async.TimerDelegate, Array, Object]],
-            STATIC, VOID, function run(handler, args_, scope_) {
+            STATIC, VOID, function RUN(handler, args_, scope_) {
                 ria.__API.defer(scope_ || window, handler, args_ || []);
             }
+
+            ria.async.Timer.RUN(function () {})
             */
         ]);
 });

@@ -69,11 +69,9 @@ NAMESPACE('ria.mvc', function () {
             [[ria.async.Future]],
             OVERRIDE, ria.async.Future, function refreshD(future) {
 
-                // TODO: change to ria.async.Timer.$once
-                this._loaderTimer = new ria.async.Timer(300, function (timer, lag) {
+                this._loaderTimer = new ria.async.Timer.$once(300, function (timer, lag) {
                     this.dom.addClass(MODEL_WAIT_CLASS);
                     this._loaderTimer = null;
-                    timer.cancel();
                 }.bind(this));
 
                 return BASE(future);

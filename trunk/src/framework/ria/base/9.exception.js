@@ -11,7 +11,7 @@
             this.stack = ria.__API.getStackTrace(Error(msg));
             this.inner_ = inner_;
         };
-        ria.__API.ctor(ExceptionBase, ExceptionBase.prototype.$, [String, [Error, ExceptionBase]], ['msg', 'inner_'], []);
+        ria.__API.ctor('$', ExceptionBase, ExceptionBase.prototype.$, [String, [Error, ExceptionBase]], ['msg', 'inner_'], []);
 
         ExceptionBase.prototype.toString = function () {
             var msg = this.stack.join('\n  ').replace('Error:', ria.__API.getIdentifierOfValue(this) + ':');

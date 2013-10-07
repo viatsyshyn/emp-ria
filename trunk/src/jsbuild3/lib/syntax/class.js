@@ -135,41 +135,43 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                         [ToAst('var _ = ClassCtor.prototype')],
                         //TODO: compile statics,
                         //TODO: compile ctor
-                        function () {
-                            var ctorDef = def.methods.filter(function (_) { return _.name == '$' }).pop();
-                            processedMethods.push('$');
-                            var argsNames = ctorDef.argsNames,
-                                argsTypes = ctorDef.argsTypes,
-                                body = ctorDef.body.raw;
-                            return [
-                                make_node(UglifyJS.AST_SimpleStatement, node, {
-                                    body: make_node(UglifyJS.AST_Assign, node, {
-                                        left: AccessNS('_.$', null, node),
-                                        operator: '=',
-                                        // TODO: insert properties initializations
-                                        right: CompileBASE(CompileSELF(body, 'ClassCtor'),
-                                            // TODO: detect TRUE base class
-                                            def.base ? def.base.raw.print_to_string() : baseClass,
-                                            '$', parts.join('.'))
+                        [].concat.apply([], def.methods
+                            .filter(function (_) { return /^\$.*/.test(_.name)})
+                            .map(function (ctorDef) {
+                                processedMethods.push(ctorDef.name);
+                                var argsNames = ctorDef.argsNames,
+                                    argsTypes = ctorDef.argsTypes,
+                                    body = ctorDef.body.raw;
+                                return [
+                                    make_node(UglifyJS.AST_SimpleStatement, node, {
+                                        body: make_node(UglifyJS.AST_Assign, node, {
+                                            left: AccessNS('_.$', null, node),
+                                            operator: '=',
+                                            // TODO: insert properties initializations
+                                            right: CompileBASE(CompileSELF(body, 'ClassCtor'),
+                                                // TODO: detect TRUE base class
+                                                def.base ? def.base.raw.print_to_string() : baseClass,
+                                                '$', parts.join('.'))
+                                        })
+                                    }),
+                                    make_node(UglifyJS.AST_SimpleStatement, node, {
+                                        body: make_node(UglifyJS.AST_Call, node, {
+                                            expression: AccessNS('ria.__API.ctor', null, node),
+                                            args: [
+                                                make_node(UglifyJS.AST_String, node, {value: ctorDef.name}),
+                                                AccessNS('ClassCtor', null, node),
+                                                AccessNS('_.$', null, node),
+                                                make_node(UglifyJS.AST_Array, node, {
+                                                    elements: argsTypes.map(function (_) { return ProcessSELF(_, 'ClassCtor') })
+                                                }),
+                                                make_node(UglifyJS.AST_Array, node, {
+                                                    elements: argsNames.map(function (_) { return make_node(UglifyJS.AST_String, node, {value: _}) })
+                                                })
+                                            ]
+                                        })
                                     })
-                                }),
-                                make_node(UglifyJS.AST_SimpleStatement, node, {
-                                    body: make_node(UglifyJS.AST_Call, node, {
-                                        expression: AccessNS('ria.__API.ctor', null, node),
-                                        args: [
-                                            AccessNS('ClassCtor', null, node),
-                                            AccessNS('_.$', null, node),
-                                            make_node(UglifyJS.AST_Array, node, {
-                                                elements: argsTypes.map(function (_) { return ProcessSELF(_, 'ClassCtor') })
-                                            }),
-                                            make_node(UglifyJS.AST_Array, node, {
-                                                elements: argsNames.map(function (_) { return make_node(UglifyJS.AST_String, node, {value: _}) })
-                                            })
-                                        ]
-                                    })
-                                })
-                            ];
-                        }(),
+                                ];
+                            })),
                         //TODO: compile properties,
                         def.properties
                             .map(function (property) {

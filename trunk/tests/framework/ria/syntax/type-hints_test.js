@@ -27,6 +27,10 @@
             assertNoException(function () { wrapper(true); });
 
             assertException(function () { wrapper(2); }, 'Error');
+        },
+
+        testClassOf: function () {
+            fail('test ClassOf(Class) extends ClassOf(BaseClass)');
         }
     };
 })();
