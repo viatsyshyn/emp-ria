@@ -142,7 +142,7 @@ NS('ria.reflection', function () {
 
             [[Array]],
             Class, function instantiate(args_) {
-                return ria.__API.init(null, this.clazz, this.clazz.__META.ctor.impl, args_ ? args_ : []);
+                return ria.__API.init(null, this.clazz, this.clazz.__META.defCtor.impl, args_ ? args_ : []);
             }
         ]);
 });

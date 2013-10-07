@@ -24,6 +24,7 @@ NAMESPACE('ria.dom', function () {
 
     ria.dom.Event = Object; // jQuery modifies event
 
+
     /** @class ria.dom.jQueryDom */
     CLASS(
         'jQueryDom', EXTENDS(ria.dom.Dom), [
@@ -91,6 +92,15 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            [[String]],
+            Boolean, function isOrInside(selector){
+                return this.is(selector) || this.parent(selector).exists();
+            },
+
+            String, function text(){
+                return this._dom.text();
+            },
+
             OVERRIDE, SELF, function on(event, selector, handler_) {
                 VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
                 if(!handler_){
@@ -106,9 +116,9 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
-            OVERRIDE, SELF, function off(event, selector, handler_) {
-                VALIDATE_ARGS(['event', 'selector', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
-                this._dom.off(event, selector, handler_ && handler_.__wrapper__);
+            OVERRIDE, SELF, function off(event, selector_, handler_) {
+                VALIDATE_ARGS(['event', 'selector_', 'handler_'], [String, [String, ria.dom.DomEventHandler], ria.dom.DomEventHandler], arguments);
+                this._dom.off(event, selector_, handler_ && handler_.__wrapper__);
                 return this;
             },
 
@@ -192,9 +202,9 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
-            [[SELF]],
+            [[ria.dom.Dom]],
             OVERRIDE, SELF, function remove(node_) {
-                node_ ? node_._dom.remove() : this._dom.remove();
+                node_ ? node_.remove() : this._dom.remove();
                 return this;
             },
 
@@ -276,11 +286,11 @@ NAMESPACE('ria.dom', function () {
             },
 
             [[Object]],
-            OVERRIDE, Object, function height(value_) {
+            OVERRIDE, Number, function height(value_) {
                 return value_ ? this._dom.height(value_) : this._dom.height();
             },
             [[Object]],
-            OVERRIDE, Object, function width(value_) {
+            OVERRIDE, Number, function width(value_) {
                 return value_ ? this._dom.width(value_) : this._dom.width();
             },
 
@@ -323,7 +333,9 @@ NAMESPACE('ria.dom', function () {
             /* css */
 
             [[String]],
-            OVERRIDE, Object, function getCss(property) {},
+            OVERRIDE, Object, function getCss(property) {
+                return this._dom.css(property);
+            },
             [[String, Object]],
             OVERRIDE, SELF, function setCss(property, value) {
                 this._dom.css(property, value);
@@ -368,6 +380,10 @@ NAMESPACE('ria.dom', function () {
 
             Boolean, function checked() {
                 return !!(this.parent().find('.hidden-checkbox').getData('value')) || false;
+            },
+
+            Number, function index() {
+                return this._dom.index();
             },
 
             /* Form */

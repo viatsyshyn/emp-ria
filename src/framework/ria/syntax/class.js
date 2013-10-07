@@ -354,8 +354,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Base class must be descendant of ' + rootClassName);
 
         function FakeSelf() {}
+        FakeSelf.__META = new ria.__API.ClassDescriptor(def.name, def.base.raw, [], [], def.flags.isAbstract || false);
         ria.__API.extend(FakeSelf, def.base.raw);
-        ria.__API.clazz(FakeSelf, def.name, def.base.raw, [], [], def.flags.isAbstract);
 
         ria.__SYNTAX.validateVarName(def.name);
 
@@ -513,8 +513,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     function compileCtorsDeclaration(def, ClassProxy, processedMethods) {
         var ctorDefs = def.methods
-            .filter(function (_1) { return processedMethods.indexOf(_1.name) < 0; })
-            .filter(function (_1) { return isFactoryCtor(_1.name)});
+            .filter(function (_) { return processedMethods.indexOf(_.name) < 0; })
+            .filter(function (_) { return isFactoryCtor(_.name) });
 
 
         ctorDefs.forEach(function (ctorDef) {

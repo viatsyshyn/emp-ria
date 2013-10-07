@@ -15,9 +15,9 @@
             var delegate = type.__META;
 
             try {
-                if (!checkTypeHint(method.retType, delegate.retType)) { //noinspection ExceptionCaughtLocallyJS
-                    throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.retType)
-                        + ', but delegate expects ' + ria.__API.getIdentifierOfType(delegate.retType));
+                if (method.ret !== delegate.ret && !checkTypeHint(method.ret, delegate.ret)) { //noinspection ExceptionCaughtLocallyJS
+                    throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.ret)
+                        + ', but delegate expects ' + ria.__API.getIdentifierOfType(delegate.ret));
                 }
 
                 if (delegate.argsNames.length > method.argsNames.length) { //noinspection ExceptionCaughtLocallyJS
@@ -32,7 +32,7 @@
                         }
                     }
 
-                    if (!checkTypeHint(method.argsTypes[index], delegate.argsTypes[index])) {
+                    if (!checkTypeHint(method.argsTypes[index] || Object, delegate.argsTypes[index] || Object)) {
                          throw new Exception('Lambda accepts ' + ria.__API.getIdentifierOfType(method.argsTypes[index]) + ' for argument ' + name
                              + ', but delegate supplies ' + ria.__API.getIdentifierOfType(delegate.argsTypes[index]));
                     }
@@ -86,7 +86,7 @@
                     if (ria.__API.isInterface(value))
                         return value === type;
 
-                    return (value instanceof ria.__API.Class) && ria.__API.implements(value, type);
+                    return (ria.__API.isClassConstructor(value) || value instanceof ria.__API.Class) && ria.__API.implements(value, type);
                 }
 
                 if (ria.__API.isArrayOfDescriptor(type)) {

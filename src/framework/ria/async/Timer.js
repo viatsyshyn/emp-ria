@@ -29,6 +29,7 @@ NAMESPACE('ria.async', function () {
 
             [[Number, ria.async.TimerDelegate]],
             function $once(duration, handler) {
+                BASE();
                 var me = this;
                 var lastCall = new Date();
                 this.cleaner = clearTimeout;

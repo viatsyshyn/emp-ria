@@ -51,7 +51,7 @@ NAMESPACE('ria.ajax', function () {
                 this._xhr.addEventListener("abort", this.transferCanceled_, false);
             },
 
-            OVERRIDE, function cancel() {
+            OVERRIDE, VOID, function cancel() {
                 this._xhr.abort();
             },
 
