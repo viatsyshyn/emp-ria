@@ -1239,6 +1239,12 @@
                 'ChildClass3', EXTENDS(ChildClass), [
                     OVERRIDE, SELF, function getParent() {}
                 ]);
+
+
+            CLASS_E(Error('Method "setParent" returns ChildClass4, but base returns void'),
+                'ChildClass4', EXTENDS(ChildClass), [
+                    OVERRIDE, SELF, function setParent(a) {}
+                ]);
         },
 
         testNamedConstructors: function () {
