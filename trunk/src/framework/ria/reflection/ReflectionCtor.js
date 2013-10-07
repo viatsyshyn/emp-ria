@@ -15,7 +15,7 @@ NS('ria.reflection', function () {
                 BASE();
                 this.clazz = clazz;
 
-                this.method = clazz.__META.ctor;
+                this.method = clazz.__META.defCtor;
                 this.name = 'ctor';
             },
 
