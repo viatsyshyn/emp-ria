@@ -37,7 +37,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.compileEnum = function (name, val) {
         var values = {};
-        function Enum(raw) { return values[raw]; }
+        function Enum(raw) {
+            if (_DEBUG && !values.hasOwnProperty(raw))
+                throw Exception('Unknown value "' + raw + '" of enum' + name);
+
+            return values[raw] || (values[raw] = new EnumImpl(raw));
+        }
         ria.__API.enum(Enum, name);
         function EnumImpl(raw) {
             this.valueOf = function () { return raw; };
