@@ -1229,10 +1229,15 @@
                 ]);
 
             CLASS(
-                'ChildClass', EXTENDS(ChildClass), [
+                'ChildClass2', EXTENDS(ChildClass), [
                     OVERRIDE, ChildClass, function getParent() {},
                     [[Class]],
                     OVERRIDE, VOID, function setParent(v) {}
+                ]);
+
+            CLASS(
+                'ChildClass3', EXTENDS(ChildClass), [
+                    OVERRIDE, SELF, function getParent() {}
                 ]);
         },
 
