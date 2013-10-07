@@ -25,6 +25,6 @@
     };
 
     ria.__API.isIdentifier = function (value) {
-        return value.__META instanceof IdentifierDescriptor;
+        return value && (value.__META instanceof IdentifierDescriptor);
     }
 })();

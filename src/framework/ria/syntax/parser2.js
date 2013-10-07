@@ -15,7 +15,7 @@
     };
 
     var RIA_KEYWORDS = ('ANNOTATION CLASS EXTENDS IMPLEMENTS DELEGATE ENUM EXCEPTION IDENTIFIER INTERFACE NS '
-        + 'NAMESPACE SELF BASE VOID OVERRIDE ClassOf ArrayOf ImplementerOf Assert').split(' ');
+        + 'NAMESPACE SELF BASE VOID OVERRIDE ClassOf ArrayOf ImplementerOf Assert OF').split(' ');
     ria.__SYNTAX.isRiaKeyword = function (name) {
         return RIA_KEYWORDS.indexOf(name) >= 0;
     };

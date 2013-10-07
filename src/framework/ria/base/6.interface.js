@@ -45,11 +45,11 @@
     ria.__API.Interface = new (function InterfaceBase() {});
 
     ria.__API.isInterface = function (ifc) {
-        return ifc.__META instanceof InterfaceDescriptor;
+        return ifc && (ifc.__META instanceof InterfaceDescriptor);
     };
 
     ria.__API.implements = function (value, ifc) {
-        return ria.__API.getConstructorOf(value).__META.ifcs.indexOf(ifc) >= 0;
+        return (value.__META || ria.__API.getConstructorOf(value).__META).ifcs.indexOf(ifc) >= 0;
     };
 
 })();

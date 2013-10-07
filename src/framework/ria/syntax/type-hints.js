@@ -15,6 +15,16 @@
             var delegate = type.__META;
 
             try {
+                if (!checkTypeHint(method.retType, delegate.retType)) { //noinspection ExceptionCaughtLocallyJS
+                    throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.retType)
+                        + ', but delegate expects ' + ria.__API.getIdentifierOfType(delegate.retType));
+                }
+
+                if (delegate.argsNames.length > method.argsNames.length) { //noinspection ExceptionCaughtLocallyJS
+                    throw new Exception('Delegate passes at most ' + delegate.argsNames.length
+                                            + ', but lambda accepts no more then ' + method.argsNames.length);
+                }
+
                 method.argsNames.forEach(function (name, index) {
                     if (!IS_OPTIONAL.test(name)) {
                         if (delegate.argsNames[index] == undefined) {
@@ -57,6 +67,7 @@
                   || value === String
                   || value === Number
                   || value === Function
+                  || value === Date
                   || value === RegExp ) {
                     return value == type;
                 }
@@ -75,55 +86,47 @@
                     if (ria.__API.isInterface(value))
                         return value === type;
 
-                    if (!(value instanceof ria.__API.Class))
-                        return false;
-
-                    return ria.__API.getConstructorOf(value).__META.ifcs.indexOf(type.valueOf()) >= 0;
+                    return (value instanceof ria.__API.Class) && ria.__API.implements(value, type);
                 }
 
                 if (ria.__API.isArrayOfDescriptor(type)) {
                     if (ria.__API.isArrayOfDescriptor(value))
-                        return type.valueOf() == value.valueOf();
+                        return checkTypeHint(value.valueOf(), type.valueOf());
 
-                    if (!Array.isArray(value))
-                        return false;
-
-                    for (var i = 0; i < value.length; i++) {
-                        if (!checkTypeHint(value[i], type.valueOf()))
-                            return false;
-                    }
-
-                    return true;
+                    var t = type.valueOf();
+                    return Array.isArray(value) && value.every(function (_) { return checkTypeHint(_, t); });
                 }
 
                 if (ria.__API.isClassOfDescriptor(type)) {
                     if (ria.__API.isClassOfDescriptor(value))
-                        return type.valueOf() == value.valueOf();
+                        value = value.valueOf();
 
-                    var v = value;
-                    while (v) {
-                        if (v === type.valueOf())
-                            return true;
-
-                        v = v.__META.base;
-                    }
-
-                    return false;
+                    return checkTypeHint(value, type.valueOf());
                 }
 
                 if (ria.__API.isImplementerOfDescriptor(type)) {
                     if (ria.__API.isImplementerOfDescriptor(value))
-                        return type.valueOf() == value.valueOf();
+                        value = value.valueOf();
 
-                    if (!ria.__API.isClassConstructor(value))
-                        return false;
-
-                    return value.__META.ifcs.indexOf(type.valueOf()) >= 0;
+                    return checkTypeHint(value, type.valueOf());
                 }
 
-                return value === type || value instanceof type;
+                if (ria.__API.isClassConstructor(type)) {
+                    if (ria.__API.isClassConstructor(value))
+                        return ria.__API.extends(value, type);
+
+                    return value instanceof type;
+                }
+
+                if (typeof type === 'function') {
+                    return type === value || value instanceof type;
+                }
+
+                return false;
         }
     }
+
+    ria.__SYNTAX.checkTypeHint = checkTypeHint;
 
     /**
      * @function

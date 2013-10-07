@@ -736,6 +736,7 @@
                         this.value = value;
                     },
 
+                    [[Number]],
                     VOID, function method(value) {
                         this.value = value;
                     }
@@ -777,15 +778,15 @@
                     }
                 ]);
 
-            assertNotEquals(BaseClass, SELF);
+            assertNotEquals(BaseClass, window.SELF);
 
             var instance = new BaseClass();
 
-            assertNotEquals(BaseClass, SELF);
+            assertNotEquals(BaseClass, window.SELF);
 
             instance.method();
 
-            assertNotEquals(BaseClass, SELF);
+            assertNotEquals(BaseClass, window.SELF);
         },
 
         testPropertyInheritance: function () {
@@ -942,8 +943,6 @@
 
             CLASS_E(Error('Method setAbstractString can\'t be abstract, because there is method with the same name in one of the base classes'),
                 'SecondClass2', EXTENDS(BaseClass), [
-
-
                     OVERRIDE, String, function getAbstractString() {
                         return this.abstractString + "_";
                     }
@@ -1182,11 +1181,82 @@
                 ]);
         },
 
-        testFactoryCtor: function () {
-            CLASS_E(Error('Factory constructors are not supported in this version.'),
+        testMethodSignatureOverload: function () {
+            var BaseClass = CLASS(
                 'BaseClass', [
-                    function $factory() {}
+                    [[String, Object]],
+                    String, function method(a, b_) {}
                 ]);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[Object, Object, String]],
+                    OVERRIDE, String, function method(a_, b_, c_) {},
+
+                    BaseClass, function getParent() {},
+                    [[BaseClass]],
+                    VOID, function setParent(v) {}
+                ]);
+
+            CLASS_E(Error('Method "method" returns Number, but base returns String'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[Object, Object, String]],
+                    OVERRIDE, Number, function method(a_, b_, c_) {}
+                ]);
+
+            CLASS_E(Error('Method "method" accepts Number for argument a_, but base accepts String'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[Number, Object, String]],
+                    OVERRIDE, String, function method(a_, b_, c_) {}
+                ]);
+
+            CLASS_E(Error('Method required arguments b then base does not have or is optional. Method: "method"'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[String, Object, String]],
+                    OVERRIDE, String, function method(a, b) {}
+                ]);
+
+            CLASS_E(Error('Method accepts less arguments then base method. Method: "method"'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[String, Object, String]],
+                    OVERRIDE, String, function method(a_) {}
+                ]);
+
+            CLASS_E(Error('Method "method" returns *, but base returns String'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[String, Object, String]],
+                    OVERRIDE, function method(a, b_) {}
+                ]);
+
+            CLASS(
+                'ChildClass', EXTENDS(ChildClass), [
+                    OVERRIDE, ChildClass, function getParent() {},
+                    [[Class]],
+                    OVERRIDE, VOID, function setParent(v) {}
+                ]);
+        },
+
+        testNamedConstructors: function () {
+            var BaseClass = CLASS(
+                'BaseClass', [
+                    ArrayOf(String), 'items',
+                    [[ArrayOf(String)]],
+                    function $fromArray(items) {
+                        BASE();
+                        this.setItems(items.slice());
+                    }
+                ]);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass), [
+                ]);
+
+            assertNotUndefined(BaseClass.$fromArray);
+
+            var instance = BaseClass.$fromArray(['1','2','3']);
+            assertInstanceOf(BaseClass, instance);
+
+            assertEquals(['1','2','3'], instance.getItems());
         }
     };
 

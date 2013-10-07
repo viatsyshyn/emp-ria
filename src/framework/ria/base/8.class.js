@@ -20,7 +20,8 @@
         this.isAbstract = isAbstract;
         this.properties = base ? ria.__API.clone(base.__META.properties) : {};
         this.methods = base ? ria.__API.clone(base.__META.methods) : {};
-        this.ctor = null;
+        this.defCtor = null;
+        this.ctors = [];
         this.children = [];
     }
 
@@ -41,13 +42,19 @@
             annotations: anns
         };
     };
-    ClassDescriptor.prototype.setCtor = function (impl, argsTypes, argsNames, anns) {
-        this.ctor = {
+    ClassDescriptor.prototype.addCtor = function (name, impl, argsTypes, argsNames, anns) {
+        var def = {
+            name: name,
             impl: impl,
             argsNames: argsNames,
             argsTypes:argsTypes,
             annotations: anns
-        }
+        };
+
+        if (name == '$')
+            this.defCtor = def;
+
+        this.ctors.push(def);
     };
     ClassDescriptor.prototype.addChild = function (clazz) {
         if (!ria.__API.isClassConstructor(clazz))
@@ -131,10 +138,10 @@
      * @param {String[]} [argsNames_]
      * @param {Annotation[]} [anns_]
      */
-    ria.__API.ctor = function (clazz, impl, argsTypes_, argsNames_, anns_) {
-        clazz.__META.setCtor(impl, argsTypes_, argsNames_, anns_);
+    ria.__API.ctor = function (name, clazz, impl, argsTypes_, argsNames_, anns_) {
+        clazz.__META.addCtor(name, impl, argsTypes_, argsNames_, anns_);
 
-        impl.__META = new ria.__API.MethodDescriptor('$', undefined, argsTypes_, argsNames_);
+        impl.__META = new ria.__API.MethodDescriptor(name, undefined, argsTypes_, argsNames_);
         _DEBUG && Object.freeze(impl);
     };
 
@@ -166,7 +173,9 @@
             //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop
             var name_ = k;
             var f_ = instance[name_];
-            if (typeof f_ === 'function' && f_ !== ctor && k !== 'constructor') {
+
+            // TODO: skip all ctors
+            if (typeof f_ === 'function' && !(/^\$.*/.test(name_)) && name_ !== 'constructor') {
                 instance[name_] = f_.bind(instance);
                 if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
                     var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance);
@@ -179,11 +188,10 @@
                     _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
                 }
             }
-        }
 
-        if (_DEBUG) {
-            instance.$ = undefined;
-            publicInstance.$ = undefined;
+            if (_DEBUG && /^\$.*/.test(name_)) {
+                instance[name_] = publicInstance[name_] = undefined;
+            }
         }
 
         if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
@@ -209,8 +217,12 @@
         _DEBUG && Object.freeze(clazz);
     };
 
+    ria.__API.extends = function ext(child, base) {
+        return child === base || (child != undefined && ext(child.__META.base, base));
+    };
+
     ria.__API.isClassConstructor = function(type) {
-        return type.__META instanceof ClassDescriptor;
+        return type && (type.__META instanceof ClassDescriptor);
     };
 
     ria.__API.Class = (function () {
@@ -221,7 +233,7 @@
             this.__hashCode = Math.random().toString(36);
             _DEBUG && Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
         };
-        ria.__API.ctor(ClassBase, ClassBase.prototype.$, [], [], []);
+        ria.__API.ctor('$', ClassBase, ClassBase.prototype.$, [], [], []);
 
         ClassBase.prototype.getClass = function () { return ria.__API.getConstructorOf(this); };
         ria.__API.method(ClassBase, ClassBase.prototype.getClass, 'getClass', Function, [], [], []);

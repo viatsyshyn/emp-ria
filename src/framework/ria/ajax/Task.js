@@ -148,13 +148,11 @@ NAMESPACE('ria.ajax', function () {
                     this._completer.completeError(e);
                 }
 
-                // todo change to ria.async.Timer.$once
-                this._requestTimeout && new ria.async.Timer(this._requestTimeout, this.timeoutHandler_);
+                this._requestTimeout && new ria.async.Timer.$once(this._requestTimeout, this.timeoutHandler_);
             },
 
             [[ria.async.Timer, Number]],
             VOID, function timeoutHandler_(timer, lag) {
-                timer.cancel(); // todo remove after change to ria.async.Timer.$once
                 this._completer.isCompleted() || this.cancel();
             }
         ]);

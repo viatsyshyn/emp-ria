@@ -6,7 +6,7 @@
             function Clazz() { return ria.__API.init(this, Clazz, Clazz.prototype.$, arguments) }
             ria.__API.clazz(Clazz, 'Clazz', null, [], []);
             Clazz.prototype.$ = function () { this.testProp = null; };
-            ria.__API.ctor(Clazz, Clazz.prototype.$, [], [], []);
+            ria.__API.ctor('$', Clazz, Clazz.prototype.$, [], [], []);
             Clazz.prototype.compare = function (_1, _2) { return _1 === _2; };
             ria.__API.method(Clazz, Clazz.prototype.compare, 'compare', Boolean, [String, String], ['_1', '_2'], []);
             ria.__API.compile(Clazz);
@@ -66,7 +66,7 @@
             function ChildClazz() { return ria.__API.init(this, ChildClazz, ChildClazz.prototype.$, arguments) }
             ria.__API.clazz(ChildClazz, 'ChildClazz', BaseClazz, [], []);
             ChildClazz.prototype.$ = function () { BaseClazz.prototype.$.call(this); };
-            ria.__API.ctor(ChildClazz, ChildClazz.prototype.$, [], [], []);
+            ria.__API.ctor('$', ChildClazz, ChildClazz.prototype.$, [], [], []);
             ria.__API.compile(ChildClazz);
 
             assertInstanceOf(ria.__API.ClassDescriptor, ChildClazz.__META);
