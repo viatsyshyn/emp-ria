@@ -199,13 +199,29 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return true;
     }
 
-    function validateClassCtor(def, ctor) {
+    function validateClassCtor(def, ctor, FakeSelf) {
         if (!ctor.body.hasBaseCall()) {
             throw Error('Class constructor MUST call base class constructor');
         }
     }
 
-    function validateMethodSignatureOverride(method, parentMethod) {
+    function getTypeFromToken(token, FakeSelf, def) {
+        if (token === undefined || token === null)
+            return def || null;
+
+        if (token instanceof ria.__SYNTAX.Tokenizer.RefToken)
+            return token.raw;
+
+        if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
+            return FakeSelf;
+
+        if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
+            return undefined;
+
+        ria.__API.Assert(true, 'This should never assert this');
+    }
+
+    function validateMethodSignatureOverride(method, parentMethod, FakeSelf) {
         //check if method accepts at least as much args as may be passed to base method
         if (method.argsNames.length < parentMethod.argsNames.length)
             throw Error('Method accepts less arguments then base method. Method: "' + method.name + '"');
@@ -218,10 +234,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         });
 
         //validate method return
-        var mrt = method.retType,
-            brt = parentMethod.retType,
-            mrtv = mrt ? mrt.raw : null,
-            brtv = brt ? brt.raw : null;
+        var mrtv = getTypeFromToken(method.retType, FakeSelf, null),
+            brtv = getTypeFromToken(parentMethod.retType, null, null);
         if (mrtv !== brtv && (mrtv === null || mrtv === undefined || !ria.__SYNTAX.checkTypeHint(mrtv, brtv))) {
             throw Error('Method "' + method.name + '" returns ' + ria.__API.getIdentifierOfType(mrtv)
                 + ', but base returns ' + ria.__API.getIdentifierOfType(brtv));
@@ -232,10 +246,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if (index >= parentMethod.argsNames.length)
                 return ;
 
-            var mat = method.argsTypes[index],
-                bat = parentMethod.argsTypes[index],
-                matv = mat ? mat.raw : Object,
-                batv = bat ? bat.raw : Object;
+            var matv = getTypeFromToken(method.argsTypes[index], FakeSelf, Object),
+                batv = getTypeFromToken(parentMethod.argsTypes[index], null, Object);
 
             if (!ria.__SYNTAX.checkTypeHint(batv, matv)) {
                 throw Error('Method "' + method.name + '" accepts ' + ria.__API.getIdentifierOfType(matv)
@@ -244,7 +256,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         });
     }
 
-    function validateMethodDeclaration(def, method) {
+    function validateMethodDeclaration(def, method, FakeSelf) {
         var parentMethod = method.__BASE_META;
         if (method.flags.isOverride && !parentMethod) {
             throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
@@ -267,11 +279,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
 
         if (method.flags.isOverride && parentMethod) {
-            validateMethodSignatureOverride(method, parentMethod);
+            validateMethodSignatureOverride(method, parentMethod, FakeSelf);
         }
     }
 
-    function validatePropertyDeclaration(property, def, processedMethods) {
+    function validatePropertyDeclaration(property, def, processedMethods, FakeSelf) {
         var getterName = property.getGetterName();
         var setterName = property.getSetterName();
 
@@ -290,7 +302,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         processedMethods.push(setterName);
     }
 
-    function validateBaseClassMethodDeclaration(def, baseMethod) {
+    function validateBaseClassMethodDeclaration(def, baseMethod, FakeSelf) {
         var childMethod = def.methods.filter(function (method) { return method.name == baseMethod.name; }).pop();
         if (baseMethod.flags.isFinal) {
             if (childMethod)
@@ -309,7 +321,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
     }
 
-    function validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def) {
+    function validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def, FakeSelf) {
         if (baseProperty.flags.isFinal) {
             if (childGetter || childSetter)
                 throw Error('There is no ability to override getter or setter of final property '
@@ -341,6 +353,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(!isDescendantOf(def.base, ria.__SYNTAX.Registry.find(rootClassName)))
             throw Error('Base class must be descendant of ' + rootClassName);
 
+        function FakeSelf() {}
+        ria.__API.extend(FakeSelf, def.base.raw);
+        ria.__API.clazz(FakeSelf, def.name, def.base.raw, [], [], def.flags.isAbstract);
+
         ria.__SYNTAX.validateVarName(def.name);
 
         // validate class flags
@@ -358,9 +374,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             .forEach(function (_) {
                 var name = _.name;
                 ria.__SYNTAX.validateVarName(name);
-
-                /*if (isFactoryCtor(name))
-                    throw Error('Factory constructors are not supported in this version.');*/
 
                 if (def.methods.filter(function (_) { return _.name === name}).length > 1)
                     throw Error('Duplicate method declaration "' + name + '"');
@@ -384,7 +397,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.methods
             .filter(function (_) { return isFactoryCtor(_.name); })
             .forEach(function (ctorDef) {
-                validateClassCtor(def, ctorDef);
+                validateClassCtor(def, ctorDef, FakeSelf);
                 processedMethods.push(ctorDef.name);
             });
 
@@ -393,7 +406,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if (isFactoryCtor(baseMethod.name))
                 return;
 
-            validateBaseClassMethodDeclaration(def, baseMethod);
+            validateBaseClassMethodDeclaration(def, baseMethod, FakeSelf);
         });
 
         // validate methods
@@ -407,7 +420,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if (processedMethods.indexOf(method.name) >= 0)
                     return;
 
-                validateMethodDeclaration(def, method);
+                validateMethodDeclaration(def, method, FakeSelf);
             });
 
         // validate properties overrides
@@ -415,7 +428,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
                 childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
 
-            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def);
+            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def, FakeSelf);
         });
 
         // validate properties
@@ -430,7 +443,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if(findParentPropertyFixed(def, property.name))
                     throw Error('There is defined property ' + property.name + ' in one of the base classes');
 
-                validatePropertyDeclaration(property, def, processedMethods);
+                validatePropertyDeclaration(property, def, processedMethods, FakeSelf);
             });
     };
 
