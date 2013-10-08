@@ -14,6 +14,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         return name !== '$$' && /^\$.*/i.test(name);
     }
 
+    function isStaticMethod(name) {
+        return name.toUpperCase() == name && /[_a-z].*/i.test(name);
+    }
+
     function getDefaultGetter(property, isOverride) {
         if (isOverride)
             return new ria.__SYNTAX.Tokenizer.FunctionToken(ria.__SYNTAX.toAst(function g() { return BASE(); }.toString().replace('name', property)));
@@ -87,6 +91,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         // defined override properties
         def.methods
+            .filter(function (_) { return !isStaticMethod(_.name); })
             .map(function (method) {
                 return findParentPropertyByGetterOrSetterFixed(def, method.name);
             })
@@ -281,6 +286,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (method.flags.isOverride && parentMethod) {
             validateMethodSignatureOverride(method, parentMethod, FakeSelf);
         }
+
+        if (ria.__SYNTAX.isProtected(method.name) && isStaticMethod(method.name)) {
+            throw Error('Only public static method are supported. Method: "' + method.name + '"');
+        }
+
+        if (isStaticMethod(method.name) && method.annotations.length) {
+            throw Error('Annotations are forbidden for static methods. Method: "' + method.name + '"');
+        }
     }
 
     function validatePropertyDeclaration(property, def, processedMethods, FakeSelf) {
@@ -459,10 +472,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     function addSelfAndBaseBody(body, SELF, method) {
         body.__SELF = SELF;
         if (method && method.__BASE_META) {
-            if (method.flags.isOverride) {
-                body.__BASE_BODY = method.__BASE_META.body.value;
-            }
-
             body.__BASE_BODY = method.__BASE_META.body.value;
         }
 
@@ -473,15 +482,26 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         method.retType = processSelf(method.retType, ClassProxy);
         method.argsTypes = processSelf(method.argsTypes, ClassProxy);
 
-        var impl = ClassProxy.prototype[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy, method);
-        ria.__API.method(
-            ClassProxy,
-            impl,
-            method.name,
-            method.retType ? method.retType.value : null,
-            method.argsTypes.map(function (_) { return _.value }),
-            method.argsNames,
-            method.annotations.map(function(_) { return _.value }));
+        var impl;
+        if (isStaticMethod(method.name)) {
+            impl = ClassProxy[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy);
+            impl.__META = new ria.__API.MethodDescriptor(
+                method.name,
+                method.retType ? method.retType.value : null,
+                method.argsTypes.map(function (_) { return _.value }),
+                method.argsNames);
+            _DEBUG && Object.freeze(impl);
+        } else {
+            impl = ClassProxy.prototype[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy, method);
+            ria.__API.method(
+                ClassProxy,
+                impl,
+                method.name,
+                method.retType ? method.retType.value : null,
+                method.argsTypes.map(function (_) { return _.value }),
+                method.argsNames,
+                method.annotations.map(function(_) { return _.value }));
+        }
     }
 
     function compilePropertyDeclaration(property, ClassProxy, processedMethods) {

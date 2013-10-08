@@ -1268,6 +1268,68 @@
             assertInstanceOf(BaseClass, instance);
 
             assertEquals(['1','2','3'], instance.getItems());
+        },
+
+        testImplicitGetterSettersBase: function () {
+            var BaseClass = CLASS(
+                'BaseClass', [
+                    String, 'item'
+                ]);
+
+            var BaseClass2 = CLASS(
+                'BaseClass2', EXTENDS(BaseClass), [
+                ]);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass2), [
+                    OVERRIDE, String, function getItem() {
+                        return BASE() + '-get';
+                    }
+                ]);
+
+            var ChildClass2 = CLASS(
+                'ChildClass', EXTENDS(ChildClass), [
+                    [[String]],
+                    OVERRIDE, VOID, function setItem(s) {
+                        return BASE(s + '-set');
+                    }
+                ]);
+
+            var instance = new ChildClass2();
+
+            instance.setItem('test');
+            assertEquals('test-set-get', instance.getItem());
+        },
+
+        testStaticMethods: function () {
+            var Application = CLASS(
+                'Application', [
+                    [[SELF]],
+                    VOID, function RUN (t_) {}
+                ]);
+
+            assertNotUndefined(Application.RUN);
+
+            var instance = new Application();
+            assertUndefined(instance.RUN);
+
+            CLASS_E(Error('Only public static method are supported. Method: "RUN_"'),
+                'Application', [
+                    VOID, function RUN_() {}
+                ]);
+
+            assertNoException(function () {
+                Application.RUN();
+                Application.RUN(instance);
+            });
+
+            assertException(function () {
+                Application.RUN(1);
+            });
+
+            assertException(function () {
+                Application.RUN(instance, 3);
+            });
         }
     };
 

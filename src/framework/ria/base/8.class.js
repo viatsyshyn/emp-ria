@@ -213,7 +213,25 @@
         return publicInstance;
     };
 
+    function StaticScope() {}
+    var staticScopeInstance = new StaticScope();
+    Object.freeze(staticScopeInstance);
+
     ria.__API.compile = function(clazz) {
+        for(var k in clazz) if (clazz.hasOwnProperty(k)) {
+            var name_ = k;
+            var f_ = clazz[name_];
+
+            // TODO: skip all ctors
+            if (typeof f_ === 'function' && ria.__API.isDelegate(f_)) {
+                if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
+                    clazz[name_] = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, staticScopeInstance);
+                } else {
+                    clazz[name_] = f_.bind(staticScopeInstance);
+                }
+            }
+        }
+
         _DEBUG && Object.freeze(clazz);
     };
 
