@@ -298,6 +298,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     function validateMethodDeclaration(def, method, FakeSelf) {
         var parentMethod = method.__BASE_META;
+
+        if (method.flags.isOverride && isStaticMethod(method.name)) {
+            throw Error('Override on static method are not supported. Method: "' + method.name + '"');
+        }
+
         if (method.flags.isOverride && !parentMethod) {
             throw Error('There is no ' + method.name + ' method in base classes of ' + def.name + ' class');
         }
@@ -320,6 +325,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if (method.flags.isOverride && parentMethod) {
             validateMethodSignatureOverride(method, parentMethod, FakeSelf);
+        }
+
+        if (method.body.hasBaseCall() && !method.flags.isOverride) {
+            throw Error('Base call are forbidden for non overriden methods. Method: "' + method.name + '"');
         }
 
         if (ria.__SYNTAX.isProtected(method.name) && isStaticMethod(method.name)) {

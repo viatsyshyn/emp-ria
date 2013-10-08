@@ -767,6 +767,13 @@
             assertNoException(function () { instance.method(7); });
 
             assertEquals(instance.getValue(), 7);
+
+            CLASS_E(Error('Base call are forbidden for non overriden methods. Method: "method7"'),
+                'SecondClass2', EXTENDS(BaseClass), [
+                    VOID, function method7() {
+                        BASE();
+                    }
+                ]);
         },
 
         testSELF: function () {
@@ -1344,6 +1351,16 @@
             assertException(function () {
                 Application.RUN(instance, 3);
             });
+
+            CLASS_E(Error('Base call are forbidden for non overriden methods. Method: "RUN_"'),
+                'Application', [
+                    VOID, function RUN_() { BASE(); }
+                ]);
+
+            CLASS_E(Error('Override on static method are not supported. Method: "RUN_"'),
+                'Application', [
+                    OVERRIDE, VOID, function RUN_() { BASE(); }
+                ]);
         },
 
         testInterfaceMethodSignatureOverride: function () {
