@@ -1,0 +1,8 @@
+h3 Notes (page #{self.page}, page size #{self.pageSize}, total #{self.count})
+.notes
+    +RenderWith(self.items, app.templates.Note)(
+        renderLink = true)
+
++DatePicker('date', new Date())( data-options = {
+    showOtherMonths: true,
+    selectOtherMonths: true })

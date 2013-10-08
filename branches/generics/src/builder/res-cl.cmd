@@ -1,0 +1,1 @@
+@CALL %~dp0../js-cli/bin/js-cli.cmd %~dp0res-cl.js %*

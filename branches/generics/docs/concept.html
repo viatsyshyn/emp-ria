@@ -1,0 +1,334 @@
+<html>
+
+<head>
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.1/styles/tomorrow-night.min.css">
+<script src="http://yandex.st/highlightjs/7.1/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<style>PRE {padding: 1px; display: block}</style>
+</head>
+
+<body>
+
+<h1>EMP Ria.js Framework</h1>
+<h5>Copyright &copy; 2012 EMP Studio</h5>
+
+<h2>Framework prime features</h2>
+<ul>
+  <li>Object Oriented approach</li>
+  <li>Checked mode</li>
+  <li>Compilation to plain JS and Google Closure Compiler optimization</li>
+  <li>Less declaration, more Code Style</li>
+  <li>Dependency management system</li>
+  <li>Assets management system</li>
+  <li>Works without compilation</li>
+  <li>Compilation dry-run ensures all code is correct</li>
+  <li>JSDoc &amp; JS vsdoc generation</li>
+</ul> 
+
+<h2>OO Design Goals</h2>
+<ul>
+  <li>Namespaces</li>
+  <li>Delegates</li>
+  <li>Interfaces</li>
+  <li>Annotations</li>
+  <li>Exceptions</li>
+  <li>Enumerations &amp; Identifiers</li>
+  <li>Classes with:
+    <ul>
+      <li>Public properties /w protected fields</li>
+      <li>Public getters &amp; setters</li>
+      <li>Public/protected methods</li>
+      <li>Reflection of public members</li>
+      <li>Optional type hinting for checked mode</li>
+    </ul>
+  </li> 
+</ul>
+
+<h2>Sample JSx Code</h2>
+
+<pre><code class="javascript">REQUIRE('empx.domx.BaseClass');
+ASSET('my.json'); // available via ASSET('my.json') after all dependencies are ready
+ASSET('my.css'); // add to head
+ASSET('my.png', true); // skip embedding in build, load at runtime
+
+NAMESPACE('empx.domx', function () {
+  "use strict";
+  // all following declarations are here
+
+  // Delegates allow to specify function signature, can be used to validate callbacks
+  DELEGATE(
+    [String, Number], 
+    Boolean, function StringNumberComparator(s, n) {});
+
+  var d = empx.domx.StringNumberComparator(function (s, n) { return s === String(n); });
+
+  d('2', 2); // ok
+  d(2, true); // fails with InvalidArguments exception
+
+  // Annotation can decorate classes and public members, available via reflection
+  ANNOTATION(
+    [Boolean, Number],
+    function BaseAnnotation(s, n_) {}); // n_ is optional
+
+  // Interfaces ensures class implements all methods with correct signature
+  INTERFACE(
+    'StringNumberComparatorIfc', [
+      [String, Number],
+      Boolean, function compare(s, n) {}
+    ]);
+
+  // annonimous interface implementation
+  var impl = empx.domx.StringNumberComparatorIfc([
+    [String, Number],
+    Boolean, function compare(s, n) { return s === String(n); }  
+  ]);
+
+  impl.compare('2', 2); // returns true
+
+  CLASS(
+    [empx.domx.BaseAnnotation(true, 5)],
+    'BaseComparatorImpl',
+        EXTENDS(empx.domx.BaseClass), 
+        IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
+
+      // public property
+      // Note: propety name can only be valid JS variable name (excluding reserved words like for, class, etc)
+      [empx.domx.BaseAnnotation(false)],
+      String, 'myProp',
+
+      // constructor with optional argument a_
+      function $(a_) {
+        BASE(a_ !== undefined ? a : 5);
+      },
+
+      // public method
+      [String, Number],
+      Booleam, function compare(x, y) { 
+        return x === String(y);
+      },
+
+      // protected method, should use OVERRIDE to state that we intesionaly override method
+      [empx.domx.StringNumberComparator],
+      OVERRIDE, VOID, function protectedMember_(cmp) {
+        BASE(this.myProp);
+      }
+    ]);
+
+  var instance = empx.domx.BaseComparatorImpl(1); // works without new
+});</code></pre>
+
+<h2>Compilation to plain JS</h2>
+
+<table border="1" style="border: 1px solid silver; border-collapse: collapse; vertical-align: top" valign="top">
+<thead>
+  <tr>
+    <th>Concept</th>
+    <th width="150">Uncompiled</th>
+    <th width="200">Compiled</th>
+    <th>Reflection Info</th>
+  </tr>
+</thead>
+<tbody>
+  <tr valign="top">
+    <td><strong>Namespaces</strong></td>
+    <td><pre><code class="javascript">NAMESPACE('empx.domx', function () {"use strict";
+  // all following declarations are here
+});</code></pre></td>
+    <td><pre><code class="javascript">empx = empx || {}; empx.domx = empx.domx || {}; (function (__API) {
+  // declarations here
+})(ria._API);</code></pre></td>
+    <td></td>
+  </tr>
+
+  <tr valign="top">
+    <td><strong>Delegates</strong></td>
+    <td><pre><code class="javascript">DELEGATE(
+  [String, Number], 
+  Boolean, function StringNumberComparator(s, n) {});</code></pre></td>
+    <td><pre><code class="javascript">empx.domx.StringNumberComparator = ria.__API.delegate('empx.domx.StringNumberComparator'
+        , Boolean, [String, Number], ['s', 'n']);
+</code></pre></td>
+    <td><pre><code class="json">"empx.domx.StringNumberComparator": {
+  ret: Boolean,
+  args: [
+    {s: String}, 
+    {n: Number}
+  ]
+}</code></pre></td>
+  </tr>
+
+  <tr valign="top">
+    <td><strong>Annotations</strong></td>
+    <td><pre><code class="javascript">ANNOTATION(
+  [Boolean, Number],
+  function BaseAnnotation(s, n_) {});</code></pre></td>
+    <td><pre><code class="javascript">empx.domx.BaseAnnotation = ria.__API.annotation('empx.domx.BaseAnnotation'
+      , [Boolean, Number]
+      , ['s', 'n_']);</code></pre></td>
+    <td><pre><code class="json">"empx.domx.BaseAnnotation": {
+  args: [
+    {s: String}, 
+    {n_: Number}
+  ]
+}</code></pre></td>
+  </tr>
+
+  <tr valign="top">
+    <td><strong>Interfaces</strong></td>
+    <td><pre><code class="javascript">INTERFACE('StringNumberComparatorIfc', [
+  [String, Number],
+  Boolean, function compare(s, n) {}
+]);</code></pre></td>
+    <td><pre><code class="javascript">empx.domx.StringNumberComparatorIfc = function (__API) {
+  var StringNumberComparatorIfc = __API.ifc('empx.domx.StringNumberComparatorIfc');
+  __API.method(StringNumberComparatorIfc, null, 'compare', Boolean, [String, Number], ['s', 'n']);
+  return StringNumberComparatorIfc;
+}(ria.__API);
+</code></pre></td>
+    <td><pre><code class="json">"empx.domx.StringNumberComparatorIfc": {
+  methods: {
+    compare: {
+      ret: Boolean,
+      args: [
+        {s: String}, 
+        {n: Number}
+      ]
+    }
+  }
+}</code></pre></td>
+  </tr>
+
+  <tr valign="top">
+    <td><strong>Classes</strong></td>
+    <td><pre><code class="javascript">CLASS(
+  [empx.domx.BaseAnnotation(true, 5)],
+  'BaseComparatorImpl',
+      EXTENDS(empx.domx.BaseClass), 
+      IMPLEMENTS(empx.domx.StringNumberComparatorIfc), [
+
+  [empx.domx.BaseAnnotation(false)],
+  String, 'myProp',
+
+
+
+
+
+
+  function $() {
+    BASE(5);
+  },
+
+
+  [String, Number],
+  Booleam, function compare(x, y) { 
+    return x === String(y) 
+  },
+
+  VOID, function protectedMember_() {
+    BASE(this.myProp + 5);
+  }
+
+]);</code></pre></td>
+    <td><pre><code class="javascript">empx.domx.BaseComparatorImpl = function (__API) {
+  function BaseComparatorImpl() { return __API.init(this, BaseComparatorImpl
+      , BaseComparatorImpl.prototype.$, arguments); };
+  __API.clazz(BaseComparatorImpl, 'empx.domx.BaseComparatorImpl', empx.domx.BaseClass
+    , [empx.domx.StringNumberComparatorIfc], [empx.domx.BaseAnnotation(true, 5)]);
+
+  __API.property(BaseComparatorImpl, 'myProp', String, [empx.domx.SomeAnnotation]);
+  BaseComparatorImpl.prototype.getMyProp = function () { return this.myProp; };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.getMyProp
+      , 'getMyProp', String, [], []); /* default getter */
+  BaseComparatorImpl.prototype.setMyProp = function (value) { this.myProp = value; };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.setMyProp
+      , 'setMyProp', __API.Void, [String], ['value']); /* default setter */
+
+  BaseComparatorImpl.prototype.$ = function () {
+    empx.domx.BaseClass.prototype.$.call(this, 5);
+  };
+  __API.ctor(BaseComparatorImpl, BaseComparatorImpl.prototype.$, [], []);
+
+  BaseComparatorImpl.prototype.compare = function (x, y) { return x === String(y) };
+  __API.method(BaseComparatorImpl, BaseComparatorImpl.prototype.compare
+      , 'compare', Booleam, [String, Number], ['x', 'y']);
+
+
+  BaseComparatorImpl.prototype.protectedMember_ = function () {
+    empx.domx.BaseClass.prototype.protectedMember_.call(this, this.myProp + 5);
+  };
+
+  __API.compile(MyClass);
+  return MyClass;
+}(ria.__API);</code></pre></td>
+    <td><pre><code class="json">"empx.domx.BaseComparatorImpl": {
+  properties: {
+    myProp: {
+      type: String,
+      getter: 'getMyProp',
+      setter: 'setMyProp'
+    }
+  },
+  constructor: {
+    args: []
+  },
+  methods: {
+    compare: {
+      ret: Boolean,
+      args: [
+        {x: String}, 
+        {y: Number}
+      ]
+    },
+    getMyProp: {
+      ret: String,
+      args: []
+    },
+    setMyProp: {
+      ret: undefined,
+      args: [
+        {value: String}
+      ]
+    }
+  }
+}</code></pre></td>
+  </tr>
+
+  <tr valign="top">
+      <td><strong>Enumeration</strong></td>
+      <td><pre><code class="javascript">ENUM(
+  'MyEnum', {
+    Value1: 1,
+    Value2: '2'
+  });</code></pre></td>
+      <td><pre><code class="javascript">empx.domx.MyEnum = function () {
+  var values = {};
+  function MyEnum(raw) {
+    return values[raw];
+  }
+  function MyEnumImpl(raw) {
+    this.valueOf = function () { return raw; }
+  }
+  ria.__API.extend(MyEnumImpl, MyEnum);
+  values[1] = MyEnum.Value1 = new MyEnumImpl(1);
+  values['2'] = MyEnum.Value2 = new MyEnumImpl('2');
+  return MyEnum;
+}();</code></pre></td>
+      <td></td>
+  </tr>
+
+
+<!--
+  <tr valign="top">
+    <td><strong></strong></td>
+    <td><pre><code class="javascript"></code></pre></td>
+    <td><pre><code class="javascript"></code></pre></td>
+    <td></td>
+  </tr>
+-->
+
+</tbody>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+//
+   Created with JetBrains WebStorm.
+   User: paladin
+   Date: 2/6/13
+   Time: 11:07 PM
+   To change this template use File | Settings | File Templates.
+
+mixin ActionLink(controller, action)
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.href = attributes.href || 'javascript:';
+    -if (arguments.length > 2) (attributes['data-params'] = escape([].slice.call(arguments, 2).map(function(_) { return JSON.stringify(_.valueOf ? _.valueOf() : _)}).join(',')));
+    a(attributes)
+        block
+
+mixin ActionForm(controller, action)
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes.action = attributes.action || 'javascript:';
+    form(attributes)
+        block
+
+mixin Counter(controller, action, value)
+    -attributes['data-controller'] = escape(controller);
+    -attributes['data-action'] = escape(action);
+    -attributes['data-value'] = value.valueOf();
+    span.counter(attributes): =value.toString()
+
+
+mixin Option(value, selected)
+    option(value=value, selected=selected==true)
+        block
+
+mixin Select(name, values, value)
+    each var key, name in values
+        +Option(key, key == value):= name
+
+
+mixin RenderWithSingle(obj, tplClass)
+    -var tpl = new tplClass
+    -var tpl.assign(obj)
+    -var tpl.options(attributes)
+    -buf.push(tpl.renderBuffer())
+
+mixin RenderWith(obj, tpl)
+    -attributes.block = block
+    if Array.isArray(obj)
+        each var key,value in obj
+            -attributes.collectionIndex=key
+            -attributes.collection=obj
+            +RenderWithSingle(value, tpl)(attributes)
+    else
+        +RenderWithSingle(obj, tpl)(attributes)
