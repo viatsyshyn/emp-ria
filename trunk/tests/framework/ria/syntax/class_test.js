@@ -37,6 +37,12 @@
         return ria.__SYNTAX.compileClass('test.' + def.name, def);
     }
 
+    function INTERFACE() {
+        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateInterfaceDecl(def);
+        return ria.__SYNTAX.compileInterface('test.' + def.name, def);
+    }
+
     /**
      * @param {Error} error
      * @param [arg*]
@@ -59,7 +65,7 @@
                 throw e;
 
             if (error && e.message != error.message) {
-                fail('Expected error "' + error.message + ", actual: " + e);
+                fail('Expected error "' + error.message + '", actual: "' + e + '"');
             }
 
             return null;
@@ -1185,7 +1191,9 @@
             var BaseClass = CLASS(
                 'BaseClass', [
                     [[String, Object]],
-                    String, function method(a, b_) {}
+                    String, function method(a, b_) {},
+
+                    String, function m2() {}
                 ]);
 
             var ChildClass = CLASS(
@@ -1210,10 +1218,16 @@
                     OVERRIDE, String, function method(a_, b_, c_) {}
                 ]);
 
-            CLASS_E(Error('Method required arguments b then base does not have or is optional. Method: "method"'),
+            CLASS_E(Error('Method requires argument "b" that base does not have or optional. Method: "method"'),
                 'ChildClass', EXTENDS(BaseClass), [
                     [[String, Object, String]],
                     OVERRIDE, String, function method(a, b) {}
+                ]);
+
+            CLASS_E(Error('Method requires argument "a" that base does not have or optional. Method: "m2"'),
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[String, Object]],
+                    OVERRIDE, String, function m2(a, b_) {}
                 ]);
 
             CLASS_E(Error('Method accepts less arguments then base method. Method: "method"'),
@@ -1330,6 +1344,76 @@
             assertException(function () {
                 Application.RUN(instance, 3);
             });
+        },
+
+        testInterfaceMethodSignatureOverride: function () {
+            var BaseClass = CLASS(
+                'BaseClass', []);
+
+            var MyIfc = INTERFACE(
+                'MyIfc', [
+                    [[BaseClass]],
+                    SELF, function op(t) {},
+
+                    [[String, Boolean]],
+                    VOID, function z(t, y) {}
+                ]);
+
+            CLASS(
+                'ChildClass', IMPLEMENTS(MyIfc), [
+                    [[BaseClass]],
+                    MyIfc, function op(t_) {},
+
+                    [[Object, Boolean]],
+                    VOID, function z(t, y_) {}
+                ]);
+
+            CLASS_E(Error('Method "op" of interface test.MyIfc not implemented'),
+                'ChildClass', IMPLEMENTS(MyIfc), []);
+
+            CLASS_E(Error('Method requires argument "z" that base does not have or optional. Method: "z"'),
+                'ChildClass', IMPLEMENTS(MyIfc), [
+                    [[BaseClass]],
+                    MyIfc, function op(t) {},
+
+                    [[String, Boolean]],
+                    VOID, function z(t, y, z) {}
+                ]);
+
+            CLASS_E(Error('Method "op" returns String, but base returns test.MyIfc'),
+                'ChildClass', IMPLEMENTS(MyIfc), [
+                    [[String, Boolean]],
+                    VOID, function z(t, y) {},
+
+                    [[BaseClass]],
+                    String, function op(t) {}
+                ]);
+        },
+
+        testInterfacePropertyOverride: function () {
+            var BaseClass = CLASS(
+                'BaseClass', []);
+
+            var MyIfc = INTERFACE(
+                'MyIfc', [
+                    BaseClass, 'myProp'
+                ]);
+
+            CLASS(
+                'ChildClass', IMPLEMENTS(MyIfc), [
+                    BaseClass, function getMyProp() {},
+
+                    [[BaseClass]],
+                    VOID, function setMyProp(v) {}
+                ]);
+
+            CLASS(
+                'ChildClass', IMPLEMENTS(MyIfc), [
+                    BaseClass, 'myProp'
+                ]);
+
+            CLASS_E(Error('Method "getMyProp" of interface test.MyIfc not implemented'),
+                'ChildClass', IMPLEMENTS(MyIfc), []);
         }
     };
 
