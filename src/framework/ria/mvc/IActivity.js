@@ -65,10 +65,10 @@ NAMESPACE('ria.mvc', function () {
         VOID, function refresh(model) {},
 
         [[ria.async.Future]],
-        VOID, function refreshD(model) {},
+        ria.async.Future, function refreshD(model) {},
 
         [[ria.async.Future]],
-        VOID, function partialRefreshD(model) {},
+        ria.async.Future, function partialRefreshD(model) {},
 
         /**
          * Configure Refresh Event

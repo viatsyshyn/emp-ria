@@ -97,7 +97,10 @@
     };
 
     FunctionToken.prototype.hasBaseCall = function () {
-        return /BASE\(/.test(this.value.toString());
+        return /BASE\(/.test(this.value.toString()
+            .replace(/\/\*[^\*]*\*\//g, '')         // replace /* .. */
+            .replace(/\/\/[^\n\r]*[\n\r]/g, '')     // replace // ... \n
+            );
     };
 
     function FunctionCallToken(token) {

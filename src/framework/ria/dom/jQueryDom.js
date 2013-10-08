@@ -261,7 +261,7 @@ NAMESPACE('ria.dom', function () {
                 return this._dom.attr(name) || null;
             },
             OVERRIDE, Object, function getValue() {
-                return this._dom.val();
+                return this._dom.val() || null;
             },
             [[Object]],
             OVERRIDE, SELF, function setAllAttrs(obj) {},
