@@ -1,12 +1,48 @@
 (function (ria) {
     "use strict";
 
+    var OVERRIDE = ria.__SYNTAX.Modifiers.OVERRIDE;
+    var ABSTRACT = ria.__SYNTAX.Modifiers.ABSTRACT;
+    var VOID = ria.__SYNTAX.Modifiers.VOID;
+    var SELF = ria.__SYNTAX.Modifiers.SELF;
+    var FINAL = ria.__SYNTAX.Modifiers.FINAL;
+    var READONLY = ria.__SYNTAX.Modifiers.READONLY;
+
+    var Class = ria.__API.Class;
+    var Interface = ria.__API.Interface;
+    var Exception = ria.__API.Exception;
+
+    var IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
+    /** @type {Function} */
+    var EXTENDS = ria.__SYNTAX.EXTENDS;
+    /** @type {Function} */
+    var VALIDATE_ARG = ria.__SYNTAX.checkArg;
+    /** @type {Function} */
+    var VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
+    /** @type {Function} */
+    var ArrayOf = ria.__API.ArrayOf;
+    /** @type {Function} */
+    var ClassOf = ria.__API.ClassOf;
+    /** @type {Function} */
+    var ImplementerOf = ria.__API.ImplementerOf;
+
+    function DELEGATE() {
+        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateDelegateDecl(def);
+        return ria.__SYNTAX.compileDelegate('test.' + name, def);
+    }
+
+    kfunction DELEGATE_E(error, arg) {
+        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        ria.__SYNTAX.validateDelegateDecl(def);
+        return ria.__SYNTAX.compileDelegate('test.' + name, def);
+    }
+
     TestCase("DelegateTestCase").prototype = {
         testBuildDelegate: function () {
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            var descriptor = DELEGATE(
                 [[String, String]],
-                Boolean, function compare(_1, _2) {}
-            ]));
+                Boolean, function compare(_1, _2) {});
 
             assertNoException(function() {
                 ria.__SYNTAX.validateDelegateDecl(descriptor);

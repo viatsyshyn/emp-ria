@@ -196,6 +196,84 @@
         return new ImplementsDescriptor(ifcs);
     };
 
+    function SpecifyDescriptor(type, specs) {
+        this.type = type;
+        this.specs = (specs || []).slice();
+    }
+
+    ria.__SYNTAX.SpecifyDescriptor = SpecifyDescriptor;
+
+    ria.__SYNTAX.OF = function OF() {
+        return new SpecifyDescriptor(this, ria.__API.clone(arguments));
+    };
+
+    function GeneralizedType(name, specs) {
+        this.name = name;
+        this.specs = specs;
+    }
+
+    ria.__SYNTAX.GeneralizedType = GeneralizedType;
+
+    ria.__SYNTAX.isGeneralizedType = function (type) {
+        return type instanceof GeneralizedType;
+    };
+
+    function GeneralizeDescriptor(types) {
+        this.types = types.slice();
+
+        this.define();
+    }
+
+    GeneralizeDescriptor.prototype.define = function () {
+        types.forEach(function (type) { window[type.name] = type; });
+    };
+
+    GeneralizeDescriptor.prototype.undefine = function () {
+        types.forEach(function (type) { delete window[type.name]; });
+    };
+
+    ria.__SYNTAX.GENERIC = function GENERIC() {
+        var types = [];
+        var args = ria.__API.clone(arguments);
+
+        while(args.length) {
+            var name = args.shift(), specs = [];
+            if (typeof name != 'string')
+                throw Error('Expected string as GeneralizedType name');
+
+            if (args.length) {
+                var hasClassOf = false;
+                do {
+                    var spec = args.shift();
+                    if (typeof spec == 'string') {
+                        args.unshift(spec);
+                        break;
+                    }
+
+                    if (ria.__API.isClassOfDescriptor(spec)) {
+                        if (hasClassOf)
+                            throw Error('Only one ClassOf() is supported as restriction of GeneralizedType');
+
+                        hasClassOf = true;
+                        specs.push(spec);
+                        continue;
+                    }
+
+                    if (ria.__API.isImplementerOfDescriptor(spec)) {
+                        specs.push(spec);
+                        continue;
+                    }
+
+                    throw Error('Only ClassOf() or ImplementerOf() are supported as restrictions of GeneralizedType')
+                } while (true);
+            }
+
+            types.push(new GeneralizedType(name, specs));
+        }
+
+        return new GeneralizeDescriptor(types);
+    };
+
     function Tokenizer(data) {
         this.token = this.token.bind(this);
         this.data = [].slice.call(data).map(this.token);
