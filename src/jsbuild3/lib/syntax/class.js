@@ -257,13 +257,23 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                             .filter(function (_) { return processedMethods.indexOf(_.name) < 0 })
                             .map(function (method) {
                                 return [
-                                    make_node(UglifyJS.AST_SimpleStatement, node, {
-                                        body: make_node(UglifyJS.AST_Assign, node, {
-                                            left: AccessNS((isStaticMethod(method.name) ? 'ClassCtor' : '_') + '.' + method.name, null, node),
-                                            operator: '=',
-                                            right: CompileSELF(method.body.raw, 'ClassCtor')
+                                    isStaticMethod(method.name)
+                                        ? make_node(UglifyJS.AST_SimpleStatement, node, {
+                                            body: make_node(UglifyJS.AST_Assign, node, {
+                                                left: AccessNS('ClassCtor.' + method.name, null, node),
+                                                operator: '=',
+                                                right: CompileSELF(method.body.raw, 'ClassCtor')
+                                            })
                                         })
-                                    }),
+                                        : make_node(UglifyJS.AST_Assign, node, {
+                                            left: AccessNS('_.' + method.name, null, node),
+                                            operator: '=',
+                                            // TODO: insert properties initializations
+                                            right: CompileBASE(CompileSELF(method.body.raw, 'ClassCtor'),
+                                                // TODO: detect TRUE base class
+                                                def.base ? def.base.raw.print_to_string() : baseClass,
+                                                method.name)
+                                        }),
                                     isProtected(method.name) || isStaticMethod(method.name) ? null : make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Call, node, {
                                             expression: AccessNS('ria.__API.method', null, node),
