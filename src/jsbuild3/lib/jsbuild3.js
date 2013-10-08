@@ -185,9 +185,7 @@ function prepareRiaConfig() {
 }
 
 function appStart() {
-    new AppClass()
-        .session(ria.__CFG['#mvc'].settings || {})
-        .run();
+    ria.mvc.Application.RUN(AppClass, ria.__CFG['#mvc'].settings);
 }
 
 /**

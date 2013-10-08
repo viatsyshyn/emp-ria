@@ -182,7 +182,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                         body: make_node(UglifyJS.AST_Assign, node, {
                                             left: AccessNS('ClassCtor.' + name, null, node),
                                             operator: '=',
-                                            right: ToAst(ClassCtor.toString().replace('$', name))
+                                            right: ToAst(ClassCtor.toString().replace('_.$', '_.' + name))
                                         })
                                     })
                                 ];
