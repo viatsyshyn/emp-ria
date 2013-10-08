@@ -137,6 +137,13 @@ NAMESPACE('ria.mvc', function () {
         VOID, function onResume_() {},
         VOID, function onPause_() {},
         VOID, function onStop_() { return ria.async.DeferredAction(); },
-        VOID, function onDispose_() {}
+        VOID, function onDispose_() {},
+
+        [[ClassOf(SELF), Object]],
+        VOID, function RUN(appClass, session_) {
+            new appClass()
+                .session(session_ || {})
+                .run()
+        }
     ]);
 });

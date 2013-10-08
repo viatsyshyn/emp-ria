@@ -24,9 +24,7 @@
         NAMESPACE('', function () {
             ria.dom.ready()
                 .then(function () {
-                    (new (eval(cfg.appClass)))
-                        .session(cfg.settings || {})
-                        .run();
+                    ria.mvc.Application.RUN(eval(cfg.appClass), cfg.settings);
                 });
         });
     });

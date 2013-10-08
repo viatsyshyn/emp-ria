@@ -221,14 +221,19 @@ NAMESPACE('ria.async', function () {
                 return new SELF(this._impl.attach(future.getImpl()));
             },
 
-            function getImpl() { return this._impl; }
+            function getImpl() { return this._impl; },
+
+            [[Object, Number]],
+            function $fromData(data, delay_) {
+                BASE();
+                this._impl = new ria.async.FutureImpl;
+                ria.__API.defer(null, this._impl.finish, [data || null], delay_|0);
+            }
         ]);
 
     /** @class ria.async.DeferredData*/
     /** @class ria.async.DeferredAction*/
     ria.async.DeferredAction = ria.async.DeferredData = function (data_, delay_) {
-        var future = new ria.async.FutureImpl;
-        ria.__API.defer(null, future.finish, [data_ || null], delay_|0);
-        return future.getWrapper();
+        return new ria.async.Future.$fromData(data_ || null, delay_);
     };
 });
