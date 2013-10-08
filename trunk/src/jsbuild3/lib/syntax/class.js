@@ -48,6 +48,10 @@ function ClassCtor() {
     return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
+function ClassNamedCtor() {
+    return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
+}
+
 function CompileSELF(node, clazz) {
     return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {
         if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
@@ -182,7 +186,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                         body: make_node(UglifyJS.AST_Assign, node, {
                                             left: AccessNS('ClassCtor.' + name, null, node),
                                             operator: '=',
-                                            right: ToAst(ClassCtor.toString().replace('_.$', '_.' + name))
+                                            right: ToAst(ClassNamedCtor.toString().replace('_.$', '_.' + name))
                                         })
                                     })
                                 ];
