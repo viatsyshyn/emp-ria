@@ -276,6 +276,9 @@
         ClassBase.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
         ria.__API.method(ClassBase, ClassBase.prototype.equals, 'equals', Boolean, [ClassBase], ['other'], []);
 
+        ClassBase.prototype.getSpecsOf = function (name) { return this.__SPECS[name]; };
+        ria.__API.method(ClassBase, ClassBase.prototype.getSpecsOf, 'equals', null, [String], ['name'], []);
+
         ria.__API.compile(ClassBase);
         return ClassBase;
     })();

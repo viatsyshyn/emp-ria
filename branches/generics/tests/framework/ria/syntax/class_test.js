@@ -1600,6 +1600,70 @@
             assertNoException(function () {
                 assertEquals(5, ins.convert('5'));
             })
+        },
+
+        testUseOfGenericIfc: function () {
+            var MyIfc = INTERFACE(
+                GENERIC('TKey', 'TValue'),
+                'MyIfc', [
+                    [[TKey, TValue]],
+                    VOID, function add(k, v) {}
+                ]);
+
+            var Impl = CLASS(
+                'Impl', IMPLEMENTS(MyIfc.OF(String, String)), [
+                    [[String, String]],
+                    VOID, function add(k, v) {}
+                ]);
+
+            var BaseClass = CLASS(
+                'BaseClass', [
+                    Impl, 'prop'
+                ]);
+
+            var impl = new Impl;
+            var inst = new BaseClass;
+
+            assertNoException(function () {
+                inst.setProp(impl);
+                assertEquals(impl, inst.getProp());
+            })
+        },
+
+        testUseOfGenericIfc2: function () {
+            var MyIfc = INTERFACE(
+                GENERIC('TKey', 'TValue'),
+                'MyIfc', [
+                    [[TKey, TValue]],
+                    VOID, function add(k, v) {}
+                ]);
+
+            var Impl = CLASS(
+                GENERIC('TKey', 'TValue'),
+                'Impl', IMPLEMENTS(MyIfc.OF(TKey, TValue)), [
+                    [[TKey, TValue]],
+                    VOID, function add(k, v) {}
+                ]);
+
+            var BaseClass = CLASS(
+                GENERIC('TKey', 'TValue'),
+                'BaseClass', [
+                    Impl.OF(TKey, TValue), 'prop',
+                    MyIfc.OF(TKey, TValue), 'prop2'
+                ]);
+
+            var impl = new Impl(String, String);
+            var inst = new BaseClass(String, String);
+
+            assertNoException(function () {
+                inst.setProp(impl);
+                assertEquals(impl, inst.getProp());
+            });
+
+            assertNoException(function () {
+                inst.setProp2(impl);
+                assertEquals(impl, inst.getProp2());
+            });
         }
     };
 

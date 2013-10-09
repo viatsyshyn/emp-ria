@@ -165,6 +165,35 @@
             assertTrue(ria.__API.isGeneralizedType(MyIfc.__META.methods.convert.argsTypes[0]));
 
             assertEquals(ria.__SYNTAX.OF, MyIfc.OF);
+        },
+
+        testImplementsGeneric: function () {
+            var MyIfc = INTERFACE(
+                GENERIC('TSource', 'TReturn'),
+                'IConverter', [
+                    [[TSource]],
+                    TReturn, function convert(source) {}
+                ]);
+
+            var Impl = CLASS(
+                'Impl', IMPLEMENTS(MyIfc.OF(String, Number)), [
+                    [[String]],
+                    Number, function convert(source) {}
+                ]);
+
+            assertFalse(ria.__API.implements(Impl, MyIfc));
+            assertTrue(ria.__API.implements(Impl, MyIfc.OF(String,Number)));
+            assertFalse(ria.__API.implements(Impl, MyIfc.OF(Number,String)));
+
+            var Impl2 = CLASS(
+                'Impl', IMPLEMENTS(MyIfc), [
+                    [[Object]],
+                    Object, function convert(source) {}
+                ]);
+
+            assertTrue(ria.__API.implements(Impl2, MyIfc));
+            assertTrue(ria.__API.implements(Impl2, MyIfc.OF(String,Number)));
+            assertTrue(ria.__API.implements(Impl2, MyIfc.OF(Number,String)));
         }
     };
 
