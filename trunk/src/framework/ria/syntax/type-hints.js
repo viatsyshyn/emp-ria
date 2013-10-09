@@ -15,7 +15,7 @@
             var delegate = type.__META;
 
             try {
-                if (method.ret !== delegate.ret && !checkTypeHint(method.ret, delegate.ret)) { //noinspection ExceptionCaughtLocallyJS
+                if (delegate.ret !== null && method.ret !== delegate.ret && !checkTypeHint(method.ret, delegate.ret)) { //noinspection ExceptionCaughtLocallyJS
                     throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.ret)
                         + ', but delegate expects ' + ria.__API.getIdentifierOfType(delegate.ret));
                 }

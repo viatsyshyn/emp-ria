@@ -14,7 +14,7 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.FutureDataDelegate */
     DELEGATE(
         [[Object]],
-        Object, function FutureDataDelegate(data){});
+        function FutureDataDelegate(data){});
 
     /** @class ria.async.FutureProgressDelegate */
     DELEGATE(
