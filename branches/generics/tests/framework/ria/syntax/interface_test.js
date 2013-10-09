@@ -35,34 +35,52 @@
         },
 
         testCtor: function() {
-            INTERFACE_E(Error('ctor not supported'),
+            INTERFACE_E(Error('Interface ctors, named ctors and factories are not supported'),
                 'MyIfc', [
                     function $() {}
                 ]);
 
-            INTERFACE_E(Error('ctor not supported'),
+            INTERFACE_E(Error('Interface ctors, named ctors and factories are not supported'),
                 'MyIfc', [
                     function $fromData(d) {}
+                ]);
+
+            INTERFACE_E(Error('Interface ctors, named ctors and factories are not supported'),
+                'MyIfc', [
+                    function $$(d) {}
+                ]);
+        },
+
+        testStatics: function() {
+            INTERFACE_E(Error('Interface static methods are not supported'),
+                'MyIfc', [
+                    function RUN() {}
                 ]);
         },
 
         testExtends: function() {
-            INTERFACE_E(Error('EXTENDS not supported'),
+            INTERFACE_E(Error('Interface can NOT extend classes or interfaces'),
                 'MyIfc', EXTENDS(Class), []);
         },
 
         testImplements: function() {
             var BaseIfc = INTERFACE('BaseIfc', []);
 
-            INTERFACE_E(Error('IMPLEMENTS not supported'),
+            INTERFACE_E(Error('Interface can NOT implement interfaces'),
                 'MyIfc', IMPLEMENTS(BaseIfc), []);
         },
 
         testDublicates: function() {
-            INTERFACE_E(Error('dublicate methods'),
+            INTERFACE_E(Error('Duplicate method declaration "method1"'),
                 'MyIfc', [
                     function method1() {},
                     function method1(a, b) {}
+                ]);
+
+            INTERFACE_E(Error('Duplicate property declaration "prop"'),
+                'MyIfc', [
+                    'prop',
+                    'prop',
                 ]);
         },
 
@@ -109,10 +127,16 @@
             var MyAnnotation = ANNOTATION(
                 function MyAnnotation() {});
 
-            INTERFACE_E(Error('annotations not supported'),
+            INTERFACE_E(Error('Interface method can NOT be annotated'),
                 'MyIfc', [
                     [MyAnnotation],
                     function method1() {}
+                ]);
+
+            INTERFACE_E(Error('Interface properties can NOT be annotated'),
+                'MyIfc', [
+                    [MyAnnotation],
+                    'prop'
                 ]);
         },
 
@@ -125,6 +149,22 @@
 
             INTERFACE_E(Error('Interface can NOT be marked with READONLY'),
                 READONLY, 'MyIfc', []);
+        },
+
+        testGenerics: function() {
+            var MyIfc = INTERFACE(
+                GENERIC('TSource', 'TReturn'),
+                'IConverter', [
+                    [[TSource]],
+                    TReturn, function convert(source) {}
+                ]);
+
+            assertNotUndefined(MyIfc.__META.genericTypes);
+            assertEquals(2, MyIfc.__META.genericTypes.length);
+            assertTrue(ria.__API.isGeneralizedType(MyIfc.__META.methods.convert.retType));
+            assertTrue(ria.__API.isGeneralizedType(MyIfc.__META.methods.convert.argsTypes[0]));
+
+            assertEquals(ria.__SYNTAX.OF, MyIfc.OF);
         }
     };
 

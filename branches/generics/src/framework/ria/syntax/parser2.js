@@ -183,7 +183,7 @@
      * @param {MethodDescriptor[]} methods
      * @constructor
      */
-    function ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods) {
+    function ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods, genericTypes) {
         this.name = name;
         this.base = base;
         this.ifcs = ifcs;
@@ -191,6 +191,7 @@
         this.annotations = annotations;
         this.properties = properties;
         this.methods = methods;
+        this.genericTypes = genericTypes;
     }
 
     ria.__SYNTAX.ClassDescriptor = ClassDescriptor;
@@ -201,6 +202,10 @@
      */
     ria.__SYNTAX.parseClassDef = function (tkz) {
         ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
+
+        var genericTypes = null;
+        if (tkz.check(ria.__SYNTAX.Tokenizer.GenericToken))
+            genericTypes = tkz.next().value;
 
         var annotations = ria.__SYNTAX.parseAnnotations(tkz);
         var flags = ria.__SYNTAX.parseModifiers(tkz);
@@ -222,7 +227,10 @@
         var properties = members.filter(function (_1) {return _1 instanceof PropertyDescriptor; });
         var methods = members.filter(function (_1) {return _1 instanceof MethodDescriptor; });
 
-        return new ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods);
+        if (genericTypes)
+            genericTypes.undefine();
+
+        return new ClassDescriptor(name, base, ifcs, flags, annotations, properties, methods, genericTypes ? genericTypes.types : []);
     };
 
     /**

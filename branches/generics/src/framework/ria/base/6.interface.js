@@ -6,8 +6,9 @@
      * @param {Array} methods
      * @constructor
      */
-    function InterfaceDescriptor(name, methods) {
+    function InterfaceDescriptor(name, methods, genericTypes) {
         this.name = name;
+        this.genericTypes = genericTypes;
         this.methods = {};
         methods.forEach(function (method) {
             this.methods[method[0]] = {
@@ -36,9 +37,9 @@
      * @param {Array} methods
      * @returns Function
      */
-    ria.__API.ifc = function(ifc, name, methods) {
+    ria.__API.ifc = function(ifc, name, methods, genericTypes) {
         ifcRegister[name] = ifc;
-        ifc.__META = new InterfaceDescriptor(name, methods);
+        ifc.__META = new InterfaceDescriptor(name, methods, genericTypes);
         return ifc;
     };
 

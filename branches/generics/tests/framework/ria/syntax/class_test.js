@@ -1294,6 +1294,13 @@
                 ]);
         },
 
+        testStaticProperties: function () {
+            CLASS_E(Error('Static properties are not supported'),
+                'Application', [
+                    Class,'RUN'
+                ]);
+        },
+
         testInterfaceMethodSignatureOverride: function () {
             var BaseClass = CLASS(
                 'BaseClass', []);

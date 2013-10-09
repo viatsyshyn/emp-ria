@@ -341,6 +341,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function validatePropertyDeclaration(property, def, processedMethods, FakeSelf) {
+        if (isStaticMethod(property.name))
+            throw Error('Static properties are not supported');
+
         var getterName = property.getGetterName();
         var setterName = property.getSetterName();
 
