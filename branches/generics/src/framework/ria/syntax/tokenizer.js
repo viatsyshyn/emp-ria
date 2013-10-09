@@ -31,6 +31,7 @@
             || ria.__API.isEnum(type)
             || ria.__API.isIdentifier(type)
             || ria.__API.isDelegate(type)
+            || ria.__API.isSpecification(type);
             //|| ArrayOfDescriptor.isArrayOfDescriptor(type)
             ;
     }
@@ -138,9 +139,10 @@
     function VoidToken() {}
     function SelfToken() {}
 
-    function ExtendsToken(base) {
+    function ExtendsToken(base, specs) {
         this.value = base;
         this.raw = base;
+        this.specs = specs;
     }
 
     function ImplementsToken(ifcs) {
@@ -151,8 +153,9 @@
      * @param {Function} base
      * @constructor
      */
-    function ExtendsDescriptor(base) {
+    function ExtendsDescriptor(base, specs) {
         this.base = base;
+        this.specs = specs;
     }
 
     ria.__SYNTAX.ExtendsDescriptor = ExtendsDescriptor;
@@ -161,10 +164,16 @@
         if (base === undefined)
             throw Error('Class expected, but got undefined. Check if it is defined already');
 
-        if (!(base.__META instanceof ria.__API.ClassDescriptor))
+        var specs = [];
+        if (ria.__API.isSpecification(base)) {
+            specs = base.specs;
+            base = base.type;
+        }
+
+        if (!ria.__API.isClassConstructor(base))
             throw Error('Class expected, but got ' + ria.__API.getIdentifierOfType(base));
 
-        return new ExtendsDescriptor(base);
+        return new ExtendsDescriptor(base, specs);
     };
 
     /**
@@ -189,22 +198,16 @@
             if (ifc === undefined)
                 throw Error('Interface expected, but got undefined. Check if it is defined already');
 
-            if (!(ifc.__META instanceof ria.__API.InterfaceDescriptor))
+            if ((!ria.__API.isSpecification(ifc) || !ria.__API.isInterface(ifc.type))
+                && !ria.__API.isInterface(ifc))
                 throw Error('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
         }
 
         return new ImplementsDescriptor(ifcs);
     };
 
-    function SpecifyDescriptor(type, specs) {
-        this.type = type;
-        this.specs = (specs || []).slice();
-    }
-
-    ria.__SYNTAX.SpecifyDescriptor = SpecifyDescriptor;
-
     ria.__SYNTAX.OF = function OF() {
-        return new SpecifyDescriptor(this, ria.__API.clone(arguments));
+        return new ria.__API.SpecifyDescriptor(this, ria.__API.clone(arguments));
     };
 
     function GenericToken(desc) {
@@ -284,7 +287,7 @@
         }
 
         if (token instanceof ExtendsDescriptor)
-            return new ExtendsToken(token.base);
+            return new ExtendsToken(token.base, token.specs);
 
         if (token instanceof ImplementsDescriptor)
             return new ImplementsToken(token.ifcs);

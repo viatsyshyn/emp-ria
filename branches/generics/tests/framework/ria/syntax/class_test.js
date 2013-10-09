@@ -1369,6 +1369,237 @@
 
             CLASS_E(Error('Method "getMyProp" of interface test.MyIfc not implemented'),
                 'ChildClass', IMPLEMENTS(MyIfc), []);
+        },
+
+        testPropertyAndMethodWithSameName: function () {
+            CLASS_E(Error('Method and property has same name "name"'),
+                'MyClass', [
+                    'name',
+                    function name() {}
+                ]);
+        },
+
+        testGenerics: function() {
+            var MyConverter = CLASS(
+                GENERIC('TSource', 'TReturn'),
+                'Converter', [
+                    [[TSource]],
+                    TReturn, function convert(source) {
+                        return source;
+                    }
+                ]);
+
+            assertNotUndefined(MyConverter.__META.genericTypes);
+            assertEquals(2, MyConverter.__META.genericTypes.length);
+            assertTrue(ria.__API.isGeneralizedType(MyConverter.__META.methods.convert.retType));
+            assertTrue(ria.__API.isGeneralizedType(MyConverter.__META.methods.convert.argsTypes[0]));
+
+            assertEquals(ria.__SYNTAX.OF, MyConverter.OF);
+
+            var instance = new MyConverter(String, String);
+            assertNoException(function () {
+                instance.convert("test");
+            });
+
+            assertException(function () {
+                instance.convert(5);
+            }, Error('Bad argument for convert'));
+        },
+
+        testUseOfGenericDelegate: function () {
+            var Processor = DELEGATE(
+                GENERIC('TSource', 'TReturn'),
+                [[TSource]],
+                TReturn, function convert(source) {});
+
+            var MyClass = CLASS(
+                'MyClass', [
+                    READONLY, Processor, 'genericProcessor',
+                    READONLY, Processor.OF(String, Number), 'stringNumberProcessor',
+
+                    [[Object]],
+                    Object, function genericProcess(source) {
+                        return source;
+                    },
+
+                    [[String]],
+                    Number, function stringNumberProcess(source) {
+                        return Number(source);
+                    },
+
+                    Processor, function getGenericProcessor() {
+                        return this.genericProcess;
+                    },
+
+                    Processor.OF(String, Number), function getStringNumberProcessor() {
+                        return this.stringNumberProcess;
+                    }
+                ]);
+
+            var instance = new MyClass;
+
+            var source = '5';
+            assertEquals(source, instance.genericProcess(source));
+            assertEquals(Number(source), instance.stringNumberProcess(source));
+
+            assertNoException(function () {
+                instance.getGenericProcessor();
+            })
+            assertNoException(function () {
+                instance.getStringNumberProcessor();
+            })
+        },
+
+        testImplementGenericIfc: function () {
+            var MyIfc = INTERFACE(
+                GENERIC('TSource', 'TReturn'),
+                'MyIfc', [
+                    [[TSource]],
+                    TReturn, function convert(source) {}
+                ]);
+
+            var Impl1 = CLASS(
+                'Impl1', IMPLEMENTS(MyIfc), [
+                    [[Object]],
+                    Object, function convert(source) {
+                        return source;
+                    }
+                ]);
+
+            var Impl2 = CLASS(
+                'Impl2', IMPLEMENTS(MyIfc.OF(String, Number)), [
+                    [[String]],
+                    Number, function convert(source) {
+                        return Number(source);
+                    }
+                ]);
+
+            CLASS_E(Error('Method "convert" returns String, but base returns Number'),
+                'Impl3', IMPLEMENTS(MyIfc.OF(String, Number)), [
+                    [[String]],
+                    String, function convert(source) {
+                        return Number(source);
+                    }
+                ]);
+
+            var i1 = new Impl1;
+            assertNoException(function () {
+                i1.convert("test");
+                i1.convert(5)
+            });
+
+            var i2 = new Impl2;
+            assertNoException(function () {
+                i2.convert("test");
+            });
+
+            assertException(function () {
+                i2.convert(5);
+            }, Error('Bad argument for convert'));
+        },
+
+        testExtendGenericClass: function () {
+            var BaseClass = CLASS(
+                GENERIC('TSource', 'TReturn'),
+                'BaseClass', [
+                    [[TSource]],
+                    ABSTRACT, TReturn, function convert(source) { return null; }
+                ]);
+
+            var ChildClass1 = CLASS(
+                'ChildClass1', EXTENDS(BaseClass), [
+                    [[Object]],
+                    OVERRIDE, Object, function convert(source) { return source; }
+                ]);
+
+            var ChildClass2 = CLASS(
+                'ChildClass2', EXTENDS(BaseClass.OF(String, Number)), [
+                    [[String]],
+                    OVERRIDE, Number, function convert(source) { return Number(source); }
+                ]);
+
+            CLASS_E(Error('Method "convert" returns Boolean, but base returns Number'),
+                'ChildClass3', EXTENDS(BaseClass.OF(String, Number)), [
+                    [[String]],
+                    OVERRIDE, Boolean, function convert(source) { return Number(source); }
+                ]);
+        },
+
+        testGenericTypeDelegation: function () {
+            var BaseClass = CLASS(
+                GENERIC('TKey', 'TValue'),
+                'BaseClass', [
+                    [[TKey, TValue]],
+                    VOID, function add(key, value) {},
+
+                    [[TKey]],
+                    TValue, function find(key) {},
+
+                    [[TKey]],
+                    VOID, function remove(key) {}
+                ]);
+
+            var ChildClass = CLASS(
+                GENERIC('TValue'),
+                'ChildClass', EXTENDS(BaseClass.OF(String, TValue)), [
+                    [[String, TValue]],
+                    OVERRIDE, VOID, function add(key, value) {},
+
+                    [[String]],
+                    OVERRIDE, TValue, function find(key) {},
+
+                    [[String]],
+                    OVERRIDE, VOID, function remove(key) {}
+                ]);
+
+            var ins = new ChildClass(Boolean);
+
+            assertNoException(function () {
+                ins.add('a', true);
+                ins.add('b', false);
+            });
+
+            assertException(function () {
+                ins.add(1, true);
+            }, Error('Bad argument for add'));
+
+            assertException(function () {
+                ins.add('b', 'false');
+            }, Error('Bad argument for add'))
+
+            assertException(function () {
+                ins.find(2);
+            }, Error('Bad argument for find'))
+        },
+
+        testGenericTypeDelegationToIfc: function () {
+            var MyIfc = INTERFACE(
+                GENERIC('TSource', 'TReturn'),
+                'MyIfc', [
+                    [[TSource]],
+                    TReturn, function convert(source) {}
+                ]);
+
+            var BaseClass = CLASS(
+                GENERIC('TSource', 'TReturn'),
+                'BaseClass', IMPLEMENTS(MyIfc.OF(TSource, TReturn)), [
+                    [[TSource]],
+                    ABSTRACT, TReturn, function convert(source) { return null; }
+                ]);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass.OF(String, Number)), [
+                    [[String]],
+                    OVERRIDE, Number, function convert(source) {
+                        return Number(source);
+                    }
+                ]);
+
+            var ins = new ChildClass();
+
+            assertNoException(function () {
+                assertEquals(5, ins.convert('5'));
+            })
         }
     };
 

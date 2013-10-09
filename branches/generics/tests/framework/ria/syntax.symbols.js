@@ -146,3 +146,57 @@ function EXCEPTION_E(error, arg) {
         ria.__SYNTAX.compileClass('test.' + def.name, def);
     });
 }
+
+function getErrorMessage(e) {
+    return ria.__API.getIdentifierOfValue(e) + '(' + (e.getMessage ? e.getMessage() : e.message) + ')' + '\n' + e.toString();
+}
+
+function assertNoException(msg, callback) {
+    var args = argsWithOptionalMsg_(arguments, 2);
+    jstestdriver.assertCount++;
+
+    try {
+        args[1]();
+    } catch(e) {
+        fail(args[0] + 'expected not to throw exception, but threw ' + getErrorMessage(e));
+    }
+}
+
+function assertException(msg, callback, error) {
+    if (arguments.length == 1) {
+        // assertThrows(callback)
+        callback = msg;
+        msg = '';
+    } else if (arguments.length == 2) {
+        if (typeof callback != 'function') {
+            // assertThrows(callback, type)
+            error = callback;
+            callback = msg;
+            msg = '';
+        } else {
+            // assertThrows(msg, callback)
+            msg += ' ';
+        }
+    } else {
+        // assertThrows(msg, callback, type)
+        msg += ' ';
+    }
+
+    jstestdriver.assertCount++;
+
+    try {
+        callback();
+    } catch(e) {
+        if (e.name == 'AssertError') {
+            throw e;
+        }
+
+        if (error && (e.getMessage ? e.getMessage() : e.message) != error.message) {
+            fail(msg + 'expected to throw "' + error.message + '" but threw ' + getErrorMessage(e));
+        }
+
+        return true;
+    }
+
+    fail(msg + 'expected to throw ' + getErrorMessage(error));
+}

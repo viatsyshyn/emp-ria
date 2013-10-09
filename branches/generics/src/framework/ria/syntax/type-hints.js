@@ -118,6 +118,10 @@
                     return value instanceof type;
                 }
 
+                if (ria.__API.isGeneralizedType(type)) {
+                    return ria.__API.isGeneralizedType(value) && type == value;
+                }
+
                 if (typeof type === 'function') {
                     return type === value || value instanceof type;
                 }
@@ -202,6 +206,8 @@
 
         return type;
     }
+
+    ria.__SYNTAX.resolveGenericType = resolveGenericType;
 
     if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',

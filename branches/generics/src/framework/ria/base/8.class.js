@@ -10,7 +10,7 @@
      * @param {Function[]} ifcs
      * @param {Annotation[]} anns
      */
-    function ClassDescriptor(name, base, ifcs, anns, isAbstract) {
+    function ClassDescriptor(name, base, ifcs, anns, isAbstract, genericTypes) {
         this.name = name;
         this.base = base;
         //noinspection JSUnusedGlobalSymbols
@@ -23,6 +23,7 @@
         this.defCtor = null;
         this.ctors = [];
         this.children = [];
+        this.genericTypes = genericTypes;
     }
 
     ClassDescriptor.prototype.addProperty = function (name, ret, anns, getter, setter) {
@@ -86,10 +87,10 @@
      * @param {Annotation[]} [anns_]
      * @param {Boolean} [isAbstract_]
      */
-    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_) {
+    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_, genericTypes_) {
         clazzRegister[name] = clazz;
 
-        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false);
+        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false, genericTypes_ || []);
         if (base_) {
             ria.__API.extend(clazz, base_);
             base_.__META.addChild(clazz);
@@ -157,11 +158,20 @@
      * @return {Object}
      */
     ria.__API.init = function (instance, clazz, ctor, args) {
+        args = ria.__API.clone(args);
+
         if (clazz.__META.isAbstract)
             throw Error('Can NOT instantiate asbtract class ' + clazz.__META.name);
 
         if (!(instance instanceof clazz))
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
+
+        var genericTypes = clazz.__META.genericTypes || [],
+            genericTypesLength = genericTypes.length,
+            specs = args.slice(0, genericTypesLength);
+
+        args = args.slice(genericTypesLength);
+
 
         var publicInstance = instance;
         if (_DEBUG) {
@@ -178,7 +188,7 @@
             if (typeof f_ === 'function' && !(/^\$.*/.test(name_)) && name_ !== 'constructor') {
                 instance[name_] = f_.bind(instance);
                 if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
-                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance);
+                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, specs);
                     if (_DEBUG) {
                         Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
                         if (f_.__META.isProtected())
@@ -195,9 +205,13 @@
         }
 
         if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
-            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance);
+            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, specs);
         }
 
+        instance.__SPECS = {};
+        genericTypes.forEach(function (_, index) {
+            instance.__SPECS[_.name] = specs[index];
+        });
 
         if (_DEBUG) for(var name in clazz.__META.properties) {
             if (clazz.__META.properties.hasOwnProperty(name)) {

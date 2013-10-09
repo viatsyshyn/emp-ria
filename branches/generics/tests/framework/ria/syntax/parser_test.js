@@ -121,7 +121,7 @@
                         FINAL, VOID, function protected_(a, b, c) {}
                     ]));
                 }
-            }, 'Error');
+            }, Error('Unexpected token, type: undefined'));
 
             assertException(function () {
                 //noinspection WithStatementJS
@@ -135,7 +135,7 @@
                         FINAL, VOID, function protected_(a, b, c) {}
                     ]));
                 }
-            }, 'Error');
+            }, Error('Unexpected token, type: undefined'));
 
             assertException(function () {
                 //noinspection WithStatementJS
@@ -152,7 +152,7 @@
                         Function, 'delegate2'
                     ]));
                 }
-            }, 'Error');
+            }, Error('Unexpected token, type: undefined'));
         },
 
         testParseClass: function () {

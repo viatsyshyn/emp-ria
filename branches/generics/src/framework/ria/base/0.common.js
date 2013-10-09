@@ -93,7 +93,7 @@ ria.__API = ria.__API || {};
      * @param {Object} type
      * @return {String}
      */
-    ria.__API.getIdentifierOfType = function (type) {
+    ria.__API.getIdentifierOfType = function getType(type) {
         if (type === undefined) return 'void';
         //if (type === __API.Modifiers.SELF) return 'SELF';
         if (type === null) return '*';
@@ -105,6 +105,10 @@ ria.__API = ria.__API || {};
         if (type === Date) return 'Date';
         if (type === Array) return 'Array';
         if (type === Object) return 'Object';
+
+        if (ria.__API.isSpecification(type)) {
+            return getType(type.type) + '.OF(' + type.specs.map(getType).join(', ') + ')';
+        }
 
         if (ria.__API.isArrayOfDescriptor(type) || ria.__API.isClassOfDescriptor(type) || ria.__API.isImplementerOfDescriptor(type))
             return type.toString();
@@ -202,4 +206,15 @@ ria.__API = ria.__API || {};
     ria.__API.isGeneralizedType = function (type) {
         return type instanceof GeneralizedType;
     };
+
+    function SpecifyDescriptor(type, specs) {
+        this.type = type;
+        this.specs = (specs || []).slice();
+    }
+
+    ria.__API.SpecifyDescriptor = SpecifyDescriptor;
+
+    ria.__API.isSpecification = function (type) {
+        return type instanceof SpecifyDescriptor;
+    }
 })();
