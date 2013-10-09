@@ -1,131 +1,79 @@
 (function (ria) {
     "use strict";
 
-    var OVERRIDE = ria.__SYNTAX.Modifiers.OVERRIDE;
-    var ABSTRACT = ria.__SYNTAX.Modifiers.ABSTRACT;
-    var VOID = ria.__SYNTAX.Modifiers.VOID;
-    var SELF = ria.__SYNTAX.Modifiers.SELF;
-    var FINAL = ria.__SYNTAX.Modifiers.FINAL;
-    var READONLY = ria.__SYNTAX.Modifiers.READONLY;
-
-    var Class = ria.__API.Class;
-    var Interface = ria.__API.Interface;
-    var Exception = ria.__API.Exception;
-
-    var IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
-    /** @type {Function} */
-    var EXTENDS = ria.__SYNTAX.EXTENDS;
-    /** @type {Function} */
-    var VALIDATE_ARG = ria.__SYNTAX.checkArg;
-    /** @type {Function} */
-    var VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
-    /** @type {Function} */
-    var ArrayOf = ria.__API.ArrayOf;
-    /** @type {Function} */
-    var ClassOf = ria.__API.ClassOf;
-    /** @type {Function} */
-    var ImplementerOf = ria.__API.ImplementerOf;
-
-    function DELEGATE() {
-        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
-        ria.__SYNTAX.validateDelegateDecl(def);
-        return ria.__SYNTAX.compileDelegate('test.' + name, def);
-    }
-
-    kfunction DELEGATE_E(error, arg) {
-        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
-        ria.__SYNTAX.validateDelegateDecl(def);
-        return ria.__SYNTAX.compileDelegate('test.' + name, def);
-    }
-
     TestCase("DelegateTestCase").prototype = {
+
+        setUp: function () {
+            window.SELF = ria.__SYNTAX.Modifiers.SELF;
+        },
+
         testBuildDelegate: function () {
-            var descriptor = DELEGATE(
+            var Compare = DELEGATE(
                 [[String, String]],
-                Boolean, function compare(_1, _2) {});
+                Boolean, function Compare(_1, _2) {});
 
-            assertNoException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            });
-
-            var result = ria.__SYNTAX.compileDelegate('Compare', descriptor);
-
-            assertNotUndefined(result);
-            assertFunction(result);
-            assertTrue(ria.__API.isDelegate(result));
-            assertEquals('Compare', result.__META.name);
+            assertNotUndefined(Compare);
+            assertFunction(Compare);
+            assertTrue(ria.__API.isDelegate(Compare));
+            assertEquals('test.Compare', Compare.__META.name);
         },
 
         testBuildDelegateWithAnnotation: function () {
 
             var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
 
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            DELEGATE_E(Error('Annotations are not supported in delegates'),
                 [MyAnnotation],
                 [[String, String]],
-                Boolean, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            }, 'Error');
+                Boolean, function compare(_1, _2) {});
         },
 
         testBuildDelegateWithFINAL: function () {
 
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            DELEGATE_E(Error('Modifiers are not supported in delegates'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.FINAL, Boolean, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            }, 'Error');
+                FINAL, Boolean, function compare(_1, _2) {})
         },
 
         testBuildDelegateWithAbstract: function () {
 
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            DELEGATE_E(Error('Modifiers are not supported in delegates'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.ABSTRACT, Boolean, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            }, 'Error');
+                ABSTRACT, Boolean, function compare(_1, _2) {})
         },
 
         testBuildDelegateWithOverride: function () {
 
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            DELEGATE_E(Error('Modifiers are not supported in delegates'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.OVERRIDE, Boolean, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            }, 'Error');
+                OVERRIDE, Boolean, function compare(_1, _2) {})
         },
 
         testBuildAnnotationWithSelf: function () {
 
-            var descriptor = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            DELEGATE_E(Error('Return type can\'t be SELF in delegates'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.SELF, function compare(_1, _2) {}
-            ]));
+                SELF, function compare(_1, _2) {});
 
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor);
-            }, 'Error');
+            DELEGATE_E(Error('Argument type can\'t be SELF in delegates'),
+                [[String, SELF]],
+                Boolean,function compare2(_1, _2) {});
+        },
 
-            var descriptor2 = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
-                [[String, ria.__SYNTAX.Modifiers.SELF]],
-                Boolean,function compare2(_1, _2) {}
-            ]));
+        testDelegateGenerics: function () {
 
-            assertException(function() {
-                ria.__SYNTAX.validateDelegateDecl(descriptor2);
-            }, 'Error');
+            var delegate = DELEGATE(
+                GENERIC('TKey', 'TValue'),
+                [[TKey, TValue]],
+                TValue, function map(key, value) {});
+
+            assertNotUndefined(delegate.__META.genericTypes);
+            assertEquals(2, delegate.__META.genericTypes.length);
+            assertTrue(ria.__API.isGeneralizedType(delegate.__META.ret));
+            assertTrue(ria.__API.isGeneralizedType(delegate.__META.argsTypes[0]));
+            assertTrue(ria.__API.isGeneralizedType(delegate.__META.argsTypes[1]));
+
+            assertEquals(ria.__SYNTAX.OF, delegate.OF);
         }
     };
 

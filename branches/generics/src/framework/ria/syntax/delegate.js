@@ -5,6 +5,26 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     "use strict";
 
     /**
+     * @param {ria.__SYNTAX.Tokenizer} tkz
+     */
+    ria.__SYNTAX.parseDelegate = function (tkz) {
+        ria.__SYNTAX.checkArg('tkz', [ria.__SYNTAX.Tokenizer], tkz);
+
+        var genericTypes = null;
+        if (tkz.check(ria.__SYNTAX.Tokenizer.GenericToken))
+            genericTypes = tkz.next().value;
+
+        var def = ria.__SYNTAX.parseMember(tkz);
+
+        if (genericTypes) {
+            def.genericTypes = genericTypes.types;
+            genericTypes.undefine();
+        }
+
+        return def;
+    };
+
+    /**
      * @param {MethodDescriptor} def
      */
     ria.__SYNTAX.validateDelegateDecl = function (def) {
@@ -33,18 +53,25 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      * @return {Function}
      */
     ria.__SYNTAX.compileDelegate = function (name, def) {
-        return ria.__API.delegate(
+        var delegate = ria.__API.delegate(
             name,
             def.retType ? def.retType.value : null,
             def.argsTypes.map(function (_) { return _.value; }),
-            def.argsNames);
+            def.argsNames,
+            def.genericTypes);
+
+        delegate.OF = ria.__SYNTAX.OF;
+
+        _DEBUG && Object.freeze(delegate);
+
+        return delegate;
     };
 
     /**
      * @function
      */
     function DELEGATE() {
-        var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
+        var def = ria.__SYNTAX.parseDelegate(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
         ria.__SYNTAX.validateDelegateDecl(def);
         var name = ria.__SYNTAX.getFullName(def.name);
         var delegate = ria.__SYNTAX.compileDelegate(name, def);

@@ -207,16 +207,9 @@
         return new SpecifyDescriptor(this, ria.__API.clone(arguments));
     };
 
-    function GeneralizedType(name, specs) {
-        this.name = name;
-        this.specs = specs;
+    function GenericToken(desc) {
+        this.value = desc;
     }
-
-    ria.__SYNTAX.GeneralizedType = GeneralizedType;
-
-    ria.__SYNTAX.isGeneralizedType = function (type) {
-        return type instanceof GeneralizedType;
-    };
 
     function GeneralizeDescriptor(types) {
         this.types = types.slice();
@@ -225,11 +218,11 @@
     }
 
     GeneralizeDescriptor.prototype.define = function () {
-        types.forEach(function (type) { window[type.name] = type; });
+        this.types.forEach(function (type) { window[type.name] = type; });
     };
 
     GeneralizeDescriptor.prototype.undefine = function () {
-        types.forEach(function (type) { delete window[type.name]; });
+        this.types.forEach(function (type) { delete window[type.name]; });
     };
 
     ria.__SYNTAX.GENERIC = function GENERIC() {
@@ -268,7 +261,7 @@
                 } while (true);
             }
 
-            types.push(new GeneralizedType(name, specs));
+            types.push(new ria.__API.GeneralizedType(name, specs));
         }
 
         return new GeneralizeDescriptor(types);
@@ -295,6 +288,9 @@
 
         if (token instanceof ImplementsDescriptor)
             return new ImplementsToken(token.ifcs);
+
+        if (token instanceof GeneralizeDescriptor)
+            return new GenericToken(token);
 
         if (Array.isArray(token) && token.length == 1 && Array.isArray(token[0]))
             return new DoubleArrayToken(token[0].map(this.token), token);
@@ -345,6 +341,7 @@
     Tokenizer.SelfToken = SelfToken;
     Tokenizer.ExtendsToken = ExtendsToken;
     Tokenizer.ImplementsToken = ImplementsToken;
+    Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
 })();

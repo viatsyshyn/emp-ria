@@ -2,118 +2,79 @@
     "use strict";
 
     TestCase("AnnotationTestCase").prototype = {
+
+        setUp: function () {
+            window.SELF = ria.__SYNTAX.Modifiers.SELF;
+        },
+
         testBuildAnnotation: function () {
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            var result = ANNOTATION(
                 [[String, String]],
-                function compare(_1, _2) {}
-            ]));
-
-            assertNoException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            });
-
-            var result = ria.__SYNTAX.compileAnnotation('Compare', annotation);
+                function Compare(_1, _2) {});
 
             assertNotUndefined(result);
             assertFunction(result);
             assertTrue(ria.__API.isAnnotation(result));
-            assertEquals('Compare', result.__META.name);
+            assertEquals('test.Compare', result.__META.name);
         },
 
         testBuildAnnotationWithAnnotation: function () {
 
             var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Annotations are not supported in annotations'),
                 [MyAnnotation],
                 [[String, String]],
-                function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithFINAL: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Modifiers are not supported in annotations'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.FINAL, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                FINAL, function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithAbstract: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Modifiers are not supported in annotations'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.ABSTRACT, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                ABSTRACT, function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithOverride: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Modifiers are not supported in annotations'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.OVERRIDE, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                OVERRIDE, function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithReturnType: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Return type is not supported in annotations'),
                 [[String, String]],
-                Boolean, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                Boolean, function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithVoid: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Return type is not supported in annotations'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.VOID, function compare(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+                VOID, function compare(_1, _2) {});
         },
 
         testBuildAnnotationWithSelf: function () {
 
-            var annotation = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
+            ANNOTATION_E(Error('Return type is not supported in annotations'),
                 [[String, String]],
-                ria.__SYNTAX.Modifiers.SELF, function compare(_1, _2) {}
-            ]));
+                SELF, function compare(_1, _2) {});
+        },
 
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+        testBuildAnnotationWithSelfArgs: function () {
 
-            var annotation2 = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([
-                [[String, ria.__SYNTAX.Modifiers.SELF]],
-                function compare2(_1, _2) {}
-            ]));
-
-            assertException(function() {
-                ria.__SYNTAX.validateAnnotationDecl(annotation);
-            }, 'Error');
+            ANNOTATION_E(Error('Argument type can\'t be SELF in annotations'),
+                [[String, SELF]],
+                function compare2(_1, _2) {});
         }
     };
 

@@ -195,20 +195,32 @@
             throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type) + ' but got ' + ria.__API.getIdentifierOfValue(value));
     };
 
+    function resolveGenericType(type, generics, specs) {
+        var index = generics.indexOf(type);
+        if (index >= 0)
+            return specs[index] || Object;
+
+        return type;
+    }
+
     if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
-            function (body, meta, scope, args) {
+            function (body, meta, scope, args, callSession, genericTypes, specs) {
                 try {
-                    ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args);
+                    var types = meta.argsTypes.map(function(type) {
+                        return resolveGenericType(type, genericTypes || [], specs || []);
+                    });
+                    ria.__SYNTAX.checkArgs(meta.argsNames, types, args);
                 } catch (e) {
                     throw new ria.__API.Exception('Bad argument for ' + meta.name, e);
                 }
             });
 
         ria.__API.addPipelineMethodCallStage('AfterCall',
-            function (body, meta, scope, args, result) {
+            function (body, meta, scope, args, result, callSession, genericTypes, specs) {
                 try {
-                    ria.__SYNTAX.checkReturn(meta.ret, result);
+                    var retType = resolveGenericType(meta.ret, genericTypes || [], specs || []);
+                    ria.__SYNTAX.checkReturn(retType, result);
                 } catch (e) {
                     throw new ria.__API.Exception('Bad return of ' + meta.name, e);
                 }

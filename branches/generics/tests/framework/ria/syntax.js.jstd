@@ -2,6 +2,7 @@ load:
   - _cfg.js
   - ../../../src/framework/ria/base/*.js
   - ../../../src/framework/ria/syntax/*.js
+  - syntax.symbols.js
 
 test:
   - syntax/*_test.js

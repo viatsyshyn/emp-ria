@@ -1,85 +1,16 @@
 (function (ria) {
     "use strict";
 
-    var OVERRIDE = ria.__SYNTAX.Modifiers.OVERRIDE;
-    var ABSTRACT = ria.__SYNTAX.Modifiers.ABSTRACT;
-    var VOID = ria.__SYNTAX.Modifiers.VOID;
-    var SELF = ria.__SYNTAX.Modifiers.SELF;
-    var FINAL = ria.__SYNTAX.Modifiers.FINAL;
-    var READONLY = ria.__SYNTAX.Modifiers.READONLY;
-
-    var Class = ria.__API.Class;
-    var Interface = ria.__API.Interface;
-    var Exception = ria.__API.Exception;
-
-    var IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
-    /** @type {Function} */
-    var EXTENDS = ria.__SYNTAX.EXTENDS;
-    /** @type {Function} */
-    var VALIDATE_ARG = ria.__SYNTAX.checkArg;
-    /** @type {Function} */
-    var VALIDATE_ARGS = ria.__SYNTAX.checkArgs;
-    /** @type {Function} */
-    var ArrayOf = ria.__API.ArrayOf;
-    /** @type {Function} */
-    var ClassOf = ria.__API.ClassOf;
-    /** @type {Function} */
-    var ImplementerOf = ria.__API.ImplementerOf;
-
-    /**
-     * @param [arg*]
-
-     */
-    function CLASS(arg) {
-        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
-        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-        ria.__SYNTAX.validateClassDecl(def, 'Class');
-        return ria.__SYNTAX.compileClass('test.' + def.name, def);
-    }
-
-    function INTERFACE() {
-        var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
-        ria.__SYNTAX.validateInterfaceDecl(def);
-        return ria.__SYNTAX.compileInterface('test.' + def.name, def);
-    }
-
-    /**
-     * @param {Error} error
-     * @param [arg*]
-     * @return {*}
-     */
-    function CLASS_E(error, arg) {
-        var args = ria.__API.clone(arguments);
-        if (error instanceof Error)
-            args.shift();
-        else
-            error = null;
-
-        try {
-            var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
-            ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-            ria.__SYNTAX.validateClassDecl(def, 'Class');
-            ria.__SYNTAX.compileClass('test.' + def.name, def);
-        } catch (e) {
-            if (e.name == 'AssertError')
-                throw e;
-
-            if (error && e.message != error.message) {
-                fail('Expected error "' + error.message + '", actual: "' + e + '"');
-            }
-
-            return null;
-        }
-
-        fail('Expected error ' + (error ? error.message : null));
-    }
-
     TestCase("ClassTestCase").prototype = {
 
         /*setUp: function () {
             ria.__SYNTAX.Registry.cleanUp();
             ria.__SYNTAX.registerSymbolsMeta();
         },*/
+
+        setUp: function () {
+            window.SELF = ria.__SYNTAX.Modifiers.SELF;
+        },
 
         tearDown: function () {
             ria.__SYNTAX.Registry.cleanUp();

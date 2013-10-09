@@ -191,4 +191,15 @@ ria.__API = ria.__API || {};
     ria.__API.defer = function defer(scope, method, args_, delay_) {
         setTimeout(function () { method.apply(scope, args_ || []); }, delay_ || 1);
     };
+
+    function GeneralizedType(name, specs) {
+        this.name = name;
+        this.specs = specs;
+    }
+
+    ria.__API.GeneralizedType = GeneralizedType;
+
+    ria.__API.isGeneralizedType = function (type) {
+        return type instanceof GeneralizedType;
+    };
 })();
