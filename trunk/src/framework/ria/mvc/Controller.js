@@ -13,6 +13,7 @@ NAMESPACE('ria.mvc', function () {
 
     /** @class ria.mvc.ControllerUri */
     ANNOTATION(
+        [[String]],
         function ControllerUri(value) {});
 
     /** @class ria.mvc.AccessFor */
@@ -23,7 +24,10 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         function Inject() {});
 
-
+    /** @class ria.mvc.SessionBind */
+    ANNOTATION(
+        [[String]],
+        function SessionBind(name_) {});
 
 
     function toCamelCase(str) {
@@ -41,13 +45,6 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.IContext, 'context',
             ria.mvc.State, 'state',
             ria.mvc.IView, 'view',
-
-            function $() {
-                BASE();
-                this.context = null;
-                this.state = null;
-                this.view = null;
-            },
 
             /**
              * Method is called once Application is starting
