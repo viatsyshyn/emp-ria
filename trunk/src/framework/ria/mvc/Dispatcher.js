@@ -167,7 +167,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function loadSessionBinds_(ref, context, instanse) {
                 ref.getPropertiesReflector().forEach(function (_) {
                     if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
-                        var name = _.getAnnotations(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
                         _.invokeSetterOn(instanse, _.getType()(context.getSession().get(name, '')));
                     }
                 }.bind(this));
@@ -177,7 +177,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function storeSessionBinds_(ref, context, instanse) {
                 ref.getPropertiesReflector().forEach(function (_) {
                     if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
-                        var name = _.getAnnotations(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
                         context.getSession().set(name, String(_.invokeGetterOn(instanse)));
                     }
                 }.bind(this));
