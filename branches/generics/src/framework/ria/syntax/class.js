@@ -255,7 +255,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         //validate method return
         var mrtv = getTypeFromToken(method.retType, FakeSelf, null),
-            brtv = ria.__SYNTAX.resolveGenericType(ifcMethodMeta.retType, genericTypes, genericSpecs);
+            brtv = ria.__API.resolveGenericType(ifcMethodMeta.retType, genericTypes, genericSpecs);
         if (mrtv !== brtv && (mrtv === null || mrtv === undefined || !ria.__SYNTAX.checkTypeHint(mrtv, brtv))) {
             throw Error('Method "' + method.name + '" returns ' + ria.__API.getIdentifierOfType(mrtv)
                 + ', but base returns ' + ria.__API.getIdentifierOfType(brtv));
@@ -267,7 +267,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 return ;
 
             var matv = getTypeFromToken(method.argsTypes[index], FakeSelf, Object),
-                batv = ria.__SYNTAX.resolveGenericType(ifcMethodMeta.argsTypes[index] || Object, genericTypes, genericSpecs);
+                batv = ria.__API.resolveGenericType(ifcMethodMeta.argsTypes[index] || Object, genericTypes, genericSpecs);
 
             if (!ria.__SYNTAX.checkTypeHint(batv, matv)) {
                 throw Error('Method "' + method.name + '" accepts ' + ria.__API.getIdentifierOfType(matv)

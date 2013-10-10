@@ -49,10 +49,18 @@
         return ifc && (ifc.__META instanceof InterfaceDescriptor);
     };
 
-    ria.__API.implements = function (value, ifc) {
+    ria.__API.implements = function (value, ifc, genericTypes, genericSpecs) {
         return (value.__META || ria.__API.getConstructorOf(value).__META).ifcs.some(function (impl) {
             if (ria.__API.isSpecification(impl))
-                return ria.__API.isSpecification(ifc) && ifc.specs.every(function (_, index) { return _ == impl.specs[index]; });
+                return ria.__API.isSpecification(ifc) && ifc.specs.every(function (_, index) {
+                    var implType = impl.specs[index];
+                    if (ria.__API.isGeneralizedType(implType)) {
+                        implType = (value instanceof ria.__API.Class)
+                            ? value.getSpecsOf(implType.name)
+                            : ria.__API.resolveGenericType(implType, genericTypes || [], genericSpecs || []);
+                    }
+                    return implType == ria.__API.resolveGenericType(_, genericTypes || [], genericSpecs || []);
+                });
 
             if (ria.__API.isSpecification(ifc))
                 return ifc.type == impl;

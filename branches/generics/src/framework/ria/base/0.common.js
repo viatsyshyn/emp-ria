@@ -93,7 +93,7 @@ ria.__API = ria.__API || {};
      * @param {Object} type
      * @return {String}
      */
-    ria.__API.getIdentifierOfType = function getType(type) {
+    ria.__API.getIdentifierOfType = function getType(type, genericTypes, genericSpecs) {
         if (type === undefined) return 'void';
         //if (type === __API.Modifiers.SELF) return 'SELF';
         if (type === null) return '*';
@@ -107,7 +107,10 @@ ria.__API = ria.__API || {};
         if (type === Object) return 'Object';
 
         if (ria.__API.isSpecification(type)) {
-            return getType(type.type) + '.OF(' + type.specs.map(getType).join(', ') + ')';
+            return getType(type.type, genericTypes || [], genericSpecs || [])
+                + '.OF(' + type.specs.map(function (type) {
+                    return getType(resolveGenericType(type, genericTypes || [], genericSpecs || []), genericTypes || [], genericSpecs || [])
+                }).join(', ') + ')';
         }
 
         if (ria.__API.isArrayOfDescriptor(type) || ria.__API.isClassOfDescriptor(type) || ria.__API.isImplementerOfDescriptor(type))
@@ -144,8 +147,16 @@ ria.__API = ria.__API || {};
         if (Array.isArray(value))
             return 'Array';
 
-        if (ria.__API.getConstructorOf(value).__META)
-            return ria.__API.getConstructorOf(value).__META.name;
+        if (ria.__API.getConstructorOf(value).__META) {
+            var meta = ria.__API.getConstructorOf(value).__META;
+            var name = meta.name;
+            if (meta.genericTypes.length) {
+                name += '.OF(' + meta.genericTypes.map(function (type) {
+                    return ria.__API.getIdentifierOfType(value.getSpecsOf(type.name));
+                }) + ')';
+            }
+            return name;
+        }
 
         if (value instanceof Object) {
             var ctor = ria.__API.getConstructorOf(value);
@@ -216,5 +227,17 @@ ria.__API = ria.__API || {};
 
     ria.__API.isSpecification = function (type) {
         return type instanceof SpecifyDescriptor;
+    };
+
+    function resolveGenericType(type, generics, specs) {
+        if (ria.__API.isGeneralizedType(type)) {
+            var index = generics.indexOf(type);
+            if (index >= 0)
+                return specs[index] || Object;
+        }
+
+        return type;
     }
+
+    ria.__API.resolveGenericType = resolveGenericType;
 })();
