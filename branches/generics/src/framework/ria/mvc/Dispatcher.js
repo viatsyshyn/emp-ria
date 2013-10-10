@@ -100,9 +100,15 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.IContext]],
             ria.async.Future, function initControllers(context) {
                 var onAppInitFutures = [];
-                for(var name in this.controllers) if (this.controllers.hasOwnProperty(name)) {
-                    onAppInitFutures.push(this.prepareInstance_(this.controllers[name], context).onAppInit());
-                }
+                for(var name in this.controllers) if (this.controllers.hasOwnProperty(name)) (function (ref) {
+                    var instance = this.prepareInstance_(ref, context);
+                    this.loadSessionBinds_(ref, context, instance);
+                    onAppInitFutures.push(instance
+                        .onAppInit()
+                        .then(function () {
+                            this.storeSessionBinds_(ref, context, instance);
+                        }, this));
+                }).call(this, this.controllers[name]);
 
                 return ria.async.wait(onAppInitFutures);
             },
@@ -157,15 +163,34 @@ NAMESPACE('ria.mvc', function () {
                 return instanse;
             },
 
+            [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
+            VOID, function loadSessionBinds_(ref, context, instanse) {
+                ref.getPropertiesReflector().forEach(function (_) {
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        _.invokeSetterOn(instanse, _.getType()(context.getSession().get(name, '')));
+                    }
+                }.bind(this));
+            },
+
+            [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
+            VOID, function storeSessionBinds_(ref, context, instanse) {
+                ref.getPropertiesReflector().forEach(function (_) {
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        context.getSession().set(name, String(_.invokeGetterOn(instanse)));
+                    }
+                }.bind(this));
+            },
+
             [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
             Class, function prepareInstance_(ref, context) {
                 var instanse = ref.instantiate();
 
                 ref.getPropertiesReflector().forEach(function (_) {
-                    if (_.isReadonly()) return;
-                    if (!_.isAnnotatedWith(ria.mvc.Inject)) return;
-
-                    _.invokeSetterOn(instanse, this.getCached_(_.getType(), context));
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.Inject)) {
+                        _.invokeSetterOn(instanse, this.getCached_(_.getType(), context));
+                    }
                 }.bind(this));
 
                 if (ref.implementsIfc(ria.mvc.IContextable)) {
@@ -211,13 +236,18 @@ NAMESPACE('ria.mvc', function () {
                                 throw new ria.mvc.MvcException('Controller with id "' + state.getController() + '" not found');
                             }
 
-                            var instanse = this.prepareInstance_(this.controllers[state.getController()], context);
+                            var ref = this.controllers[state.getController()];
+                            var instanse = this.prepareInstance_(ref, context);
+
+                            this.loadSessionBinds_(ref, context, instanse);
 
                             instanse.onInitialize();
                             instanse.dispatch(state);
 
                             if (!state.isDispatched())
                                 continue;
+
+                            this.storeSessionBinds_(ref, context, instanse);
 
                             for(index = this.plugins.length; index > 0; index--)
                                 this.plugins[index - 1].postDispatch(state);
