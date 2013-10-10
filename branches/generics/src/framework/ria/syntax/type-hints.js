@@ -17,7 +17,7 @@
             try {
                 var drt = ria.__API.resolveGenericType(delegate.ret, genericTypes, genericSpecs);
 
-                if (method.ret !== drt && !checkTypeHint(method.ret, drt)) { //noinspection ExceptionCaughtLocallyJS
+                if (delegate.ret !== null && method.ret !== drt && !checkTypeHint(method.ret, drt)) { //noinspection ExceptionCaughtLocallyJS
                     throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.ret)
                         + ', but delegate expects ' + ria.__API.getIdentifierOfType(drt));
                 }
