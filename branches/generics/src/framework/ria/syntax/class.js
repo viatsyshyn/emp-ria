@@ -640,7 +640,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             def.ifcs.values,//.map(function (_) { return _.value }),
             def.annotations.map(function (_) { return _.value }),
             def.flags.isAbstract,
-            def.genericTypes);
+            def.genericTypes,
+            def.base.specs || []);
 
         def.properties.forEach(
             /**
@@ -705,19 +706,29 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     if (ria.__CFG.enablePipelineMethodCall) {
         ria.__API.addPipelineMethodCallStage('CallInit',
-            function (body, meta, scope, callSession) {
+            function (body, meta, scope, callSession, genericTypes, genericSpecs) {
                 callSession.__OLD_SELF = window.SELF;
                 window.SELF = body.__SELF;
 
                 callSession.__OLD_BASE = window.BASE;
                 var base = body.__BASE_BODY;
                 window.BASE = base
-                    ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope)
+                    ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope, genericTypes, genericSpecs)
                     : BaseIsUndefined;
+
+                (genericTypes || []).forEach(function (type, index) {
+                    callSession['__OLD_' + type.name] = window[type.name];
+                    window[type.name] = genericSpecs[index];
+                });
             });
 
         ria.__API.addPipelineMethodCallStage('CallFinally',
-            function (body, meta, scope, callSession) {
+            function (body, meta, scope, callSession, genericTypes, genericSpecs) {
+                (genericTypes || []).forEach(function (type, index) {
+                    window[type.name] = callSession['__OLD_' + type.name];
+                    delete callSession['__OLD_' + type.name];
+                });
+
                 window.SELF = callSession.__OLD_SELF;
                 delete callSession.__OLD_SELF;
 

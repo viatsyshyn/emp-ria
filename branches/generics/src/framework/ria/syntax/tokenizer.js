@@ -261,7 +261,7 @@
                     }
 
                     throw Error('Only ClassOf() or ImplementerOf() are supported as restrictions of GeneralizedType')
-                } while (true);
+                } while (args.length);
             }
 
             types.push(new ria.__API.GeneralizedType(name, specs));

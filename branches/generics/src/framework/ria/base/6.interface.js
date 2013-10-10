@@ -51,8 +51,12 @@
 
     ria.__API.implements = function (value, ifc, genericTypes, genericSpecs) {
         return (value.__META || ria.__API.getConstructorOf(value).__META).ifcs.some(function (impl) {
-            if (ria.__API.isSpecification(impl))
-                return ria.__API.isSpecification(ifc) && ifc.specs.every(function (_, index) {
+            if (ria.__API.isSpecification(impl)) {
+                if (!ria.__API.isSpecification(ifc)) {
+                    return impl.type == ifc;
+                }
+
+                return  ifc.specs.every(function (_, index) {
                     var implType = impl.specs[index];
                     if (ria.__API.isGeneralizedType(implType)) {
                         implType = (value instanceof ria.__API.Class)
@@ -61,6 +65,7 @@
                     }
                     return implType == ria.__API.resolveGenericType(_, genericTypes || [], genericSpecs || []);
                 });
+            }
 
             if (ria.__API.isSpecification(ifc))
                 return ifc.type == impl;

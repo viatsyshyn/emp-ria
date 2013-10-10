@@ -8,6 +8,8 @@ NAMESPACE('ria.mvc', function () {
      */
     INTERFACE(
         'IStateSerializer', [
+            String, 'separator',
+
             [[ria.mvc.State]],
             String, function serialize(state) {},
 

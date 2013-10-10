@@ -8,9 +8,12 @@
      * @param {String} name
      * @param {Function} base
      * @param {Function[]} ifcs
-     * @param {Annotation[]} anns
+     * @param {Array} anns
+     * @param {Array} isAbstract
+     * @param {Array} genericTypes
+     * @param {Array} baseSpecs
      */
-    function ClassDescriptor(name, base, ifcs, anns, isAbstract, genericTypes) {
+    function ClassDescriptor(name, base, ifcs, anns, isAbstract, genericTypes, baseSpecs) {
         this.name = name;
         this.base = base;
         //noinspection JSUnusedGlobalSymbols
@@ -23,7 +26,19 @@
         this.defCtor = null;
         this.ctors = [];
         this.children = [];
-        this.genericTypes = genericTypes;
+
+        var gt = [];
+        var bs = [];
+
+        if (base) {
+            bs = base.__META.baseSpecs || [];
+            gt = base.__META.genericTypes.filter(function (bt) {
+                return (genericTypes || []).every(function (_) { return _.name != bt.name });
+            });
+        }
+
+        this.genericTypes = gt.concat(genericTypes);
+        this.baseSpecs = bs.concat((baseSpecs || []).filter(function (_) { return !ria.__API.isGeneralizedType(_); } ));
     }
 
     ClassDescriptor.prototype.addProperty = function (name, ret, anns, getter, setter) {
@@ -86,11 +101,13 @@
      * @param {Function[]} [ifcs_]
      * @param {Annotation[]} [anns_]
      * @param {Boolean} [isAbstract_]
+     * @param {Array} genericTypes_
+     * @param {Array} baseSpecs_
      */
-    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_, genericTypes_) {
+    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_, genericTypes_, baseSpecs_) {
         clazzRegister[name] = clazz;
 
-        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false, genericTypes_ || []);
+        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false, genericTypes_ || [], baseSpecs_ || []);
         if (base_) {
             ria.__API.extend(clazz, base_);
             base_.__META.addChild(clazz);
@@ -168,10 +185,9 @@
 
         var genericTypes = clazz.__META.genericTypes || [],
             genericTypesLength = genericTypes.length,
-            specs = args.slice(0, genericTypesLength);
+            genericSpecs = clazz.__META.baseSpecs.concat(args.slice(0, genericTypesLength));
 
         args = args.slice(genericTypesLength);
-
 
         var publicInstance = instance;
         if (_DEBUG) {
@@ -188,7 +204,7 @@
             if (typeof f_ === 'function' && !(/^\$.*/.test(name_)) && name_ !== 'constructor') {
                 instance[name_] = f_.bind(instance);
                 if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
-                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, specs);
+                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
                     if (_DEBUG) {
                         Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
                         if (f_.__META.isProtected())
@@ -205,12 +221,12 @@
         }
 
         if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
-            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, specs);
+            ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
         }
 
         instance.__SPECS = {};
         genericTypes.forEach(function (_, index) {
-            instance.__SPECS[_.name] = specs[index];
+            instance.__SPECS[_.name] = genericSpecs[index];
         });
 
         if (_DEBUG) for(var name in clazz.__META.properties) {
