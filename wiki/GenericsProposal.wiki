@@ -201,3 +201,24 @@ test.MyClass = function () {
   return MyClass;
 }();
 }}}
+
+{{{
+CLASS(
+  'MyChildClass', EXTENDS(test.MyClass.OF(String, Number)), [
+    [[String, Number]],
+    OVERRIDE, Boolean, function compare(_1, _2) {}
+  ]);
+}}}
+
+{{{
+test.MyChildClass = function () {
+  function MyChildClass() {}
+  ria.__API.clazz(MyChildClass, 'test.MyChildClass', test.MyClass
+     , [], [], [TKey, TValue], [String, Number]);
+
+  MyChildClass.prorotype.compare = function (_1, _2) {};
+  ria.__API.method(MyChildClass, MyChildClass.prototype.compare, 'compare', Boolean, [String, Number], []);
+
+  return MyChildClass;
+}();
+}}}
