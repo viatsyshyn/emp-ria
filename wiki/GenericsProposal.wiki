@@ -164,3 +164,64 @@ if (ria.__API.isSpecifyDescriptor(clazz)) {
 }
 
 }}}
+
+Compilation
+
+{{{
+DELEGATE(
+  GENERIC('TKey', 'TValue'),
+  [[TValue]],
+  TKey, function Indexer(value) {});
+}}}
+
+{{{
+test.Indexer = function () {
+  var TKey = new ria.__API.GenerializedType('TKey');
+  var TValue = new ria.__API.GenerializedType('TValue');
+  return ria.__API.delegate('test.Indexer', TKey, [TValue], ['value'], [TKey, TValue]);
+}();
+}}}
+
+{{{
+INTERFACE(
+  GENERIC('TKey', 'TValue'),
+  'MyComparatorIfc', [
+    [[TKey, TValue]],
+    Boolean, function compare(_1, _2) {}
+  ]
+}}}
+
+{{{
+test.MyComparatorIfc = function () {
+  var TKey = new ria.__API.GenerializedType('TKey');
+  var TValue = new ria.__API.GenerializedType('TValue');
+  return ria.__API.ifc('test.MyComparatorIfc', [
+    ['compare', Boolean, [TKey, TValue], ['_1', '_2']]
+  ], [TKey, TValue]); 
+}();
+}}}
+
+{{{
+CLASS(
+  GENERIC('TKey', 'TValue'),
+  'MyClass', IMPLEMENTS(test.MyComparatorIfc.OF(TKey, TValue), [
+    [[TKey, TValue]],
+    Boolean, function compare(_1, _2) {}
+  ]);
+}}}
+
+{{{
+test.MyClass = function () {
+  var TKey = new ria.__API.GenerializedType('TKey');
+  var TValue = new ria.__API.GenerializedType('TValue');
+
+  function MyClass() {}
+  ria.__API.clazz(MyClass, 'test.MyClass', ria.__API.Class
+     , [ria.__API.specify(test.MyComparatorIfc, TKey, TValue)], [], [TKey, TValue]);
+
+  MyClass.prorotype.compare = function (_1, _2) {};
+  ria.__API.method(MyClass, MyClass.prototype.compare, 'compare', Boolean, [TKey, TValue], []);
+
+  return MyClass;
+}();
+}}}
