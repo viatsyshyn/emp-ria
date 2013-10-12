@@ -141,31 +141,7 @@ Dictionary = function () {
 }();
 }}}
 
-{{{
-
-if (ria.__API.isGeneralizedType(clazz)) {
-  return checkTypeHints(value, scope.getSpecsOf(clazz.name));
-}
-
-if (ria.__API.isSpecifyDescriptor(clazz)) {
-  if (ria.__API.isClassDescriptor(value)) {
-    return false;
-  }
-
-  if (ria.__API.isSpecifyDescriptor(value)) {
-    return clazz.toString() === value.toString();
-  }
-
-  if (!(value instance of clazz.ctor)) return false;
-
-  return clazz.specs.all(function (genType) {
-    return checkTypeHints(value.getSpecsOf(genType.name), genType.typeHints);
-  });
-}
-
-}}}
-
-Compilation
+=== Compilation ===
 
 {{{
 DELEGATE(
