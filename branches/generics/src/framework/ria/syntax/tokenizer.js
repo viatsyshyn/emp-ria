@@ -207,7 +207,19 @@
     };
 
     ria.__SYNTAX.OF = function OF() {
-        return new ria.__API.SpecifyDescriptor(this, ria.__API.clone(arguments));
+        var specs = ria.__API.clone(arguments),
+            clazz = this,
+            baseSpecs = clazz.__META.baseSpecs || [],
+            genericTypes = clazz.__META.genericTypes.slice(baseSpecs.length);
+
+        genericTypes.forEach(function (type, index) {
+            var spec = specs[index];
+            type.specs.forEach(function (restriction) {
+                ria.__SYNTAX.checkArg(type.name, restriction, spec);
+            });
+        });
+
+        return new ria.__API.specify(clazz, specs);
     };
 
     function GenericToken(desc) {

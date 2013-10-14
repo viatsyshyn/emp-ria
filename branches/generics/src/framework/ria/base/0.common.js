@@ -225,6 +225,10 @@ ria.__API = ria.__API || {};
 
     ria.__API.SpecifyDescriptor = SpecifyDescriptor;
 
+    ria.__API.specify = function (type, specs) {
+        return new SpecifyDescriptor(type, specs);
+    };
+
     ria.__API.isSpecification = function (type) {
         return type instanceof SpecifyDescriptor;
     };

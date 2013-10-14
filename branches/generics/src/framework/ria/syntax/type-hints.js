@@ -175,8 +175,8 @@
      * @param {String} name
      * @param {Array} type
      * @param {*} value
-     * @param {Array} genericTypes
-     * @param {Array} genericSpecs
+     * @param {Array} [genericTypes]
+     * @param {Array} [genericSpecs]
      */
     ria.__SYNTAX.checkArg = function (name, type, value, genericTypes, genericSpecs) {
         var isOptional = IS_OPTIONAL.test(name);
