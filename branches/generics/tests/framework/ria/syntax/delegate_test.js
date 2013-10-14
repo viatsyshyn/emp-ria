@@ -73,7 +73,7 @@
             assertTrue(ria.__API.isGeneralizedType(delegate.__META.argsTypes[0]));
             assertTrue(ria.__API.isGeneralizedType(delegate.__META.argsTypes[1]));
 
-            assertEquals(ria.__SYNTAX.OF, delegate.OF);
+            assertEquals(ria.__API.OF, delegate.OF);
         }
     };
 

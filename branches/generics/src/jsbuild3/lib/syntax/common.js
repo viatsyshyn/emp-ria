@@ -59,6 +59,27 @@ function TraverseNS(parts, top, right) {
         right);
 }
 
+function CompileGenericTypes(types, node) {
+    return make_node(UglifyJS.AST_Var, node, {
+        definitions: types
+            .map(function (d) {
+                var name = d[0],
+                    specs = d[1];
+
+                return make_node(UglifyJS.AST_VarDef, node, {
+                    name: make_node(UglifyJS.AST_SymbolVar, name.raw, { name: name.value }),
+                    value: make_node(UglifyJS.AST_Call, node, {
+                        expression: getNameTraversed('ria.__API'.split('.'), 'getGeneralizedType'),
+                        args: [
+                            name.raw,
+                            make_node(UglifyJS.AST_Array, null, {elements: specs})
+                        ]
+                    })
+                })
+            })
+        })
+}
+
 function SymbolsCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
         var name = node.name;

@@ -60,7 +60,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             def.argsNames,
             def.genericTypes);
 
-        delegate.OF = ria.__SYNTAX.OF;
+        delegate.OF = ria.__API.OF;
 
         _DEBUG && Object.freeze(delegate);
 

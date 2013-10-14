@@ -1,6 +1,9 @@
 (function (ria) {
     "use strict";
 
+    var _P = ria.__CFG.enablePipelineMethodCall;
+    var _C = ria.__CFG.checkedMode;
+
     TestCase("ClassTestCase").prototype = {
 
         /*setUp: function () {
@@ -8,13 +11,11 @@
             ria.__SYNTAX.registerSymbolsMeta();
         },*/
 
-        setUp: function () {
-            window.SELF = ria.__SYNTAX.Modifiers.SELF;
-        },
-
         tearDown: function () {
-            ria.__SYNTAX.Registry.cleanUp();
-            ria.__SYNTAX.registerSymbolsMeta();
+            if (ria.__SYNTAX) {
+                ria.__SYNTAX.Registry.cleanUp();
+                ria.__SYNTAX.registerSymbolsMeta();
+            }
         },
 
         testSelf: function () {
@@ -714,23 +715,23 @@
 
                     function $() {
                         BASE();
-                        assertEquals(BaseClass, window.SELF);
+                        assertEquals(BaseClass, SELF);
                     },
 
                     VOID, function method() {
-                        assertEquals(BaseClass, window.SELF);
+                        assertEquals(BaseClass, SELF);
                     }
                 ]);
 
-            assertNotEquals(BaseClass, window.SELF);
+            assertNotEquals(BaseClass, SELF);
 
             var instance = new BaseClass();
 
-            assertNotEquals(BaseClass, window.SELF);
+            assertNotEquals(BaseClass, SELF);
 
             instance.method();
 
-            assertNotEquals(BaseClass, window.SELF);
+            assertNotEquals(BaseClass, SELF);
         },
 
         testPropertyInheritance: function () {
@@ -754,17 +755,18 @@
 
             var instance = new BaseClass();
 
-            assertUndefined(instance.value);
+            _C && assertUndefined(instance.value);
             instance.method(5);
-            assertUndefined(instance.value);
+            _C && assertUndefined(instance.value);
 
-            assertEquals(5, instance.__PROTECTED.value);
+            _C && assertEquals(5, instance.__PROTECTED.value);
+            _C || assertEquals(5, instance.value);
 
             assertEquals(5, instance.getValue());
 
-            assertUndefined(instance.value);
+            _C && assertUndefined(instance.value);
             assertNoException(function (){ instance.setValue(6); });
-            assertUndefined(instance.value);
+            _C && assertUndefined(instance.value);
 
             assertEquals(6, instance.getValue());
         },
@@ -1086,7 +1088,7 @@
                         assertFunction(ctor);
                         assertEquals(BaseClass.prototype.$, ctor);
                         assertEquals([1,2,'3'], args);
-                        assertEquals(BaseClass, window.SELF);
+                        assertEquals(BaseClass, SELF);
 
                         return ria.__API.init(instance, clazz, ctor, ria.__API.clone(args).map(Number));
                     },
@@ -1275,13 +1277,13 @@
                 Application.RUN(instance);
             });
 
-            assertException(function () {
+            _P && assertException(function () {
                 Application.RUN(1);
-            });
+            }, Error('Bad argument for RUN'));
 
-            assertException(function () {
+            _P && assertException(function () {
                 Application.RUN(instance, 3);
-            });
+            }, Error('Bad argument for RUN'));
 
             CLASS_E(Error('Base call are forbidden for non overriden methods. Method: "RUN_"'),
                 'Application', [
@@ -1394,14 +1396,14 @@
             assertTrue(ria.__API.isGeneralizedType(MyConverter.__META.methods.convert.retType));
             assertTrue(ria.__API.isGeneralizedType(MyConverter.__META.methods.convert.argsTypes[0]));
 
-            assertEquals(ria.__SYNTAX.OF, MyConverter.OF);
-
             var instance = new MyConverter(String, String);
             assertNoException(function () {
                 instance.convert("test");
             });
 
-            assertException(function () {
+            assertEquals(ria.__API.OF, MyConverter.OF);
+
+            _P && assertException(function () {
                 instance.convert(5);
             }, Error('Bad argument for convert'));
         },
@@ -1493,7 +1495,7 @@
                 i2.convert("test");
             });
 
-            assertException(function () {
+            _P && assertException(function () {
                 i2.convert(5);
             }, Error('Bad argument for convert'));
         },
@@ -1559,15 +1561,15 @@
                 ins.add('b', false);
             });
 
-            assertException(function () {
+            _P && assertException(function () {
                 ins.add(1, true);
             }, Error('Bad argument for add'));
 
-            assertException(function () {
+            _P && assertException(function () {
                 ins.add('b', 'false');
             }, Error('Bad argument for add'))
 
-            assertException(function () {
+            _P && assertException(function () {
                 ins.find(2);
             }, Error('Bad argument for find'))
         },

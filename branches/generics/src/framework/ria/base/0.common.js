@@ -214,6 +214,10 @@ ria.__API = ria.__API || {};
 
     ria.__API.GeneralizedType = GeneralizedType;
 
+    ria.__API.getGeneralizedType = function (name, specs) {
+        return new GeneralizedType(name, specs);
+    };
+
     ria.__API.isGeneralizedType = function (type) {
         return type instanceof GeneralizedType;
     };
@@ -227,6 +231,22 @@ ria.__API = ria.__API || {};
 
     ria.__API.specify = function (type, specs) {
         return new SpecifyDescriptor(type, specs);
+    };
+
+    ria.__API.OF = function OF() {
+        var specs = ria.__API.clone(arguments),
+            clazz = this,
+            baseSpecs = clazz.__META.baseSpecs || [],
+            genericTypes = clazz.__META.genericTypes.slice(baseSpecs.length);
+
+        _DEBUG && genericTypes.forEach(function (type, index) {
+            var spec = specs[index];
+            type.specs.forEach(function (restriction) {
+                ria.__SYNTAX.checkArg(type.name, restriction, spec);
+            });
+        });
+
+        return new ria.__API.specify(clazz, specs);
     };
 
     ria.__API.isSpecification = function (type) {

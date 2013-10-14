@@ -179,7 +179,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         ria.__API.ifc(InterfaceProxy, name, methods, def.genericTypes);
 
-        InterfaceProxy.OF = ria.__SYNTAX.OF;
+        InterfaceProxy.OF = ria.__API.OF;
 
         Object.freeze(InterfaceProxy);
         ria.__SYNTAX.Registry.registry(name, InterfaceProxy);

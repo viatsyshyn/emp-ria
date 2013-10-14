@@ -14,7 +14,7 @@ function InterfaceCompiler(ns, node, descend) {
 
         var def = ria.__SYNTAX.parseClassDef(tkz);
 
-        ria.__SYNTAX.validateInterfaceDecl(def);
+        //ria.__SYNTAX.validateInterfaceDecl(def);
 
         //console.info('Found interface ' + def.name + ' in ' + ns);
 
@@ -27,23 +27,35 @@ function InterfaceCompiler(ns, node, descend) {
             ]})
         });
 
-        var result = new UglifyJS.AST_Assign({
+        return make_node(UglifyJS.AST_Assign, node, {
             left: getNameTraversed(ns.split('.'), def.name),
             operator: '=',
-            right: new UglifyJS.AST_Call({
-                expression: getNameTraversed('ria.__API'.split('.'), 'ifc'),
-                args: [
-                    make_node(UglifyJS.AST_Function, node, {argnames: [], body: []}),
-                    new UglifyJS.AST_String({value: ns + '.' + def.name}),
-                    new UglifyJS.AST_Array({elements: items})
-                ]
+            right: make_node(UglifyJS.AST_Call, node, {
+                expression: make_node(UglifyJS.AST_Function, node, {
+                    argnames: [],
+                    body: [].concat(
+                            [def.genericTypes.length ? CompileGenericTypes(def.genericTypes, node) : null],
+                            [make_node(UglifyJS.AST_Var, node, {
+                                definitions: [make_node(UglifyJS.AST_VarDef, null, {
+                                    name: make_node(UglifyJS.AST_SymbolRef, node, {name: 'ifc'}),
+                                    value: new UglifyJS.AST_Call({
+                                        expression: getNameTraversed('ria.__API'.split('.'), 'ifc'),
+                                        args: [
+                                            make_node(UglifyJS.AST_Function, node, {argnames: [], body: []}),
+                                            new UglifyJS.AST_String({value: ns + '.' + def.name}),
+                                            new UglifyJS.AST_Array({elements: items}),
+                                            make_node(UglifyJS.AST_Array, null, {elements: def.genericTypes ? def.genericTypes.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _[0].value })}) : []})
+                                        ]
+                                    })
+                                })]
+                            })],
+                            [ToAst('ifc.OF = ria.__API.OF')],
+                            [ToAst('return ifc')]
+                        ).filter(function (_) { return _ })
+                    }),
+                args: []
             })
         });
-
-        result.start = node.start;
-        result.end = node.end;
-
-        return result;
     }
 }
 

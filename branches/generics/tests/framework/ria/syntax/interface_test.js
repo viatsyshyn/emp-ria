@@ -164,7 +164,7 @@
             assertTrue(ria.__API.isGeneralizedType(MyIfc.__META.methods.convert.retType));
             assertTrue(ria.__API.isGeneralizedType(MyIfc.__META.methods.convert.argsTypes[0]));
 
-            assertEquals(ria.__SYNTAX.OF, MyIfc.OF);
+            assertEquals(ria.__API.OF, MyIfc.OF);
         },
 
         testImplementsGeneric: function () {

@@ -683,7 +683,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 compileMethodDeclaration(def, method, ClassProxy);
             });
 
-        ClassProxy.OF = ria.__SYNTAX.OF;
+        ClassProxy.OF = ria.__API.OF;
 
         ria.__API.compile(ClassProxy);
 
