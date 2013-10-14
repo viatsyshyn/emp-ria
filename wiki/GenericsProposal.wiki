@@ -214,7 +214,7 @@ CLASS(
 test.MyChildClass = function () {
   function MyChildClass() {}
   ria.__API.clazz(MyChildClass, 'test.MyChildClass', test.MyClass
-     , [], [], [TKey, TValue], [String, Number]);
+     , [], [], [], [String, Number]);
 
   MyChildClass.prorotype.compare = function (_1, _2) {};
   ria.__API.method(MyChildClass, MyChildClass.prototype.compare, 'compare', Boolean, [String, Number], []);
