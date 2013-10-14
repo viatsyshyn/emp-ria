@@ -181,7 +181,7 @@
                     Number, function convert(source) {}
                 ]);
 
-            assertFalse(ria.__API.implements(Impl, MyIfc));
+            assertTrue(ria.__API.implements(Impl, MyIfc));
             assertTrue(ria.__API.implements(Impl, MyIfc.OF(String,Number)));
             assertFalse(ria.__API.implements(Impl, MyIfc.OF(Number,String)));
 
