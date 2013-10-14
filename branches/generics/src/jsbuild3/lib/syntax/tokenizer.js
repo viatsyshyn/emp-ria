@@ -164,6 +164,7 @@
     Tokenizer.SelfToken = SelfToken;
     Tokenizer.ExtendsToken = ExtendsToken;
     Tokenizer.ImplementsToken = ImplementsToken;
+    //Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
 })();

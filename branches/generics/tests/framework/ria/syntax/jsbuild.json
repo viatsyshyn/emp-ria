@@ -1,0 +1,32 @@
+{
+    "appDir": "./",
+    "assetsDir": "./",
+
+    "libs": {
+        "ria": "../../../../src/framework/"
+    },
+
+    "options": {
+        "uglifyjs": {
+            "mangle": false,
+            "mangle_options_": {},
+            "squeeze": false,
+            "squeeze_options_": {
+                "make_seqs": true,
+                "dead_code": true,
+                "no_warnings": false,
+                "extra": false
+            },
+            "beautify": true
+        },
+        "_gcc": {
+            "cmd": "goog-cc.cmd --compilation_level SIMPLE_OPTIMIZATIONS"
+        }
+    },
+
+    "modules": [{
+        "name": "class_test",
+        "in": "./class_test.js",
+        "out": "./class_test.compiled.js"
+    }]
+}
