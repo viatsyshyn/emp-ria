@@ -36,7 +36,11 @@ function DelegateCompiler(ns, node, descend) {
                                         expression: getNameTraversed('ria.__API'.split('.'), 'delegate'),
                                         args: [
                                             make_node(UglifyJS.AST_String, null, {value: ns + '.' + method.name}),
-                                            method.retType.raw || make_node(UglifyJS.AST_Null, null, {}),
+                                            method.retType instanceof ria.__SYNTAX.Tokenizer.VoidToken
+                                                ? make_node(UglifyJS.AST_Undefined, null, {})
+                                                : (method.retType
+                                                    ? method.retType.raw
+                                                    : make_node(UglifyJS.AST_Null, null, {})),
                                             make_node(UglifyJS.AST_Array, null, {elements: method.argsTypes.map(function (_) { return _.raw; })}),
                                             make_node(UglifyJS.AST_Array, null, {elements: method.argsNames.map(function (_) { return new UglifyJS.AST_String({ value: _})})}),
                                             make_node(UglifyJS.AST_Array, null, {elements: genericTypes ? genericTypes.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _[0].value })}) : []})
