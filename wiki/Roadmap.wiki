@@ -53,9 +53,9 @@
       * ~~SELF in method body~~
     * Properties
       * ~~READONLY~~
-      * FINAL
-      * ABSTRACT 
-      * OVERRIDE of getter/setter
+      * ~~FINAL~~
+      * ~~ABSTRACT~~
+      * ~~OVERRIDE of getter/setter~~
       * ~~SELF~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
