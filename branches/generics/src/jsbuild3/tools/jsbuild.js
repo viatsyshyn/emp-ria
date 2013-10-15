@@ -4,12 +4,15 @@ var vm = require("vm");
 var sys = require("util");
 var FFI = require("ffi");
 
+console.info('Platform: ' + process.platform);
+console.info('Env: ' + process.arch);
+
 var execSync = function() {
-  var isWin = !!process.platform.match(/^win/);
+  var isWin32 = process.platform == 'win32';
 
   var run;
-  if (isWin) {
-      var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec.dll"), {
+  if (isWin32) {
+      var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec." + process.arch + ".dll"), {
         "WinExecSync": ["int32", ["string", "string"]]
       });
 
