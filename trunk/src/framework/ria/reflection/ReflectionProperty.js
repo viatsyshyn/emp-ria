@@ -26,15 +26,43 @@ NS('ria.reflection', function () {
 
             function invokeGetterOn(instance) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
+                var getter = this.property.getter;
                 _DEBUG && (instance = instance.__PROTECTED || instance);
-                return this.property.getter.call(instance);
+
+                if (ria.__CFG.enablePipelineMethodCall && getter.__META) {
+                    var genericTypes = this.clazz.__META.genericTypes;
+                    var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
+                        if (this.clazz.__META.baseSpecs.length > index)
+                            return this.clazz.__META.genericTypes[index];
+
+                        return instance.getSpecsOf(type.name);
+                    }.bind(this));
+                    getter = ria.__API.getPipelineMethodCallProxyFor(getter, getter.__META, instance, genericTypes, genericSpecs);
+                }
+
+                return getter.call(instance);
             },
 
             VOID, function invokeSetterOn(instance, value) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
                 VALIDATE_ARG('value', [this.property.retType], value);
-                _DEBUG && (instance = instance.__PROTECTED || instance);
-                this.property.setter.call(instance, value);
+                var setter = this.property.setter;
+                if (_DEBUG) {
+                    instance = instance.__PROTECTED || instance;
+                }
+
+                if (ria.__CFG.enablePipelineMethodCall && setter.__META) {
+                    var genericTypes = this.clazz.__META.genericTypes;
+                    var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
+                        if (this.clazz.__META.baseSpecs.length > index)
+                            return this.clazz.__META.genericTypes[index];
+
+                        return instance.getSpecsOf(type.name);
+                    }.bind(this));
+                    setter = ria.__API.getPipelineMethodCallProxyFor(setter, setter.__META, instance, genericTypes, genericSpecs);
+                }
+
+                setter.call(instance, value);
             }
         ]);
 });
