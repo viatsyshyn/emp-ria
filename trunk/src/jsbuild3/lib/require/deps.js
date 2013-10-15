@@ -26,7 +26,7 @@ function resolve(path, config) {
     path = path.replace(/^~\//gi, appRoot);
     path = path.replace(/^\.\//gi, appCodeDir);
 
-    if (!path.match(/^\//i))
+    if (!path.match(/^\//i) && !path.match(/^\w:\\/))
         path = appCodeDir + path;
 
     path = path.replace(/\/\//gi, '/');

@@ -4,15 +4,15 @@ var vm = require("vm");
 var sys = require("util");
 var FFI = require("ffi");
 
-console.info('Platform: ' + process.platform);
-console.info('Env: ' + process.arch);
+var isWin32 = process.platform == 'win32';
+console.info('Platform: ' + process.platform + '/' + process.arch);
 
-var execSync = function() {
-  var isWin32 = process.platform == 'win32';
-
+var execSync = function(process) {
   var run;
   if (isWin32) {
-      var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec." + process.arch + ".dll"), {
+      var libPath = path.resolve(__dirname, "WinSyncExec." + process.arch + ".dll");
+      console.info('Loading Win32 lib: ' + libPath);
+      var dll = FFI.Library(libPath, {
         "WinExecSync": ["int32", ["string", "string"]]
       });
 
@@ -36,7 +36,7 @@ var execSync = function() {
       throw Error("Error " + code + " executing " + cmd)
     }
   };
-}();
+}(process);
 
 var JsBuild3 = vm.createContext({
     sys           : sys,
