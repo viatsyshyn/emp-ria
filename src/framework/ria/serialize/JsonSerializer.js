@@ -76,12 +76,18 @@ NAMESPACE('ria.serialize', function () {
                     });
                 }
 
+                var genericSpecs = [];
+                if (ria.__API.isSpecification(clazz)) {
+                    genericSpecs.clazz.specs;
+                    clazz = clazz.type;
+                }
+
                 if (ria.__API.isClassConstructor(clazz)) {
                     if (raw === null || raw === undefined || raw == '' && chlk.models.common.ChlkDate == clazz)
                         return null;
 
                     var ref = new ria.reflection.ReflectionClass(clazz);
-                    value = ref.instantiate();
+                    value = ref.instantiate(genericSpecs);
 
                     if (ref.implementsIfc(ria.serialize.IDeserializable)) {
                         try {
