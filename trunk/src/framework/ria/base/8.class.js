@@ -189,6 +189,10 @@
 
         args = args.slice(genericTypesLength);
 
+        if (_DEBUG) {
+            ria.__API.OF.apply(clazz, genericSpecs);
+        }
+
         var publicInstance = instance;
         if (_DEBUG) {
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
