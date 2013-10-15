@@ -1,8 +1,0 @@
-load:
-  - tests/framework/ria/_cfg.release.js
-  - src/framework/lib/stacktrace.js
-  - src/framework/ria/base/*.js
-  - src/framework/ria/syntax/*.js
-
-test:
-  - tests/framework/ria/syntax/*_test.compiled.js

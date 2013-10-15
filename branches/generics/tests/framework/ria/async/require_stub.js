@@ -1,1 +1,0 @@
-window.REQUIRE = function (dep) {};
