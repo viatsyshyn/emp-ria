@@ -9,8 +9,6 @@ REQUIRE('ria.reflection.ReflectionClass');
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
-    var jsonSerializer = new ria.serialize.JsonSerializer;
-
     /** @class ria.mvc.ControllerUri */
     ANNOTATION(
         [[String]],
@@ -45,6 +43,18 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.IContext, 'context',
             ria.mvc.State, 'state',
             ria.mvc.IView, 'view',
+
+            function $() {
+                BASE();
+                this.context = null;
+                this.state = null;
+                this.view = null;
+                this._serializer = this.initSerializer_();
+            },
+
+            ria.serialize.ISerializer, function initSerializer_() {
+                return new ria.serialize.JsonSerializer;
+            },
 
             /**
              * Method is called once Application is starting
@@ -154,11 +164,11 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     return params.map(function (_, index) {
                         try {
-                            return (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof types[index])) ? _ : jsonSerializer.deserialize(_, types[index]);
+                            return (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof types[index])) ? _ : this._serializer.deserialize(_, types[index]);
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error deserializing action param ' + names[index], e);
                         }
-                    });
+                    }, this);
                 } catch (e) {
                     throw new ria.mvc.MvcException('Error deserializing action params', e);
                 }
@@ -197,7 +207,25 @@ NAMESPACE('ria.mvc', function () {
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             function PushView(clazz, data) {
                 var instance = new clazz();
+                this.prepareActivity(instance);
                 this.view.pushD(instance, data);
+                this.pushHistoryState();
+            },
+
+            [[ria.mvc.IActivity]],
+            function prepareActivity(activity){},
+
+            function pushHistoryState(){
+                var state = this.getContext().getState();
+                var params = state.getParams().slice();
+                params.unshift(state.getAction());
+                params.unshift(state.getController());
+                params = params.map(function(item){
+                    return item.valueOf().toString();
+                });
+                var href = '#' + params.join('/');
+                if(href != window.location.hash)
+                    history.pushState(null, null, href);
             },
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
