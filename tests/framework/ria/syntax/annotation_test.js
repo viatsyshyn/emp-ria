@@ -3,10 +3,6 @@
 
     TestCase("AnnotationTestCase").prototype = {
 
-        setUp: function () {
-            window.SELF = ria.__SYNTAX.Modifiers.SELF;
-        },
-
         testBuildAnnotation: function () {
             var result = ANNOTATION(
                 [[String, String]],
