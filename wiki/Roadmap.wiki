@@ -4,7 +4,7 @@
 
   * ~~#1. Low-level API~~
   * ~~#2. Syntax, Dependencies, Reflection~~
-  * #3. Compilation and GCC optimizations
+  * ~~#3. Compilation and GCC optimizations~~
   * #4. ~~Futures~~, ~~AJAX~~, ~~MVC~~, ~~DOM~~, ~~Compiled Templates~~, ~~Data Serialization~~
   * #5. XMPP,...
 
@@ -76,4 +76,4 @@ Wiki page [Reflection]
   * ~~[Interfaces]~~, ~~Tests~~ 
   * ~~[Classes]~~, ~~Tests~~
   * ~~Methods~~, ~~Tests~~
-  * ~~Properties~~, Tests
+  * ~~Properties~~, ~~Tests~~
