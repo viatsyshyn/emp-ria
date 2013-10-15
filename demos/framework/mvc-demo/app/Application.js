@@ -1,4 +1,4 @@
-REQUIRE('ria.mvc.Application');
+REQUIRE('ria.mvc.DefaultApplication');
 REQUIRE('ria.dom.jQueryDom');
 
 REQUIRE('app.controls.ActionLinkControl');
@@ -10,7 +10,7 @@ NAMESPACE('app', function (){
 
     /** @class app.Application */
     CLASS(
-        'Application', EXTENDS(ria.mvc.Application), [
+        'Application', EXTENDS(ria.mvc.DefaultApplication), [
             OVERRIDE, ria.async.Future, function onStart_() {
                 return BASE()
                     .then(function (data) {

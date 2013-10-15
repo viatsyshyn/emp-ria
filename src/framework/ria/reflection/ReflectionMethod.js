@@ -38,9 +38,24 @@ NS('ria.reflection', function () {
 
             function invokeOn(instance, args_) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
-                VALIDATE_ARGS(this.method.argsNames, this.method.argsTypes, args_ || []);
-                _DEBUG && (instance = instance.__PROTECTED || instance);
-                return this.method.impl.apply(instance, args_ || []);
+
+                var impl = this.method.impl;
+                if (_DEBUG) {
+                    instance = instance.__PROTECTED || instance;
+                }
+
+                if (ria.__CFG.enablePipelineMethodCall && impl.__META) {
+                    var genericTypes = this.clazz.__META.genericTypes;
+                    var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
+                        if (this.clazz.__META.baseSpecs.length > index)
+                            return this.clazz.__META.genericTypes[index];
+
+                        return instance.getSpecsOf(type.name);
+                    }.bind(this));
+                    impl = ria.__API.getPipelineMethodCallProxyFor(impl, impl.__META, instance, genericTypes, genericSpecs);
+                }
+
+                return impl.apply(instance, args_ || []);
             }
         ]);
 });

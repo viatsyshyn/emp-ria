@@ -12,24 +12,11 @@ NAMESPACE('app.model', function () {
 
     /** @class app.model.PaginatedList */
     CLASS(
+        GENERIC('TItem'),
         'PaginatedList', [
-            [[Function]],
-            function $(itemClass) {
-                this.itemClass = itemClass;
-            },
-
-            READONLY, Function, 'itemClass',
-
-            ArrayOf(Object), 'items',
-
+            ArrayOf(TItem), 'items',
             Number, 'pageSize',
             Number, 'page',
-            Number, 'count',
-
-            VOID, function setItems(values) {
-                VALIDATE_ARG('value', [ArrayOf(this.itemClass)], values);
-
-                this.items = values;
-            }
+            Number, 'count'
         ])
 })

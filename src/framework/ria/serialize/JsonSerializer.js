@@ -19,7 +19,7 @@ NAMESPACE('ria.serialize', function () {
                 throw Error('Not implemented');
             },
 
-            Object, function deserialize(raw, clazz) {
+            Object, function deserialize(raw, clazz, instance_) {
                 var value;
 
                 if (clazz === Object)
@@ -67,9 +67,13 @@ NAMESPACE('ria.serialize', function () {
                         throw new ria.serialize.Exception('Value expected to be array, but got: ' + JSON.stringify(raw));
 
                     var type = clazz.valueOf();
+                    if (ria.__API.isGeneralizedType(type) && instance_) {
+                        type = instance_.getSpecsOf(type.name);
+                    }
+
                     return raw.filter(isValue).map(function (_, i) {
                         try {
-                            return deserialize(_, type);
+                            return deserialize(_, type, instance_);
                         } catch (e) {
                             throw new ria.serialize.Exception('Error deserializing ' + clazz + ' value with index ' + i, e);
                         }
@@ -78,7 +82,7 @@ NAMESPACE('ria.serialize', function () {
 
                 var genericSpecs = [];
                 if (ria.__API.isSpecification(clazz)) {
-                    genericSpecs.clazz.specs;
+                    genericSpecs = clazz.specs;
                     clazz = clazz.type;
                 }
 
@@ -114,7 +118,7 @@ NAMESPACE('ria.serialize', function () {
                                 r = r[path.shift()];
 
                             if (isValue(r))
-                                tmp = deserialize(r, property.getType());
+                                tmp = deserialize(r, property.getType(), value);
 
                             property.invokeSetterOn(value, tmp);
                         } catch (e) {

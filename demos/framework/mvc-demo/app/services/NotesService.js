@@ -17,7 +17,7 @@ NAMESPACE('app.services', function () {
     CLASS(
         'NotesService', EXTENDS(app.services.Base), [
             ria.async.Future, function getNotes() {
-                return this.getPaginatedList('data/paginated-notes.json', app.model.Note, 0);
+                return this.getPage('data/paginated-notes.json', app.model.PaginatedList.OF(app.model.Note), 0);
             }
         ])
 });

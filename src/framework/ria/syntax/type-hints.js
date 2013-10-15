@@ -116,7 +116,7 @@
                         return checkTypeHint(value.valueOf(), type.valueOf(), genericTypes || [], genericSpecs || []);
 
                     var t = type.valueOf();
-                    return Array.isArray(value) && value.every(function (_) { return checkTypeHint(_, t); });
+                    return Array.isArray(value) && value.every(function (_) { return checkTypeHint(_, t, genericTypes || [], genericSpecs || []); });
                 }
 
                 if (ria.__API.isClassOfDescriptor(type)) {
