@@ -1,1 +1,0 @@
-CALL ..\..\src\builder\jsbuild2.cmd
