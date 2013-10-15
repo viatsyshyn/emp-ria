@@ -31,18 +31,8 @@ NAMESPACE('app.services', function () {
             },
 
             [[String, Object, Number]],
-            ria.async.Future, function getPaginatedList(uri, clazz, pageIndex) {
-                return new ria.ajax.JsonGetTask(uri)
-                    .run()
-                    .then(function (data) {
-                        var model = new app.model.PaginatedList(clazz);
-                        model.setItems(Serializer.deserialize(data.items, ArrayOf(clazz)));
-                        model.setPage(Number(data.page));
-                        model.setPageSize(Number(data.pageSize));
-                        model.setCount(Number(data.count));
-
-                        return model;
-                    });
+            ria.async.Future, function getPage(uri, clazz, pageIndex) {
+                return this.get(uri, clazz);
             }
         ]);
 });

@@ -45,7 +45,6 @@ NS('ria.reflection', function () {
 
             VOID, function invokeSetterOn(instance, value) {
                 VALIDATE_ARG('instance', [this.clazz], instance);
-                VALIDATE_ARG('value', [this.property.retType], value);
                 var setter = this.property.setter;
                 if (_DEBUG) {
                     instance = instance.__PROTECTED || instance;
