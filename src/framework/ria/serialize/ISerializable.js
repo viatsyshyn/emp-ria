@@ -3,7 +3,8 @@ NAMESPACE('ria.serialize', function () {
 
     /** @class ria.serialize.ISerializable */
     INTERFACE(
+        GENERIC('TReturn'),
         'ISerializable', [
-            Object, function serialize() {}
+            TReturn, function serialize() {}
         ])
 });

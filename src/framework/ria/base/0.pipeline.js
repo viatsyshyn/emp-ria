@@ -12,9 +12,9 @@
          * @param {Object} scope
          * @param {Object} callSession
          */
-        'OnCallInit': function (body, meta, scope, callSession) {
+        'OnCallInit': function (body, meta, scope, callSession, genericTypes, specs) {
             this.callInit_.forEach(function (_) {
-                _(body, meta, scope, callSession);
+                _(body, meta, scope, callSession, genericTypes, specs);
             });
         },
 
@@ -29,9 +29,9 @@
          * @param {Array} args
          * @param {Object} callSession
          */
-        'OnBeforeCall': function (body, meta, scope, args, callSession) {
+        'OnBeforeCall': function (body, meta, scope, args, callSession, genericTypes, specs) {
             this.beforeCall_.forEach(function (_) {
-                _(body, meta, scope, args, callSession);
+                _(body, meta, scope, args, callSession, genericTypes, specs);
             });
         },
 
@@ -47,9 +47,9 @@
          * @param {Object} result
          * @param {Object} callSession
          */
-        'OnAfterCall': function (body, meta, scope, args, result, callSession) {
+        'OnAfterCall': function (body, meta, scope, args, result, callSession, genericTypes, specs) {
             this.afterCall_.forEach(function (_) {
-                result = _(body, meta, scope, args, result, callSession);
+                result = _(body, meta, scope, args, result, callSession, genericTypes, specs);
             });
             return result;
         },
@@ -65,9 +65,9 @@
          * @param {Object} scope
          * @param {Object} callSession
          */
-        'OnCallFinally': function (body, meta, scope, callSession) {
+        'OnCallFinally': function (body, meta, scope, callSession, genericTypes, specs) {
             this.callFinally_.forEach(function (_) {
-                _(body, meta, scope, callSession);
+                _(body, meta, scope, callSession, genericTypes, specs);
             });
         }
     };
@@ -78,17 +78,17 @@
      * @param {Object} scope
      * @param {Array} args
      */
-    function PipelineMethodCall(body, meta, scope, args) {
+    function PipelineMethodCall(body, meta, scope, args, genericTypes, specs) {
         var callSession = {};
-        pmcStages.OnCallInit(body, meta, scope, callSession);
+        pmcStages.OnCallInit(body, meta, scope, callSession, genericTypes, specs);
         try {
-            pmcStages.OnBeforeCall(body, meta, scope, args, callSession);
+            pmcStages.OnBeforeCall(body, meta, scope, args, callSession, genericTypes, specs);
             // THIS IS WHERE METHOD BODY IS CALLED
             var result = body.apply(scope, args);
             // END OF METHOD BODY CALL
-            return pmcStages.OnAfterCall(body, meta, scope, args, result, callSession);
+            return pmcStages.OnAfterCall(body, meta, scope, args, result, callSession, genericTypes, specs);
         } finally {
-            pmcStages.OnCallFinally(body, meta, scope, callSession);
+            pmcStages.OnCallFinally(body, meta, scope, callSession, genericTypes, specs);
         }
     }
 
@@ -110,11 +110,12 @@
      * @param {Function} body
      * @param {ria.__API.MethodDescriptor} meta
      * @param {Object} scope
+     * @param {Object[]} specs
      * @return {Function}
      */
-    ria.__API.getPipelineMethodCallProxyFor = function (body, meta, scope) {
+    ria.__API.getPipelineMethodCallProxyFor = function (body, meta, scope, genericTypes, specs) {
         var f_ = function PipelineMethodCallProxy() {
-            return PipelineMethodCall(body, meta, scope, [].slice.call(arguments));
+            return PipelineMethodCall(body, meta, scope, [].slice.call(arguments), genericTypes, specs);
         };
 
       

@@ -83,6 +83,11 @@
     function SelfToken() {}
 
     function ExtendsToken(base) {
+        if (base instanceof UglifyJS.AST_Call) {
+            this.specs = base.args;
+            base = base.expression.expression;
+        }
+
         this.value = base.print_to_string();
         this.raw = base;
     }
@@ -91,6 +96,42 @@
         this.raw = this.values = __clone(ifcs);
     }
 
+    function GenericToken(desc) {
+        this.value = desc;
+    }
+
+    function GeneralizeDescriptor(types) {
+        this.types = types.slice();
+    }
+
+    GeneralizeDescriptor.prototype.define = function () {
+    };
+
+    GeneralizeDescriptor.prototype.undefine = function () {
+    };
+
+    function ParseGeneric(args) {
+        var types = [];
+
+        while(args.length) {
+            var name = args.shift(), specs = [];
+            if (args.length) {
+                do {
+                    var spec = args.shift();
+                    if (spec instanceof Tokenizer.StringToken) {
+                        args.unshift(spec);
+                        break;
+                    }
+
+                    specs.push(spec);
+                } while (args.length);
+            }
+
+            types.push([name, specs]);
+        }
+
+        return new GeneralizeDescriptor(types);
+    }
 
     function Tokenizer(data, processed) {
         this.token = this.token.bind(this);
@@ -113,6 +154,9 @@
 
         if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'IMPLEMENTS')
             return new ImplementsToken(token.args.slice());
+
+        if (token instanceof UglifyJS.AST_Call && token.expression.print_to_string() == 'GENERIC')
+            return new GenericToken(ParseGeneric(__clone(token.args).map(this.token)));
 
         if (token instanceof UglifyJS.AST_Array && token.elements.length == 1 && token.elements[0] instanceof UglifyJS.AST_Array)
             return new DoubleArrayToken(__clone(token.elements[0].elements).map(this.token), token.elements[0]);
@@ -164,6 +208,7 @@
     Tokenizer.SelfToken = SelfToken;
     Tokenizer.ExtendsToken = ExtendsToken;
     Tokenizer.ImplementsToken = ImplementsToken;
+    Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
 })();

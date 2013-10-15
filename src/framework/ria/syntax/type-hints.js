@@ -6,7 +6,7 @@
 
     var IS_OPTIONAL = /^.+_$/;
 
-    function checkDelegate(value, type) {
+    function checkDelegate(value, type, genericTypes, genericSpecs) {
         if ('function' !== typeof value)
             return false;
 
@@ -15,9 +15,11 @@
             var delegate = type.__META;
 
             try {
-                if (delegate.ret !== null && method.ret !== delegate.ret && !checkTypeHint(method.ret, delegate.ret)) { //noinspection ExceptionCaughtLocallyJS
+                var drt = ria.__API.resolveGenericType(delegate.ret, genericTypes, genericSpecs);
+
+                if (delegate.ret !== null && method.ret !== drt && !checkTypeHint(method.ret, drt)) { //noinspection ExceptionCaughtLocallyJS
                     throw new Exception('Lambda returns ' + ria.__API.getIdentifierOfType(method.ret)
-                        + ', but delegate expects ' + ria.__API.getIdentifierOfType(delegate.ret));
+                        + ', but delegate expects ' + ria.__API.getIdentifierOfType(drt));
                 }
 
                 if (delegate.argsNames.length > method.argsNames.length) { //noinspection ExceptionCaughtLocallyJS
@@ -32,9 +34,11 @@
                         }
                     }
 
-                    if (!checkTypeHint(method.argsTypes[index] || Object, delegate.argsTypes[index] || Object)) {
+                    var dat = ria.__API.resolveGenericType(delegate.argsTypes[index] || Object, genericTypes, genericSpecs);
+
+                    if (!checkTypeHint(method.argsTypes[index] || Object, dat)) {
                          throw new Exception('Lambda accepts ' + ria.__API.getIdentifierOfType(method.argsTypes[index]) + ' for argument ' + name
-                             + ', but delegate supplies ' + ria.__API.getIdentifierOfType(delegate.argsTypes[index]));
+                             + ', but delegate supplies ' + ria.__API.getIdentifierOfType(dat));
                     }
                 });
             } catch (e) {
@@ -49,8 +53,12 @@
      * @param {*} value
      * @param {*} type
      * @return {Boolean}
+     * @param {Array} genericTypes
+     * @param {Array} genericSpecs
      */
-    function checkTypeHint(value, type) {
+    function checkTypeHint(value, type, genericTypes, genericSpecs) {
+        type = ria.__API.resolveGenericType(type, genericTypes || [], genericSpecs || []);
+
         if (value === undefined)
             return false;
 
@@ -72,8 +80,15 @@
                     return value == type;
                 }
 
+                if (ria.__API.isSpecification(type) && ria.__API.isSpecification(value)) {
+                    return type.type == value.type && type.specs.every(function (_, index) { return _ == value.specs[index] });
+                }
+
                 if (ria.__API.isDelegate(type))
-                    return checkDelegate(value, type);
+                    return checkDelegate(value, type, type.__META.genericTypes, []);
+
+                if (ria.__API.isSpecification(type) && ria.__API.isDelegate(type.type))
+                    return checkDelegate(value, type.type, type.type.__META.genericTypes, type.specs);
 
                 if (type === Function)
                     return 'function' === typeof value;
@@ -86,12 +101,19 @@
                     if (ria.__API.isInterface(value))
                         return value === type;
 
-                    return (ria.__API.isClassConstructor(value) || value instanceof ria.__API.Class) && ria.__API.implements(value, type);
+                    return (ria.__API.isClassConstructor(value) || value instanceof ria.__API.Class) && ria.__API.implements(value, type, genericTypes || [], genericSpecs || []);
+                }
+
+                if (ria.__API.isSpecification(type) && ria.__API.isInterface(type.type)) {
+                    if (ria.__API.isInterface(value))
+                        return false;
+
+                    return (ria.__API.isClassConstructor(value) || value instanceof ria.__API.Class) && ria.__API.implements(value, type, genericTypes || [], genericSpecs || []);
                 }
 
                 if (ria.__API.isArrayOfDescriptor(type)) {
                     if (ria.__API.isArrayOfDescriptor(value))
-                        return checkTypeHint(value.valueOf(), type.valueOf());
+                        return checkTypeHint(value.valueOf(), type.valueOf(), genericTypes || [], genericSpecs || []);
 
                     var t = type.valueOf();
                     return Array.isArray(value) && value.every(function (_) { return checkTypeHint(_, t); });
@@ -101,14 +123,14 @@
                     if (ria.__API.isClassOfDescriptor(value))
                         value = value.valueOf();
 
-                    return checkTypeHint(value, type.valueOf());
+                    return checkTypeHint(value, type.valueOf(), genericTypes || [], genericSpecs || []);
                 }
 
                 if (ria.__API.isImplementerOfDescriptor(type)) {
                     if (ria.__API.isImplementerOfDescriptor(value))
                         value = value.valueOf();
 
-                    return checkTypeHint(value, type.valueOf());
+                    return checkTypeHint(value, type.valueOf(), genericTypes || [], genericSpecs || []);
                 }
 
                 if (ria.__API.isClassConstructor(type)) {
@@ -116,6 +138,25 @@
                         return ria.__API.extends(value, type);
 
                     return value instanceof type;
+                }
+
+                if (ria.__API.isSpecification(type) && ria.__API.isClassConstructor(type.type)) {
+                    if (ria.__API.isClassConstructor(value)) {
+                        return false;
+                    }
+
+                    if (value instanceof type.type) {
+                        return type.type.__META.genericTypes.every(function (_, index) {
+                            //return value.getSpecsOf(_.name) == type.specs[index];
+                            return checkTypeHint(value.getSpecsOf(_.name), type.specs[index], genericTypes || [], genericSpecs || []);
+                        })
+                    }
+
+                    return false;
+                }
+
+                if (ria.__API.isGeneralizedType(type)) {
+                    return ria.__API.isGeneralizedType(value) && type == value;
                 }
 
                 if (typeof type === 'function') {
@@ -134,8 +175,10 @@
      * @param {String} name
      * @param {Array} type
      * @param {*} value
+     * @param {Array} [genericTypes]
+     * @param {Array} [genericSpecs]
      */
-    ria.__SYNTAX.checkArg = function (name, type, value) {
+    ria.__SYNTAX.checkArg = function (name, type, value, genericTypes, genericSpecs) {
         var isOptional = IS_OPTIONAL.test(name);
         if (isOptional && value === undefined)
             return;
@@ -151,15 +194,16 @@
         while (t.length > 0) {
             var t_ = t.pop();
             try {
-                if (checkTypeHint(value, t_))
+                if (checkTypeHint(value, t_, genericTypes || [], genericSpecs || []))
                     return;
             } catch (e) {
                 error = e;
             }
         }
 
-        throw new Exception('Argument ' + name + ' expected to be ' + type.map(ria.__API.getIdentifierOfType).join(' or ')
-            + ' but received ' + ria.__API.getIdentifierOfValue(value), error);
+        throw new Exception('Argument ' + name + ' expected to be ' + type.map(function (_) {
+            return ria.__API.getIdentifierOfType(_, genericTypes || [], genericSpecs || []);
+            }).join(' or ') + ' but received ' + ria.__API.getIdentifierOfValue(value), error);
     };
 
     /**
@@ -167,14 +211,16 @@
      * Ensure arguments are of correct types
      * @param {String[]} names
      * @param {Array} types
-     * @param {Array}values
+     * @param {Array} values
+     * @param {Array} genericTypes
+     * @param {Array} genericSpecs
      */
-    ria.__SYNTAX.checkArgs = function (names, types, values) {
+    ria.__SYNTAX.checkArgs = function (names, types, values, genericTypes, genericSpecs) {
         if (values.length > names.length)
             throw Error('Too many arguments passed');
 
         for(var index = 0; index < names.length; index++) {
-            ria.__SYNTAX.checkArg(names[index], types.length > index ? types[index] : Object, values[index]);
+            ria.__SYNTAX.checkArg(names[index], types.length > index ? types[index] : Object, values[index], genericTypes, genericSpecs);
         }
     };
 
@@ -183,7 +229,7 @@
      * @param {*} type
      * @param {*} value
      */
-    ria.__SYNTAX.checkReturn = function (type, value) {
+    ria.__SYNTAX.checkReturn = function (type, value, genericTypes, genericSpecs) {
         if (type === null)
             return ;
 
@@ -191,24 +237,24 @@
             throw Error('No return expected but got ' + ria.__API.getIdentifierOfValue(value));
         }
 
-        if (type !== undefined && !checkTypeHint(value, type))
-            throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type) + ' but got ' + ria.__API.getIdentifierOfValue(value));
+        if (type !== undefined && !checkTypeHint(value, type, genericTypes || [], genericSpecs || []))
+            throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type, genericTypes || [], genericSpecs || []) + ' but got ' + ria.__API.getIdentifierOfValue(value));
     };
 
     if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
-            function (body, meta, scope, args) {
+            function (body, meta, scope, args, callSession, genericTypes, specs) {
                 try {
-                    ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args);
+                    ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args, genericTypes || [], specs || []);
                 } catch (e) {
                     throw new ria.__API.Exception('Bad argument for ' + meta.name, e);
                 }
             });
 
         ria.__API.addPipelineMethodCallStage('AfterCall',
-            function (body, meta, scope, args, result) {
+            function (body, meta, scope, args, result, callSession, genericTypes, specs) {
                 try {
-                    ria.__SYNTAX.checkReturn(meta.ret, result);
+                    ria.__SYNTAX.checkReturn(meta.ret, result, genericTypes || [], specs || []);
                 } catch (e) {
                     throw new ria.__API.Exception('Bad return of ' + meta.name, e);
                 }

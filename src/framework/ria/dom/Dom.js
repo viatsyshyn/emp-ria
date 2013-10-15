@@ -300,11 +300,15 @@ NAMESPACE('ria.dom', function () {
                         }else{
                             return null;
                         }
-                    parents.forEach(function(parent){
+                    parents.forEach(function(parent) {
                         if(parent.contains(this))
                             return parent;
-                    })
+                    });
+
+                    return null;
                 }
+
+                return ria.dom.Dom(this._dom.map(function (_) { return _.parentNode }));
             },
 
             Object, function offset() {

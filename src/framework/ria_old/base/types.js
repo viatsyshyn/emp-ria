@@ -51,6 +51,8 @@
         if (type === Array) return 'Array';
         if (type === Object) return 'Object';
 
+        if (ClassOf)
+
         if (ArrayOfDescriptor.isArrayOfDescriptor(type))
             return type.toString();
 

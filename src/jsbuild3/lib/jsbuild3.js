@@ -171,7 +171,7 @@ function loadModule(path, config, memoization) {
 }
 
 function prepareRiaConfig() {
-    (ria = ria || {}).__CFG = [].slice.call(document.getElementsByTagName('script'))
+    (ria = ria || this.ria || {}).__CFG = ria.__CFG || [].slice.call(document.getElementsByTagName('script'))
         .map(function (_) {
             return _.innerText || _.innerHTML;
         })
@@ -261,7 +261,7 @@ function compile(path, config, appClass) {
                                     })
                                 })
                             ], globalFunctions, currentBody, [
-                                make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                appClass ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                                     body: make_node(UglifyJS.AST_Call, topLevel, {
                                         expression: make_node(UglifyJS.AST_Function, topLevel, {
                                             argnames: [],
@@ -269,8 +269,8 @@ function compile(path, config, appClass) {
                                         }),
                                         args: []
                                     })
-                                })
-                            ])
+                                }) : null
+                            ]).filter(function (_) { return _ })
                     }),
                     args: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolVar, topLevel, {name: _}); })
                 })
