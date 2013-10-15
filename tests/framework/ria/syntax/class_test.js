@@ -1686,11 +1686,11 @@
 
             _P && _C && assertException(function () {
                 GenericClass(Class, MyIfcImpl);
-            }, Error('desc'));
+            }, Error('Error instantiating class window.GenericClass'));
 
             _P && _C && assertException(function () {
                 GenericClass(BaseClass, Class);
-            }, Error('desc'));
+            }, Error('Error instantiating class window.GenericClass'));
         },
 
         testGenericTypeReferenceInMembers: function () {
