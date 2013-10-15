@@ -60,6 +60,7 @@
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
   * Proxy interface impls in DEBUG (to protect implementation)
+  * Proxy class impl in DEBUG (cast to parent)
 
 == Dependencies ==
 
