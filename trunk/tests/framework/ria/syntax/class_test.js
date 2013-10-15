@@ -1666,6 +1666,31 @@
                 inst.setProp2(impl);
                 assertEquals(impl, inst.getProp2());
             });
+        },
+
+        testGenericRestrictions: function () {
+            var MyIfc = INTERFACE(
+                'MyIfc', []);
+
+            var MyIfcImpl = CLASS(
+                'MyIfcImpl', IMPLEMENTS(MyIfc), []);
+
+            var BaseClass = CLASS(
+                'BaseClass', []);
+
+            var GenericClass = CLASS(
+                GENERIC('TKey', ClassOf(BaseClass), 'TValue', ImplementerOf(MyIfc)),
+                'GenericClass', []);
+
+            var instance = GenericClass(BaseClass, MyIfcImpl);
+
+            _P && _C && assertException(function () {
+                GenericClass(Class, MyIfcImpl);
+            }, Error('desc'));
+
+            _P && _C && assertException(function () {
+                GenericClass(BaseClass, Class);
+            }, Error('desc'));
         }
     };
 

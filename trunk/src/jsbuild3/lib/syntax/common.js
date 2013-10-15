@@ -72,7 +72,7 @@ function CompileGenericTypes(types, node) {
                         expression: getNameTraversed('ria.__API'.split('.'), 'getGeneralizedType'),
                         args: [
                             name.raw,
-                            make_node(UglifyJS.AST_Array, null, {elements: specs})
+                            make_node(UglifyJS.AST_Array, node, {elements: specs.map(function (_) { return _.raw; })})
                         ]
                     })
                 })

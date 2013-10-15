@@ -281,7 +281,7 @@ function compile(path, config, appClass) {
     var uglifyjsParams = config.getPluginConfiguration('uglifyjs');
 
     topLevel.figure_out_scope();
-    topLevel.scope_warnings();
+    //topLevel.scope_warnings();
 
     if (uglifyjsParams.mangle) {
         topLevel.compute_char_frequency();

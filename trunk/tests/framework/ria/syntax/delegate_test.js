@@ -3,10 +3,6 @@
 
     TestCase("DelegateTestCase").prototype = {
 
-        setUp: function () {
-            window.SELF = ria.__SYNTAX.Modifiers.SELF;
-        },
-
         testBuildDelegate: function () {
             var Compare = DELEGATE(
                 [[String, String]],
