@@ -24,7 +24,7 @@
                     MARS: function (){},
                     NUTS: '3'
                 });
-            },"Error");
+            }, Error('Enum value should Number, String or Boolean, got function'));
         }
     };
 

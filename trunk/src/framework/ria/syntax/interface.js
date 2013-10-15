@@ -4,6 +4,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 (function () {
     "use strict";
 
+    function isFactoryCtor(name) {
+        return name !== '$$' && /^\$.*/i.test(name);
+    }
+
+    function isStaticMethod(name) {
+        return name.toUpperCase() == name && /[_a-z].*/i.test(name);
+    }
+
     function checkXxxOfIsSELF(token, descriptor) {
         return token.value instanceof descriptor
             && token.value.clazz == ria.__SYNTAX.Modifiers.SELF;
@@ -25,8 +33,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (checkXxxOfIsSELF(token, ria.__API.ClassOfDescriptor))
             return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(SELF));
 
-        if (checkXxxOfIsSELF(token, ria.__API.ClassOfDescriptor))
-            return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ClassOf(SELF));
+        if (checkXxxOfIsSELF(token, ria.__API.ImplementerOfDescriptor))
+            return new ria.__SYNTAX.Tokenizer.RefToken(ria.__API.ImplementerOf(SELF));
 
         return token;
     }
@@ -54,22 +62,48 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (def.annotations.length != 0)
             throw Error('Annotation are not supported on interfaces');
 
-        // TODO: throw Error if any EXTENDS
-        // TODO: throw Error if any IMPLEMENTS
-        // TODO: validate no duplicate members
-        // TODO: throw Error if any ctors
-        // TODO: throw Error if any flags on methods
-        // TODO: throw Error if any annotations on methods
+        if (def.base != null)
+            throw Error('Interface can NOT extend classes or interfaces');
+
+        if (def.ifcs.values.length)
+            throw Error('Interface can NOT implement interfaces');
+
+        // validate no duplicate members
+        def.methods
+            .forEach(function (_) {
+                var name = _.name;
+                ria.__SYNTAX.validateVarName(name);
+
+                if (def.methods.filter(function (_) { return _.name === name}).length > 1)
+                    throw Error('Duplicate method declaration "' + name + '"');
+            });
+
+        // validate no duplicate members
+        def.properties
+            .forEach(function (_) {
+                var name = _.name;
+                ria.__SYNTAX.validateVarName(name);
+
+                if (def.properties.filter(function (_) { return _.name === name}).length > 1)
+                    throw Error('Duplicate property declaration "' + name + '"');
+            });
 
         def.methods.map(
             /**
              * @param {MethodDescriptor} method
              */
             function (method) {
+                if (isFactoryCtor(method.name) || method.name == '$$')
+                    throw Error('Interface ctors, named ctors and factories are not supported');
+
+                if(isStaticMethod(method.name))
+                    throw Error('Interface static methods are not supported');
+
                 if (method.flags.isAbstract || method.flags.isOverride || method.flags.isReadonly || method.flags.isFinal )
                     throw Error('Interface method can NOT be marked with ABSTRACT, OVERRIDE, READONLY or FINAL');
 
-
+                if (method.annotations.length)
+                    throw Error('Interface method can NOT be annotated');
             });
 
         def.properties.forEach(
@@ -79,6 +113,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             function (property) {
                 if (property.flags.isAbstract || property.flags.isOverride || property.flags.isFinal )
                     throw Error('Interface property can NOT be marked with ABSTRACT, OVERRIDE or FINAL');
+
+                if (property.annotations.length)
+                    throw Error('Interface properties can NOT be annotated');
             });
     };
 
@@ -89,8 +126,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.compileInterface = function (name, def) {
         function InterfaceProxy() {
-            // TODO: update to tokenizer
+            throw Error('Anonymous classes from interfaces are not supported');
 
+            // TODO: update to tokenizer
             var members = ria.__SYNTAX.parseMembers([].slice.call(arguments));
             var flags = {isFinal: true };
             var properties = members.filter(function (_1) { return _1 instanceof ria.__SYNTAX.PropertyDescriptor });
@@ -99,8 +137,6 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             var impl = ria.__SYNTAX.buildClass('$AnonymousClass', def);
             return impl();
         }
-
-        // TODO: handle ImplementerOf(SELF)
 
         var methods = def.methods.map(
             /**
@@ -141,7 +177,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 ]);
             });
 
-        ria.__API.ifc(InterfaceProxy, name, methods);
+        ria.__API.ifc(InterfaceProxy, name, methods, def.genericTypes);
+
+        InterfaceProxy.OF = ria.__API.OF;
 
         Object.freeze(InterfaceProxy);
         ria.__SYNTAX.Registry.registry(name, InterfaceProxy);

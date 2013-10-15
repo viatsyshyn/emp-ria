@@ -31,6 +31,7 @@
             || ria.__API.isEnum(type)
             || ria.__API.isIdentifier(type)
             || ria.__API.isDelegate(type)
+            || ria.__API.isSpecification(type);
             //|| ArrayOfDescriptor.isArrayOfDescriptor(type)
             ;
     }
@@ -138,9 +139,10 @@
     function VoidToken() {}
     function SelfToken() {}
 
-    function ExtendsToken(base) {
+    function ExtendsToken(base, specs) {
         this.value = base;
         this.raw = base;
+        this.specs = specs;
     }
 
     function ImplementsToken(ifcs) {
@@ -151,8 +153,9 @@
      * @param {Function} base
      * @constructor
      */
-    function ExtendsDescriptor(base) {
+    function ExtendsDescriptor(base, specs) {
         this.base = base;
+        this.specs = specs;
     }
 
     ria.__SYNTAX.ExtendsDescriptor = ExtendsDescriptor;
@@ -161,10 +164,16 @@
         if (base === undefined)
             throw Error('Class expected, but got undefined. Check if it is defined already');
 
-        if (!(base.__META instanceof ria.__API.ClassDescriptor))
+        var specs = [];
+        if (ria.__API.isSpecification(base)) {
+            specs = base.specs;
+            base = base.type;
+        }
+
+        if (!ria.__API.isClassConstructor(base))
             throw Error('Class expected, but got ' + ria.__API.getIdentifierOfType(base));
 
-        return new ExtendsDescriptor(base);
+        return new ExtendsDescriptor(base, specs);
     };
 
     /**
@@ -189,11 +198,72 @@
             if (ifc === undefined)
                 throw Error('Interface expected, but got undefined. Check if it is defined already');
 
-            if (!(ifc.__META instanceof ria.__API.InterfaceDescriptor))
+            if ((!ria.__API.isSpecification(ifc) || !ria.__API.isInterface(ifc.type))
+                && !ria.__API.isInterface(ifc))
                 throw Error('Interface expected, but got ' + ria.__API.getIdentifierOfType(ifc));
         }
 
         return new ImplementsDescriptor(ifcs);
+    };
+
+    function GenericToken(desc) {
+        this.value = desc;
+    }
+
+    function GeneralizeDescriptor(types) {
+        this.types = types.slice();
+
+        this.define();
+    }
+
+    GeneralizeDescriptor.prototype.define = function () {
+        this.types.forEach(function (type) { window[type.name] = type; });
+    };
+
+    GeneralizeDescriptor.prototype.undefine = function () {
+        this.types.forEach(function (type) { delete window[type.name]; });
+    };
+
+    ria.__SYNTAX.GENERIC = function GENERIC() {
+        var types = [];
+        var args = ria.__API.clone(arguments);
+
+        while(args.length) {
+            var name = args.shift(), specs = [];
+            if (typeof name != 'string')
+                throw Error('Expected string as GeneralizedType name');
+
+            if (args.length) {
+                var hasClassOf = false;
+                do {
+                    var spec = args.shift();
+                    if (typeof spec == 'string') {
+                        args.unshift(spec);
+                        break;
+                    }
+
+                    if (ria.__API.isClassOfDescriptor(spec)) {
+                        if (hasClassOf)
+                            throw Error('Only one ClassOf() is supported as restriction of GeneralizedType');
+
+                        hasClassOf = true;
+                        specs.push(spec);
+                        continue;
+                    }
+
+                    if (ria.__API.isImplementerOfDescriptor(spec)) {
+                        specs.push(spec);
+                        continue;
+                    }
+
+                    throw Error('Only ClassOf() or ImplementerOf() are supported as restrictions of GeneralizedType')
+                } while (args.length);
+            }
+
+            types.push(new ria.__API.GeneralizedType(name, specs));
+        }
+
+        return new GeneralizeDescriptor(types);
     };
 
     function Tokenizer(data) {
@@ -213,10 +283,13 @@
         }
 
         if (token instanceof ExtendsDescriptor)
-            return new ExtendsToken(token.base);
+            return new ExtendsToken(token.base, token.specs);
 
         if (token instanceof ImplementsDescriptor)
             return new ImplementsToken(token.ifcs);
+
+        if (token instanceof GeneralizeDescriptor)
+            return new GenericToken(token);
 
         if (Array.isArray(token) && token.length == 1 && Array.isArray(token[0]))
             return new DoubleArrayToken(token[0].map(this.token), token);
@@ -267,6 +340,7 @@
     Tokenizer.SelfToken = SelfToken;
     Tokenizer.ExtendsToken = ExtendsToken;
     Tokenizer.ImplementsToken = ImplementsToken;
+    Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
 })();

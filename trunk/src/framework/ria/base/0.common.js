@@ -93,7 +93,7 @@ ria.__API = ria.__API || {};
      * @param {Object} type
      * @return {String}
      */
-    ria.__API.getIdentifierOfType = function (type) {
+    ria.__API.getIdentifierOfType = function getType(type, genericTypes, genericSpecs) {
         if (type === undefined) return 'void';
         //if (type === __API.Modifiers.SELF) return 'SELF';
         if (type === null) return '*';
@@ -105,6 +105,13 @@ ria.__API = ria.__API || {};
         if (type === Date) return 'Date';
         if (type === Array) return 'Array';
         if (type === Object) return 'Object';
+
+        if (ria.__API.isSpecification(type)) {
+            return getType(type.type, genericTypes || [], genericSpecs || [])
+                + '.OF(' + type.specs.map(function (type) {
+                    return getType(resolveGenericType(type, genericTypes || [], genericSpecs || []), genericTypes || [], genericSpecs || [])
+                }).join(', ') + ')';
+        }
 
         if (ria.__API.isArrayOfDescriptor(type) || ria.__API.isClassOfDescriptor(type) || ria.__API.isImplementerOfDescriptor(type))
             return type.toString();
@@ -140,8 +147,16 @@ ria.__API = ria.__API || {};
         if (Array.isArray(value))
             return 'Array';
 
-        if (ria.__API.getConstructorOf(value).__META)
-            return ria.__API.getConstructorOf(value).__META.name;
+        if (ria.__API.getConstructorOf(value).__META) {
+            var meta = ria.__API.getConstructorOf(value).__META;
+            var name = meta.name;
+            if (meta.genericTypes.length) {
+                name += '.OF(' + meta.genericTypes.map(function (type) {
+                    return ria.__API.getIdentifierOfType(value.getSpecsOf(type.name));
+                }) + ')';
+            }
+            return name;
+        }
 
         if (value instanceof Object) {
             var ctor = ria.__API.getConstructorOf(value);
@@ -191,4 +206,62 @@ ria.__API = ria.__API || {};
     ria.__API.defer = function defer(scope, method, args_, delay_) {
         setTimeout(function () { method.apply(scope, args_ || []); }, delay_ || 1);
     };
+
+    function GeneralizedType(name, specs) {
+        this.name = name;
+        this.specs = specs;
+    }
+
+    ria.__API.GeneralizedType = GeneralizedType;
+
+    ria.__API.getGeneralizedType = function (name, specs) {
+        return new GeneralizedType(name, specs);
+    };
+
+    ria.__API.isGeneralizedType = function (type) {
+        return type instanceof GeneralizedType;
+    };
+
+    function SpecifyDescriptor(type, specs) {
+        this.type = type;
+        this.specs = (specs || []).slice();
+    }
+
+    ria.__API.SpecifyDescriptor = SpecifyDescriptor;
+
+    ria.__API.specify = function (type, specs) {
+        return new SpecifyDescriptor(type, specs);
+    };
+
+    ria.__API.OF = function OF() {
+        var specs = ria.__API.clone(arguments),
+            clazz = this,
+            baseSpecs = clazz.__META.baseSpecs || [],
+            genericTypes = clazz.__META.genericTypes.slice(baseSpecs.length);
+
+        _DEBUG && genericTypes.forEach(function (type, index) {
+            var spec = specs[index];
+            type.specs.forEach(function (restriction) {
+                ria.__SYNTAX.checkArg(type.name, restriction, spec);
+            });
+        });
+
+        return new ria.__API.specify(clazz, specs);
+    };
+
+    ria.__API.isSpecification = function (type) {
+        return type instanceof SpecifyDescriptor;
+    };
+
+    function resolveGenericType(type, generics, specs) {
+        if (ria.__API.isGeneralizedType(type)) {
+            var index = generics.indexOf(type);
+            if (index >= 0)
+                return specs[index] || Object;
+        }
+
+        return type;
+    }
+
+    ria.__API.resolveGenericType = resolveGenericType;
 })();

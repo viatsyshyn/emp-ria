@@ -39,6 +39,8 @@ window.IMPLEMENTS = ria.__SYNTAX.IMPLEMENTS;
 /** @type {Function} */
 window.EXTENDS = ria.__SYNTAX.EXTENDS;
 /** @type {Function} */
+window.GENERIC = ria.__SYNTAX.GENERIC;
+/** @type {Function} */
 window.VALIDATE_ARG = ria.__SYNTAX.checkArg;
 /** @type {Function} */
 window.VALIDATE_ARGS = ria.__SYNTAX.checkArgs;

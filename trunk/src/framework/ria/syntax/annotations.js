@@ -20,7 +20,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Return type is not supported in annotations');
 
         def.argsTypes.forEach(function(type){
-            if(type == ria.__SYNTAX.Modifiers.SELF)
+            if(type instanceof ria.__SYNTAX.Tokenizer.SelfToken)
                 throw Error('Argument type can\'t be SELF in annotations');
         });
 

@@ -5,11 +5,8 @@ NAMESPACE('ria.mvc', function () {
     /** @class ria.mvc.StateSerializer */
     CLASS(
         'StateSerializer', IMPLEMENTS(ria.mvc.IStateSerializer), [
-            [[String]],
-            function $(separator) {
-                BASE();
-                this.separator = separator;
-            },
+
+            String, 'separator',
 
             [[ria.mvc.State]],
             String, function serialize(state) {

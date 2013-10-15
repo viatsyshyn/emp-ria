@@ -1,7 +1,0 @@
-load:
-  - _cfg.js
-  - ../../../src/framework/ria/base/*.js
-  - ../../../src/framework/ria/syntax/*.js
-
-test:
-  - syntax/*_test.js

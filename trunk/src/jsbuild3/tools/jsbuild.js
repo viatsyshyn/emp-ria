@@ -4,13 +4,34 @@ var vm = require("vm");
 var sys = require("util");
 var FFI = require("ffi");
 
+console.info('Platform: ' + process.platform);
+console.info('Env: ' + process.arch);
+
 var execSync = function() {
-  var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec.dll"), {
-    "WinExecSync": ["int32", ["string", "string"]]
-  });
+  var isWin32 = process.platform == 'win32';
+
+  var run;
+  if (isWin32) {
+      var dll = FFI.Library(path.resolve(__dirname, "WinSyncExec." + process.arch + ".dll"), {
+        "WinExecSync": ["int32", ["string", "string"]]
+      });
+
+      run = dll.WinExecSync;
+  } else {
+      var libc = new FFI.Library(null, {
+          "system": ["int32", ["string"]]
+      });
+
+      run = function (cmd, wdir) {
+          // set current dir
+          libc.system(cmd);
+          // read ret code
+          return 0;
+      }
+  }
 
   return function(cmd, dir) {
-    var code = dll.WinExecSync(cmd, dir);
+    var code = run(cmd, dir);
     if (code) {
       throw Error("Error " + code + " executing " + cmd)
     }

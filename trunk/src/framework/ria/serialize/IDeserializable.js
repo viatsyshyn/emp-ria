@@ -3,7 +3,9 @@ NAMESPACE('ria.serialize', function () {
 
     /** @class ria.serialize.IDeserializable */
     INTERFACE(
+        GENERIC('TSource'),
         'IDeserializable', [
+            [[TSource]],
             VOID, function deserialize(raw) {}
         ])
 });

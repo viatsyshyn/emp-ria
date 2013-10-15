@@ -52,29 +52,6 @@ function ClassNamedCtor() {
     return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
-function CompileSELF(node, clazz) {
-    return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {
-        if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
-            var name = node.name;
-            if ('SELF' === name) {
-                return AccessNS(clazz, null, node);
-            }
-        }
-    }))
-}
-
-function ProcessSELF(token, clazz) {
-    if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
-        return AccessNS(clazz);
-
-    if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
-        return make_node(UglifyJS.AST_Null);
-
-    //console.info(token.__proto__.constructor.name);
-
-    return CompileSELF(token.raw, clazz);
-}
-
 function CompileBASE(node, baseClazz, method, clazz) {
     var found = false;
 
@@ -115,9 +92,11 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
             left: AccessNS(parts, null, node),
             operator: '=',
             right: make_node(UglifyJS.AST_Call, node, {
-                expression: make_node(UglifyJS.AST_Function, node, {
+                args: [],
+                expression: make_node(UglifyJS.AST_Lambda, node, {
                     argnames: [],
                     body: [].concat(
+                        [def.genericTypes.length ? CompileGenericTypes(def.genericTypes, node) : null],
                         [ToAst(ClassCtor)],
                         [make_node(UglifyJS.AST_SimpleStatement, node, {
                             body: make_node(UglifyJS.AST_Call, node, {
@@ -128,7 +107,9 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                     def.base ? def.base.raw : AccessNS('ria.__API.Class'),
                                     make_node(UglifyJS.AST_Array, node, {elements: def.ifcs.raw}),
                                     make_node(UglifyJS.AST_Array, node, {elements: def.annotations.map(processAnnotation) }),
-                                    make_node(def.flags.isAbstract ? UglifyJS.AST_True : UglifyJS.AST_False, node)
+                                    make_node(def.flags.isAbstract ? UglifyJS.AST_True : UglifyJS.AST_False, node),
+                                    make_node(UglifyJS.AST_Array, null, {elements: def.genericTypes ? def.genericTypes.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _[0].value })}) : []}),
+                                    make_node(UglifyJS.AST_Array, null, {elements: def.base.specs ? def.base.specs : []})
                                 ]
                             })
                         })],
@@ -285,7 +266,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                                 AccessNS('ClassCtor', null, node),
                                                 AccessNS('_.' + method.name, null, node),
                                                 make_node(UglifyJS.AST_String, node, {value: method.name}),
-                                                method.retType ? ProcessSELF(method.retType, 'ClassCtor') : make_node(UglifyJS.AST_Null),
+                                                CompileReturnType(method.retType, 'ClassCtor', node),
                                                 make_node(UglifyJS.AST_Array, node, {
                                                     elements: method.argsTypes.map(function (_) { return ProcessSELF(_, 'ClassCtor') })
                                                 }),
@@ -303,8 +284,9 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                             .reduce(function (node, _) { return _.concat(node); }, [])
                             .filter(function (_) { return _ != null; }),
                         [ToAst('ria.__API.compile(ClassCtor)')],
+                        [ToAst('ClassCtor.OF = ria.__API.OF')],
                         [ToAst('return ClassCtor')]
-                    )
+                    ).filter(function (_) { return _ })
                 })
                 //expression: UglifyJS.parse(ClassCompilerImpl.toString().replace('NS-HERE', ns)).body[0],
                 //args: node.args

@@ -115,6 +115,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.properties
             .forEach(function (property) {
                 var name = property.name;
+                property.type = property.type || new ria.__SYNTAX.Tokenizer.RefToken(ria.__SYNTAX.toAst('Object'));
+
                 ria.__SYNTAX.validateVarName(name);
                 var getterName = property.getGetterName();
                 var flags = ria.__API.clone(property.flags);
@@ -162,6 +164,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.methods
             .forEach(function (method) {
                 method.__BASE_META = findParentMethodFixed(def, method.name);
+                method.__GENERIC_TYPES = [];
+                method.__GENERIC_SPECS = [];
             });
     };
 
@@ -226,42 +230,18 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         ria.__API.Assert(true, 'This should never assert this');
     }
 
-    function validateMethodSignatureOverride(method, parentMethod, FakeSelf) {
-        //check if method accepts at least as much args as may be passed to base method
-        if (method.argsNames.length < parentMethod.argsNames.length)
-            throw Error('Method accepts less arguments then base method. Method: "' + method.name + '"');
+    function validateMethodSignatureOverride(method, parentMethod, FakeSelf, genericTypes, genericSpecs) {
+        var meta = {
+            name: parentMethod.name,
+            retType: getTypeFromToken(parentMethod.retType, null, null),
+            argsNames: parentMethod.argsNames,
+            argsTypes: parentMethod.argsTypes.map(function (_) { return getTypeFromToken(_, null, Object) })
+        };
 
-        //check if method requires no more args than may be passed to base method
-        method.argsNames.forEach(function (name, index) {
-            if (!IS_OPTIONAL.test(name) && (IS_OPTIONAL.test(parentMethod.argsNames[index]) || parentMethod.argsNames[index] == undefined)) {
-                throw Error('Method requires argument "' + name + '" that base does not have or optional. Method: "' + method.name + '"');
-            }
-        });
-
-        //validate method return
-        var mrtv = getTypeFromToken(method.retType, FakeSelf, null),
-            brtv = getTypeFromToken(parentMethod.retType, null, null);
-        if (mrtv !== brtv && (mrtv === null || mrtv === undefined || !ria.__SYNTAX.checkTypeHint(mrtv, brtv))) {
-            throw Error('Method "' + method.name + '" returns ' + ria.__API.getIdentifierOfType(mrtv)
-                + ', but base returns ' + ria.__API.getIdentifierOfType(brtv));
-        }
-
-        //validate method args types
-        method.argsNames.forEach(function (name, index) {
-            if (index >= parentMethod.argsNames.length)
-                return ;
-
-            var matv = getTypeFromToken(method.argsTypes[index], FakeSelf, Object),
-                batv = getTypeFromToken(parentMethod.argsTypes[index], null, Object);
-
-            if (!ria.__SYNTAX.checkTypeHint(batv, matv)) {
-                throw Error('Method "' + method.name + '" accepts ' + ria.__API.getIdentifierOfType(matv)
-                    + ' for argument ' + name + ', but base accepts ' + ria.__API.getIdentifierOfType(batv));
-            }
-        });
+        validateMethodSignatureImplementation(method, meta, FakeSelf, genericTypes, genericSpecs);
     }
 
-    function validateMethodSignatureImplementation(method, ifcMethodMeta, FakeSelf) {
+    function validateMethodSignatureImplementation(method, ifcMethodMeta, FakeSelf, genericTypes, genericSpecs) {
         //check if method accepts at least as much args as may be passed to base method
         if (method.argsNames.length < ifcMethodMeta.argsNames.length)
             throw Error('Method accepts less arguments then base method. Method: "' + method.name + '"');
@@ -275,7 +255,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         //validate method return
         var mrtv = getTypeFromToken(method.retType, FakeSelf, null),
-            brtv = ifcMethodMeta.retType;
+            brtv = ria.__API.resolveGenericType(ifcMethodMeta.retType, genericTypes, genericSpecs);
         if (mrtv !== brtv && (mrtv === null || mrtv === undefined || !ria.__SYNTAX.checkTypeHint(mrtv, brtv))) {
             throw Error('Method "' + method.name + '" returns ' + ria.__API.getIdentifierOfType(mrtv)
                 + ', but base returns ' + ria.__API.getIdentifierOfType(brtv));
@@ -287,7 +267,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 return ;
 
             var matv = getTypeFromToken(method.argsTypes[index], FakeSelf, Object),
-                batv = ifcMethodMeta.argsTypes[index] || Object;
+                batv = ria.__API.resolveGenericType(ifcMethodMeta.argsTypes[index] || Object, genericTypes, genericSpecs);
 
             if (!ria.__SYNTAX.checkTypeHint(batv, matv)) {
                 throw Error('Method "' + method.name + '" accepts ' + ria.__API.getIdentifierOfType(matv)
@@ -296,7 +276,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         });
     }
 
-    function validateMethodDeclaration(def, method, FakeSelf) {
+    function validateMethodDeclaration(def, method, FakeSelf, parentGenericTypes, parentGenericSpecs) {
         var parentMethod = method.__BASE_META;
 
         if (method.flags.isOverride && isStaticMethod(method.name)) {
@@ -324,7 +304,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
 
         if (method.flags.isOverride && parentMethod) {
-            validateMethodSignatureOverride(method, parentMethod, FakeSelf);
+            validateMethodSignatureOverride(method, parentMethod, FakeSelf, parentGenericTypes, parentGenericSpecs);
         }
 
         if (method.body.hasBaseCall() && !method.flags.isOverride) {
@@ -341,6 +321,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     }
 
     function validatePropertyDeclaration(property, def, processedMethods, FakeSelf) {
+        if (isStaticMethod(property.name))
+            throw Error('Static properties are not supported');
+
         var getterName = property.getGetterName();
         var setterName = property.getSetterName();
 
@@ -438,6 +421,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 var name = _.name;
                 if (def.properties.filter(function (_) { return _.name === name}).length > 1)
                     throw Error('Duplicate property declaration "' + name + '"');
+
+                if (def.methods.filter(function (_) { return _.name === name}).length > 0)
+                    throw Error('Method and property has same name "' + name + '"');
             });
 
         function FakeSelf() {}
@@ -449,6 +435,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         if (baseSyntaxMeta.flags.isFinal)
             throw Error('Can NOT extend final class ' + ria.__SYNTAX.resolveNameFromToken(def.base));
+
+        var parentGenericTypes = baseSyntaxMeta.genericTypes;
+        var parentGenericSpecs = def.base.specs;
 
         // validate ctor declaration
         def.methods
@@ -463,7 +452,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if (isFactoryCtor(baseMethod.name))
                 return;
 
-            validateBaseClassMethodDeclaration(def, baseMethod, FakeSelf);
+            validateBaseClassMethodDeclaration(def, baseMethod, FakeSelf, parentGenericTypes, parentGenericSpecs);
         });
 
         // validate methods
@@ -477,7 +466,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if (processedMethods.indexOf(method.name) >= 0)
                     return;
 
-                validateMethodDeclaration(def, method, FakeSelf);
+                validateMethodDeclaration(def, method, FakeSelf, parentGenericTypes, parentGenericSpecs);
             });
 
         // validate properties overrides
@@ -485,7 +474,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             var childGetter = def.methods.filter(function(method){ return method.name == baseProperty.getGetterName() }).pop(),
                 childSetter = def.methods.filter(function(method){ return method.name == baseProperty.getSetterName() }).pop();
 
-            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def, FakeSelf);
+            validateBaseClassPropertyDeclaration(baseProperty, childGetter, childSetter, def, FakeSelf, parentGenericTypes, parentGenericSpecs);
         });
 
         // validate properties
@@ -500,18 +489,26 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if(findParentPropertyFixed(def, property.name))
                     throw Error('There is defined property ' + property.name + ' in one of the base classes');
 
-                validatePropertyDeclaration(property, def, processedMethods, FakeSelf);
+                validatePropertyDeclaration(property, def, processedMethods, FakeSelf, parentGenericTypes, parentGenericSpecs);
             });
 
-        // TODO: validate interface method implementations
+        // validate interface method implementations
         def.ifcs.values.forEach(function(ifc) {
+            var genericSpecs = [];
+            if (ria.__API.isSpecification(ifc)) {
+                genericSpecs = ifc.specs;
+                ifc = ifc.type;
+            }
+
+            var genericTypes = ifc.__META.genericTypes;
+
             var methods = ifc.__META.methods;
             for(var name in methods) if (methods.hasOwnProperty(name)) {
                 var methodDef = def.methods.filter(function (_) { return _.name == name }).pop();
                 if (!methodDef)
                     throw Error('Method "' + name + '" of interface ' + ria.__API.getIdentifierOfType(ifc) + ' not implemented');
 
-                validateMethodSignatureImplementation(methodDef, methods[name], FakeSelf);
+                validateMethodSignatureImplementation(methodDef, methods[name], FakeSelf, genericTypes, genericSpecs);
             }
         });
     };
@@ -642,7 +639,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             def.base.value,
             def.ifcs.values,//.map(function (_) { return _.value }),
             def.annotations.map(function (_) { return _.value }),
-            def.flags.isAbstract);
+            def.flags.isAbstract,
+            def.genericTypes,
+            def.base.specs || []);
 
         def.properties.forEach(
             /**
@@ -684,6 +683,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 compileMethodDeclaration(def, method, ClassProxy);
             });
 
+        ClassProxy.OF = ria.__API.OF;
+
         ria.__API.compile(ClassProxy);
 
         ria.__SYNTAX.Registry.registry(name, def);
@@ -705,19 +706,29 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     if (ria.__CFG.enablePipelineMethodCall) {
         ria.__API.addPipelineMethodCallStage('CallInit',
-            function (body, meta, scope, callSession) {
+            function (body, meta, scope, callSession, genericTypes, genericSpecs) {
                 callSession.__OLD_SELF = window.SELF;
                 window.SELF = body.__SELF;
 
                 callSession.__OLD_BASE = window.BASE;
                 var base = body.__BASE_BODY;
                 window.BASE = base
-                    ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope)
+                    ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope, genericTypes, genericSpecs)
                     : BaseIsUndefined;
+
+                (genericTypes || []).forEach(function (type, index) {
+                    callSession['__OLD_' + type.name] = window[type.name];
+                    window[type.name] = genericSpecs[index];
+                });
             });
 
         ria.__API.addPipelineMethodCallStage('CallFinally',
-            function (body, meta, scope, callSession) {
+            function (body, meta, scope, callSession, genericTypes, genericSpecs) {
+                (genericTypes || []).forEach(function (type, index) {
+                    window[type.name] = callSession['__OLD_' + type.name];
+                    delete callSession['__OLD_' + type.name];
+                });
+
                 window.SELF = callSession.__OLD_SELF;
                 delete callSession.__OLD_SELF;
 

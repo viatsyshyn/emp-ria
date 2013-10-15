@@ -3,7 +3,9 @@ NAMESPACE('ria.templates', function () {
 
     /** @class ria.templates.IConverter */
     INTERFACE(
+        GENERIC('TSource', 'TReturn'),
         'IConverter', [
-            Object, function convert(source) {}
+            [[TSource]],
+            TReturn, function convert(source) {}
         ])
 });
