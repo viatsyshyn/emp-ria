@@ -71,6 +71,27 @@ function CompileBASE(node, baseClazz, method, clazz) {
     return result;
 }
 
+function CompileGenericTypeRefs(node, genericTypeName) {
+    return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {
+        if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == genericTypeName) {
+            node.expression = make_node(UglifyJS.AST_Call, node, {
+                expression: AccessNS('this.getSpecsOf', null, node),
+                args: [make_node(UglifyJS.AST_String, node, {value: genericTypeName})]
+            })
+        }
+        /*if (node instanceof UglifyJS.AST_New && node.expression.print_to_string() == genericTypeName) {
+            node.expression = make_node(UglifyJS.AST_Call, node, {
+                expression: AccessNS('this.getSpecsOf', null, node),
+                args: [make_node(UglifyJS.AST_String, node, {value: genericTypeName})]
+            })
+        }*/
+    }));
+}
+
+function CompileGenericTypesRefs(genericTypesNames, node) {
+    return genericTypesNames.reduce(CompileGenericTypeRefs, node);
+}
+
 function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
     if (node instanceof UglifyJS.AST_Call && node.expression.print_to_string() == KEYWORD) {
 
@@ -84,6 +105,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
         //ria.__SYNTAX.validateClassDecl(def, baseClass);
 
         //console.info('found class ' + def.name + ' in ' + ns);
+
+        var genericTypesNames = (def.genericTypes || []).map(function (_) { return _[0].value });
 
         var processedMethods = [];
         var parts = ns.split('.');
@@ -108,7 +131,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                     make_node(UglifyJS.AST_Array, node, {elements: def.ifcs.raw}),
                                     make_node(UglifyJS.AST_Array, node, {elements: def.annotations.map(processAnnotation) }),
                                     make_node(def.flags.isAbstract ? UglifyJS.AST_True : UglifyJS.AST_False, node),
-                                    make_node(UglifyJS.AST_Array, null, {elements: def.genericTypes ? def.genericTypes.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _[0].value })}) : []}),
+                                    make_node(UglifyJS.AST_Array, null, {elements: genericTypesNames.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _ })})}),
                                     make_node(UglifyJS.AST_Array, null, {elements: def.base.specs ? def.base.specs : []})
                                 ]
                             })
@@ -141,10 +164,10 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             left: AccessNS('_.' + name, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
-                                            right: CompileBASE(CompileSELF(body, 'ClassCtor'),
+                                            right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(body, 'ClassCtor'),
                                                 // TODO: detect TRUE base class
                                                 def.base ? def.base.raw.print_to_string() : baseClass,
-                                                '$', parts.join('.'))
+                                                '$', parts.join('.')))
                                         })
                                     }),
                                     make_node(UglifyJS.AST_SimpleStatement, node, {
@@ -193,10 +216,10 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             left: AccessNS('_.' + getterName, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
-                                            right: CompileBASE(CompileSELF(getterBody, 'ClassCtor'),
+                                            right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(getterBody, 'ClassCtor'),
                                                 // TODO: detect TRUE base class
                                                 def.base ? def.base.raw.print_to_string() : baseClass,
-                                                getterName)
+                                                getterName))
                                         })
                                     }),
 
@@ -205,10 +228,10 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             left: AccessNS('_.' + setterName, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
-                                            right: CompileBASE(CompileSELF(setterBody, 'ClassCtor'),
+                                            right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(setterBody, 'ClassCtor'),
                                                 // TODO: detect TRUE base class
                                                 def.base ? def.base.raw.print_to_string() : baseClass,
-                                                setterName)
+                                                setterName))
                                         })
                                     }),
 
@@ -254,10 +277,10 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             left: AccessNS('_.' + method.name, null, node),
                                             operator: '=',
                                             // TODO: insert properties initializations
-                                            right: CompileBASE(CompileSELF(method.body.raw, 'ClassCtor'),
+                                            right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(method.body.raw, 'ClassCtor'),
                                                 // TODO: detect TRUE base class
                                                 def.base ? def.base.raw.print_to_string() : baseClass,
-                                                method.name)
+                                                method.name))
                                         }),
                                     isProtected(method.name) || isStaticMethod(method.name) ? null : make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Call, node, {

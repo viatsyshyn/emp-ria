@@ -1691,6 +1691,28 @@
             _P && _C && assertException(function () {
                 GenericClass(BaseClass, Class);
             }, Error('desc'));
+        },
+
+        testGenericTypeReferenceInMembers: function () {
+            var ItemClass = CLASS(
+                'ItemClass', []);
+
+            var BaseClass = CLASS(
+                GENERIC('TItem'),
+                'BaseClass', [
+                    TItem, function method() {
+                        return new TItem();
+                    },
+
+                    TItem, function method2() {
+                        return TItem();
+                    }
+                ]);
+
+            var instance = new BaseClass(ItemClass);
+
+            assertInstanceOf(ItemClass, instance.method());
+            assertInstanceOf(ItemClass, instance.method2());
         }
     };
 
