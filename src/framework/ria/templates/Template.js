@@ -4,7 +4,7 @@ REQUIRE('ria.dom.Dom');
 
 REQUIRE('ria.reflection.ReflectionClass');
 
-/** @namespace hwax.templates */
+/** @namespace ria.templates */
 NAMESPACE('ria.templates', function () {
     "use strict";
 
@@ -194,7 +194,7 @@ NAMESPACE('ria.templates', function () {
                 var tpl = new tplClass;
 
                 if (!(tpl instanceof SELF))
-                    throw new Exception('Can render model only with ' + hwax.templates.Template.__IDENTIFIER__);
+                    throw new Exception('Can render model only with ' + ria.__API.getIdentifierOfType(SELF));
 
                 options_ && tpl.options(options_);
 

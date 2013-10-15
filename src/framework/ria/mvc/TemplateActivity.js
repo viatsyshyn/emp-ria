@@ -3,6 +3,7 @@ REQUIRE('ria.mvc.DomActivity');
 REQUIRE('ria.templates.Template');
 
 NAMESPACE('ria.mvc', function () {
+    "use strict";
 
     /** @class ria.mvc.TemplateBind */
     ANNOTATION(
@@ -34,9 +35,13 @@ NAMESPACE('ria.mvc', function () {
                 if (!ref.isAnnotatedWith(ria.mvc.TemplateBind))
                     throw new ria.mvc.MvcException('ria.mvc.TemplateActivity expects annotation ria.mvc.TemplateBind');
 
-                var tpls = ref.findAnnotation(ria.mvc.TemplateBind).pop().tpl;
-                if (!Array.isArray(tpls))
-                    tpls = [tpls];
+                var tpls = [].concat.apply([], ref.findAnnotation(ria.mvc.TemplateBind).map(function (_) {
+                    var tpl = _.tpl;
+                    if (!Array.isArray(tpl))
+                        tpl = [tpl];
+
+                    return tpl;
+                }));
 
                 if (tpls.some(function (_) { return _ === undefined; }))
                     throw new ria.mvc.MvcException(ref.getName() + " is annotated with ria.mvc.TemplateBind"
