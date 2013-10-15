@@ -13,9 +13,9 @@
             assertNoException(function () { wrapper('1'); });
             assertNoException(function () { wrapper('1', 2); });
 
-            assertException(function () { wrapper(); }, Error('Bad argument for test.TestDelegate'));
-            assertException(function () { wrapper(2, '3'); }, Error('Bad argument for test.TestDelegate'));
-            assertException(function () { wrapper('2', 1, 3); }, Error('Bad argument for test.TestDelegate'));
+            assertException(function () { wrapper(); }, Error('Bad argument for window.TestDelegate'));
+            assertException(function () { wrapper(2, '3'); }, Error('Bad argument for window.TestDelegate'));
+            assertException(function () { wrapper('2', 1, 3); }, Error('Bad argument for window.TestDelegate'));
         },
 
         testCheckReturn: function () {
@@ -26,7 +26,7 @@
             var wrapper = d(function (s) { return s; });
 
             assertNoException(function () { wrapper(true); });
-            assertException(function () { wrapper(2); }, Error('Bad return of test.TestDelegate'));
+            assertException(function () { wrapper(2); }, Error('Bad return of window.TestDelegate'));
         },
 
         /*testClassOf: function () {
@@ -45,12 +45,12 @@
             assertNoException(function () { objProcessor(2); });
 
             var stringProcessor = Processor(String, String, function (source) { return source; });
-            assertException(function () { stringProcessor(true); }, Error('Bad argument for test.Processor'));
+            assertException(function () { stringProcessor(true); }, Error('Bad argument for window.Processor'));
             assertNoException(function () { stringProcessor("Source"); });
-            assertException(function () { stringProcessor(2); }, Error('Bad argument for test.Processor'));
+            assertException(function () { stringProcessor(2); }, Error('Bad argument for window.Processor'));
 
             var stringNumberProcessor = Processor(String, Number, function (source) { return source; });
-            assertException(function () { stringNumberProcessor("Source"); }, Error('Bad return of test.Processor'));
+            assertException(function () { stringNumberProcessor("Source"); }, Error('Bad return of window.Processor'));
         }
     };
 })();

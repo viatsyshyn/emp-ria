@@ -13,7 +13,7 @@ var globalFunctions = [];
 var Exception = ria.__API.Exception;
 
 ria.__SYNTAX.PropertyDescriptor.prototype.isOfBooleanType = function () {
-    return this.type.raw.print_to_string() === 'Boolean';
+    return this.type && this.type.raw && this.type.raw.print_to_string() === 'Boolean';
 };
 
 function AccessNS(parts, top, node) {
@@ -90,3 +90,37 @@ function SymbolsCompiler(ns, node, descend) {
 }
 
 compilers.push(SymbolsCompiler);
+
+function CompileSELF(node, clazz) {
+    return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {
+        if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
+            var name = node.name;
+            if ('SELF' === name) {
+                return AccessNS(clazz, null, node);
+            }
+        }
+    }))
+}
+
+function ProcessSELF(token, clazz) {
+    if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
+        return AccessNS(clazz);
+
+    if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
+        return make_node(UglifyJS.AST_Undefined);
+
+    return CompileSELF(token.raw, clazz);
+}
+
+function CompileReturnType(token, selfRefName, node) {
+    if (token == undefined)
+        return make_node(UglifyJS.AST_Null);
+
+    if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
+        return AccessNS(selfRefName);
+
+    if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
+        return make_node(UglifyJS.AST_Undefined);
+
+    return CompileSELF(token.raw, selfRefName);
+}

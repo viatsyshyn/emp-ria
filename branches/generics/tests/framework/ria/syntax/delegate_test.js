@@ -15,7 +15,7 @@
             assertNotUndefined(Compare);
             assertFunction(Compare);
             assertTrue(ria.__API.isDelegate(Compare));
-            assertEquals('test.Compare', Compare.__META.name);
+            assertEquals('window.Compare', Compare.__META.name);
         },
 
         testBuildDelegateWithAnnotation: function () {

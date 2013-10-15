@@ -16,7 +16,7 @@
                     }
                 ]);
 
-            assertEquals('test.MyException', MyException.__META.name);
+            assertEquals('window.MyException', MyException.__META.name);
             assertNotUndefined(MyException);
             assertFunction(MyException);
         },
@@ -29,7 +29,7 @@
                 ]);
 
             var ChildException = EXCEPTION(
-                'ChildException', ria.__SYNTAX.EXTENDS(BaseException), [
+                'ChildException', EXTENDS(BaseException), [
                     function $() {BASE();}
                 ]);
 
@@ -45,7 +45,7 @@
                 'BaseClass', []);
 
             EXCEPTION_E(Error('Base class must be descendant of Exception'),
-                'MyException', ria.__SYNTAX.EXTENDS(BaseClass), [
+                'MyException', EXTENDS(BaseClass), [
                     [String],
                     String, function method(_1) {
                         return 'I think, this is error: ' + _1;

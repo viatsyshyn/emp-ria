@@ -52,29 +52,6 @@ function ClassNamedCtor() {
     return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
-function CompileSELF(node, clazz) {
-    return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {
-        if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
-            var name = node.name;
-            if ('SELF' === name) {
-                return AccessNS(clazz, null, node);
-            }
-        }
-    }))
-}
-
-function ProcessSELF(token, clazz) {
-    if (token instanceof ria.__SYNTAX.Tokenizer.SelfToken)
-        return AccessNS(clazz);
-
-    if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
-        return make_node(UglifyJS.AST_Null);
-
-    //console.info(token.__proto__.constructor.name);
-
-    return CompileSELF(token.raw, clazz);
-}
-
 function CompileBASE(node, baseClazz, method, clazz) {
     var found = false;
 
@@ -289,7 +266,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                                 AccessNS('ClassCtor', null, node),
                                                 AccessNS('_.' + method.name, null, node),
                                                 make_node(UglifyJS.AST_String, node, {value: method.name}),
-                                                method.retType ? ProcessSELF(method.retType, 'ClassCtor') : make_node(UglifyJS.AST_Null),
+                                                CompileReturnType(method.retType, 'ClassCtor', node),
                                                 make_node(UglifyJS.AST_Array, node, {
                                                     elements: method.argsTypes.map(function (_) { return ProcessSELF(_, 'ClassCtor') })
                                                 }),

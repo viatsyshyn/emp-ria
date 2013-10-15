@@ -51,14 +51,14 @@ function __WRAPPER_E(args, cb) {
 function ANNOTATION(arg) {
     var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
     ria.__SYNTAX.validateAnnotationDecl(def);
-    return ria.__SYNTAX.compileAnnotation('test.' + def.name, def);
+    return ria.__SYNTAX.compileAnnotation('window.' + def.name, def);
 }
 
 function ANNOTATION_E(error, arg) {
     __WRAPPER_E(ria.__API.clone(arguments), function (args) {
         var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer(args));
         ria.__SYNTAX.validateAnnotationDecl(def);
-        return ria.__SYNTAX.compileAnnotation('test.' + def.name, def);
+        return ria.__SYNTAX.compileAnnotation('window.' + def.name, def);
     });
 }
 
@@ -66,14 +66,14 @@ function ANNOTATION_E(error, arg) {
 function DELEGATE() {
     var def = ria.__SYNTAX.parseDelegate(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
     ria.__SYNTAX.validateDelegateDecl(def);
-    return ria.__SYNTAX.compileDelegate('test.' + def.name, def);
+    return ria.__SYNTAX.compileDelegate('window.' + def.name, def);
 }
 
 function DELEGATE_E(error, arg) {
     __WRAPPER_E(ria.__API.clone(arguments), function (args) {
         var def = ria.__SYNTAX.parseMember(new ria.__SYNTAX.Tokenizer(args));
         ria.__SYNTAX.validateDelegateDecl(def);
-        ria.__SYNTAX.compileDelegate('test.' + def.name, def);
+        ria.__SYNTAX.compileDelegate('window.' + def.name, def);
     });
 }
 
@@ -83,7 +83,7 @@ function DELEGATE_E(error, arg) {
 function INTERFACE(arg) {
     var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(arguments)));
     ria.__SYNTAX.validateInterfaceDecl(def);
-    return ria.__SYNTAX.compileInterface('test.' + def.name, def);
+    return ria.__SYNTAX.compileInterface('window.' + def.name, def);
 }
 
 /**
@@ -95,7 +95,7 @@ function INTERFACE_E(error, arg) {
     __WRAPPER_E(ria.__API.clone(arguments), function (args) {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
         ria.__SYNTAX.validateInterfaceDecl(def);
-        ria.__SYNTAX.compileInterface('test.' + def.name, def);
+        ria.__SYNTAX.compileInterface('window.' + def.name, def);
     });
 }
 
@@ -106,7 +106,7 @@ function CLASS(arg) {
     var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
     ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
     ria.__SYNTAX.validateClassDecl(def, 'Class');
-    return ria.__SYNTAX.compileClass('test.' + def.name, def);
+    return ria.__SYNTAX.compileClass('window.' + def.name, def);
 }
 
 /**
@@ -119,7 +119,7 @@ function CLASS_E(error, arg) {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
         ria.__SYNTAX.validateClassDecl(def, 'Class');
-        ria.__SYNTAX.compileClass('test.' + def.name, def);
+        ria.__SYNTAX.compileClass('window.' + def.name, def);
     });
 }
 
@@ -130,7 +130,7 @@ function EXCEPTION(arg) {
     var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(ria.__API.clone(arguments)));
     ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Exception);
     ria.__SYNTAX.validateException(def);
-    return ria.__SYNTAX.compileClass('test.' + def.name, def);
+    return ria.__SYNTAX.compileClass('window.' + def.name, def);
 }
 
 /**
@@ -143,7 +143,7 @@ function EXCEPTION_E(error, arg) {
         var def = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer(args));
         ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Exception);
         ria.__SYNTAX.validateException(def);
-        ria.__SYNTAX.compileClass('test.' + def.name, def);
+        ria.__SYNTAX.compileClass('window.' + def.name, def);
     });
 }
 

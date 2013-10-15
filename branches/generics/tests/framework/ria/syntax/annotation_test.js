@@ -15,7 +15,7 @@
             assertNotUndefined(result);
             assertFunction(result);
             assertTrue(ria.__API.isAnnotation(result));
-            assertEquals('test.Compare', result.__META.name);
+            assertEquals('window.Compare', result.__META.name);
         },
 
         testBuildAnnotationWithAnnotation: function () {

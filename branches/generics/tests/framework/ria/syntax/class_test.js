@@ -126,7 +126,7 @@
                     }
                 ]);
 
-            CLASS_E(Error('Can NOT extend final class test.BaseClass'),
+            CLASS_E(Error('Can NOT extend final class window.BaseClass'),
                 FINAL, 'MyClass', EXTENDS(BaseClass), [
 
 
@@ -1325,7 +1325,7 @@
                     VOID, function z(t, y_) {}
                 ]);
 
-            CLASS_E(Error('Method "op" of interface test.MyIfc not implemented'),
+            CLASS_E(Error('Method "op" of interface window.MyIfc not implemented'),
                 'ChildClass', IMPLEMENTS(MyIfc), []);
 
             CLASS_E(Error('Method requires argument "z" that base does not have or optional. Method: "z"'),
@@ -1337,7 +1337,7 @@
                     VOID, function z(t, y, z) {}
                 ]);
 
-            CLASS_E(Error('Method "op" returns String, but base returns test.MyIfc'),
+            CLASS_E(Error('Method "op" returns String, but base returns window.MyIfc'),
                 'ChildClass', IMPLEMENTS(MyIfc), [
                     [[String, Boolean]],
                     VOID, function z(t, y) {},
@@ -1369,7 +1369,7 @@
                     BaseClass, 'myProp'
                 ]);
 
-            CLASS_E(Error('Method "getMyProp" of interface test.MyIfc not implemented'),
+            CLASS_E(Error('Method "getMyProp" of interface window.MyIfc not implemented'),
                 'ChildClass', IMPLEMENTS(MyIfc), []);
         },
 
