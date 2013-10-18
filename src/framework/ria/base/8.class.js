@@ -278,7 +278,7 @@
     };
 
     ria.__API.Class = (function () {
-        function ClassBase() { ria.__API.init(this, ClassBase, ClassBase.prototype.$, arguments); }
+        function ClassBase() { return ria.__API.init(this, ClassBase, ClassBase.prototype.$, arguments); }
         ria.__API.clazz(ClassBase, 'Class', null, [], []);
 
         ClassBase.prototype.$ = function () {
