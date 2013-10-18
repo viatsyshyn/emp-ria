@@ -3,7 +3,7 @@
     /** @class ria.__API.Exception */
     ria.__API.Exception = (function () {
         "use strict";
-        function ExceptionBase() { ria.__API.init(this, ExceptionBase, ExceptionBase.prototype.$, arguments); }
+        function ExceptionBase() { return ria.__API.init(this, ExceptionBase, ExceptionBase.prototype.$, arguments); }
         ria.__API.clazz(ExceptionBase, 'Exception', null, [], []);
 
         ExceptionBase.prototype.$ = function (msg, inner_) {
