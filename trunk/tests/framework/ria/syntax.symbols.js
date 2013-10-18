@@ -38,8 +38,9 @@ function __WRAPPER_E(args, cb) {
         if (e.name == 'AssertError')
             throw e;
 
-        if (error && e.message != error.message) {
-            fail('Expected error "' + error.message + '", actual: "' + e.message + '"');
+        var emsg = e.getMessage ? e.getMessage() : e.message;
+        if (error && error.message != emsg) {
+            fail('Expected error "' + error.message + '", actual: "' + emsg + '"');
         }
 
         return;
