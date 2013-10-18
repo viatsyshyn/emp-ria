@@ -1713,6 +1713,62 @@
 
             assertInstanceOf(ItemClass, instance.method());
             assertInstanceOf(ItemClass, instance.method2());
+        },
+
+        testGenericRestrictionsAndExtending: function () {
+            var BaseBaseModel = CLASS(
+                'BaseBaseModel', []);
+
+            var BaseModel = CLASS(
+                GENERIC('TKey', ClassOf(BaseBaseModel)),
+                'BaseModel', []);
+
+            var BaseBaseTemplate = CLASS(
+                'BaseBaseTemplate', []);
+
+            var BaseTemplate = CLASS(
+                GENERIC('TKey', ClassOf(BaseBaseModel)),
+                'BaseTemplate', [
+                    BaseModel.OF(TKey), 'model'
+                ]);
+
+            var ChildBaseModel = CLASS(
+                'ChildBaseModel', EXTENDS(BaseBaseModel), []);
+
+            CLASS(
+                GENERIC('TKey', ClassOf(ChildBaseModel)),
+                'BaseTemplate3', [
+                    BaseModel.OF(TKey), 'model'
+                ]);
+
+            _DEBUG && (function () {
+                assertException(function () {
+                    CLASS(
+                        GENERIC('TKey', ClassOf(Class)),
+                        'BaseTemplate', [
+                            BaseModel.OF(TKey), 'model'
+                        ]);
+                }, Error('Specification of window.BaseModel failed.'));
+
+                assertException(function () {
+                    CLASS(
+                        GENERIC('TKey'),
+                        'BaseTemplate2', [
+                            BaseModel.OF(TKey), 'model'
+                        ]);
+                }, Error('Specification of window.BaseModel failed.'));
+
+                var OtherBaseModel = CLASS(
+                    'OtherBaseModel', []);
+
+                assertException(function () {
+                    CLASS(
+                        GENERIC('TKey', ClassOf(OtherBaseModel)),
+                        'BaseTemplate3', [
+                            BaseModel.OF(TKey), 'model'
+                        ]);
+                }, Error('Specification of window.BaseModel failed.'));
+            })();
         }
     };
 

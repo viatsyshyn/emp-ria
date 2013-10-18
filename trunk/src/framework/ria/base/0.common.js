@@ -239,12 +239,43 @@ ria.__API = ria.__API || {};
             baseSpecs = clazz.__META.baseSpecs || [],
             genericTypes = clazz.__META.genericTypes.slice(baseSpecs.length);
 
-        _DEBUG && genericTypes.forEach(function (type, index) {
-            var spec = specs[index];
-            type.specs.forEach(function (restriction) {
-                ria.__SYNTAX.checkArg(type.name, restriction, spec);
+        try {
+            _DEBUG && genericTypes.forEach(function (type, index) {
+                var spec = specs[index];
+                var typeSpecs = type.specs.slice();
+
+                if (ria.__API.isGeneralizedType(spec)) {
+                    var specSpecs = spec.specs.slice();
+                    if (ria.__API.isClassOfDescriptor(typeSpecs[0])) {
+                        if (!ria.__API.isClassOfDescriptor(specSpecs[0]))
+                            throw Error('Generic type ' + type.name + ' restricts to ' + ria.__API.getIdentifierOfType(typeSpecs[0]));
+
+                        try {
+                            ria.__SYNTAX.checkArg(type.name, typeSpecs[0], specSpecs[0]);
+                        } catch (e) {
+                            throw Exception('Generic type ' + type.name + ' restricts to ' + ria.__API.getIdentifierOfType(typeSpecs[0]) + ', but got ' + ria.__API.getIdentifierOfType(specSpecs[0]), e);
+                        }
+
+                        typeSpecs.shift();
+                        specSpecs.shift();
+                    }
+
+                    var typeIfcSpecs = typeSpecs.map(function (_) { return _.valueOf() ;});
+                    var specIfcSpecs = specSpecs.map(function (_) { return _.valueOf() ;});
+
+                    if (!typeIfcSpecs.every(function (_) { return specIfcSpecs.indexOf(_) >= 0; }))
+                        throw Error('Generic type ' + type.name + ' restricts to ' + typeIfcSpecs.map(function (_) { return ria.__API.getIdentifierOfType(_); }).join(',')
+                            + ', but got ' + specIfcSpecs.map(function (_) { return ria.__API.getIdentifierOfType(_); }).join(','));
+
+                } else {
+                    typeSpecs.forEach(function (restriction) {
+                        ria.__SYNTAX.checkArg(type.name, restriction, spec);
+                    });
+                }
             });
-        });
+        } catch (e) {
+            throw new Exception('Specification of ' + ria.__API.getIdentifierOfType(clazz) + ' failed.', e);
+        }
 
         return new ria.__API.specify(clazz, specs);
     };
