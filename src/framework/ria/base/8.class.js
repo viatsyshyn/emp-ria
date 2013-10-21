@@ -184,7 +184,7 @@
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
 
         var genericTypes = clazz.__META.genericTypes || [],
-            genericTypesLength = genericTypes.length,
+            genericTypesLength = genericTypes.length - clazz.__META.baseSpecs.length,
             genericSpecs = clazz.__META.baseSpecs.concat(args.slice(0, genericTypesLength));
 
         args = args.slice(genericTypesLength);
