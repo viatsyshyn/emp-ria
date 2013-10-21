@@ -23,6 +23,14 @@
     }
 
     TestCase("ReflectionClassTestCase").prototype = {
+        tearDown: function () {
+            if (ria.__SYNTAX) {
+                ria.__SYNTAX.Registry.cleanUp();
+                ria.__SYNTAX.registerSymbolsMeta();
+                window.SELF = ria.__SYNTAX.Modifiers.SELF;
+            }
+        },
+
         testGetName: function () {
             var BugWarrior = CLASS('BugWarrior', []);
             var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
@@ -53,7 +61,12 @@
 
             var reflectionCls = new ria.reflection.ReflectionClass(BugWarriorTaras);
 
-            assertEquals(reflectionCls.getBaseClassReflector().getClazz(), reflectionCls.getBaseClass());
+            var baseViaReflector = reflectionCls.getBaseClassReflector().getClazz();
+            assertEquals(BugWarrior, baseViaReflector);
+            var base = reflectionCls.getBaseClass();
+            assertEquals(BugWarriorTaras, baseViaReflector);
+
+            assertEquals(base, baseViaReflector);
         },
         testGetInterfaces: function(){
             var TestInterface =

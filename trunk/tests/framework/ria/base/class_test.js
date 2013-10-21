@@ -97,6 +97,36 @@
 
             assertUndefined(instance.testProp);
             assertNotUndefined(instance.__PROTECTED.testProp);
+        },
+
+        testGenericInstantiation: function () {
+
+            var Clazz = this.Clazz;
+
+            var BaseClazz = function () {
+                var T = ria.__API.getGeneralizedType('T', []);
+                function BaseClazz() {
+                    return ria.__API.init(this, BaseClazz, BaseClazz.prototype.$, arguments)
+                }
+                ria.__API.clazz(BaseClazz, 'BaseClazz', Clazz, [], [], false, [T], []);
+                BaseClazz.prototype.$ = function (t_) { Clazz.prototype.$.call(this); };
+                ria.__API.ctor('$', BaseClazz, BaseClazz.prototype.$, [T], ['t_'], []);
+                ria.__API.compile(BaseClazz);
+                return BaseClazz;
+            }();
+
+            var ChildClazz = function () {
+                function ChildClazz() {
+                    return ria.__API.init(this, ChildClazz, ChildClazz.prototype.$, arguments)
+                }
+                ria.__API.clazz(ChildClazz, 'ChildClazz', BaseClazz, [], [], false, [], [String]);
+                ChildClazz.prototype.$ = function (t_, g_) { BaseClazz.prototype.$.call(this, t_); };
+                ria.__API.ctor('$', ChildClazz, ChildClazz.prototype.$, [String, Number], ['t_', 'g_'], []);
+                ria.__API.compile(ChildClazz);
+                return ChildClazz;
+            }();
+
+            var instance = new ChildClazz('test', 5);
         }
     }
 })(ria);
