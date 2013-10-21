@@ -17,7 +17,7 @@
             [[ria.__API.Class]],
             Boolean, function equals(other) {},
             [[String]],
-            FINAL, function getSpecsOf(name) {}
+            ria.__SYNTAX.Modifiers.FINAL, function getSpecsOf(name) {}
         ]]));
 
     var ExceptionMeta = ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([

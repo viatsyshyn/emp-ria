@@ -2,6 +2,15 @@
     "use strict";
 
     TestCase("InterfaceTestCase").prototype = {
+
+        tearDown: function () {
+            if (ria.__SYNTAX) {
+                ria.__SYNTAX.Registry.cleanUp();
+                ria.__SYNTAX.registerSymbolsMeta();
+                window.SELF = ria.__SYNTAX.Modifiers.SELF;
+            }
+        },
+
         testSelf: function () {
 
             var MyIfc = INTERFACE(

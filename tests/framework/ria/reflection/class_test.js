@@ -677,6 +677,21 @@
 
             assertInstanceOf(ChildClass, inst);
         },
+        testInstantiateGenericChild2: function(){
+            var BaseClass = CLASS(
+                GENERIC('T'),
+                'BaseClass', []);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass), []);
+
+            var reflectionCls = new ria.reflection.ReflectionClass(ChildClass);
+
+            assertNotUndefined(reflectionCls);
+            var inst = reflectionCls.instantiate();
+
+            assertInstanceOf(ChildClass, inst);
+        },
         testParentsReflector: function(){
             var aDef = ClassDef([
                 'A', [

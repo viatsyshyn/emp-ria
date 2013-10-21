@@ -84,7 +84,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
         // add omitted default constructor
         var classCtorDef = def.methods.filter(function (_) {return _.name === '$'; }).pop();
+        var baseCtorDef = baseSyntaxMeta ? baseSyntaxMeta.methods.filter(function (_) {return _.name === '$'; }).pop() : null;
         if (!classCtorDef) {
+            if (baseCtorDef && baseCtorDef.argsNames.filter(function(_) { return !IS_OPTIONAL.test(_)}).length > 0) {
+                throw Error('Can NOT create default constructor, base requires more then 0 args');
+            }
+
             classCtorDef = new ria.__SYNTAX.MethodDescriptor('$', [], [], null, {}, getDefaultCtor(), []);
             def.methods.unshift(classCtorDef);
         }
@@ -228,6 +233,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             return undefined;
 
         ria.__API.Assert(true, 'This should never assert this');
+        return undefined;
     }
 
     function validateMethodSignatureOverride(method, parentMethod, FakeSelf, genericTypes, genericSpecs) {

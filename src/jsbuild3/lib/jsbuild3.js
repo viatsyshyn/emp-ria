@@ -195,6 +195,10 @@ function appStart() {
  * @returns string
  */
 function compile(path, config, appClass) {
+
+    //ria.__SYNTAX.Registry.cleanUp();
+    //ria.__SYNTAX.registerSymbolsMeta();
+
     var code = this.loadModule(resolve(path, config), config, {});
 
     // add runtime
