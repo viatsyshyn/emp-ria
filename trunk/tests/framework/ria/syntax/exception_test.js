@@ -2,6 +2,15 @@
     "use strict";
 
     TestCase("ExceptionTestCase").prototype = {
+
+        tearDown: function () {
+            if (ria.__SYNTAX) {
+                ria.__SYNTAX.Registry.cleanUp();
+                ria.__SYNTAX.registerSymbolsMeta();
+                window.SELF = ria.__SYNTAX.Modifiers.SELF;
+            }
+        },
+
         testBuildException: function () {
 
             var MyException = EXCEPTION(

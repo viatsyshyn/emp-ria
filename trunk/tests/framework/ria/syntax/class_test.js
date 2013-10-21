@@ -15,6 +15,7 @@
             if (ria.__SYNTAX) {
                 ria.__SYNTAX.Registry.cleanUp();
                 ria.__SYNTAX.registerSymbolsMeta();
+                window.SELF = ria.__SYNTAX.Modifiers.SELF;
             }
         },
 
@@ -702,6 +703,10 @@
 
             CLASS_E(Error('Base call are forbidden for non overriden methods. Method: "method7"'),
                 'SecondClass2', EXTENDS(BaseClass), [
+                    function $() {
+                        BASE(5);
+                    },
+
                     VOID, function method7() {
                         BASE();
                     }
@@ -1769,6 +1774,16 @@
                         ]);
                 }, Error('Specification of window.BaseModel failed.'));
             })();
+        },
+
+        testMissingConstructorInChild: function () {
+            var BaseClass = CLASS(
+                'BaseClass', [
+                    function $(p, b) { BASE(); }
+                ]);
+
+            CLASS_E(Error('Can NOT create default constructor, base requires more then 0 args'),
+                'ChildClass', EXTENDS(BaseClass), [])
         }
     };
 
