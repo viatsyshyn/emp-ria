@@ -16,17 +16,30 @@ NS('ria.reflection', function () {
 
             // $$ - instance factory
             function $$(instance, Clazz, ctor, args) {
-                var clazz = args[0];
-                if (clazz instanceof ria.__API.Class)
-                    clazz = clazz.getClass();
+                var clazz = args[0],
+                    specs = args[1];
 
                 if (clazz instanceof ria.__API.ClassDescriptor)
                     clazz = clazz.ctor;
 
+                if (clazz instanceof ria.__API.Class) {
+                    var instance = clazz;
+                    clazz = instance.getClass();
+                    // TODO; fetch specs from instance
+                }
+
+                if (ria.__API.isSpecification(clazz)) {
+                    var specify = clazz;
+                    clazz = specify.type;
+                    specs = specify.specs;
+                }
+
                 if (!ria.__API.isClassConstructor(clazz))
                     throw new ria.reflection.Exception('ReflectionFactory works only on CLASS');
 
-                var name = clazz.__META.name;
+                args.splice(0, 1, clazz, specs);
+
+                var name = ria.__API.getIdentifierOfType(ria.__API.specify(clazz, specs));
                 if (cache.hasOwnProperty(name))
                     return cache[name];
 
@@ -35,10 +48,11 @@ NS('ria.reflection', function () {
 
             READONLY, ClassOf(Class), 'clazz',
 
-            [[ClassOf(Class)]],
-            function $(clazz) {
+            [[ClassOf(Class), Array]],
+            function $(clazz, specs_) {
                 BASE();
                 this.clazz = clazz;
+                this._specs = specs_ || [];
             },
 
             String, function getName() { return this.clazz.__META.name; },

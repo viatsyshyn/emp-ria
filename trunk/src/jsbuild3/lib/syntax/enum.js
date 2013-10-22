@@ -53,7 +53,8 @@ function EnumCompiler(ns, node, descend) {
             var n = props[k];
             if (!(n.value instanceof UglifyJS.AST_String
                 || n.value instanceof UglifyJS.AST_Number
-                || n.value instanceof UglifyJS.AST_Boolean))
+                || n.value instanceof UglifyJS.AST_Boolean
+                || n.value instanceof  UglifyJS.AST_Unary))
                 throw Error('Value of enum ' + name + ' expected to be string, number or boolean, got ' + n.value.print_to_string());
 
             body[n.key] = n.value;

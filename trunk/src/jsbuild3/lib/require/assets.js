@@ -10,15 +10,22 @@ globalNsRoots.push('__ASSETS');
 
 function resolveAsset(path, config) {
     var appRoot = config.getBasePath();
-    var appAssetsDir = appRoot || config.getAppDir();
+    var appAssetsDir = config.getAssetsDir() || appRoot;
 
-    path = path.replace(/^~\//gi, appRoot);
-    path = path.replace(/^\.\//gi, appAssetsDir);
+    // todo: move this to plugin
+    if (/i18n\//.test(path)) {
+        path = path.replace(/i18n\//, 'i18n/' + config.getOption('i18n').locale + '/');
+    }
+    // end
 
-    if (!path.match(/^\//i))
+    path = path.replace(/^~\//, appRoot);
+    path = path.replace(/^\.\//, appAssetsDir);
+
+    if (!path.match(/^\w\:/i) && !path.match(/^\//i))
         path = appAssetsDir + path;
 
     path = path.replace(/\/\//gi, '/');
+    path = path.replace(/\.\/\.\//gi, './');
 
     return path;
 }

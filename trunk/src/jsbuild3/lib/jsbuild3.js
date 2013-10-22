@@ -196,6 +196,8 @@ function appStart() {
  */
 function compile(path, config, appClass) {
 
+    //console.log(config.getAssetsDir());
+
     //ria.__SYNTAX.Registry.cleanUp();
     //ria.__SYNTAX.registerSymbolsMeta();
 

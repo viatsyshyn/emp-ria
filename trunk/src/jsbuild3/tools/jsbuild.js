@@ -97,7 +97,9 @@ function load_global(file) {
         "../lib/syntax/post.js",
         "../lib/require/deps.js",
         "../lib/require/assets.js",
-        "../lib/assets/jade.js"
+        "../lib/assets/jade.js",
+        "../lib/assets/txt.js",
+        "../lib/assets/json.js"
         ])
     .map(function(file){
             return path.join(path.dirname(fs.realpathSync(__filename)), file);
