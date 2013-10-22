@@ -35,7 +35,7 @@ function ModuleConfiguration(params, config) {
     this.outFile = params['out'];
     this.appClass = params['app'];
     this.appDir = params.appDir ? PATH.resolve(config.getBasePath() + (params.appDir || 'app')) + '/' : null;
-    this.assetDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetDir || 'assets')) + '/' : null;
+    this.assetsDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetsDir || 'assets')) + '/' : null;
     this.libs = params.libs || {};
     this.globals = [].slice.call(params.globals || []);
 }
@@ -58,11 +58,13 @@ ModuleConfiguration.prototype = {
     /** @returns String */
     getAppDir: function () { return this.appDir; },
     /** @returns String */
-    getAssetDir: function () { return this.assetDir; },
+    getAssetsDir: function () { return this.assetsDir; },
     /** @returns Object */
     getLibs: function () { return this.libs; },
     /** @returns String[] */
-    getGlobals: function () { return this.globals; }
+    getGlobals: function () { return this.globals; },
+    /** @returns Object */
+    getOption: function (name) { return this.options[name] || null; }
 };
 
 /**
@@ -72,10 +74,13 @@ ModuleConfiguration.prototype = {
  * @param {String} path
  */
 function Configuration(config, path) {
+    if (config.version != 3)
+        throw Error('Unsupported configuration file. Version: ' + config.version)
+
     this.basePath = PATH.dirname(path) + '/';
 
     this.appDir = PATH.resolve(this.basePath + (config.appDir || 'app')) + '/';
-    this.assetDir = PATH.resolve(this.basePath + (config.assetDir || 'assets')) + '/';
+    this.assetsDir = PATH.resolve(this.basePath + (config.assetsDir || 'assets')) + '/';
 
     this.libs = config.libs || {};
 
@@ -89,11 +94,11 @@ function Configuration(config, path) {
 
 Configuration.prototype = {
     /** @returns String */
-    getBasePath: function () { return this.basePath; },
+    getBasePath: function () { return PATH.resolve(this.basePath) + '/'; },
     /** @returns String */
     getAppDir: function () { return this.moduleConfig.getAppDir() || this.appDir; },
     /** @returns String */
-    getAssetDir: function () { return this.moduleConfig.getAssetDir() || this.assetDir; },
+    getAssetsDir: function () { return this.moduleConfig.getAssetsDir() || this.assetsDir; },
     /** @returns Object */
     getLibs: function () { return merge(merge({}, this.moduleConfig.getLibs()), this.libs); },
     getGlobals: function () { return [].concat(this.moduleConfig.getGlobals(), this.globals || []); },
@@ -102,10 +107,6 @@ Configuration.prototype = {
     getModules: function () { return [].slice.call(this.modules); },
     /** @returns PluginConfiguration[] */
     getPlugins: function () { return [].slice.call(this.plugins); },
-    /** @returns String */
-    resolveFilePath: function (name) { return PATH.resolve(this.getAppDir() + name); },
-    /** @returns String */
-    resolveAssetPath: function (name) { return PATH.resolve(this.getAssetDir() + name); },
     /**
      * @param {String} name
      * @returns Object
@@ -115,7 +116,9 @@ Configuration.prototype = {
         return cfg.hasOwnProperty(name) ? cfg[name] : {};
     },
     /** @param {ModuleConfiguration} config */
-    setModuleConfig: function (config) { this.moduleConfig = config; }
+    setModuleConfig: function (config) { this.moduleConfig = config; },
+    /** @returns Object */
+    getOption: function (name) { return this.moduleConfig.getOption(name) || this.options[name] || null; }
 };
 
 exports.Configuration = Configuration;
