@@ -21,6 +21,9 @@
         if ('string' !== typeof name)
             throw Error('String is only acceptable type for name');
 
+        if (registry.hasOwnProperty('window.' + name))
+            return registry['window.' + name];
+
         return registry.hasOwnProperty(name)
             ? registry[name]
             : null;

@@ -45,11 +45,11 @@ function processAnnotation(_) {
 }
 
 function ClassCtor() {
-    return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
+    return $$(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
 function ClassNamedCtor() {
-    return (ClassCtor.$$ || ria.__API.init)(this, ClassCtor, _.$, [].slice.call(arguments));
+    return $$(this, ClassCtor, _.$, [].slice.call(arguments));
 }
 
 function CompileBASE(node, baseClazz, method, clazz) {
@@ -106,6 +106,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
 
         //console.info('found class ' + def.name + ' in ' + ns);
 
+        ria.__SYNTAX.Registry.registry(ns + '.' + def.name, def);
+
         var genericTypesNames = (def.genericTypes || []).map(function (_) { return _[0].value });
 
         var processedMethods = [];
@@ -119,6 +121,17 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                 expression: make_node(UglifyJS.AST_Lambda, node, {
                     argnames: [],
                     body: [].concat(
+                        //compile factory is any
+                        [function () {
+                            var $$Def = def.methods.filter(function (_) { return _.name == '$$'; }).pop();
+                            processedMethods.push('$$');
+                            return make_node(UglifyJS.AST_Var, node, {
+                                definitions: [make_node(UglifyJS.AST_VarDef, null, {
+                                    name: make_node(UglifyJS.AST_SymbolRef, node, {name: '$$'}),
+                                    value: $$Def ? ProcessSELF($$Def.body, 'ClassCtor') : AccessNS('ria.__API.init')
+                                })]
+                            })
+                        }()],
                         [def.genericTypes.length ? CompileGenericTypes(def.genericTypes, node) : null],
                         [ToAst(ClassCtor)],
                         [make_node(UglifyJS.AST_SimpleStatement, node, {
@@ -136,18 +149,6 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 ]
                             })
                         })],
-                        //compile factory is any
-                        [make_node(UglifyJS.AST_SimpleStatement, node, {
-                            body: function () {
-                                var $$Def = def.methods.filter(function (_) { return _.name == '$$'; }).pop();
-                                processedMethods.push('$$');
-                                return make_node(UglifyJS.AST_Assign, node, {
-                                    left: AccessNS('ClassCtor.$$'),
-                                    operator: '=',
-                                    right: $$Def ? ProcessSELF($$Def.body, 'ClassCtor') : make_node(UglifyJS.AST_Null, node)
-                                })
-                            }()
-                        })],
                         [ToAst('var _ = ClassCtor.prototype')],
                         //compile ctors
                         [].concat.apply([], def.methods
@@ -158,6 +159,7 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                     argsTypes = ctorDef.argsTypes,
                                     body = ctorDef.body.raw,
                                     name = ctorDef.name;
+                                body.name = '';
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
@@ -186,13 +188,13 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             ]
                                         })
                                     }),
-                                    make_node(UglifyJS.AST_SimpleStatement, node, {
+                                    name != '$' ? make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
                                             left: AccessNS('ClassCtor.' + name, null, node),
                                             operator: '=',
                                             right: ToAst(ClassNamedCtor.toString().replace('_.$', '_.' + name))
                                         })
-                                    })
+                                    }) : null
                                 ];
                             })),
                         //compile properties,
@@ -210,6 +212,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 var getterBody = getterDef.body.raw,
                                     setterBody = !property.flags.isReadonly ? setterDef.body.raw : null;
 
+                                getterBody.name = '';
+                                setterBody && (setterBody.name = '');
                                 return [
                                     make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Assign, node, {
@@ -264,24 +268,26 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                         def.methods
                             .filter(function (_) { return processedMethods.indexOf(_.name) < 0 })
                             .map(function (method) {
+                                var body = method.body.raw;
+                                body.name = '';
                                 return [
-                                    isStaticMethod(method.name)
-                                        ? make_node(UglifyJS.AST_SimpleStatement, node, {
-                                            body: make_node(UglifyJS.AST_Assign, node, {
-                                                left: AccessNS('ClassCtor.' + method.name, null, node),
-                                                operator: '=',
-                                                right: CompileSELF(method.body.raw, 'ClassCtor')
+                                    make_node(UglifyJS.AST_SimpleStatement, node, {
+                                        body: isStaticMethod(method.name)
+                                            ?  make_node(UglifyJS.AST_Assign, node, {
+                                                    left: AccessNS('ClassCtor.' + method.name, null, node),
+                                                    operator: '=',
+                                                    right: CompileSELF(body, 'ClassCtor')
                                             })
-                                        })
-                                        : make_node(UglifyJS.AST_Assign, node, {
-                                            left: AccessNS('_.' + method.name, null, node),
-                                            operator: '=',
-                                            // TODO: insert properties initializations
-                                            right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(method.body.raw, 'ClassCtor'),
-                                                // TODO: detect TRUE base class
-                                                def.base ? def.base.raw.print_to_string() : baseClass,
-                                                method.name))
-                                        }),
+                                            : make_node(UglifyJS.AST_Assign, node, {
+                                                left: AccessNS('_.' + method.name, null, node),
+                                                operator: '=',
+                                                // TODO: insert properties initializations
+                                                right: CompileGenericTypesRefs(genericTypesNames, CompileBASE(CompileSELF(body, 'ClassCtor'),
+                                                    // TODO: detect TRUE base class
+                                                    def.base ? def.base.raw.print_to_string() : baseClass,
+                                                    method.name))
+                                            })
+                                    }),
                                     isProtected(method.name) || isStaticMethod(method.name) ? null : make_node(UglifyJS.AST_SimpleStatement, node, {
                                         body: make_node(UglifyJS.AST_Call, node, {
                                             expression: AccessNS('ria.__API.method', null, node),
