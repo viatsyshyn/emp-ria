@@ -72,19 +72,20 @@ NAMESPACE('ria.mvc', function () {
                 this._loaderTimer = new ria.async.Timer.$once(300, function (timer, lag) {
                     this.dom.addClass(MODEL_WAIT_CLASS);
                     this._loaderTimer = null;
-                }.bind(this));
+                }, this);
 
                 return BASE(future);
             },
 
-            [[String]],
-            OVERRIDE, VOID, function onModelComplete_(msg_) {
+            OVERRIDE, VOID, function onRender_(model) {
                 this.dom.removeClass(MODEL_WAIT_CLASS);
 
-                BASE(msg_);
+                BASE(model);
 
-                if (this._loaderTimer)
+                if (this._loaderTimer) {
                     this._loaderTimer.cancel();
+                    this._loaderTimer = null;
+                }
             },
             ABSTRACT, ria.dom.Dom, function onDomCreate_() {},
 
