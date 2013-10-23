@@ -166,9 +166,10 @@ NAMESPACE('ria.mvc', function () {
             [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
             VOID, function loadSessionBinds_(ref, context, instanse) {
                 ref.getPropertiesReflector().forEach(function (_) {
-                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
+                    var t = _.getType();
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && ([String, Number].indexOf(t) >= 0 || ria.__API.isEnum(t) || ria.__API.isIdentifier(t))) {
                         var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
-                        _.invokeSetterOn(instanse, _.getType()(context.getSession().get(name, '')));
+                        _.invokeSetterOn(instanse, t(context.getSession().get(name, '')));
                     }
                 }.bind(this));
             },
@@ -176,9 +177,10 @@ NAMESPACE('ria.mvc', function () {
             [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
             VOID, function storeSessionBinds_(ref, context, instanse) {
                 ref.getPropertiesReflector().forEach(function (_) {
-                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && [String, Number].indexOf(_.getType()) >= 0) {
+                    var t = _.getType();
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && ([String, Number].indexOf(t) >= 0 || ria.__API.isEnum(t) || ria.__API.isIdentifier(t))) {
                         var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
-                        context.getSession().set(name, String(_.invokeGetterOn(instanse)));
+                        context.getSession().set(name, String(_.invokeGetterOn(instanse).valueOf()));
                     }
                 }.bind(this));
             },
@@ -244,10 +246,10 @@ NAMESPACE('ria.mvc', function () {
                             instanse.onInitialize();
                             instanse.dispatch(state);
 
+                            this.storeSessionBinds_(ref, context, instanse);
+
                             if (!state.isDispatched())
                                 continue;
-
-                            this.storeSessionBinds_(ref, context, instanse);
 
                             for(index = this.plugins.length; index > 0; index--)
                                 this.plugins[index - 1].postDispatch(state);

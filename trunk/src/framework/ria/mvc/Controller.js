@@ -88,7 +88,7 @@ NAMESPACE('ria.mvc', function () {
             [[String, String, Array]],
             VOID, function redirect_(controller, action, args) {
                 this.state.setController(controller);
-                this.state.setParams(args);
+                this.state.setParams(args || []);
                 this.state.setAction(action);
                 this.state.setDispatched(false);
                 this.state.setPublic(true);
@@ -105,7 +105,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function forward_(controller, action, args) {
                 this.state.setController(controller);
                 this.state.setParams(args);
-                this.state.setAction(action);
+                this.state.setAction(action || []);
                 this.state.setDispatched(false);
                 this.state.setPublic(false);
                 this.context.stateUpdated();
