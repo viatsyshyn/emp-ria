@@ -16,6 +16,7 @@ NS('ria.reflection', function () {
 
             // $$ - instance factory
             function $$(instance, Clazz, ctor, args) {
+                args = ria.__API.clone(args);
                 var clazz = args[0],
                     specs = args[1];
 
