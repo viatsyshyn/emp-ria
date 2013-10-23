@@ -124,3 +124,11 @@ function CompileReturnType(token, selfRefName, node) {
 
     return CompileSELF(token.raw, selfRefName);
 }
+
+function CompilePublicSymbolDef(name, defTree, node) {
+    return ria.__SYNTAX.isProtected(Array.isArray(name) ? name.join('.') : name) ? defTree : make_node(UglifyJS.AST_Assign, node, {
+        left: AccessNS(name, null, node),
+        operator: '=',
+        right: defTree
+    });
+}
