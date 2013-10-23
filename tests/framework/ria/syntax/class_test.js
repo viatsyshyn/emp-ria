@@ -1083,6 +1083,32 @@
             assertEquals(6, second.getValue());
         },
 
+        testPropertySetterOverride: function () {
+            var BaseClass = CLASS(
+                'BaseClass', [
+                    String, 'prop'
+                ]);
+
+            var ChildClass = CLASS(
+                'ChildClass', EXTENDS(BaseClass), [
+                    [[String]],
+                    OVERRIDE, VOID, function setProp(v) {
+                        BASE(v + '-test');
+                    }
+                ]);
+
+            var instance = new ChildClass;
+            instance.setProp('ha-ha');
+            assertEquals('ha-ha-test', instance.getProp());
+
+            assertNotNull(ChildClass.__META.properties["prop"]);
+            assertFunction(ChildClass.__META.properties["prop"].getter);
+            assertFunction(ChildClass.__META.properties["prop"].setter);
+
+            assertNotEquals(BaseClass.prototype.setProp, ChildClass.__META.properties["prop"].setter);
+            assertEquals(ChildClass.prototype.setProp, ChildClass.__META.properties["prop"].setter);
+        },
+
         test$$: function () {
             var BaseClass = CLASS(
                 'BaseClass', [
