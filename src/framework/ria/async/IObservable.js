@@ -6,7 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+REQUIRE('ria.async.Future');
+
 NAMESPACE('ria.async', function () {
+    "use strict";
 
     /** @class ria.async.Observer */
     DELEGATE(
@@ -21,6 +24,8 @@ NAMESPACE('ria.async', function () {
             SELF, function on(handler, scope_) {},
 
             [[Function]],
-            SELF, function off(handler) {}
+            SELF, function off(handler) {},
+
+            ria.async.Future, function ready() {}
         ]);
 });

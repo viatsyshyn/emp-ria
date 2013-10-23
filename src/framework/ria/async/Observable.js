@@ -8,7 +8,10 @@
 
 REQUIRE('ria.async.IObservable');
 
+REQUIRE('ria.async.Completer');
+
 NAMESPACE('ria.async', function () {
+    "use strict";
 
     /** @class ria.async.Observable */
     CLASS(
@@ -74,6 +77,15 @@ NAMESPACE('ria.async', function () {
 
             VOID, function clear() {
                 this._handlers = [];
+            },
+
+            ria.async.Future, function ready() {
+                var completer = new ria.async.Completer;
+                this.on(function (data_) {
+                    completer.complete(data_);
+                    return false; // remove this listener
+                });
+                return completer.getFuture();
             }
         ]);
 });

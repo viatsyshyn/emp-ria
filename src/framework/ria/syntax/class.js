@@ -623,6 +623,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
      */
     ria.__SYNTAX.compileClass = function (name, def) {
 
+        var className = name;
         var processedMethods = [];
 
         var $$Def = def.methods.filter(function (_1) { return _1.name == '$$'}).pop();
@@ -635,7 +636,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 window.SELF = ClassProxy;
                 return $$.call(undefined, this, ClassProxy, ClassProxy.prototype.$, arguments);
             } catch (e) {
-                throw new Exception('Error instantiating class ' + name, e);
+                throw new Exception('Error instantiating class ' + className, e);
             } finally {
                 window.SELF = _old_SELF;
             }
@@ -669,7 +670,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                         window.SELF = ClassProxy;
                         return $$.call(undefined, this, ClassProxy, ClassProxy.prototype[name], arguments);
                     } catch (e) {
-                        throw new Exception('Error instantiating class ' + name, e);
+                        throw new Exception('Error instantiating class ' + className, e);
                     } finally {
                         window.SELF = _old_SELF;
                     }

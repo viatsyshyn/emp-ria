@@ -61,9 +61,9 @@ NAMESPACE('ria.mvc', function () {
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.PartialUpdateRule)})
                     .map(function(_) {
                         var annotation = _.findAnnotation(ria.mvc.PartialUpdateRule).pop();
-                        var tplRef = new ria.reflection.ReflectionClass(annotation.tpl);
+                        var tplRef = annotation.tpl === null ? null : new ria.reflection.ReflectionClass(annotation.tpl);
                         return {
-                            tpl: tplRef.instantiate(),
+                            tpl: tplRef ? tplRef.instantiate() : null,
                             msg: annotation.msg_ || null,
                             methodRef: _
                         }
@@ -137,6 +137,9 @@ NAMESPACE('ria.mvc', function () {
                     if (_.msg !== null && _.msg != msg)
                         return false;
 
+                    if (!_.tpl)
+                        return true;
+
                     var modelClass = _.tpl.getModelClass();
 
                     if (ria.__API.isArrayOfDescriptor(modelClass))
@@ -162,8 +165,8 @@ NAMESPACE('ria.mvc', function () {
                 BASE(model, msg_);
                 var rule = this.doFindTemplateForPartialModel_(model, msg_ || '');
                 var tpl = rule.tpl;
-                this.onPrepareTemplate_(tpl, model, msg_);
-                tpl.assign(model);
+                tpl && this.onPrepareTemplate_(tpl, model, msg_);
+                tpl && tpl.assign(model);
                 if(rule.methodRef){
                     rule.methodRef.invokeOn(this, [tpl, model, msg_]);
                 }else{
