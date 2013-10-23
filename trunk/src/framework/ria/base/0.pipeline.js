@@ -118,10 +118,13 @@
             return PipelineMethodCall(body, meta, scope, [].slice.call(arguments), genericTypes, specs);
         };
 
-      
         f_.__META = meta;
 
-        _DEBUG && Object.freeze(f_);
+        Object.defineProperty(f_, '__META', {
+            writable: false,
+            configurable: false,
+            enumerable: false
+        });
 
         return f_;
     };
