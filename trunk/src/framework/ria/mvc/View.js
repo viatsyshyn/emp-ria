@@ -151,6 +151,11 @@ NAMESPACE('ria.mvc', function () {
                 return this._stack.slice();
             },
 
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            Boolean, function contains(activity) {
+                return this._stack.some(function (i) { return i instanceof activity; });
+            },
+
             [[ria.mvc.IActivity, Object, String]],
             VOID, function onActivityRefreshed_(activity, model, msg_) {
                 this._refreshEvents.notifyAndClear([activity, model, msg_]);

@@ -57,6 +57,9 @@ NAMESPACE('ria.mvc', function () {
             VOID, function reset() {},
 
             [[ria.mvc.ActivityRefreshedEvent]],
-            VOID, function onActivityRefreshed(callback) {}
+            VOID, function onActivityRefreshed(callback) {},
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            Boolean, function contains(activity) {}
         ]);
 });

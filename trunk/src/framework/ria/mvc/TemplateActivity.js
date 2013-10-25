@@ -88,14 +88,15 @@ NAMESPACE('ria.mvc', function () {
                         };
                     }).concat(partialUpdateWithMethods);
 
-
-
-                if (this._partialUpdateRules.length < 1 && this._templateClasses.length == 1) {
-                    this._partialUpdateRules.push({
-                        tpl: this._templateClasses[0],
-                        msg: null,
-                        selector: null,
-                        action: ria.mvc.PartialUpdateRuleActions.Replace
+                if (this._partialUpdateRules.length < 1) {
+                    var rules = this._partialUpdateRules;
+                    this._templateClasses.forEach(function (tpl) {
+                        rules.push({
+                            tpl: tpl,
+                            msg: undefined,
+                            selector: null,
+                            action: ria.mvc.PartialUpdateRuleActions.Replace
+                        })
                     })
                 }
             },
@@ -132,9 +133,9 @@ NAMESPACE('ria.mvc', function () {
 
 
 
-            Object, function doFindTemplateForPartialModel_(model, msg) {
+            Object, function doFindTemplateForPartialModel_(model, msg_) {
                 var matches = this._partialUpdateRules.filter(function (_) {
-                    if (_.msg !== null && _.msg != msg)
+                    if (_.msg !== null && _.msg !== msg_)
                         return false;
 
                     if (!_.tpl)
@@ -152,10 +153,10 @@ NAMESPACE('ria.mvc', function () {
                 });
 
                 if (matches.length == 0)
-                    throw new ria.mvc.MvcException('Found no template that can render ' + ria.__API.getIdentifierOfValue(model) + ' with message ' + msg);
+                    throw new ria.mvc.MvcException('Found no template that can render ' + ria.__API.getIdentifierOfValue(model) + ' with message ' + msg_);
 
                 if (matches.length > 1)
-                    throw new ria.mvc.MvcException('Found multiple templates that can render ' + ria.__API.getIdentifierOfValue(model) + ' with message ' + msg
+                    throw new ria.mvc.MvcException('Found multiple templates that can render ' + ria.__API.getIdentifierOfValue(model) + ' with message ' + msg_
                         + ', matches ' + matches.map(function (_) { return ria.__API.getIdentifierOfValue(_) }));
 
                 return matches.pop();
@@ -163,7 +164,7 @@ NAMESPACE('ria.mvc', function () {
 
             OVERRIDE, VOID, function onPartialRender_(model, msg_) {
                 BASE(model, msg_);
-                var rule = this.doFindTemplateForPartialModel_(model, msg_ || '');
+                var rule = this.doFindTemplateForPartialModel_(model, msg_);
                 var tpl = rule.tpl;
                 tpl && this.onPrepareTemplate_(tpl, model, msg_);
                 tpl && tpl.assign(model);

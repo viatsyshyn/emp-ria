@@ -234,6 +234,23 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            SELF, function insertBefore(dom) {
+                VALIDATE_ARG('dom', [SELF, String, Node], dom);
+
+                if(typeof dom == "string")
+                    dom = new ria.dom.Dom(dom);
+
+                var dest = dom instanceof Node ? dom : dom.valueOf().shift();
+                VALIDATE_ARG('dest', [Node], dest);
+
+
+                this._dom.forEach(function(item){
+                    dest.parentNode.insertBefore(item, dest);
+                });
+
+                return this;
+            },
+
             /* parseHTML - make static */
 
             [[String]],
