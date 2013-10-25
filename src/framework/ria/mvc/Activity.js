@@ -115,8 +115,11 @@ NAMESPACE('ria.mvc', function () {
             VOID, function refresh(model) {
                 this.onModelReady_(model);
                 this.onRender_(model);
-                ria.async.DeferredData(model)
-                    .next(this.onRefresh_)
+                ria.async.Future.$fromData(model)
+                    .then(function (data) {
+                        this.onRefresh_(data);
+                        return data;
+                    })
             },
 
             ABSTRACT, VOID, function onCreate_() {},
