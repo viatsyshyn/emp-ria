@@ -221,6 +221,11 @@ NAMESPACE('ria.async', function () {
                 return new SELF(this._impl.attach(future.getImpl()));
             },
 
+            [[SELF]],
+            SELF, function attachEnd(future) {
+                return new SELF(this._impl.attachEnd(future ? future.getImpl() : null));
+            },
+
             function getImpl() { return this._impl; },
 
             [[Object, Number]],

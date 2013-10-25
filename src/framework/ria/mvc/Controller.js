@@ -236,7 +236,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             function UpdateView(clazz, data, msg_) {
-                this.view.updateD(clazz, data, msg_ || '');
+                this.view.updateD(clazz, data, msg_);
             }
         ]);
 });

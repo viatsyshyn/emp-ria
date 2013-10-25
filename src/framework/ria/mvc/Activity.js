@@ -102,7 +102,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.async.Future, String]],
             ria.async.Future, function partialRefreshD(future, msg_) {
-                var msg = msg_ || "";
+                var msg = msg_;
                 var me = this;
                 return future
                     .attach(this.getModelEvents_(msg))
