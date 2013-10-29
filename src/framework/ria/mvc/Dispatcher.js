@@ -102,12 +102,9 @@ NAMESPACE('ria.mvc', function () {
                 var onAppInitFutures = [];
                 for(var name in this.controllers) if (this.controllers.hasOwnProperty(name)) (function (ref) {
                     var instance = this.prepareInstance_(ref, context);
-                    this.loadSessionBinds_(ref, context, instance);
-                    onAppInitFutures.push(instance
-                        .onAppInit()
-                        .then(function () {
-                            this.storeSessionBinds_(ref, context, instance);
-                        }, this));
+                    onAppInitFutures.push(instance.doAppInit());
+
+
                 }).call(this, this.controllers[name]);
 
                 return ria.async.wait(onAppInitFutures);
@@ -161,51 +158,6 @@ NAMESPACE('ria.mvc', function () {
                 }
 
                 return instanse;
-            },
-
-            Boolean, function validateSessionBindType_(type) {
-                if (ria.__API.isArrayOfDescriptor(type))
-                    return validateSessionBindType_(type.valueOf());
-
-                return [String, Number, Boolean].indexOf(type) >= 0 || ria.__API.isEnum(type) || ria.__API.isIdentifier(type);
-            },
-
-            Object, function serializeSessionBindValue_(value, type) {
-                if (ria.__API.isArrayOfDescriptor(type)) {
-                    return JSON.stringify(value.map(function (_) { return serializeSessionBindValue_(_, type.valueOf()); }));
-                }
-
-                return value ? value.valueOf() : null;
-            },
-
-            Object, function deserializeSessionBindValue_(value, type) {
-                if (ria.__API.isArrayOfDescriptor(type)) {
-                    return JSON.parse(value || '[]').map(function (_) { return deserializeSessionBindValue_(_, type.valueOf()); });
-                }
-
-                return type(value || null);
-            },
-
-            [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
-            VOID, function loadSessionBinds_(ref, context, instance) {
-                ref.getPropertiesReflector().forEach(function (_) {
-                    var t = _.getType();
-                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && (this.validateSessionBindType_(t))) {
-                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
-                        _.invokeSetterOn(instance, this.deserializeSessionBindValue_(context.getSession().get(name, ''), t));
-                    }
-                }.bind(this));
-            },
-
-            [[ria.reflection.ReflectionClass, ria.mvc.IContext, ria.mvc.Controller]],
-            VOID, function storeSessionBinds_(ref, context, instance) {
-                ref.getPropertiesReflector().forEach(function (_) {
-                    var t = _.getType();
-                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && ([String, Number].indexOf(t) >= 0 || ria.__API.isEnum(t) || ria.__API.isIdentifier(t))) {
-                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
-                        context.getSession().set(name, this.serializeSessionBindValue_(_.invokeGetterOn(instance), t));
-                    }
-                }.bind(this));
             },
 
             [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
@@ -264,12 +216,8 @@ NAMESPACE('ria.mvc', function () {
                             var ref = this.controllers[state.getController()];
                             var instanse = this.prepareInstance_(ref, context);
 
-                            this.loadSessionBinds_(ref, context, instanse);
-
                             instanse.onInitialize();
                             instanse.dispatch(state);
-
-                            this.storeSessionBinds_(ref, context, instanse);
 
                             if (!state.isDispatched())
                                 continue;

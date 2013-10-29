@@ -119,7 +119,7 @@ NAMESPACE('ria.mvc', function () {
                     .then(function (data) {
                         this.onRefresh_(data);
                         return data;
-                    })
+                    }, this);
             },
 
             ABSTRACT, VOID, function onCreate_() {},

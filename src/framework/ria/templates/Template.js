@@ -17,6 +17,7 @@ NAMESPACE('ria.templates', function () {
      * @class ria.templates.ModelBind
      */
     ANNOTATION(
+        [[ClassOf(Class)]],
         function ModelBind(model) {});
 
     /**

@@ -463,6 +463,19 @@ NAMESPACE('ria.dom', function () {
                 return set_ ? this.setAttr(name, name) : this.removeAttr(name);
             },
 
+            /* props */
+            [[String]],
+            Object, function getProp(name) {
+                return firstOrDef(
+                    this._dom.map(function (_) { return _[name]}), null);
+            },
+
+            [[String]],
+            SELF, function setProp(name, value) {
+                this._dom.forEach(function (_) { return _[name] = value});
+                return this;
+            },
+
             /* data attributes */
 
             Boolean, function hasData(name) {
@@ -568,6 +581,11 @@ NAMESPACE('ria.dom', function () {
             [[ria.dom.DomIterator]],
             SELF, function filter(iterator) {
                 return ria.dom.Dom(this._dom.filter(function (_) { return iterator(ria.dom.Dom(_)); }));
+            },
+
+            [[ria.dom.DomIterator]],
+            Array, function map(iterator) {
+                return this._dom.map(function (_) { return iterator(ria.dom.Dom(_)); });
             },
 
             Number, function count() {
