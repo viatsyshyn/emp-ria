@@ -19,8 +19,11 @@ NAMESPACE('ria.mvc', function () {
             ria.mvc.Dispatcher, 'dispatcher',
 
             VOID, function stateUpdated() {
+                var state = this.dispatcher.getState();
+                state.setDispatched(false);
+
                 if (!this.dispatcher.isDispatching())
-                    this.dispatcher.dispatch(this.dispatcher.getState(), this);
+                    this.dispatcher.dispatch(state, this);
             },
 
             ria.mvc.State, function getState() {

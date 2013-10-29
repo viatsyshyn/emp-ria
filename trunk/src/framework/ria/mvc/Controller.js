@@ -9,6 +9,12 @@ REQUIRE('ria.reflection.ReflectionClass');
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
+    function toDashed(str) {
+        return str.replace(/([A-Z])/g, function($1){
+            return "-" + $1.toLowerCase();
+        });
+    }
+
     /** @class ria.mvc.ControllerUri */
     ANNOTATION(
         [[String]],
@@ -26,6 +32,11 @@ NAMESPACE('ria.mvc', function () {
     ANNOTATION(
         [[String]],
         function SessionBind(name_) {});
+
+    /** @class ria.mvc.ServiceEvent */
+    ANNOTATION(
+        [[ClassOf(Class), String]],
+        function ServiceEvent(service, name_) {});
 
 
     function toCamelCase(str) {
@@ -74,48 +85,47 @@ NAMESPACE('ria.mvc', function () {
                 return ria.async.DeferredAction();
             },
 
+            /**
+             * Internal use only, use onAppInit() ONLY
+             */
+            FINAL, ria.async.Future, function doAppInit() {
+                this.loadSessionBinds_();
+                return this
+                    .onAppInit()
+                    .then(function () {
+                        this.storeSessionBinds_();
+                    }, this)
+                    .then(function () {
+                        // let's bind session events to this instance
+                        var ref = ria.reflection.ReflectionClass(this);
+                        var instance = this;
+                        ref.getMethodsReflector()
+                            .filter(function (_) { return _.isAnnotatedWith(ria.mvc.ServiceEvent)})
+                            .forEach(function (_) {
+                                var a = _.findAnnotation(ria.mvc.ServiceEvent).pop();
+                                var service = instance.context.getService(a.service);
+                                var eventName = a.name_ || _.getShortName();
+
+                                var serviceRef = ria.reflection.ReflectionClass(service);
+                                var prop = serviceRef.getPropertyReflector(eventName);
+
+                                prop.invokeGetterOn(service).on(function () {
+                                    this.loadSessionBinds_();
+                                    _.invokeOn(this, ria.__API.clone(arguments));
+                                    this.storeSessionBinds_();
+                                }, instance);
+                            })
+                    }, this);
+            },
+
             VOID, function onInitialize() {
                 this.view = this.context.getDefaultView();
                 this.state = null;
             },
 
-            /**
-             * Redirect to other controller/action
-             * @param {String} controller
-             * @param {String} action
-             * @param {Array} args
-             */
-            [[String, String, Array]],
-            VOID, function redirect_(controller, action, args) {
-                this.state.setController(controller);
-                this.state.setParams(args || []);
-                this.state.setAction(action);
-                this.state.setDispatched(false);
-                this.state.setPublic(true);
-                this.context.stateUpdated();
-            },
-
-            /**
-             * Forward to other controller/action
-             * @param {String} controller
-             * @param {String} action
-             * @param {Array} args
-             */
-            [[String, String, Array]],
-            VOID, function forward_(controller, action, args) {
-                this.state.setController(controller);
-                this.state.setParams(args);
-                this.state.setAction(action || []);
-                this.state.setDispatched(false);
-                this.state.setPublic(false);
-                this.context.stateUpdated();
-            },
-
             VOID, function preDispatchAction_() {},
 
             VOID, function postDispatchAction_() {},
-
-
 
             ria.reflection.ReflectionMethod, function resolveRoleAction_(state){
                 var ref = new ria.reflection.ReflectionClass(this.getClass());
@@ -137,7 +147,14 @@ NAMESPACE('ria.mvc', function () {
                 this.validateActionCall_(method, params);
 
                 try {
-                    method.invokeOn(this, this.deserializeParams_(params, method));
+                    this.loadSessionBinds_();
+
+                    var result = method.invokeOn(this, this.deserializeParams_(params, method));
+                    if (_DEBUG && result === undefined) {
+                        console.warn('WARN: Action ' + method.getName() + ' returned VOID result');
+                    }
+
+                    this.storeSessionBinds_();
                 } catch (e) {
                     throw new ria.mvc.MvcException("Exception in action " + method.getName(), e);
                 }
@@ -195,27 +212,34 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[String, String, Array]],
-            function Redirect(controller, action_, arg_) {
-                return this.redirect_(controller, action_ || null, arg_ || null);
+            function Redirect(controller, action_, args_) {
+                var state = this.context.getState();
+                state.setController(controller);
+                state.setAction(action_ || null);
+                state.setParams(args_ || []);
+                this.context.stateUpdated();
+                return null;
             },
 
             [[String, String, Array]],
-            function Forward(controller, action_, arg_) {
-                return this.forward_(controller, action_ || null, arg_ || null);
+            function Forward(controller, action_, args_) {
+                _DEBUG && console.warn('WARN this.Forward is deprecated and will be removed soon. Use this.Redirect instead');
+                return this.Redirect(controller, action_, args_);
             },
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             function PushView(clazz, data) {
                 var instance = new clazz();
-                this.prepareActivity(instance);
+                this.prepareActivity_(instance);
                 this.view.pushD(instance, data);
-                this.pushHistoryState();
+                this.pushHistoryState_();
+                return null;
             },
 
             [[ria.mvc.IActivity]],
-            function prepareActivity(activity){},
+            function prepareActivity_(activity){},
 
-            function pushHistoryState(){
+            function pushHistoryState_(){
                 var state = this.getContext().getState();
                 var params = state.getParams().slice();
                 params.unshift(state.getAction());
@@ -232,11 +256,65 @@ NAMESPACE('ria.mvc', function () {
             function ShadeView(clazz, data) {
                 var instance = new clazz();
                 this.view.shadeD(instance, data);
+                return null;
             },
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             function UpdateView(clazz, data, msg_) {
                 this.view.updateD(clazz, data, msg_);
+                return null;
+            },
+
+            Boolean, function validateSessionBindType_(type) {
+                if (ria.__API.isArrayOfDescriptor(type))
+                    return validateSessionBindType_(type.valueOf());
+
+                return [String, Number, Boolean].indexOf(type) >= 0 || ria.__API.isEnum(type) || ria.__API.isIdentifier(type);
+            },
+
+            Object, function serializeSessionBindValue_(value, type) {
+                if (ria.__API.isArrayOfDescriptor(type)) {
+                    return JSON.stringify(value.map(function (_) { return serializeSessionBindValue_(_, type.valueOf()); }));
+                }
+
+                return (value !== undefined && value !== null) ? value.valueOf() : null;
+            },
+
+            Object, function deserializeSessionBindValue_(value, type) {
+                if (ria.__API.isArrayOfDescriptor(type)) {
+                    return JSON.parse(value || '[]').map(function (_) { return deserializeSessionBindValue_(_, type.valueOf()); });
+                }
+
+                return (value !== undefined && value !== null) ? type(value) : null;
+            },
+
+            VOID, function loadSessionBinds_() {
+                var ref = ria.reflection.ReflectionClass(this),
+                    context = this.context,
+                    instance = this;
+
+                ref.getPropertiesReflector().forEach(function (_) {
+                    var t = _.getType();
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && this.validateSessionBindType_(t)) {
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        _.invokeSetterOn(instance, this.deserializeSessionBindValue_(context.getSession().get(name), t));
+                    }
+                }.bind(this));
+            },
+
+            VOID, function storeSessionBinds_() {
+                var ref = ria.reflection.ReflectionClass(this),
+                    context = this.context,
+                    instance = this;
+
+                ref.getPropertiesReflector().forEach(function (_) {
+                    var t = _.getType();
+                    if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.SessionBind) && this.validateSessionBindType_(t)) {
+                        var name = _.findAnnotation(ria.mvc.SessionBind).pop().name_ || toDashed(_.getShortName());
+                        context.getSession().set(name, this.serializeSessionBindValue_(_.invokeGetterOn(instance), t));
+                    }
+                }.bind(this));
             }
+
         ]);
 });
