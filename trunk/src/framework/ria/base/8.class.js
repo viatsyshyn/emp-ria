@@ -24,7 +24,7 @@
         this.properties = base ? ria.__API.clone(base.__META.properties) : {};
         this.methods = base ? ria.__API.clone(base.__META.methods) : {};
         this.defCtor = null;
-        this.ctors = [];
+        this.ctors = {};
         this.children = [];
 
         var gt = [];
@@ -70,7 +70,7 @@
         if (name == '$')
             this.defCtor = def;
 
-        this.ctors.push(def);
+        this.ctors[def.name] = def;
     };
     ClassDescriptor.prototype.addChild = function (clazz) {
         if (!ria.__API.isClassConstructor(clazz))

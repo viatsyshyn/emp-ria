@@ -41,7 +41,13 @@
                     [[SELF]],
                     SELF, function me2(a) {
                         return new BaseClass();
-                    }
+                    },
+
+                    [[SELF]],
+                    VOID, function $named(me) { BASE(); },
+
+                    [[SELF]],
+                    VOID, function $(me) { BASE(); }
                 ]);
 
             assertEquals(BaseClass, BaseClass.__META.methods['me'].retType);
@@ -52,6 +58,9 @@
             assertEquals(BaseClass, BaseClass.__META.methods['me2'].retType);
             assertEquals(BaseClass, BaseClass.__META.methods['me2'].argsTypes[0]);
             assertEquals(BaseClass, BaseClass.__META.methods['method2'].argsTypes[0]);
+
+            assertEquals(BaseClass, BaseClass.__META.defCtor.argsTypes[0]);
+            assertEquals(BaseClass, BaseClass.__META.ctors['$named'].argsTypes[0]);
         },
 
         testExtending: function () {
