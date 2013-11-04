@@ -600,6 +600,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             var name = ctorDef.name;
             processedMethods.push(name);
 
+            ctorDef.argsTypes = processSelf(ctorDef.argsTypes, ClassProxy);
+
             var impl = ClassProxy.prototype[name] = ctorDef.body.value;
             impl.__BASE_BODY = def.base.value.__META.defCtor.impl;
             impl.__SELF = ClassProxy;
