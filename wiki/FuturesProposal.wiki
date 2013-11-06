@@ -13,47 +13,77 @@ This library is based on CommonJS Promises/A proposal.
 
 Main components are:
   
-  * IFuture
-  * ITask
+  * ria.async.Future
+  * ria.async.Completer
 
 {{{
 
 DELEGATE(
-  [Object],
+  GENERIC('TProgress'),
+  [[TProgress]],
   VOID, function ProgressHandler(data) {});
 
 DELEGATE(
-  [Object],
+  GENERIC('TData'),
+  [[TData]],
   Object, function DataTransformer(data) {});
 
 DELEGATE(
-  [Object],
-  IFuture, function DataHandler(data) {});
+  GENERIC('TData'),
+  [[TData]],
+  Future, function DataHandler(data) {});
 
 DELEGATE(
-  [Exception],
-  Boolean, function ErrorHandler(exception) {});
+  [[Error]],
+  Object, function ErrorHandler(exception) {});
+
+DELEGATE(
+  [[Exception]],
+  Object, function ExceptionHandler(exception) {});
+
+DELEGATE(
+  Object, function CompleteHandler() {});
 
 INTERFACE(
-  'IFuture', [
-     [DataHandler],
-     SELF, function chain(callback) {},
-     [DataTransformer],
-     SELF, function done(callback) {},
-     [ErrorHandler],
-     SELF, function error(errback) {},
-     [ProgressHandler],
-     SELF, function progress(progback) {},
-     SELF, function complete(callback) {},
-     VOID, function cancel() {}
+  GENERIC('TData', 'TProgress'),
+  'IFutureCompleter', [
+     [[TData]],
+     VOID, function finish(data) {},
+
+     [[TProgress]],
+     VOID, function progress(data) {},
+
+     [Error],
+     VOID, function fail(exception) {}
   ]);
 
 INTERFACE(
-  'IFutureCompleter', [
-     VOID, function resolve(data) {},
-     VOID, function notify(data) {},
-     [Exception],
-     VOID, function fail(exception) {}
+  GENERIC('TData', 'TProgress'),
+  'IFuture', [
+     [[DataHandler.OF(TData)]],
+     SELF, function then(callback, scope_) {},
+
+     [[DataTransformer.OF(TData)]],
+     SELF, function transform(callback, scope_) {},
+
+     [[DataHandler.OF(TData)]],
+     SELF, function thenCall(callback, scope_) {},
+
+     [ErrorHandler],
+     SELF, function catchError(errback, scope_) {},
+
+     [ExceptionHandler],
+     SELF, function catchException(errback, scope_) {},
+
+     [ProgressHandler.OF(TProgress)],
+     SELF, function handleProgress(progback, scope_) {},
+
+     [[CompleteHandler]],
+     SELF, function complete(callback, scope_) {},
+
+     VOID, function cancel() {},
+
+     IFutureCompleter.OF(TData, TProgress), function getImpl() {}
   ]);
 
 INTERFACE(
@@ -61,10 +91,6 @@ INTERFACE(
     VOID, function cancel() {}
   ]);
 
-INTERFACE(
-  'ITask', [
-     IFuture, function run() {}
-  ]);
 }}}
 
 IFuture is a core interface, which defines that future may transform propagated data or chain other task based on propagated data or handle propagated exception.
@@ -75,7 +101,9 @@ If exception was not handled it should be thrown to global scope
 
 {{{
 
-var FutureImpl = PRIVATE_CLASS('FutureImpl', IMPLEMENTS(IFuture, IFutureCompleter, ICancelable), [
+var FutureImpl_ = CLASS(
+  GENERIC('TData', 'TProgress'),
+  'FutureImpl_', IMPLEMENTS(IFuture, IFutureCompleter, ICancelable), [
     // IFuture
     [ProgressHandler]
     SELF, function progress(progback) {},
