@@ -50,6 +50,14 @@ NAMESPACE('ria.dom', function () {
                     'bubbles': true,
                     'cancelable': true
                 }));
+            },
+
+            function SUBMIT(data_) {
+                return new UIEvent('submit', def(data_, {
+                                    'view': window,
+                                    'bubbles': true,
+                                    'cancelable': true
+                                }));
             }
         ])
 });

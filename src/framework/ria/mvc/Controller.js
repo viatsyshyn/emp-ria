@@ -267,12 +267,13 @@ NAMESPACE('ria.mvc', function () {
 
             Boolean, function validateSessionBindType_(type) {
                 if (ria.__API.isArrayOfDescriptor(type))
-                    return validateSessionBindType_(type.valueOf());
+                    return this.validateSessionBindType_(type.valueOf());
 
                 return [String, Number, Boolean].indexOf(type) >= 0 || ria.__API.isEnum(type) || ria.__API.isIdentifier(type);
             },
 
             Object, function serializeSessionBindValue_(value, type) {
+                var serializeSessionBindValue_ = this.serializeSessionBindValue_;
                 if (ria.__API.isArrayOfDescriptor(type)) {
                     return JSON.stringify(value.map(function (_) { return serializeSessionBindValue_(_, type.valueOf()); }));
                 }
