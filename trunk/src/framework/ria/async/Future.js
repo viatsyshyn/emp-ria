@@ -9,7 +9,10 @@ NAMESPACE('ria.async', function () {
     function FutureBreaker() {}
 
     ria.async.BREAK = new FutureBreaker();
-    Object.defineProperty(ria.async, 'BREAK', { writable: false, configurable: false, enumerable: true });
+    _DEBUG && Object.defineProperty(ria.async, 'BREAK', { writable: false, configurable: false, enumerable: true });
+
+    ria.async.BreakDelegate = function () { return ria.async.BREAK; };
+    _DEBUG && Object.defineProperty(ria.async, 'BreakDelegate', { writable: false, configurable: false, enumerable: true });
 
     /** @class ria.async.FutureDataDelegate */
     DELEGATE(
@@ -196,6 +199,22 @@ NAMESPACE('ria.async', function () {
                 return new SELF(this._impl.then(handler, scope_));
             },
 
+            [[ria.async.FutureDataDelegate, Object]],
+            SELF, function transform(handler, scope_) {
+                return new SELF(this._impl.then(handler, scope_));
+            },
+
+            [[Function, Array]],
+            SELF, function thenCall(delegate, args_) {
+                return new SELF(this._impl.then(function () {
+                    return delegate.apply(undefined, args_ || [])
+                }));
+            },
+
+            SELF, function thenBreak() {
+                return new SELF(this._impl.then(ria.async.BreakDelegate));
+            },
+
             [[ria.async.FutureProgressDelegate, Object]],
             SELF, function handleProgress(handler, scope_) {
                 return new SELF(this._impl.handleProgress(handler, scope_));
@@ -232,7 +251,7 @@ NAMESPACE('ria.async', function () {
             function $fromData(data, delay_) {
                 BASE();
                 this._impl = new ria.async.FutureImpl;
-                ria.__API.defer(null, this._impl.finish, [data || null], delay_|0);
+                ria.__API.defer(null, this._impl.finish, [data], delay_|0);
             }
         ]);
 

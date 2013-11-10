@@ -359,12 +359,17 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function first(selector_) {
                 if (!selector_)
-                    return this._dom[0] ? ria.dom.Dom(this._dom[0]) : null;
+                    return new ria.dom.Dom(this.valueOf().shift());
 
                 throw new Exception('not implemented');
             },
             [[String]],
-            SELF, function last(selector_) {},
+            SELF, function last(selector_) {
+                if (!selector_)
+                    return new ria.dom.Dom(this.valueOf().pop());
+
+                throw new Exception('not implemented');
+            },
             [[String]],
             Boolean, function is(selector) {
                 return this._dom.some(function (el) {

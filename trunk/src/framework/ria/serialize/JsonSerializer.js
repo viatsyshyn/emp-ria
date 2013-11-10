@@ -49,8 +49,12 @@ NAMESPACE('ria.serialize', function () {
                     return clazz(raw || '');
                 }
 
-                if (ria.__API.isIdentifier(clazz))
-                    return raw !== undefined ? clazz(raw) : null;
+                if (ria.__API.isIdentifier(clazz)) {
+                    if (raw === null || raw === undefined)
+                        return null;
+
+                    return clazz(raw);
+                }
 
                 if (ria.__API.isEnum(clazz)) {
                     if (raw === null || raw === undefined)
@@ -159,15 +163,16 @@ NAMESPACE('ria.serialize', function () {
                 }
 
                 if (clazz === Number || clazz === String) {
-                    return ria.async.Future.$fromData(clazz(raw || ''));
+                    return ria.async.Future.$fromData(isValue(raw) ? clazz(raw) : null);
                 }
 
-                if (ria.__API.isIdentifier(clazz))
-                    return ria.async.Future.$fromData(raw !== undefined ? clazz(raw) : null);
+                if (ria.__API.isIdentifier(clazz)) {
+                    return ria.async.Future.$fromData(isValue(raw) ? clazz(raw) : null);
+                }
 
                 if (ria.__API.isEnum(clazz)) {
                     if (raw === null || raw === undefined)
-                        return null;
+                        return ria.async.Future.$fromData(null);
 
                     value = clazz(raw);
                     if (value == undefined)
