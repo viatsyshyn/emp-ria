@@ -80,7 +80,7 @@ function CompileGenericTypes(types, node) {
         })
 }
 
-function SymbolsCompiler(ns, node, descend) {
+/*function SymbolsCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_SymbolVar || node instanceof UglifyJS.AST_SymbolRef) {
         var name = node.name;
         if (['Class', 'Interface', 'Exception'].indexOf(name) >= 0) {
@@ -89,7 +89,7 @@ function SymbolsCompiler(ns, node, descend) {
     }
 }
 
-compilers.push(SymbolsCompiler);
+compilers.push(SymbolsCompiler);*/
 
 function CompileSELF(node, clazz) {
     return node.transform(new UglifyJS.TreeTransformer(function (node, descend) {

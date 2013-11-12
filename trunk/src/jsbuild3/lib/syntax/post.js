@@ -52,3 +52,14 @@ function TestsEDeclCompiler(ns, node, descend) {
 }
 
 compilers.push(TestsEDeclCompiler);
+
+function AssertCompiler(ns, node, descend) {
+    if (node instanceof UglifyJS.AST_Call) {
+        var name = node.expression.print_to_string();
+        if (['Assert'].indexOf(name) >= 0) {
+            return make_node(UglifyJS.AST_BlockStatement, node, {body: []})
+        }
+    }
+}
+
+compilers.push(AssertCompiler);

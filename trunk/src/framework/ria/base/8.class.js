@@ -185,12 +185,13 @@
 
         var genericTypes = clazz.__META.genericTypes || [],
             genericTypesLength = genericTypes.length - clazz.__META.baseSpecs.length,
-            genericSpecs = clazz.__META.baseSpecs.concat(args.slice(0, genericTypesLength));
+            ownGenericSpecs = args.slice(0, genericTypesLength),
+            genericSpecs = clazz.__META.baseSpecs.concat(ownGenericSpecs);
 
         args = args.slice(genericTypesLength);
 
         if (_DEBUG) {
-            ria.__API.OF.apply(clazz, genericSpecs);
+            ria.__API.OF.apply(clazz, ownGenericSpecs);
         }
 
         var publicInstance = instance;

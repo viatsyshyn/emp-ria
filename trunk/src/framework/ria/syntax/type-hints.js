@@ -178,7 +178,7 @@
      * @param {Array} [genericTypes]
      * @param {Array} [genericSpecs]
      */
-    ria.__SYNTAX.checkArg = function (name, type, value, genericTypes, genericSpecs) {
+    ria.__SYNTAX.checkArg = function (name, type, value, genericTypes, genericSpecs, isType_) {
         var isOptional = IS_OPTIONAL.test(name);
         if (isOptional && value === undefined)
             return;
@@ -203,7 +203,7 @@
 
         throw new Exception('Argument ' + name + ' expected to be ' + type.map(function (_) {
             return ria.__API.getIdentifierOfType(_, genericTypes || [], genericSpecs || []);
-            }).join(' or ') + ' but received ' + ria.__API.getIdentifierOfValue(value), error);
+            }).join(' or ') + ' but received ' + (isType_ ? ria.__API.getIdentifierOfType(value) : ria.__API.getIdentifierOfValue(value)), error);
     };
 
     /**
