@@ -149,7 +149,8 @@
                     }
 
                     if (value instanceof type.type) {
-                        return type.type.__META.genericTypes.every(function (_, index) {
+                        var meta = type.type.__META;
+                        return meta.genericTypes.slice(meta.baseSpecs.length).every(function (_, index) {
                             //return value.getSpecsOf(_.name) == type.specs[index];
                             return checkTypeHint(value.getSpecsOf(_.name), type.specs[index], genericTypes || [], genericSpecs || []);
                         })
