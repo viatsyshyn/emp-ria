@@ -123,6 +123,9 @@
                     if (ria.__API.isClassOfDescriptor(value))
                         value = value.valueOf();
 
+                    if (ria.__API.isSpecification(value))
+                        value = value.type;
+
                     return checkTypeHint(value, type.valueOf(), genericTypes || [], genericSpecs || []);
                 }
 
