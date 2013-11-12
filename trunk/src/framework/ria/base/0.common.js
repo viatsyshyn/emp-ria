@@ -151,7 +151,7 @@ ria.__API = ria.__API || {};
             var meta = ria.__API.getConstructorOf(value).__META;
             var name = meta.name;
             if (meta.genericTypes.length) {
-                name += '.OF(' + meta.genericTypes.map(function (type) {
+                name += '.OF(' + meta.genericTypes.slice(meta.baseSpecs.length).map(function (type) {
                     return ria.__API.getIdentifierOfType(value.getSpecsOf(type.name));
                 }) + ')';
             }

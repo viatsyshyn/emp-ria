@@ -70,7 +70,7 @@ NAMESPACE('ria.templates', function () {
                 if (this._modelClass === undefined)
                     throw new ria.templates.Exception('Template class is bound to model. But model not loaded');
 
-                if (!ria.__API.isClassConstructor(this._modelClass))
+                if (!ria.__API.isClassConstructor(this._modelClass) && !ria.__API.isSpecification(this._modelClass))
                     return ;
 
                 var model = ria.reflection.ReflectionClass(this._modelClass);
@@ -96,19 +96,20 @@ NAMESPACE('ria.templates', function () {
             },
 
             ClassOf(Class), function getModelClass() {
+                if (ria.__API.isSpecification(this._modelClass))
+                    return this._modelClass.type;
+
                 return this._modelClass;
             },
 
             VOID, function assign(model) {
 
-                if (ria.__API.isArrayOfDescriptor(this._modelClass) && !Array.isArray(model)) {
+                try {
+                    VALIDATE_ARG('model', this._modelClass, model);
+                } catch (e) {
                     throw ria.templates.Exception('Expected instance of '
                         + ria.__API.getIdentifierOfType(this._modelClass) + ' but got '
-                        + ria.__API.getIdentifierOfValue(model));
-                } else if (ria.__API.isClassConstructor(this._modelClass) && !(model instanceof this._modelClass)) {
-                    throw ria.templates.Exception('Expected instance of '
-                        + ria.__API.getIdentifierOfType(this._modelClass) + ' but got '
-                        + ria.__API.getIdentifierOfValue(model));
+                        + ria.__API.getIdentifierOfValue(model), e);
                 }
 
                 this._model = model;
