@@ -1811,6 +1811,35 @@
             })();
         },
 
+        testGenericRestrictionsAndInstantiation: function () {
+            var BaseViewModel = CLASS(
+                'BaseViewModel', []);
+
+            var BaseModel = CLASS(
+                'BaseModel', []);
+
+            var BaseTemplate = CLASS(
+                GENERIC('TKey', ClassOf(BaseModel)),
+                'BaseTemplate', [
+                    [TKey],
+                    function $(a_) { BASE() }
+                ]);
+
+            var ChildModel = CLASS(
+                'ChildModel', EXTENDS(BaseModel), []);
+
+            var ChildViewModel = CLASS(
+                'ChildViewModel', EXTENDS(BaseViewModel), []);
+
+            var BaseViewData = CLASS(
+                GENERIC('T', ClassOf(BaseViewModel)),
+                'BaseViewData', EXTENDS(BaseTemplate.OF(BaseModel)), []);
+
+            assertNoException(function () {
+                new BaseViewData(ChildViewModel)
+            })
+        },
+
         testMissingConstructorInChild: function () {
             var BaseClass = CLASS(
                 'BaseClass', [

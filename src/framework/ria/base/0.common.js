@@ -251,7 +251,7 @@ ria.__API = ria.__API || {};
                             throw Error('Generic type ' + type.name + ' restricts to ' + ria.__API.getIdentifierOfType(typeSpecs[0]));
 
                         try {
-                            ria.__SYNTAX.checkArg(type.name, typeSpecs[0], specSpecs[0]);
+                            ria.__SYNTAX.checkArg(type.name, typeSpecs[0], specSpecs[0], [], [], true);
                         } catch (e) {
                             throw Exception('Generic type ' + type.name + ' restricts to ' + ria.__API.getIdentifierOfType(typeSpecs[0]) + ', but got ' + ria.__API.getIdentifierOfType(specSpecs[0]), e);
                         }
@@ -269,7 +269,7 @@ ria.__API = ria.__API || {};
 
                 } else {
                     typeSpecs.forEach(function (restriction) {
-                        ria.__SYNTAX.checkArg(type.name, restriction, spec);
+                        ria.__SYNTAX.checkArg(type.name, restriction, spec, [], [], true);
                     });
                 }
             });
