@@ -12,48 +12,68 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.Events */
     CLASS(
         FINAL, 'Events', [
-            function CLICK(data_) {
-                return new MouseEvent('click', def(data_, {
+            READONLY, Function, 'clazz',
+            READONLY, String, 'type',
+            READONLY, Object, 'data',
+
+            function $(clazz, type, data_) {
+                this.clazz = clazz;
+                this.type = type;
+                this.data = def(data_, {});
+            },
+
+            [[Node]],
+            function triggerOn(node) {
+                if (document.createEvent) {
+                    node.dispatchEvent(new (this.clazz)(this.type, this.data));
+                } else {
+                    var evt = document.createEventObject();
+                    node.fireEvent("on" + evt.type, evt);
+                }
+            },
+
+            SELF, function CLICK(data_) {
+                return new SELF(MouseEvent, 'click', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
                 }))
             },
 
-            function FOCUS(data_) {
-                return new FocusEvent('focus', def(data_, {
+            SELF, function FOCUS(data_) {
+                return new SELF(FocusEvent, 'focus', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
                 }));
             },
 
-            function CHANGE(data_) {
-                return new UIEvent('change', def(data_, {
+            SELF, function CHANGE(data_) {
+                return new SELF(UIEvent, 'change', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
                 }));
             },
 
-            function KEY_UP(data_) {
-                return new KeyboardEvent('keyup', def(data_, {
+            SELF, function KEY_UP(data_) {
+                return new SELF(KeyboardEvent, 'keyup', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
                 }));
             },
 
-            function KEY_DOWN(data_) {
-                return new KeyboardEvent('keydown', def(data_, {
+            SELF, function KEY_DOWN(data_) {
+                return new SELF(KeyboardEvent, 'keydown', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
                 }));
             },
 
-            function SUBMIT(data_) {
-                return new UIEvent('submit', def(data_, {
+            SELF, function SUBMIT(data_) {
+                return new SELF(UIEvent, 'submit', def(data_, {
                                     'view': window,
                                     'bubbles': true,
                                     'cancelable': true
