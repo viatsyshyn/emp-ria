@@ -17,6 +17,7 @@ NAMESPACE('ria.dom', function () {
             READONLY, Object, 'data',
 
             function $(clazz, type, data_) {
+                BASE();
                 this.clazz = clazz;
                 this.type = type;
                 this.data = def(data_, {});
