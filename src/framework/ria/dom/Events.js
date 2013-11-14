@@ -12,10 +12,11 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.Events */
     CLASS(
         FINAL, 'Events', [
-            READONLY, Function, 'clazz',
+            READONLY, String, 'clazz',
             READONLY, String, 'type',
             READONLY, Object, 'data',
 
+            [[String, String, Object]]
             function $(clazz, type, data_) {
                 BASE();
                 this.clazz = clazz;
@@ -26,15 +27,23 @@ NAMESPACE('ria.dom', function () {
             [[Node]],
             function triggerOn(node) {
                 if (document.createEvent) {
-                    node.dispatchEvent(new (this.clazz)(this.type, this.data));
+                    try {
+                    var event = new (window[this.clazz])(this.type, this.data)
+                    } catch (e) {
+                        // this is ms ie 10+ way
+                        event = document.createEvent(this.clazz);
+                        event.initEvent(this.type, !!this.data.bubbles, !!this.data.cancelable);
+                    }
+                    node.dispatchEvent(event);
                 } else {
+                    // this is IE9- way
                     var evt = document.createEventObject();
                     node.fireEvent("on" + evt.type, evt);
                 }
             },
 
             SELF, function CLICK(data_) {
-                return new SELF(MouseEvent, 'click', def(data_, {
+                return new SELF('MouseEvent', 'click', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
@@ -42,7 +51,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function FOCUS(data_) {
-                return new SELF(FocusEvent, 'focus', def(data_, {
+                return new SELF('FocusEvent', 'focus', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
@@ -50,7 +59,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function CHANGE(data_) {
-                return new SELF(UIEvent, 'change', def(data_, {
+                return new SELF('UIEvent', 'change', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
@@ -58,7 +67,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function KEY_UP(data_) {
-                return new SELF(KeyboardEvent, 'keyup', def(data_, {
+                return new SELF('KeyboardEvent', 'keyup', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
@@ -66,7 +75,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function KEY_DOWN(data_) {
-                return new SELF(KeyboardEvent, 'keydown', def(data_, {
+                return new SELF('KeyboardEvent', 'keydown', def(data_, {
                     'view': window,
                     'bubbles': true,
                     'cancelable': true
@@ -74,7 +83,7 @@ NAMESPACE('ria.dom', function () {
             },
 
             SELF, function SUBMIT(data_) {
-                return new SELF(UIEvent, 'submit', def(data_, {
+                return new SELF('UIEvent', 'submit', def(data_, {
                                     'view': window,
                                     'bubbles': true,
                                     'cancelable': true
