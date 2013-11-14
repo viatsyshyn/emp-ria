@@ -12,6 +12,8 @@
  *      .off('click', 'span', handler)
  */
 
+REQUIRE('ria.dom.Events');
+
 NAMESPACE('ria.dom', function () {
     "use strict";
 
@@ -415,17 +417,9 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
-            [[ria.dom.Event]],
+            [[ria.dom.Events]],
             SELF, function triggerEvent(event) {
-                this.valueOf()
-                    .forEach(function (element) {
-                        if (document.createEvent) {
-                            element.dispatchEvent(event);
-                        } else {
-                            var evt = document.createEventObject();
-                            element.fireEvent("on" + evt.eventType, evt);
-                        }
-                    });
+                this.valueOf().forEach(event.triggerOn);
                 return this;
             },
 
