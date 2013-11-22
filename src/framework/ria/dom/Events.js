@@ -16,7 +16,7 @@ NAMESPACE('ria.dom', function () {
             READONLY, String, 'type',
             READONLY, Object, 'data',
 
-            [[String, String, Object]]
+            [[String, String, Object]],
             function $(clazz, type, data_) {
                 BASE();
                 this.clazz = clazz;
@@ -28,7 +28,7 @@ NAMESPACE('ria.dom', function () {
             function triggerOn(node) {
                 if (document.createEvent) {
                     try {
-                    var event = new (window[this.clazz])(this.type, this.data)
+                        var event = new (window[this.clazz])(this.type, this.data);
                     } catch (e) {
                         // this is ms ie 10+ way
                         event = document.createEvent(this.clazz);

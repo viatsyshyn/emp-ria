@@ -134,6 +134,11 @@ NAMESPACE('ria.mvc', function () {
                 //window.addEventListener("activate", this.onResume_, false);
                 //window.addEventListener("unload", this.onDispose_, false);
 
+                window.onerror = function (error) {
+                    _DEBUG && console.info('Uncaught error', ria.__API.clone(arguments));
+                    this.onError_(error);
+                }.bind(this);
+
                 return ria.async.DeferredAction();
             },
 
@@ -142,6 +147,11 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onPause_() {},
             VOID, function onStop_() { return ria.async.DeferredAction(); },
             VOID, function onDispose_() {},
+
+            VOID, function onError_(error) {
+                Assert(false, 'Unhandled error: ' + error.toString());
+                throw Exception('Unhandled error', error);
+            },
 
             [[ClassOf(SELF), Object]],
             VOID, function RUN(appClass, session_) {

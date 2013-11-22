@@ -43,7 +43,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
             return values[raw] || (values[raw] = new EnumImpl(raw));
         }
-        ria.__API.enum(Enum, name);
+        ria.__API.enumeration(Enum, name);
         function EnumImpl(raw) {
             this.valueOf = function () { return raw; };
             this.toString = function () { return name + '#' + raw; };

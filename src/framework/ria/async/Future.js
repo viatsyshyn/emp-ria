@@ -38,8 +38,8 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.Future */
     CLASS(
         ABSTRACT, 'Future', IMPLEMENTS(ria.async.ICancelable), [
-            function $$(instance, clazz, ctor, args) {
-                if (ctor == SELF.prototype.$fromData) {
+            function $$(instance, clazz, ctorCalled, args) {
+                if (ctorCalled == SELF.prototype.$fromData) {
                     var delayArgs = args;
                     args = [];
                 }
@@ -57,7 +57,7 @@ NAMESPACE('ria.async', function () {
                     instance = FutureImpl_.apply(undefined, args)
                 }
 
-                if (ctor == SELF.prototype.$fromData) {
+                if (ctorCalled == SELF.prototype.$fromData) {
                     ria.__API.defer(null, instance.finish, [delayArgs[0]], delayArgs[1]|0);
                 }
 
@@ -69,11 +69,14 @@ NAMESPACE('ria.async', function () {
                 BASE();
 
                 this._canceler = canceler_;
+                this._disposed = false;
             },
 
             function onDispose() {
+                Assert(!this._disposed, 'Disposing already disposed future');
                 this._next && this._next.getImpl().setCanceler(null);
-                futuresPull.push(this);
+                this._disposed || ria.__API.defer(this, function () { futuresPull.push(this); });
+                this._disposed = true;
             },
 
             VOID, function cancel() {},
@@ -82,7 +85,9 @@ NAMESPACE('ria.async', function () {
             SELF, function then(handler, scope_) {},
 
             [[ria.async.FutureDataDelegate, Object]],
-            SELF, function transform(handler, scope_) {},
+            SELF, function transform(handler, scope_) {
+                return this.then(handler, scope_);
+            },
 
             [[Function, Array]],
             SELF, function thenCall(delegate, args_) {
@@ -174,6 +179,8 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.Future]],
             OVERRIDE, ria.async.Future, function attach(future) {
+                Assert(!future || this.getHashCode() != future.getHashCode(), 'Can not attach self');
+
                 var old_next = this._next;
                 this._next = future;
                 this._next.getImpl().setCanceler(this);
@@ -182,25 +189,30 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.Future]],
             OVERRIDE, ria.async.Future, function attachEnd(future) {
+                Assert(!future || this.getHashCode() != future.getHashCode(), 'Can not attach self');
+
                 return this._next
                     ? this._next.attachEnd(future)
                     : (future ? (this._next = future) : this);
             },
 
             VOID, function updateProgress(data) {
+                Assert(!this._disposed, 'Can not updateProgress disposed future');
                 ria.__API.defer(this, function () {
+                    Assert(!this._disposed, 'Can not updateProgress disposed future');
                     try {
                         this._onProgress && this._onProgress(data);
                     } finally {
                         this._next && this._next.getImpl().updateProgress(data);
                     }
-
-                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
             VOID, function finish(data) {
+                Assert(!this._disposed, 'Can not finish disposed future');
+
                 ria.__API.defer(this, function () {
+                    Assert(!this._disposed, 'Can not finish disposed future');
                     try {
                         var result = (this._onData || DefaultDataHanlder).call(this, data);
                         if (result === ria.async.BREAK) {
@@ -214,17 +226,18 @@ NAMESPACE('ria.async', function () {
                         this._next && this._next.getImpl().completeError(e);
                     } finally {
                         this._onComplete && this._onComplete();
+                        this.onDispose();
                     }
-
-                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
             VOID, function completeError(error) {
+                Assert(!this._disposed, 'Can not completeError disposed future');
                 if (!this._next)
                     throw new Exception('Uncaught error', error);
 
                 ria.__API.defer(this, function () {
+                    Assert(!this._disposed, 'Can not completeError disposed future');
                     try {
                         var result = (this._onError || DefaultErrorHandler).call(this, error);
                         if (result === ria.async.BREAK) {
@@ -238,21 +251,21 @@ NAMESPACE('ria.async', function () {
                         this._next && this._next.getImpl().completeError(e);
                     } finally {
                         this._onComplete && this._onComplete();
+                        this.onDispose();
                     }
-
-                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
             VOID, function completeBreak() {
+                Assert(!this._disposed, 'Can not completeBreak disposed future');
                 ria.__API.defer(this, function () {
+                    Assert(!this._disposed, 'Can not completeBreak disposed future');
                     try {
                         this._onComplete && this._onComplete();
                     } finally {
                         this._next && this._next.getImpl().completeBreak();
+                        this.onDispose();
                     }
-
-                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 

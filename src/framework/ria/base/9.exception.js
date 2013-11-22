@@ -14,12 +14,12 @@
         ria.__API.ctor('$', ExceptionBase, ExceptionBase.prototype.$, [String, [Error, ExceptionBase]], ['msg', 'inner_'], []);
 
         ExceptionBase.prototype.toString = function () {
-            var msg = this.stack.join('\n  ').replace('Error:', ria.__API.getIdentifierOfValue(this) + ':');
+            var msg = ria.__API.getIdentifierOfValue(this) + ':' + this.stack.join('\n  ').replace('Error:', '');
 
             if (this.inner_) {
                 msg += '\nCaused by: ';
                 if (this.inner_ instanceof Error) {
-                    msg += ria.__API.getStackTrace(this.inner_).join('\n  ');
+                    msg += this.inner_.message + '\n' + this.inner_ + '\n' + ria.__API.getStackTrace(this.inner_).join('\n  ');
                 } else {
                     msg += this.inner_.toString();
                 }

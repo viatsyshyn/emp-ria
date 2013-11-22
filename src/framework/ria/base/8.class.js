@@ -270,7 +270,7 @@
         _DEBUG && Object.freeze(clazz);
     };
 
-    ria.__API.extends = function ext(child, base) {
+    ria.__API.extendsBase = function ext(child, base) {
         return child === base || (child != undefined && ext(child.__META.base, base));
     };
 

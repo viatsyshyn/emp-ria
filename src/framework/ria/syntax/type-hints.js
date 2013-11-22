@@ -138,7 +138,7 @@
 
                 if (ria.__API.isClassConstructor(type)) {
                     if (ria.__API.isClassConstructor(value))
-                        return ria.__API.extends(value, type);
+                        return ria.__API.extendsBase(value, type);
 
                     return value instanceof type;
                 }

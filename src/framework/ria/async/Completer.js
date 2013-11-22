@@ -21,11 +21,15 @@ NAMESPACE('ria.async', function () {
             },
 
             VOID, function complete(data) {
+                Assert(!this.completed, 'Can not complete completed completer');
+
                 this.future.finish(data);
                 this.completed = true;
             },
 
             VOID, function completeError(error) {
+                Assert(!this.completed, 'Can not completeError completed completer');
+
                 this.future.completeError(error);
                 this.completed = true;
             },
