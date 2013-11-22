@@ -125,13 +125,12 @@ NAMESPACE('ria.mvc', function () {
 
             OVERRIDE, VOID, function onRender_(model) {
                 BASE(model);
+
                 var tpl = this.doFindTemplateForModel_(model);
                 this.onPrepareTemplate_(tpl, model);
                 tpl.assign(model);
                 tpl.renderTo(this.dom.empty());
             },
-
-
 
             Object, function doFindTemplateForPartialModel_(model, msg_) {
                 var matches = this._partialUpdateRules.filter(function (_) {
@@ -164,6 +163,7 @@ NAMESPACE('ria.mvc', function () {
 
             OVERRIDE, VOID, function onPartialRender_(model, msg_) {
                 BASE(model, msg_);
+
                 var rule = this.doFindTemplateForPartialModel_(model, msg_);
                 var tpl = rule.tpl;
                 tpl && this.onPrepareTemplate_(tpl, model, msg_);
