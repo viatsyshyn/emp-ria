@@ -9,6 +9,9 @@ NAMESPACE('ria.templates', function () {
     "use strict";
 
     function appendTo(content, to) {
+        if (to.count() < 0)
+            return ;
+
         var dom = new ria.dom.Dom();
         dom.fromHTML(content).appendTo(to);
     }

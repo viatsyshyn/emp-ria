@@ -96,8 +96,18 @@ NAMESPACE('ria.mvc', function () {
                 var me = this;
                 return future
                     .attach(this.getModelEvents_())
-                    .then(function (model) { me.onRender_(model); return model; })
-                    .then(function (model) { me.onRefresh_(model); return model; })
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onRender_(model);
+                        return model;
+                    }, this)
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onRefresh_(model);
+                        return model;
+                    }, this)
             },
 
             [[ria.async.Future, String]],
@@ -106,8 +116,18 @@ NAMESPACE('ria.mvc', function () {
                 var me = this;
                 return future
                     .attach(this.getModelEvents_(msg))
-                    .then(function (model) { me.onPartialRender_(model, msg); return model; })
-                    .then(function (model) { me.onPartialRefresh_(model, msg); return model; })
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onPartialRender_(model, msg);
+                        return model;
+                    }, this)
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onPartialRefresh_(model, msg);
+                        return model;
+                    }, this)
             },
 
             /** @deprecated */
