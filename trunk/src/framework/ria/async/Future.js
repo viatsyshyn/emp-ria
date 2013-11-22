@@ -33,15 +33,109 @@ NAMESPACE('ria.async', function () {
     DELEGATE(
         VOID, function FutureCompleteDelegate(){});
 
-    /** @class ria.async.FutureImpl */
+    var futuresPull = [];
+
+    /** @class ria.async.Future */
     CLASS(
-        'FutureImpl', IMPLEMENTS(ria.async.ICancelable), [
+        ABSTRACT, 'Future', IMPLEMENTS(ria.async.ICancelable), [
+            function $$(instance, clazz, ctor, args) {
+                if (ctor == SELF.prototype.$fromData) {
+                    var delayArgs = args;
+                    args = [];
+                }
+
+                var fromPool = futuresPull.pop();
+                if (fromPool) {
+                    var ctor = FutureImpl_.prototype.$;
+                    if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
+                        ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, fromPool, [], []);
+                    }
+
+                    ctor.apply(fromPool, args);
+                    instance = fromPool;
+                } else {
+                    instance = FutureImpl_.apply(undefined, args)
+                }
+
+                if (ctor == SELF.prototype.$fromData) {
+                    ria.__API.defer(null, instance.finish, [delayArgs[0]], delayArgs[1]|0);
+                }
+
+                return instance.getWrapper();
+            },
 
             [[ria.async.ICancelable]],
             function $(canceler_) {
                 BASE();
 
                 this._canceler = canceler_;
+            },
+
+            function onDispose() {
+                this._next && this._next.getImpl().setCanceler(null);
+                futuresPull.push(this);
+            },
+
+            VOID, function cancel() {},
+
+            [[ria.async.FutureDataDelegate, Object]],
+            SELF, function then(handler, scope_) {},
+
+            [[ria.async.FutureDataDelegate, Object]],
+            SELF, function transform(handler, scope_) {},
+
+            [[Function, Array]],
+            SELF, function thenCall(delegate, args_) {
+                return this.then(function () {
+                    return delegate.apply(undefined, args_ || [])
+                });
+            },
+
+            SELF, function thenBreak() {
+                return this.then(ria.async.BreakDelegate);
+            },
+
+            [[ria.async.FutureProgressDelegate, Object]],
+            SELF, function handleProgress(handler, scope_) {},
+
+            [[ria.async.FutureErrorDelegate, Object]],
+            SELF, function catchError(handler, scope_) {},
+
+            [[ClassOf(Exception), ria.async.FutureErrorDelegate, Object]],
+            SELF, function catchException(exception, handler, scope_) {
+                return this.catchError(function (error) {
+                    if (error instanceof exception)
+                        return handler.call(scope_, error);
+
+                    throw error;
+                });
+            },
+
+            [[ria.async.FutureCompleteDelegate, Object]],
+            SELF, function complete(handler, scope_) {},
+
+            [[SELF]],
+            SELF, function attach(future) {},
+
+            [[SELF]],
+            SELF, function attachEnd(future) {},
+
+            function getImpl() { return this; },
+
+            [[Object, Number]],
+            function $fromData(data, delay_) {
+                BASE();
+            }
+        ]);
+
+    /** @class ria.async.FutureImpl */
+    var FutureImpl_ = CLASS(
+        'FutureImpl_', EXTENDS(ria.async.Future), [
+
+            [[ria.async.ICancelable]],
+            function $(canceler_) {
+                BASE(canceler_);
+
                 this._next = null;
 
                 this._onData = null;
@@ -50,45 +144,47 @@ NAMESPACE('ria.async', function () {
                 this._onComplete = null;
             },
 
-            VOID, function cancel() {
+            OVERRIDE, VOID, function cancel() {
                 this._canceler && this._canceler.cancel();
             },
 
             [[ria.async.FutureDataDelegate, Object]],
-            SELF, function then(handler, scope_) {
-                this._onData = handler.bind(scope_);
-                return this.attach(new SELF);
+            OVERRIDE, ria.async.Future, function then(handler, scope_) {
+                this._onData = scope_ ? handler.bind(scope_) : handler;
+                return this.attach(new ria.async.Future);
             },
 
             [[ria.async.FutureProgressDelegate, Object]],
-            SELF, function handleProgress(handler, scope_) {
-                this._onProgress = handler.bind(scope_);
-                return this.attach(new SELF);
+            OVERRIDE, ria.async.Future, function handleProgress(handler, scope_) {
+                this._onProgress = scope_ ? handler.bind(scope_) : handler;
+                return this.attach(new ria.async.Future);
             },
 
             [[ria.async.FutureErrorDelegate, Object]],
-            SELF, function catchError(handler, scope_) {
-                this._onError = handler.bind(scope_);
-                return this.attach(new SELF);
-            },
-
-            [[ClassOf(Exception), ria.async.FutureErrorDelegate, Object]],
-            SELF, function catchException(exception, handler, scope_) {
-                var me = this;
-                this._onError = function (error) {
-                    if (error instanceof exception)
-                        return handler.call(scope_, error);
-
-                    throw error;
-                };
-
-                return this.attach(new SELF);
+            OVERRIDE, ria.async.Future, function catchError(handler, scope_) {
+                this._onError = scope_ ? handler.bind(scope_) : handler;
+                return this.attach(new ria.async.Future);
             },
 
             [[ria.async.FutureCompleteDelegate, Object]],
-            SELF, function complete(handler, scope_) {
+            OVERRIDE, ria.async.Future, function complete(handler, scope_) {
                 this._onComplete = handler.bind(scope_);
-                return this.attach(new SELF);
+                return this.attach(new ria.async.Future);
+            },
+
+            [[ria.async.Future]],
+            OVERRIDE, ria.async.Future, function attach(future) {
+                var old_next = this._next;
+                this._next = future;
+                this._next.getImpl().setCanceler(this);
+                return this.attachEnd(old_next || null);
+            },
+
+            [[ria.async.Future]],
+            OVERRIDE, ria.async.Future, function attachEnd(future) {
+                return this._next
+                    ? this._next.attachEnd(future)
+                    : (future ? (this._next = future) : this);
             },
 
             VOID, function updateProgress(data) {
@@ -96,8 +192,10 @@ NAMESPACE('ria.async', function () {
                     try {
                         this._onProgress && this._onProgress(data);
                     } finally {
-                        this._next && this._next.updateProgress(data);
+                        this._next && this._next.getImpl().updateProgress(data);
                     }
+
+                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
@@ -106,19 +204,19 @@ NAMESPACE('ria.async', function () {
                     try {
                         var result = (this._onData || DefaultDataHanlder).call(this, data);
                         if (result === ria.async.BREAK) {
-                            this._next && this._next.completeBreak();
-                        } else if (result instanceof ria.async.FutureImpl) {
-                            this.attach(result);
+                            this._next && this._next.getImpl().completeBreak();
                         } else if (result instanceof ria.async.Future) {
-                            this.attach(result.getImpl());
+                            this.attach(result);
                         } else {
-                            this._next && this._next.finish(result === undefined ? null : result);
+                            this._next && this._next.getImpl().finish(result === undefined ? null : result);
                         }
                     } catch (e) {
-                        this._next && this._next.completeError(e);
+                        this._next && this._next.getImpl().completeError(e);
                     } finally {
                         this._onComplete && this._onComplete();
                     }
+
+                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
@@ -130,19 +228,19 @@ NAMESPACE('ria.async', function () {
                     try {
                         var result = (this._onError || DefaultErrorHandler).call(this, error);
                         if (result === ria.async.BREAK) {
-                            this._next && this._next.completeBreak();
-                        } else if (result instanceof ria.async.FutureImpl) {
-                            this.attach(result);
+                            this._next && this._next.getImpl().completeBreak();
                         } else if (result instanceof ria.async.Future) {
-                            this.attach(result.getImpl());
+                            this.attach(result);
                         } else {
-                            this._next && this._next.finish(result === undefined ? null : result);
+                            this._next && this._next.getImpl().finish(result === undefined ? null : result);
                         }
                     } catch (e) {
-                        this._next && this._next.completeError(e);
+                        this._next && this._next.getImpl().completeError(e);
                     } finally {
                         this._onComplete && this._onComplete();
                     }
+
+                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
@@ -151,8 +249,10 @@ NAMESPACE('ria.async', function () {
                     try {
                         this._onComplete && this._onComplete();
                     } finally {
-                        this._next && this._next.completeBreak();
+                        this._next && this._next.getImpl().completeBreak();
                     }
+
+                    ria.__API.defer(this, function () { this.onDispose(); });
                 });
             },
 
@@ -161,99 +261,11 @@ NAMESPACE('ria.async', function () {
                 this._canceler = canceler;
             },
 
-            [[SELF]],
-            SELF, function attach(future) {
-                var old_next = this._next;
-                this._next = future;
-                this._next.setCanceler(this);
-                return this.attachEnd(old_next || null);
-            },
-
-            [[SELF]],
-            SELF, function attachEnd(future) {
-                return this._next
-                    ? this._next.attachEnd(future)
-                    : (future ? (this._next = future) : this);
-            },
-
-            function getWrapper() {
-                return new ria.async.Future(this);
+            ria.async.Future, function getWrapper() {
+                return this;
             }
         ]);
 
-    /** @class ria.async.Future */
-    CLASS(
-        FINAL, 'Future', IMPLEMENTS(ria.async.ICancelable), [
-            [[ria.async.FutureImpl]],
-            function $(impl_) {
-                BASE();
-                this._impl = impl_ || new ria.async.FutureImpl();
-            },
-
-            VOID, function cancel() {
-                this._impl.cancel();
-            },
-
-            [[ria.async.FutureDataDelegate, Object]],
-            SELF, function then(handler, scope_) {
-                return new SELF(this._impl.then(handler, scope_));
-            },
-
-            [[ria.async.FutureDataDelegate, Object]],
-            SELF, function transform(handler, scope_) {
-                return new SELF(this._impl.then(handler, scope_));
-            },
-
-            [[Function, Array]],
-            SELF, function thenCall(delegate, args_) {
-                return new SELF(this._impl.then(function () {
-                    return delegate.apply(undefined, args_ || [])
-                }));
-            },
-
-            SELF, function thenBreak() {
-                return new SELF(this._impl.then(ria.async.BreakDelegate));
-            },
-
-            [[ria.async.FutureProgressDelegate, Object]],
-            SELF, function handleProgress(handler, scope_) {
-                return new SELF(this._impl.handleProgress(handler, scope_));
-            },
-
-            [[ria.async.FutureErrorDelegate, Object]],
-            SELF, function catchError(handler, scope_) {
-                return new SELF(this._impl.catchError(handler, scope_));
-            },
-
-            [[ClassOf(Exception), ria.async.FutureErrorDelegate, Object]],
-            SELF, function catchException(exception, handler, scope_) {
-                return new SELF(this._impl.catchException(exception, handler, scope_));
-            },
-
-            [[ria.async.FutureCompleteDelegate, Object]],
-            SELF, function complete(handler, scope_) {
-                return new SELF(this._impl.complete(handler, scope_));
-            },
-
-            [[SELF]],
-            SELF, function attach(future) {
-                return new SELF(this._impl.attach(future.getImpl()));
-            },
-
-            [[SELF]],
-            SELF, function attachEnd(future) {
-                return new SELF(this._impl.attachEnd(future ? future.getImpl() : null));
-            },
-
-            function getImpl() { return this._impl; },
-
-            [[Object, Number]],
-            function $fromData(data, delay_) {
-                BASE();
-                this._impl = new ria.async.FutureImpl;
-                ria.__API.defer(null, this._impl.finish, [data], delay_|0);
-            }
-        ]);
 
     /** @class ria.async.DeferredData*/
     /** @class ria.async.DeferredAction*/
