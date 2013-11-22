@@ -9,14 +9,10 @@ NAMESPACE('ria.async', function () {
             READONLY, ria.async.Future, 'future',
             READONLY, Boolean, 'completed',
 
-            ria.async.Future, function getFuture() {
-                return this.future.getWrapper();
-            },
-
             [[ria.async.ICancelable]],
             function $(canceler_) {
                 BASE();
-                this.future = new ria.async.FutureImpl(canceler_);
+                this.future = new ria.async.Future(canceler_).getImpl();
                 this.completed = false;
             },
 
