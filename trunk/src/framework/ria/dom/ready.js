@@ -82,6 +82,6 @@ NAMESPACE('ria.dom', function () {
     ria.dom.ready = function () {
         return !isPageReady
                 ? new ria.dom.DomReadyTask().run()
-                : ria.async.DeferredAction();
+                : ria.async.Future.$fromData(null);
     };
 });

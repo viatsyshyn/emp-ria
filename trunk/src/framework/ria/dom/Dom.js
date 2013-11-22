@@ -29,7 +29,6 @@ NAMESPACE('ria.dom', function () {
     function checkEventHandlerResult(event, result) {
         if (result === false) {
             event.stopPropagation && event.stopPropagation();
-            event.cancelBubble && event.cancelBubble();
             event.preventDefault && event.preventDefault();
         }
     }
@@ -419,7 +418,9 @@ NAMESPACE('ria.dom', function () {
 
             [[ria.dom.Events]],
             SELF, function triggerEvent(event) {
-                this.valueOf().forEach(event.triggerOn);
+                this.valueOf().forEach(function (node) {
+                    event.triggerOn(node);
+                });
                 return this;
             },
 
@@ -458,8 +459,12 @@ NAMESPACE('ria.dom', function () {
 
             [[String]],
             SELF, function toggleAttr(name, set_) {
-                set_ = set_ === undefined ? !this.hasAttr(name) : set_;
-                return set_ ? this.setAttr(name, name) : this.removeAttr(name);
+                this.forEach(function (_) {
+                    set_ = set_ === undefined ? !_.hasAttr(name) : set_;
+                    return set_ ? _.setAttr(name, name) : _.removeAttr(name);
+                });
+
+                return this;
             },
 
             /* props */
@@ -531,18 +536,20 @@ NAMESPACE('ria.dom', function () {
 
             [[String, Boolean]],
             SELF, function toggleClass(clazz, toggleOn_) {
-                var hasClass = this.hasClass(clazz);
-                toggleOn_ = (toggleOn_ === undefined ? !hasClass : toggleOn_);
+                this.forEach(function (_) {
+                    var hasClass = _.hasClass(clazz);
+                    toggleOn_ = (toggleOn_ === undefined ? !hasClass : toggleOn_);
 
-                if (toggleOn_ && !hasClass) {
-                    this.setAttr('class', this.getAttr('class') + " " + clazz);
-                    return this;
-                }
+                    if (toggleOn_ && !hasClass) {
+                        _.setAttr('class', _.getAttr('class') + " " + clazz);
+                        return;
+                    }
 
-                if (!toggleOn_ && hasClass) {
-                    this.setAttr('class', this.getAttr('class').split(/\s+/).filter(function(_){ return _ != clazz;}).join(' '));
-                    return this;
-                }
+                    if (!toggleOn_ && hasClass) {
+                        _.setAttr('class', _.getAttr('class').split(/\s+/).filter(function(_){ return _ != clazz;}).join(' '));
+                        return;
+                    }
+                });
 
                 return this;
             },

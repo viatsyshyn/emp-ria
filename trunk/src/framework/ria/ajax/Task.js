@@ -21,6 +21,21 @@ REQUIRE('ria.async.Timer');
 NAMESPACE('ria.ajax', function () {
     "use strict";
 
+    /** @class ria.ajax.AjaxException */
+    EXCEPTION(
+        'AjaxException', [
+            READONLY, Number, 'status',
+            READONLY, String, 'statusText',
+            READONLY, String, 'response',
+
+            function $(status, statusText, response) {
+                BASE('Ajax error: ' + status + ' ' + statusText);
+                this.status = status;
+                this.statusText = statusText;
+                this.response = response;
+            }
+        ]);
+
     /** @class ria.ajax.Method */
     ENUM(
         'Method', {
@@ -114,6 +129,9 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function transferComplete_(evt) {
+                if (this._xhr.status != 200)
+                    this._completer.completeError(ria.ajax.AjaxException(this._xhr.status, this._xhr.statusText, this._xhr.response));
+
                 this._completer.complete(this._xhr.responseText);
             },
 

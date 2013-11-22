@@ -22,8 +22,8 @@ var _RELEASE = false;
         var script = scripts[index];
 
         if (script.src.toString().match(/ria\/_bootstrap\.js$/i)) {
-            var text = script.innerText || script.innerHTML;
-            ria.__CFG = JSON.parse(text.toString().split('=').pop());
+            var text = (script.innerText || script.innerHTML).toString().split('=').slice(1);
+            ria.__CFG = JSON.parse(text.join('='));
         }
     }
 

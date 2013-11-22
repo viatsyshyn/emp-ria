@@ -70,7 +70,7 @@
 
     var Modifiers = function () {
         function Modifiers() { throw Error(); }
-        ria.__API.enum(Modifiers, 'Modifiers');
+        ria.__API.enumeration(Modifiers, 'Modifiers');
         function ModifiersImpl(raw) { this.valueOf = function () { return raw; } }
         ria.__API.extend(ModifiersImpl, Modifiers);
         Modifiers.OVERRIDE = new ModifiersImpl('OVERRIDE');

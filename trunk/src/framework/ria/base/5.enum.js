@@ -17,7 +17,7 @@
      * @param {Function} enumClass
      * @param {String} name
      */
-    ria.__API.enum = function (enumClass, name) {
+    ria.__API.enumeration = function (enumClass, name) {
         enumClass.__META = new EnumDescriptor(enumClass, name);
     };
 
