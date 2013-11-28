@@ -151,29 +151,29 @@ NAMESPACE('ria.mvc', function () {
                     return this.cache[name];
                 }
 
-                var instanse = this.cache[name] = ref.instantiate();
+                var instance = this.cache[name] = ref.instantiate();
 
                 if (ref.implementsIfc(ria.mvc.IContextable)) {
-                    ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
+                    ref.getPropertyReflector('context').invokeSetterOn(instance, context);
                 }
 
-                return instanse;
+                return instance;
             },
 
             [[ria.reflection.ReflectionClass, ria.mvc.IContext]],
             Class, function prepareInstance_(ref, context) {
-                var instanse = ref.instantiate();
+                var instance = ref.instantiate();
 
                 ref.getPropertiesReflector().forEach(function (_) {
                     if (!_.isReadonly() && _.isAnnotatedWith(ria.mvc.Inject)) {
-                        _.invokeSetterOn(instanse, this.getCached_(_.getType(), context));
+                        _.invokeSetterOn(instance, this.getCached_(_.getType(), context));
                     }
                 }.bind(this));
 
                 if (ref.implementsIfc(ria.mvc.IContextable)) {
-                    ref.getPropertyReflector('context').invokeSetterOn(instanse, context);
+                    ref.getPropertyReflector('context').invokeSetterOn(instance, context);
                 }
-                return instanse;
+                return instance;
             },
 
             [[ClassOf(Class), ria.mvc.IContext]],
@@ -212,10 +212,10 @@ NAMESPACE('ria.mvc', function () {
                         }
 
                         var ref = this.controllers[state.getController()];
-                        var instanse = this.prepareInstance_(ref, context);
+                        var instance = this.prepareInstance_(ref, context);
 
-                        instanse.onInitialize();
-                        instanse.dispatch(state);
+                        instance.onInitialize();
+                        instance.dispatch(state);
 
                         if (!state.isDispatched())
                             continue;
