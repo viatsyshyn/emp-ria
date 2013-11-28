@@ -42,5 +42,5 @@ NAMESPACE('ria.dom', function () {
             }
         ]);
 
-    ria.dom.setDomImpl(ria.dom.SizzleDom);
+    ria.dom.Dom.SET_IMPL(ria.dom.SizzleDom);
 });

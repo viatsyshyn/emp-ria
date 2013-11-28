@@ -178,7 +178,7 @@
         args = ria.__API.clone(args);
 
         if (clazz.__META.isAbstract)
-            throw Error('Can NOT instantiate asbtract class ' + clazz.__META.name);
+            throw Error('Can NOT instantiate abstract class ' + clazz.__META.name);
 
         if (!(instance instanceof clazz))
             instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
