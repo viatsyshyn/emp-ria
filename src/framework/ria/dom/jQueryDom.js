@@ -405,5 +405,5 @@ NAMESPACE('ria.dom', function () {
             }
         ]);
 
-    ria.dom.setDomImpl(ria.dom.jQueryDom);
+    ria.dom.Dom.SET_IMPL(ria.dom.jQueryDom);
 });

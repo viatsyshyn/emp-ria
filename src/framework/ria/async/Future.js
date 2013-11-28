@@ -22,18 +22,19 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.FutureProgressDelegate */
     DELEGATE(
         [[Object]],
-        Object, function FutureProgressDelegate(data){});
+        VOID, function FutureProgressDelegate(data){});
 
     /** @class ria.async.FutureErrorDelegate */
     DELEGATE(
         [[Object]],
-        Object, function FutureErrorDelegate(error){});
+        function FutureErrorDelegate(error){});
 
     /** @class ria.async.FutureCompleteDelegate */
     DELEGATE(
         VOID, function FutureCompleteDelegate(){});
 
-    var futuresPull = [];
+    var __futuresPool = [],
+        __uncaughtErrorHandler = DefaultErrorHandler;
 
     /** @class ria.async.Future */
     CLASS(
@@ -44,7 +45,7 @@ NAMESPACE('ria.async', function () {
                     args = [];
                 }
 
-                var fromPool = futuresPull.pop();
+                var fromPool = __futuresPool.pop();
                 if (fromPool) {
                     var ctor = FutureImpl_.prototype.$;
                     if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
@@ -75,7 +76,7 @@ NAMESPACE('ria.async', function () {
             function onDispose() {
                 Assert(!this._disposed, 'Disposing already disposed future');
                 this._next && this._next.getImpl().setCanceler(null);
-                this._disposed || ria.__API.defer(this, function () { futuresPull.push(this); });
+                this._disposed || ria.__API.defer(this, function () { __futuresPool.push(this); });
                 this._disposed = true;
             },
 
@@ -130,6 +131,11 @@ NAMESPACE('ria.async', function () {
             [[Object, Number]],
             function $fromData(data, delay_) {
                 BASE();
+            },
+
+            [[ria.async.FutureErrorDelegate]],
+            function UNCAUGHT_ERROR(handler) {
+                __uncaughtErrorHandler = handler;
             }
         ]);
 
@@ -234,7 +240,7 @@ NAMESPACE('ria.async', function () {
             VOID, function completeError(error) {
                 Assert(!this._disposed, 'Can not completeError disposed future');
                 if (!this._next)
-                    throw new Exception('Uncaught error', error);
+                    __uncaughtErrorHandler(new Exception('Uncaught error', error));
 
                 ria.__API.defer(this, function () {
                     Assert(!this._disposed, 'Can not completeError disposed future');

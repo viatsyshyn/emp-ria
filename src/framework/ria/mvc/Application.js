@@ -28,6 +28,24 @@ NAMESPACE('ria.mvc', function () {
 
     var History = window.History;
 
+    /** @class ria.mvc.UncaughtException */
+    EXCEPTION(
+        'UncaughtException', [
+            READONLY, 'srcUrl',
+            READONLY, 'lineNo',
+
+            function $(msg, srcUrl, lineNo) {
+                BASE(msg);
+
+                this.srcUrl = srcUrl;
+                this.lineNo = lineNo;
+            },
+
+            OVERRIDE, String, function toString() {
+                return 'Uncaught error: ' + this.message + '\nAt ' + this.srcUrl + ':' + this.lineNo;
+            }
+        ])
+
     /**@namespace ria.mvc.Application */
     CLASS(
         GENERIC('TContext', ImplementerOf(ria.mvc.IContext), 'TSerializer', ImplementerOf(ria.mvc.IStateSerializer)),
@@ -85,7 +103,7 @@ NAMESPACE('ria.mvc', function () {
 
             VOID, function run() {
                 var me = this;
-                ria.async.DeferredAction()
+                ria.async.Future.$fromData(null)
                     .then(function () {
                         return me.onInitialize_();
                     })
@@ -109,20 +127,26 @@ NAMESPACE('ria.mvc', function () {
                         me.onResume_();
                         return null;
                     })
+                    .catchError(function (e) {
+                        this.onError_(new ria.mvc.MvcException('Failed to start application', e));
+                        return ria.async.BREAK;
+                    }, this)
                     .then(function() {
                         me.dispatch();
                         return null;
-                    })
-                    .catchError(function (e) {
-                        throw new ria.mvc.MvcException('Failed to start application', e);
                     });
             },
 
             [[String]],
             VOID, function dispatch(route_) {
-                var state = this.serializer.deserialize(route_ || window.location.hash.substr(1));
-                state.setPublic(true);
-                this._dispatcher.dispatch(state, this.context);
+                var route = route_ || window.location.hash.substr(1);
+                try {
+                    var state = this.serializer.deserialize(route);
+                    state.setPublic(true);
+                    this._dispatcher.dispatch(state, this.context);
+                } catch (e) {
+                    this.onError_(new ria.mvc.MvcException('Failed to dispatch request: ' + JSON.stringify(route), e));
+                }
             },
 
             ria.async.Future, function onInitialize_() {
@@ -134,9 +158,10 @@ NAMESPACE('ria.mvc', function () {
                 //window.addEventListener("activate", this.onResume_, false);
                 //window.addEventListener("unload", this.onDispose_, false);
 
-                window.onerror = function (error) {
-                    _DEBUG && console.info('Uncaught error', ria.__API.clone(arguments));
-                    this.onError_(error);
+                window.onerror = function (error, src, lineNo) {
+                    _DEBUG && console.info('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src, 'at', lineNo);
+
+                    this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
                 }.bind(this);
 
                 return ria.async.DeferredAction();
@@ -149,8 +174,8 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onDispose_() {},
 
             VOID, function onError_(error) {
-                Assert(false, 'Unhandled error: ' + error.toString());
-                throw Exception('Unhandled error', error);
+                if (!(error instanceof ria.mvc.UncaughtException))
+                    console.error(error.toString());
             },
 
             [[ClassOf(SELF), Object]],
