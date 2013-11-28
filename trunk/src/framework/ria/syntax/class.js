@@ -6,7 +6,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     var IS_OPTIONAL = /^.+_$/;
 
-    ria.__SYNTAX.toAst = function (x) {
+    ria.__SYNTAX.toRef = ria.__SYNTAX.toAst = function (x) {
         return new Function ('return ' + x)();
     };
 
@@ -120,7 +120,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         def.properties
             .forEach(function (property) {
                 var name = property.name;
-                property.type = property.type || new ria.__SYNTAX.Tokenizer.RefToken(ria.__SYNTAX.toAst('Object'));
+                property.type = property.type || new ria.__SYNTAX.Tokenizer.RefToken(ria.__SYNTAX.toRef('Object'));
 
                 ria.__SYNTAX.validateVarName(name);
                 var getterName = property.getGetterName();

@@ -179,7 +179,7 @@ function prepareRiaConfig() {
             return text.match(/ria\.__CFG\s+=\s+\{/)
         })
         .map(function (text) {
-            return JSON.parse(text.split('=').pop());
+            return JSON.parse(text.split('=').slice(1).join('='));
         })
         .pop();
 }
@@ -308,7 +308,8 @@ function compile(path, config, appClass) {
     config.getPrepend().forEach(function (prepend) {
         var path = resolve(prepend, config);
         console.info('Prepending: ' + path);
-        fileContents.push('/** @path ' + prepend + ' */');
+        fileContents.push(';\n');
+        //fileContents.push('/** @path ' + prepend + ' */');
         fileContents.push(fs.readFileSync(path));
     });
 
