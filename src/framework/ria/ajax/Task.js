@@ -129,8 +129,10 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function transferComplete_(evt) {
-                if (this._xhr.status != 200)
+                if (this._xhr.status != 200)   {
                     this._completer.completeError(ria.ajax.AjaxException(this._xhr.status, this._xhr.statusText, this._xhr.response));
+                    return;
+                }
 
                 this._completer.complete(this._xhr.responseText);
             },
