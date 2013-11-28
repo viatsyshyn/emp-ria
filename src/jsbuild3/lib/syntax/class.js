@@ -33,6 +33,7 @@ function ToAst(fn) {
 }
 
 ria.__SYNTAX.toAst = ToAst;
+ria.__SYNTAX.toRef = AccessNS;
 
 function processAnnotation(_) {
     if (_.raw instanceof UglifyJS.AST_Call)
