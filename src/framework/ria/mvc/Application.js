@@ -159,7 +159,7 @@ NAMESPACE('ria.mvc', function () {
                 //window.addEventListener("unload", this.onDispose_, false);
 
                 window.onerror = function (error, src, lineNo) {
-                    _DEBUG && console.info('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src, 'at', lineNo);
+                    _DEBUG && console.error('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src + ":" + lineNo);
 
                     this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
                 }.bind(this);
