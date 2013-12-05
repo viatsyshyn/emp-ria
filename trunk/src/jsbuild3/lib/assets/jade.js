@@ -7,5 +7,5 @@
  */
 
 setFileHandler('jade', function JadeFileHandler(content, config, path) {
-    return 'jade.globals = jade.globals || {}; __ASSETS["' + AssetsCache[path] + '"] = ' + Jade.compile(content, {client: true, compileDebug: false, self: true});
+    return '__ASSETS["' + AssetsCache[path] + '"] = ' + Jade.compile(content, {client: true, compileDebug: false, self: true});
 });
