@@ -1,7 +1,7 @@
 /** @namespace ria.__SYNTAX */
 ria.__SYNTAX = ria.__SYNTAX || {};
 
-(function () {
+(function (global) {
     "use strict";
 
     var IS_OPTIONAL = /^.+_$/;
@@ -633,14 +633,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         processedMethods.push('$$');
 
         var ClassProxy = function ClassProxy() {
-            var _old_SELF = window.SELF;
+            var _old_SELF = global.SELF;
             try {
-                window.SELF = ClassProxy;
+                global.SELF = ClassProxy;
                 return $$.call(undefined, this, ClassProxy, ClassProxy.prototype.$, arguments);
             } catch (e) {
                 throw new Exception('Error instantiating class ' + className, e);
             } finally {
-                window.SELF = _old_SELF;
+                global.SELF = _old_SELF;
             }
         };
 
@@ -667,14 +667,14 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             .forEach(function (ctorDef) {
                 var name = ctorDef.name;
                 ClassProxy[name] = function NamedConstructorProxy() {
-                    var _old_SELF = window.SELF;
+                    var _old_SELF = global.SELF;
                     try {
-                        window.SELF = ClassProxy;
+                        global.SELF = ClassProxy;
                         return $$.call(undefined, this, ClassProxy, ClassProxy.prototype[name], arguments);
                     } catch (e) {
                         throw new Exception('Error instantiating class ' + className, e);
                     } finally {
-                        window.SELF = _old_SELF;
+                        global.SELF = _old_SELF;
                     }
                 };
             });
@@ -716,33 +716,33 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     if (ria.__CFG.enablePipelineMethodCall) {
         ria.__API.addPipelineMethodCallStage('CallInit',
             function (body, meta, scope, callSession, genericTypes, genericSpecs) {
-                callSession.__OLD_SELF = window.SELF;
-                window.SELF = body.__SELF;
+                callSession.__OLD_SELF = global.SELF;
+                global.SELF = body.__SELF;
 
-                callSession.__OLD_BASE = window.BASE;
+                callSession.__OLD_BASE = global.BASE;
                 var base = body.__BASE_BODY;
-                window.BASE = base
+                global.BASE = base
                     ? ria.__API.getPipelineMethodCallProxyFor(base, base.__META, scope, genericTypes, genericSpecs)
                     : BaseIsUndefined;
 
                 (genericTypes || []).forEach(function (type, index) {
-                    callSession['__OLD_' + type.name] = window[type.name];
-                    window[type.name] = genericSpecs[index];
+                    callSession['__OLD_' + type.name] = global[type.name];
+                    global[type.name] = genericSpecs[index];
                 });
             });
 
         ria.__API.addPipelineMethodCallStage('CallFinally',
             function (body, meta, scope, callSession, genericTypes, genericSpecs) {
                 (genericTypes || []).forEach(function (type, index) {
-                    window[type.name] = callSession['__OLD_' + type.name];
+                    global[type.name] = callSession['__OLD_' + type.name];
                     delete callSession['__OLD_' + type.name];
                 });
 
-                window.SELF = callSession.__OLD_SELF;
+                global.SELF = callSession.__OLD_SELF;
                 delete callSession.__OLD_SELF;
 
-                window.BASE = callSession.__OLD_BASE;
+                global.BASE = callSession.__OLD_BASE;
                 delete callSession.__OLD_BASE;
             });
     }
-})();
+})(this);

@@ -7,6 +7,7 @@
  */
 
 
-window.REQUIRE = ria.__REQUIRE.requireSymbol;
-window.ASSET = ria.__REQUIRE.getContent;
-window.NAMESPACE = window.NS = ria.__REQUIRE.addCurrentModuleCallback;
+var REQUIRE = ria.__REQUIRE.requireSymbol;
+var ASSET = ria.__REQUIRE.getContent;
+var NAMESPACE = ria.__REQUIRE.addCurrentModuleCallback;
+var NS = ria.__REQUIRE.addCurrentModuleCallback;
