@@ -1,4 +1,4 @@
-(function () {
+(function (global) {
 
     /**
      * Method borrowed at http://eriwen.com/javascript/js-stack-trace/
@@ -20,7 +20,7 @@
             return callstack;
         }
 
-        if (window.opera && e.message) { //Opera
+        if (global.opera && e.message) { //Opera
             lines = e.message.split('\n');
             for (i = 0, len = lines.length; i < len; i++) {
                 if (lines[i].match(/^\s*[A-Za-z0-9\-_\$]+\(/)) {
@@ -59,7 +59,7 @@
     function getPrintStackTraceWrapper() {
         "use strict";
         return function (e) {
-            return window.printStackTrace({
+            return global.printStackTrace({
                 e: e,
                 guess: ria.__CFG.prettyStackTraces
             });
@@ -70,5 +70,5 @@
      * @param {Error} e
      * @return {Array}
      */
-    ria.__API.getStackTrace = window.printStackTrace ? getPrintStackTraceWrapper() : getStackTrace;
-})();
+    ria.__API.getStackTrace = global.printStackTrace ? getPrintStackTraceWrapper() : getStackTrace;
+})(this);

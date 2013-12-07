@@ -1,7 +1,7 @@
 /** @namespace ria.__SYNTAX */
 ria.__SYNTAX = ria.__SYNTAX || {};
 
-(function () {
+(function (global) {
     "use strict";
 
     function buildNs(ns, name) {
@@ -10,7 +10,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     function setPath(path, value) {
         var p = path.split(/\./);
-        var root = window;
+        var root = global;
         var name = p.pop();
 
         while (p.length) {
@@ -51,4 +51,4 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         callback();
         CurrentNamespace = old;
     }
-})();
+})(this);
