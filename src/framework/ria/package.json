@@ -1,0 +1,27 @@
+{
+    "name": "emp.ria-framework",
+    "title": "EMP RIA Framework",
+    "description": "EMP rich internet application framework",
+    "version": "0.1.0-beta",
+    "main": "_bootstrap.node.js",
+    "homepage": "https://code.google.com/p/emp-ria/",
+    "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
+    "repository": "http://emp-ria.googlecode.com/svn/trunk/",
+    "keywords": [
+        "emp.ria",
+        "javascript",
+        "library"
+    ],
+    "bugs": {
+        "url": "https://code.google.com/p/emp-ria/issues/list"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt"
+        }
+    ],
+    "dependencies": {},
+    "devDependencies": {},
+    "scripts": {}
+}

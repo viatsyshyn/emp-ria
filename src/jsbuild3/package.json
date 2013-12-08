@@ -1,13 +1,22 @@
 {
   "name": "emp.ria-jsbuild3",
-  "description": "emp.ria build system",
-  "version": "0.1.0",
+  "title": "EMP RIA Jsbuild3",
+  "description": "EMP RIA build system",
+  "version": "0.1.0-beta",
   "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
   "repository": "http://emp-ria.googlecode.com/svn/trunk/",
   "main": "./index.js",
   "bin": {
     "jsbuild3": "./bin/jsbuild3"
   },
+  "bugs": {
+    "url": "https://code.google.com/p/emp-ria/issues/list"
+  },
+  "keywords": [
+    "emp.ria",
+    "javascript",
+    "library"
+  ],
   "dependencies": {
     "optimist": "*",
     "uglify-js": "*",
