@@ -3,7 +3,6 @@
 
 "use strict";
 
-var config = require("../lib/config")
 var ARGS = require("optimist")
     .usage("$0 config")
     .describe("config", "Specify an path to config file")
@@ -11,19 +10,19 @@ var ARGS = require("optimist")
     .string("config")
     .describe("modules", "Specify modules to build")
     .string("modules")
-    //.optional("modules")
     .wrap(80)
     .argv;
 
-var fs = require("fs");
-var Path = require("path");
-var CFG = new config.Configuration(JSON.parse(fs.readFileSync(ARGS.config)), ARGS.config);
+var fs = require("fs"),
+    Path = require("path"),
+    JsBuild3 = require("../tools/jsbuild");
+
+var CFG = new JsBuild3.Configuration(JSON.parse(fs.readFileSync(ARGS.config)), ARGS.config);
+
 // todo: load plugins
 for(var plugin in CFG.getPlugins()) {
     console.info(plugin.path);
 }
-
-var JsBuild3 = require("../tools/jsbuild");
 
 var MODULES = (ARGS.modules || '');
 var toBuild = CFG.getModules();

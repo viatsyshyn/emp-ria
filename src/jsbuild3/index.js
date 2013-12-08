@@ -1,0 +1,1 @@
+exports = require("./tools/jsbuild");
