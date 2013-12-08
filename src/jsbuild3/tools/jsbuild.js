@@ -45,7 +45,6 @@ var JsBuild3 = vm.createContext({
     Path          : path,
     fs            : fs,
     UglifyJS      : require("uglify-js"),
-    Jade          : require("jade"),
     execSync      : execSync
 });
 
