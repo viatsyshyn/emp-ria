@@ -6,7 +6,7 @@ var isWin32 = process.platform == 'win32',
 
 //console.info('Platform: ' + process.platform + '/' + process.arch);
 
-exports = function() {
+module.exports = function() {
     var run;
     if (isWin32) {
         var libPath = path.resolve(__dirname, "./win32/WinSyncExec." + arch + ".dll");

@@ -9,7 +9,8 @@ var JsBuild3 = vm.createContext({
     require       : require,
     Path          : path,
     fs            : fs,
-    UglifyJS      : require("uglify-js")
+    UglifyJS      : require("uglify-js"),
+    __CWD         : process.cwd()
 });
 
 function load_global(file) {
