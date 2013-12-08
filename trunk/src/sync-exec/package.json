@@ -1,0 +1,26 @@
+{
+    "name": "emp.ria-exec-sync",
+    "title": "EMP RIA Jsbuild3",
+    "description": "EMP RIA exec-sync",
+    "version": "0.1.0-beta",
+    "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
+    "repository": "http://emp-ria.googlecode.com/svn/trunk/",
+    "main": "./index.js",
+    "bugs": {
+        "url": "https://code.google.com/p/emp-ria/issues/list"
+    },
+    "keywords": [
+        "emp.ria",
+        "javascript",
+        "library"
+    ],
+    "dependencies": {
+        "ffi": "*"
+    },
+    "scripts": {
+        "prepublish": "npm prune"
+    },
+    "engines": {
+        "node": ">= 0.10.0"
+    }
+}

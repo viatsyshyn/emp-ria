@@ -2,41 +2,6 @@ var path = require("path");
 var fs = require("fs");
 var vm = require("vm");
 var sys = require("util");
-var FFI = require("ffi");
-
-var isWin32 = process.platform == 'win32';
-console.info('Platform: ' + process.platform + '/' + process.arch);
-
-var execSync = function(process) {
-  var run;
-  if (isWin32) {
-      var libPath = path.resolve(__dirname, "WinSyncExec." + process.arch + ".dll");
-      console.info('Loading Win32 lib: ' + libPath);
-      var dll = FFI.Library(libPath, {
-        "WinExecSync": ["int32", ["string", "string"]]
-      });
-
-      run = dll.WinExecSync;
-  } else {
-      var libc = new FFI.Library(null, {
-          "system": ["int32", ["string"]]
-      });
-
-      run = function (cmd, wdir) {
-          // set current dir
-          libc.system(cmd);
-          // read ret code
-          return 0;
-      }
-  }
-
-  return function(cmd, dir) {
-    var code = run(cmd, dir);
-    if (code) {
-      throw Error("Error " + code + " executing " + cmd)
-    }
-  };
-}(process);
 
 var JsBuild3 = vm.createContext({
     sys           : sys,
@@ -44,8 +9,7 @@ var JsBuild3 = vm.createContext({
     require       : require,
     Path          : path,
     fs            : fs,
-    UglifyJS      : require("uglify-js"),
-    execSync      : execSync
+    UglifyJS      : require("uglify-js")
 });
 
 function load_global(file) {

@@ -2,6 +2,9 @@
 
 var _DEBUG = false;
 
+var execSync = require('emp.ria-exec-sync');
+
+
 /**
  * @param {String} path
  * @param {CodeBlockDescriptor[]} deps
