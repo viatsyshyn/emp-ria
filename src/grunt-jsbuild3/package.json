@@ -1,0 +1,47 @@
+{
+  "name": "emp.ria-grunt-jsbuild3",
+  "description": "EMP RIA Jsbuild3 Gruntjs plugin",
+  "version": "0.1.0-beta",
+  "homepage": "https://code.google.com/p/emp-ria/",
+  "author": {
+    "name": "Volodymyt Iatsyshyn",
+    "email": "viatsyshyn@gmail.com"
+  },
+  "repository": {
+    "type": "svn",
+    "url": "http://emp-ria.googlecode.com/svn/trunk/"
+  },
+  "bugs": {
+    "url": "https://code.google.com/p/emp-ria/issues/list"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://code.google.com/p/emp-ria//blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": "0.10.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "emp.ria-jsbuild3": "*"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt": "~0.4.2"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.2"
+  },
+  "keywords": [
+    "gruntplugin",
+    "emp.ria",
+    "jsbuild3"
+  ]
+}
