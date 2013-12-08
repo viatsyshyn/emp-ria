@@ -120,5 +120,3 @@ Configuration.prototype = {
     /** @returns Object */
     getOption: function (name) { return this.moduleConfig.getOption(name) || this.options[name] || null; }
 };
-
-exports.Configuration = Configuration;

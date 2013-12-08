@@ -41,6 +41,7 @@ var execSync = function(process) {
 var JsBuild3 = vm.createContext({
     sys           : sys,
     console       : console,
+    require       : require,
     Path          : path,
     fs            : fs,
     UglifyJS      : require("uglify-js"),
@@ -63,6 +64,7 @@ function load_global(file) {
 }
 
     ([
+        "../lib/config.js",
         "../lib/jsbuild3.js",
         "../../framework/ria/base/0.common.js",
         "../../framework/ria/base/5.annotations.js",
@@ -107,8 +109,14 @@ function load_global(file) {
     .forEach(load_global);
 
 // XXX: perhaps we shouldn't export everything but heck, I'm lazy.
-for (var i in JsBuild3) {
+/*for (var i in JsBuild3) {
     if (JsBuild3.hasOwnProperty(i)) {
+        console.info('global exports: ', i);
         exports[i] = JsBuild3[i];
     }
-}
+}*/
+
+exports.PluginConfiguration = JsBuild3.PluginConfiguration;
+exports.ModuleConfiguration = JsBuild3.ModuleConfiguration;
+exports.Configuration = JsBuild3.Configuration;
+exports.compile = JsBuild3.compile.bind(JsBuild3);
