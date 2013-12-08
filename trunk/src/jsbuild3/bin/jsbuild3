@@ -15,35 +15,7 @@ var ARGS = require("optimist")
 
 var fs = require("fs"),
     Path = require("path"),
-    JsBuild3 = require("../tools/jsbuild");
+    JsBuild3 = require("../index");
 
-var CFG = new JsBuild3.Configuration(JSON.parse(fs.readFileSync(ARGS.config)), ARGS.config);
-
-// todo: load plugins
-for(var plugin in CFG.getPlugins()) {
-    console.info(plugin.path);
-}
-
-var MODULES = (ARGS.modules || '');
-var toBuild = CFG.getModules();
-if (MODULES.length) {
-    MODULES = MODULES.split(',').filter(function(_) { return _ != null; });
-    toBuild = toBuild.filter(function (module) {
-        return MODULES.indexOf(module.getName()) >= 0;
-    });
-}
-
-toBuild.forEach(/** @param {ModuleConfiguration} module */ function (module) {
-    CFG.setModuleConfig(module);
-
-    console.info('Processing: ' + module.getName());
-
-    var fileContents = JsBuild3.compile(module.getInFile() || module.getAppClass(), CFG, module.getAppClass());
-    var outPath = Path.resolve(CFG.getBasePath() + module.getOutFile());
-
-    var jsbuildParams = CFG.getPluginConfiguration("jsbuild");
-    fs.writeFileSync(outPath, fileContents.join(jsbuildParams.separator || ';'), "utf-8");
-});
-
-console.info("done");
+JsBuild3(ARGS.config, (ARGS.modules || '').split(','));
 
