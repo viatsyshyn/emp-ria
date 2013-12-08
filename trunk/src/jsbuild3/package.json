@@ -21,7 +21,8 @@
     "optimist": "*",
     "uglify-js": "*",
     "emp.ria-jade": "*",
-    "ffi": "*"
+    "ffi": "*",
+    "emp.ria-framework": "*"
   },
   "scripts": {
     "prepublish": "npm prune"
