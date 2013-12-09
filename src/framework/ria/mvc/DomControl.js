@@ -34,19 +34,21 @@ NAMESPACE('ria.mvc', function () {
             VOID, function bind_() {
                 var ref = new ria.reflection.ReflectionClass(this.getClass());
 
-                this._domEvents = ref.getMethodsReflector()
+                this._domEvents = [].concat.apply([], ref.getMethodsReflector()
                     .filter(function (_) { return _.isAnnotatedWith(ria.mvc.DomEventBind)})
                     .map(function(_) {
                         if (_.getArguments().length < 2)
                             throw new ria.mvc.MvcException('Methods, annotated with ria.mvc.DomBindEvent, are expected to accept at least two arguments (node, event)');
 
-                        var annotation = _.findAnnotation(ria.mvc.DomEventBind).pop();
-                        return {
-                            event: annotation.event,
-                            selector: annotation.selector_,
-                            methodRef: _
-                        }
-                    });
+                        return _.findAnnotation(ria.mvc.DomEventBind)
+                            .map(function (annotation) {
+                                return {
+                                    event: annotation.event,
+                                    selector: annotation.selector_,
+                                    methodRef: _
+                                }
+                            });
+                    }));
             }
         ]);
 });

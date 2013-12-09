@@ -37,7 +37,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             OVERRIDE, Boolean, function is(selector) {
                 return this._dom.some(function (el) {
-                    return Sizzle.matchesSelector(el, selector);
+                    return Sizzle['matchesSelector'](el, selector);
                 });
             }
         ]);
