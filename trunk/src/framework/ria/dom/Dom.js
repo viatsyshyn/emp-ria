@@ -234,7 +234,11 @@ NAMESPACE('ria.dom', function () {
                                 return checkEventHandlerResult(e, handler_(new ria.dom.Dom(selectorTarget), e));
                         };
 
-                        element.addEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
+                        if (evt == 'ria::wheel') {
+                            addWheelListener(element, h, false);
+                        } else {
+                            element.addEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
+                        }
                     })
                 });
                 return this;
@@ -257,9 +261,16 @@ NAMESPACE('ria.dom', function () {
                         if (!element.__domEvents)
                             return ;
 
+                        if (evt == 'ria::wheel') {
+                            _DEBUG && console.warn('ria.dom.Dom .off() is not supported for "ria::wheel" event');
+                            return ;
+                        }
+
                         var h;
                         if (h = element.__domEvents[evt + hid])
                             element.removeEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
+
+                        delete element.__domEvents[evt + hid];
                     })
                 });
                 return this;
