@@ -4,10 +4,10 @@
 
 ViewResult is a base result for action methods of controllers. If controller action returns :
 
-1. undefined - trigger an error
-2. null - do nothing
-3. non ViewResult - trigger an error
-4. ViewResult - do view update
+# undefined - trigger an error
+# null - do nothing
+# non ViewResult - trigger an error
+# ViewResult - do view update
 
 
 = Details =
@@ -190,4 +190,3 @@ return this.PushOrUpdateView(MyActivity, dataFuture1)
            .ChainUpdateView(dataFuture2, 'msg2')
            .ChainUpdateView(dataFuture3, 'msg3')
 }}}
-
