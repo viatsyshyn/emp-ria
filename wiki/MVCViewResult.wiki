@@ -197,6 +197,7 @@ CLASS(
 
     function modalConfirmSampleAction() {
       var data = this.ModalView(MyConfirmBox, myConfirmBoxModel)
+        /* MyConfirmBox.getModalResult() return instance of MyConfirmModalResult */
         .then(function (modalResult) {
           return modalResult.isOk() ? modalResult.getData() : ria.async.Future;
         })
