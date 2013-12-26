@@ -88,7 +88,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future]],
     ActionResult, function PushView(activityClass, data) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Push, 
               false, 
               data);
@@ -100,7 +100,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future, String]],
     ActionResult, function PushOrUpdateView(activityClass, data, msg_) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Push, 
               true, 
               data,
@@ -113,7 +113,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future]],
     ActionResult, function ShadeView(activityClass, data) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
               false, 
               data);
@@ -125,7 +125,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future, String]],
     ActionResult, function ShadeOrUpdateView(activityClass, data, msg_) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
               true, 
               data,
@@ -138,7 +138,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future]],
     ActionResult, function StaticView(activityClass, data) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
               false, 
               data);
@@ -149,7 +149,7 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future, String]],
     ActionResult, function StaticOrUpdateView(activityClass, data, msg_) {
-       return SELF.$fromData(activityClass, 
+       return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
               true, 
               data,
