@@ -59,9 +59,7 @@ CLASS(
      SELF, function ChainUpdateView (data, msg_) {
        return SELF.$fromData(this.getActivityClass(), 
               ActionType.BackgroundUpdate, 
-              false, 
-              data, 
-              msg_);
+              false, data, msg_);
      }
   ]);
 
@@ -90,8 +88,7 @@ CLASS(
     ActionResult, function PushView(activityClass, data) {
        return ActionResult.$fromData(activityClass, 
               ActionType.Push, 
-              false, 
-              data);
+              false, data);
     },
 
     /**
@@ -102,9 +99,7 @@ CLASS(
     ActionResult, function PushOrUpdateView(activityClass, data, msg_) {
        return ActionResult.$fromData(activityClass, 
               ActionType.Push, 
-              true, 
-              data,
-              msg_);
+              true, data, msg_);
     },
 
     /**
@@ -115,8 +110,7 @@ CLASS(
     ActionResult, function ShadeView(activityClass, data) {
        return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
-              false, 
-              data);
+              false, data);
     },
 
     /**
@@ -127,9 +121,7 @@ CLASS(
     ActionResult, function ShadeOrUpdateView(activityClass, data, msg_) {
        return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
-              true, 
-              data,
-              msg_);
+              true, data, msg_);
     },
 
     /**
@@ -151,9 +143,7 @@ CLASS(
     ActionResult, function StaticOrUpdateView(activityClass, data, msg_) {
        return ActionResult.$fromData(activityClass, 
               ActionType.Shade, 
-              true, 
-              data,
-              msg_);
+              true, data, msg_);
     },
 
     /**
@@ -161,7 +151,9 @@ CLASS(
      */
     [[ImplementerOf(IActivity), ria.async.Future, Array]],
     ActionResult, function UpdateView(activityClass, data, msg_) {
-      return ActionResult.$fromData(activityClass, ActionType.Update, false, data, msg_);
+      return ActionResult.$fromData(activityClass, 
+             ActionType.Update, 
+             false, data, msg_);
     },
 
     /**
@@ -169,7 +161,9 @@ CLASS(
      */
     [[ImplementerOf(IActivity), Object, Array]],
     ActionResult, function BackgroundUpdateView(activityClass, data, msg_) {
-      return ActionResult.$fromData(activityClass, ActionType.BackgroundUpdate, false, data, msg_);
+      return ActionResult.$fromData(activityClass, 
+             ActionType.BackgroundUpdate, 
+             false, data, msg_);
     }
 
     /**
@@ -179,14 +173,38 @@ CLASS(
     [[String]],
     CloseResult, function CloseView(activityClass) {
       return CloseResult.$fromData(activityClass);
-    }
+    },
+
+    /**
+     * Shows activity immediatly and pauses viewResultQueue processing
+     * till modal activity is closed. Resulting future is resolved with 
+     * return of getModelResult().
+     */
+    [[ImplementerOf(IActivity]],
+    ria.async.Future, function ModalView(activityClass, rawData) {
+      return this.view.modalView(activityClass, rawData);
   ]);
 }}}
 
 
-Example:
+Examples:
 {{{
-return this.PushOrUpdateView(MyActivity, dataFuture1)
-           .ChainUpdateView(dataFuture2, 'msg2')
-           .ChainUpdateView(dataFuture3, 'msg3')
+CLASS(
+  'SampleController', EXTENDS(ActionController), [
+    function chainedUpdateSampleAction() {
+      return this.PushOrUpdateView(MyActivity, dataFuture1)
+                 .ChainUpdateView(dataFuture2, 'msg2')
+                 .ChainUpdateView(dataFuture3, 'msg3')
+    }
+
+    function modalConfirmSampleAction() {
+      var data = this.ModalView(MyConfirmBox, myConfirmBoxModel)
+        .then(function (modalResult) {
+          return modalResult.isOk() ? modalResult.getData() : ria.async.Future;
+        })
+        .thenCall(this.service.getSomeData)
+
+      return this.PushOrUpdateView(MyActivity, data);   
+    }
+  ]);
 }}}
