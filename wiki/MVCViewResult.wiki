@@ -15,9 +15,7 @@ ViewResult is a base result for action methods of controllers. If controller act
 {{{
 CLASS(ABSTRACT, 
   'ViewResult', []);
-}}}
 
-{{{
 CLASS(
   'RedirectResult', EXTENDS(ViewResult), [
     String, 'controller',
@@ -195,7 +193,7 @@ CLASS(
       return this.PushOrUpdateView(MyActivity, dataFuture1)
                  .ChainUpdateView(dataFuture2, 'msg2')
                  .ChainUpdateView(dataFuture3, 'msg3')
-    }
+    },
 
     function modalConfirmSampleAction() {
       var data = this.ModalView(MyConfirmBox, myConfirmBoxModel)
