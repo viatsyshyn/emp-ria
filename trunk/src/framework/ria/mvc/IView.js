@@ -18,7 +18,7 @@ NAMESPACE('ria.mvc', function () {
 
             function $fromData(controller, action, args) {
                 BASE();
-                this.controler = controller;
+                this.controller = controller;
                 this.action = action;
                 this.args = args;
             }
