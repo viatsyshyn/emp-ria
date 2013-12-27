@@ -150,9 +150,13 @@ NAMESPACE('ria.mvc', function () {
                     this.loadSessionBinds_();
 
                     var result = method.invokeOn(this, this.deserializeParams_(params, method));
-                    if (_DEBUG && result === undefined) {
-                        console.warn('WARN: Action ' + method.getName() + ' returned VOID result');
+                    if (_DEBUG && result === undefined && (result !== null && !(result instanceof ria.mvc.ViewResult))) {
+                        console.warn('WARN: Action ' + method.getName() + ' returned not supported result: '
+                            + ria.__API.getIdentifierOfValue(result));
                     }
+
+                    if (result)
+                        this.view.queueViewResult(result);
 
                     this.storeSessionBinds_();
                 } catch (e) {
@@ -354,7 +358,7 @@ NAMESPACE('ria.mvc', function () {
             /**
              * Updates all activities of this class on stack and out-of-stack
              */
-            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, Array]],
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             ria.mvc.ActionResult, function UpdateView(activityClass, data, msg_) {
                 return ria.mvc.ActionResult.$fromData(activityClass,
                     ria.mvc.ActivityActionType.Update, false, data, msg_);
@@ -363,17 +367,17 @@ NAMESPACE('ria.mvc', function () {
             /**
              * Silently updates activities of this on stack or out-of-stack with data/message, deferred
              */
-            [[ImplementerOf(ria.mvc.IActivity), Object, Array]],
+            [[ImplementerOf(ria.mvc.IActivity), Object, String]],
             VOID, function BackgroundUpdateView(activityClass, data, msg_) {
                 this.view.queueViewResult(ria.mvc.ActionResult.$fromData(activityClass,
                     ria.mvc.ActivityActionType.SilentUpdate, false, data, msg_));
-            }
+            },
 
             /**
              * Closes all activities of this class on stack and out-of-stack.
              * All activities that shades this one are stopped also.
              */
-                [[String]],
+            [[String]],
             ria.mvc.CloseResult, function CloseView(activityClass) {
                 return ria.mvc.CloseResult.$fromData(activityClass);
             },

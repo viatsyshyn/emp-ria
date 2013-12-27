@@ -89,7 +89,7 @@ NAMESPACE('ria.mvc', function () {
                 return context;
             },
 
-            [[HashChangeEvent]],
+            //[[HashChangeEvent]],
             VOID, function onHashChanged_(event) {
                 this.dispatch(event.newUrl);
             },

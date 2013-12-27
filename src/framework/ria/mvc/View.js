@@ -244,18 +244,18 @@ NAMESPACE('ria.mvc', function () {
                         break;
 
                     case ria.mvc.ActivityActionType.SilentUpdate:
-                        possibleActivities = [].contact(
+                        possibleActivities = [].concat(
                             this._stack.filter(function (_) { return _ instanceof actionResult.getActivityClass() }),
                             this._outOfStack.filter(function (_) { return _ instanceof actionResult.getActivityClass() })
                         );
                         result = ria.async.wait(possibleActivities.map(function (_) {
-                            return _.silentRefreshD(actionResult.getData(), actionResult.getMsg());
+                            return _.silentRefreshD(ria.async.Future.$fromData(actionResult.getData()), actionResult.getMsg());
                         }));
 
                         break;
 
                     case ria.mvc.ActivityActionType.Update:
-                        possibleActivities = [].contact(
+                        possibleActivities = [].concat(
                             this._stack.filter(function (_) { return _ instanceof actionResult.getActivityClass() }),
                             this._outOfStack.filter(function (_) { return _ instanceof actionResult.getActivityClass() })
                         );
@@ -269,9 +269,21 @@ NAMESPACE('ria.mvc', function () {
                         return ria.async.Future.$fromData(null);
                 }
 
-                return actionResult.getThenAction()
-                    ? result.then(function () { return this.handleActionResult_(actionResult.getThenAction()); }, this)
-                    : result;
+                return this.processThenAction_(result, actionResult.getThenAction());
+            },
+
+            [[ria.async.Future, ria.mvc.ActionResult]],
+            ria.async.Future, function processThenAction_(result, thenAction) {
+                if (!thenAction)
+                    return result;
+
+                result = ria.async.wait(result, thenAction.getData())
+                    .then(function (d) {
+                        thenAction.setData(d[1]);
+                        return this.handleActionResult_(thenAction);
+                    }, this);
+
+                return this.processThenAction_(result, thenAction.getThenAction());
             },
 
             [[ImplementerOf(ria.mvc.IActivity)]],
