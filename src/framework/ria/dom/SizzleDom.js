@@ -23,6 +23,49 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.SizzleDom */
     CLASS(
         'SizzleDom', EXTENDS(ria.dom.Dom), [
+
+            OVERRIDE, function $$(instance, clazz, ctor, args) {
+                var genericTypes = [],
+                    genericSpecs = [];
+
+                if (!(instance instanceof clazz))
+                    instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
+
+                if (_DEBUG && ria.__CFG.enablePipelineMethodCall) for(var name_ in instance) {
+                    //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop
+                    var f_ = instance[name_];
+
+                    // TODO: skip all ctors
+                    if (typeof f_ === 'function' && !(/^\$.*/.test(name_)) && name_ !== 'constructor') {
+                        instance[name_] = f_.bind(instance);
+                        if (f_.__META) {
+                            var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
+                            Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
+                        }
+                    }
+
+                    if (_DEBUG && /^\$.*/.test(name_)) {
+                        instance[name_] = undefined;
+                    }
+                }
+
+                if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
+                    ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
+                }
+
+                if (_DEBUG) for(var name in clazz.__META.properties) {
+                    if (clazz.__META.properties.hasOwnProperty(name)) {
+                        instance[name] = null;
+                    }
+                }
+
+                ctor.apply(instance, args);
+
+                _DEBUG && Object.seal(instance);
+
+                return instance;
+            },
+
             function $(dom_) {
                 BASE(dom_);
             },
