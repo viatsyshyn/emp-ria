@@ -1,6 +1,7 @@
 REQUIRE('ria.mvc.MvcException');
 
 REQUIRE('ria.mvc.IView');
+REQUIRE('ria.mvc.IContextable');
 
 REQUIRE('ria.async.Observable');
 
@@ -13,11 +14,18 @@ NAMESPACE('ria.mvc', function () {
      * @class ria.mvc.View
      */
     CLASS(
-        'View', IMPLEMENTS(ria.mvc.IView), [
+        'View', IMPLEMENTS(ria.mvc.IView, ria.mvc.IContextable), [
+
+            ria.mvc.IContext, 'context',
+
             function $() {
                 BASE();
                 this._stack = [];
+                this._outOfStack = [];
                 this._refreshEvents = new ria.async.Observable(ria.mvc.ActivityRefreshedEvent);
+                this._viewResultsQueue = [];
+                this._modalMode = false;
+                this._activityCache = [];
             },
 
             [[ria.mvc.IActivity, ria.mvc.IActivity]],
@@ -40,6 +48,13 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.IActivity]],
             VOID, function onActivityClosed_(activity) {
+                var staticCandidates = this._outOfStack.filter(function (_) { return _ && _.equals(activity)});
+                if (staticCandidates.length) {
+                    this.stopActivity_(staticCandidates[0]);
+                    this._outOfStack = this._outOfStack.filter(function (_) { return _ && !_.equals(activity)});
+                    return;
+                }
+
                 if (!this._stack.filter(function (_) { return _ && _.equals(activity)}).length)
                     return;
 
@@ -48,7 +63,7 @@ NAMESPACE('ria.mvc', function () {
                         this.pop(); // stop and start under
                         break;
                     } else {
-                        this.pop_(); // just stop current
+                        this.stopActivity_(this.pop_()); // just stop current
                     }
                 }
             },
@@ -58,9 +73,9 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[ria.mvc.IActivity, ria.async.Future]],
-            VOID, function pushD(activity, data) {
+            ria.async.Future, function pushD(activity, data) {
                 this.push(activity);
-                activity.refreshD(data);
+                return activity.refreshD(data);
             },
 
             /**
@@ -69,22 +84,14 @@ NAMESPACE('ria.mvc', function () {
              */
             [[ria.mvc.IActivity]],
             VOID, function push(activity) {
-                /*var top = this.getCurrent();
-                if (top) {
-                    top.stop();
-
-                    if (this.isSameActivityGroup_(top, activity))
-                        this.pop_().stop();
-                }*/
-
                 this.reset();
                 this.push_(activity);
             },
 
             [[ria.mvc.IActivity, ria.async.Future]],
-            VOID, function shadeD(activity, data) {
+            ria.async.Future, function shadeD(activity, data) {
                 this.shade(activity);
-                activity.refreshD(data);
+                return activity.refreshD(data);
             },
 
             /**
@@ -98,10 +105,16 @@ NAMESPACE('ria.mvc', function () {
                     top.pause();
 
                     if (this.isSameActivityGroup_(top, activity))
-                        this.pop_().stop();
+                        this.stopActivity_(this.pop_());
                 }
 
                 this.push_(activity);
+            },
+
+            [[ria.mvc.IActivity]],
+            VOID, function stopActivity_(activity) {
+                activity.stop();
+                //this._activityCache.push(activity);
             },
 
             /**
@@ -113,7 +126,7 @@ NAMESPACE('ria.mvc', function () {
                 if (!pop)
                     return null;
 
-                pop.stop();
+                this.stopActivity_(pop);
 
                 var top = this.getCurrent();
                 if (top) {
@@ -124,11 +137,11 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
-            VOID, function updateD(activityClass, data, msg_) {
-                this._stack.forEach(function (_) {
-                    if (_ instanceof activityClass)
-                        _.partialRefreshD(data, msg_);
-                })
+            ria.async.Future, function updateD(activityClass, data, msg_) {
+                return ria.async.wait(this._stack
+                    .filter(function (_) { return _ instanceof activityClass })
+                    .map(function (_) { return _.partialRefreshD(data, msg_) })
+                );
             },
 
             /**
@@ -144,7 +157,7 @@ NAMESPACE('ria.mvc', function () {
              */
             VOID, function reset() {
                 while (this.getCurrent() !== null)
-                    this.pop_().stop();
+                    this.stopActivity_(this.pop_());
             },
 
             ArrayOf(ria.mvc.IActivity), function getStack_() {
@@ -164,6 +177,165 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.ActivityRefreshedEvent]],
             VOID, function onActivityRefreshed(callback) {
                 this._refreshEvents.on(callback);
+            },
+
+            VOID, function closeView_(activityClass) {
+                this._outOfStack.forEach(function (activity) {
+                    if (activity instanceof activityClass)
+                        activity.close();
+                });
+
+                this._stack.forEach(function (activity) {
+                    if (activity instanceof activityClass)
+                        activity.close();
+                });
+            },
+
+            VOID, function redirectTo_(controller, action, args_) {
+                var state = this.context.getState();
+                state.setController(controller);
+                state.setAction(action);
+                state.setParams(args_ || []);
+                this.context.stateUpdated();
+            },
+
+            [[ria.mvc.ActionResult]],
+            function handleActionResult_(actionResult) {
+                var result, activity, possibleActivities;
+                switch (actionResult.getAction()) {
+                    case ria.mvc.ActivityActionType.Push:
+                        if (actionResult.isOrUpdate() && this._stack[this._stack.length - 1] instanceof actionResult.getActivityClass()) {
+                            activity = this._stack.pop();
+                            this.reset();
+                            this._stack.unshift(activity);
+                            result = activity
+                                .partialRefreshD(actionResult.getData(), actionResult.getMsg())
+                        } else {
+                            activity = this.get_(actionResult.getActivityClass());
+                            result = this.pushD(activity, actionResult.getData())
+                        }
+
+                        break;
+
+                    case ria.mvc.ActivityActionType.Shade:
+                        possibleActivities = this._stack.filter(function (_) { return _ instanceof actionResult.getActivityClass() });
+                        if (actionResult.isOrUpdate() && possibleActivities.length) {
+                            result = ria.async.wait(possibleActivities.map(function (_) {
+                                return _.partialRefreshD(actionResult.getData(), actionResult.getMsg());
+                            }));
+                        } else {
+                            activity = this.get_(actionResult.getActivityClass());
+                            result = this.shadeD(activity, actionResult.getData())
+                        }
+
+                        break;
+
+                    case ria.mvc.ActivityActionType.Static:
+                        possibleActivities = this._outOfStack.filter(function (_) { return _ instanceof actionResult.getActivityClass() });
+                        if (actionResult.isOrUpdate() && possibleActivities.length) {
+                            result = ria.async.wait(possibleActivities.map(function (_) {
+                                return _.partialRefreshD(actionResult.getData(), actionResult.getMsg());
+                            }));
+                        } else {
+                            activity = this.get_(actionResult.getActivityClass());
+                            result = this.staticD(activity, actionResult.getData())
+                        }
+
+                        break;
+
+                    case ria.mvc.ActivityActionType.SilentUpdate:
+                        possibleActivities = [].contact(
+                            this._stack.filter(function (_) { return _ instanceof actionResult.getActivityClass() }),
+                            this._outOfStack.filter(function (_) { return _ instanceof actionResult.getActivityClass() })
+                        );
+                        result = ria.async.wait(possibleActivities.map(function (_) {
+                            return _.silentRefreshD(actionResult.getData(), actionResult.getMsg());
+                        }));
+
+                        break;
+
+                    case ria.mvc.ActivityActionType.Update:
+                        possibleActivities = [].contact(
+                            this._stack.filter(function (_) { return _ instanceof actionResult.getActivityClass() }),
+                            this._outOfStack.filter(function (_) { return _ instanceof actionResult.getActivityClass() })
+                        );
+                        result = ria.async.wait(possibleActivities.map(function (_) {
+                            return _.partialRefreshD(actionResult.getData(), actionResult.getMsg());
+                        }));
+
+                        break;
+
+                    default:
+                        return ria.async.Future.$fromData(null);
+                }
+
+                return actionResult.getThenAction()
+                    ? result.then(function () { return this.handleActionResult_(actionResult.getThenAction()); }, this)
+                    : result;
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            ria.mvc.IActivity, function get_(activityClass) {
+                for(var i = 0; i < this._activityCache.length; i++) {
+                    var activity = this._activityCache[i];
+                    if (activity.getClass() == activityClass) {
+                        this._activityCache.splice(i, 1);
+                        return activity;
+                    }
+                }
+
+                return new activityClass;
+            },
+
+            VOID, function processViewResultsQueue_() {
+                if (this._modalMode) return ;
+
+                ria.__API.defer(this, function () {
+                    if (!this._viewResultsQueue.length) return ;
+
+                    var viewResult = this._viewResultsQueue.shift();
+
+                    if (viewResult instanceof ria.mvc.RedirectResult) {
+                        this.redirectTo_(viewResult.getController(), viewResult.getAction(), viewResult.getArgs());
+                    } else if (viewResult instanceof ria.mvc.CloseResult) {
+                        this.closeView_(viewResult.getActivityClass());
+                    } else if (viewResult instanceof ria.mvc.ActionResult) {
+                        this.handleActionResult_(viewResult);
+                    } else {
+                        throw Exception('Unknown ViewResult: ' + ria.__API.getIdentifierOfValue(viewResult));
+                    }
+
+                    this.processViewResultsQueue_();
+                })
+            },
+
+            [[ria.mvc.ViewResult]],
+            VOID, function queueViewResult(viewResult) {
+                this._viewResultsQueue.push(viewResult);
+                this.processViewResultsQueue_();
+            },
+
+            [[ImplementerOf(ria.mvc.IActivity), Object]],
+            ria.async.Future, function showModal(activityClass, model) {
+                this._modalMode = true;
+
+                var completer = new ria.async.Completer;
+
+                var activity = this.get_(activityClass);
+                activity.addCloseCallback(function () {
+                    completer.complete(activity.getModalResult());
+                });
+
+                this.push_(activity);
+                activity.show();
+                activity.refreshD(ria.async.Future.$fromData(model));
+
+                return completer.getFuture()
+                    .then(function (modalResult) {
+                        this._modalMode = false;
+                        this.processViewResultsQueue_();
+                        return modalResult;
+                    }, this);
             }
         ]);
 });

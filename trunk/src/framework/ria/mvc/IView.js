@@ -1,65 +1,99 @@
 REQUIRE('ria.mvc.IActivity');
 
+REQUIRE('ria.async.Future');
+
 NAMESPACE('ria.mvc', function () {
     "use strict";
+
+    /** @class ria.mvc.ViewResult */
+    CLASS(ABSTRACT,
+        'ViewResult', []);
+
+    /** @class ria.mvc.RedirectResult */
+    CLASS(
+        'RedirectResult', EXTENDS(ria.mvc.ViewResult), [
+            String, 'controller',
+            String, 'action',
+            Array, 'args',
+
+            function $fromData(controller, action, args) {
+                BASE();
+                this.controler = controller;
+                this.action = action;
+                this.args = args;
+            }
+        ]);
+
+    /** @class ria.mvc.ActivityResult */
+    CLASS(ABSTRACT,
+        'ActivityResult', EXTENDS(ria.mvc.ViewResult), [
+            ImplementerOf(ria.mvc.IActivity), 'activityClass'
+        ]);
+
+    /** @class ria.mvc.CloseResult */
+    CLASS(
+        'CloseResult', EXTENDS(ria.mvc.ActivityResult), [
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            function $fromData(activityClass) {
+                BASE();
+                this.activityClass = activityClass;
+            }
+        ]);
+
+    /** @class ria.mvc.ActivityActionType */
+    ENUM(
+        'ActivityActionType', {
+            Push: 'push',
+            Shade: 'shade',
+            Static: 'static',
+            Update: 'update',
+            SilentUpdate: 'silent-update'
+        });
+
+    /** @class ria.mvc.ActionResult */
+    CLASS(
+        'ActionResult', EXTENDS(ria.mvc.ActivityResult), [
+            ria.mvc.ActivityActionType, 'action',
+            Object, 'data',
+            String, 'msg',
+            Boolean, 'orUpdate',
+            SELF, 'thenAction',
+
+            [[ImplementerOf(ria.mvc.IActivity), ria.mvc.ActivityActionType, Boolean, Object, String]],
+            function $fromData(activityClass, action, orUpdate, data, msg_) {
+                BASE();
+                this.activityClass = activityClass;
+                this.action = action;
+                this.orUpdate = orUpdate;
+                this.data = data;
+                this.msg = msg_;
+            },
+
+            /**
+             * Chains silent update of view after parent action result completes and data is ready.
+             * If dataFuture is null this update is skipped. If dataFuture is BREAKed then
+             * all updates are canceled
+             */
+            [[Object, String]],
+            SELF, function ChainUpdateView(data, msg_) {
+                return this.thenAction = SELF.$fromData(this.activityClass,
+                    ria.mvc.ActivityActionType.SilentUpdate,
+                    false, data, msg_);
+            }
+        ]);
 
     /**
      * @class ria.mvc.IView
      */
     INTERFACE(
         'IView', [
-            /**
-             * Push Activity over current and stop current
-             */
-            [[ria.mvc.IActivity]],
-            VOID, function push(activity) {},
-
-            /**
-             * Push Activity over current and stop current
-             */
-            [[ria.mvc.IActivity, ria.async.Future]],
-            VOID, function pushD(activity, data) {},
-
-            /**
-             * Shade current with new Activity (background current)
-             */
-            [[ria.mvc.IActivity]],
-            VOID, function shade(activity) {},
-
-            /**
-             * Shade current with new Activity (background current)
-             */
-            [[ria.mvc.IActivity, ria.async.Future]],
-            VOID, function shadeD(activity, data) {},
-
-            /**
-             * Shade current with new Activity and callback on pop (background current)
-             */
-            //[ria.mvc.IActivity, Function],
-            //VOID, function modal(activity, callback) {},
-
-            /**
-             * Pop current Activity and foreground previous
-             */
-            ria.mvc.IActivity, function pop() {},
-
-            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
-            VOID, function updateD(activityClass, data) {},
-
-            /**
-             * Return active Activity
-             */
-            ria.mvc.IActivity, function getCurrent() {},
-
-            /**
-             * Init engine, stop all activities and empty stack
-             */
-            VOID, function reset() {},
-
             [[ria.mvc.ActivityRefreshedEvent]],
             VOID, function onActivityRefreshed(callback) {},
 
-            [[ImplementerOf(ria.mvc.IActivity)]],
-            Boolean, function contains(activity) {}
+            [[ria.mvc.ViewResult]],
+            VOID, function queueViewResult(viewResult) {},
+
+            [[ImplementerOf(ria.mvc.IActivity), Object]],
+            ria.async.Future, function showModal(activityClass, model) {}
         ]);
 });

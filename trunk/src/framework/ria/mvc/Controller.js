@@ -212,28 +212,9 @@ NAMESPACE('ria.mvc', function () {
             },
 
             [[String, String, Array]],
-            function Redirect(controller, action_, args_) {
-                var state = this.context.getState();
-                state.setController(controller);
-                state.setAction(action_ || null);
-                state.setParams(args_ || []);
-                this.context.stateUpdated();
-                return null;
-            },
-
-            [[String, String, Array]],
             function Forward(controller, action_, args_) {
                 _DEBUG && console.warn('WARN this.Forward is deprecated and will be removed soon. Use this.Redirect instead');
-                return this.Redirect(controller, action_, args_);
-            },
-
-            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
-            function PushView(clazz, data) {
-                var instance = new clazz();
-                this.prepareActivity_(instance);
-                this.view.pushD(instance, data);
-                this.pushHistoryState_();
-                return null;
+                return this.Redirect(controller, action_ || null, args_);
             },
 
             [[ria.mvc.IActivity]],
@@ -250,19 +231,6 @@ NAMESPACE('ria.mvc', function () {
                 var href = '#' + params.join('/');
                 if(href != window.location.hash && history.pushState)
                     history.pushState(null, null, href);
-            },
-
-            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
-            function ShadeView(clazz, data) {
-                var instance = new clazz();
-                this.view.shadeD(instance, data);
-                return null;
-            },
-
-            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
-            function UpdateView(clazz, data, msg_) {
-                this.view.updateD(clazz, data, msg_);
-                return null;
             },
 
             Boolean, function validateSessionBindType_(type) {
@@ -315,6 +283,109 @@ NAMESPACE('ria.mvc', function () {
                         context.getSession().set(name, this.serializeSessionBindValue_(_.invokeGetterOn(instance), t));
                     }
                 }.bind(this));
+            },
+
+            /**
+             * Redirect to new location
+             */
+            [[String, String, Array]],
+            ria.mvc.RedirectResult, function Redirect(controller, action, args_) {
+                return ria.mvc.RedirectResult.$fromData(controller, action, args_ || []);
+            },
+
+            /**
+             * Resets stack and puts activity on top, triggers state persistence
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
+            ria.mvc.ActionResult, function PushView(activityClass, data) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Push, false, data);
+            },
+
+            /**
+             * If activity is on stack bottom, then all other activities are popped,
+             * activity is updated, state is persisted; otherwise acts like PushView
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
+            ria.mvc.ActionResult, function PushOrUpdateView(activityClass, data, msg_) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Push, true, data, msg_);
+            },
+
+            /**
+             * Shades top activity with this one, no state persistence. If top activity
+             * has same ActivityGroup it is popped
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
+            ria.mvc.ActionResult, function ShadeView(activityClass, data) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Shade, false, data);
+            },
+
+            /**
+             * If activity is on stack, then all activities of this class are updated,
+             * no state persistence; otherwise acts like ShadeView
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
+            ria.mvc.ActionResult, function ShadeOrUpdateView(activityClass, data, msg_) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Shade, true, data, msg_);
+            },
+
+            /**
+             * Puts activity in special out-of-stack flow: it's not affected by PushView or ShadeView.
+             * All activities with same ActivityGroup are stopped and removed
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
+            ria.mvc.ActionResult, function StaticView(activityClass, data) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Shade, false, data);
+            },
+
+            /**
+             * If activity if found on out-of-stack, it is updated; otherwise acts like StaticView
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
+            ria.mvc.ActionResult, function StaticOrUpdateView(activityClass, data, msg_) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Shade, true, data, msg_);
+            },
+
+            /**
+             * Updates all activities of this class on stack and out-of-stack
+             */
+            [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, Array]],
+            ria.mvc.ActionResult, function UpdateView(activityClass, data, msg_) {
+                return ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.Update, false, data, msg_);
+            },
+
+            /**
+             * Silently updates activities of this on stack or out-of-stack with data/message, deferred
+             */
+            [[ImplementerOf(ria.mvc.IActivity), Object, Array]],
+            VOID, function BackgroundUpdateView(activityClass, data, msg_) {
+                this.view.queueViewResult(ria.mvc.ActionResult.$fromData(activityClass,
+                    ria.mvc.ActivityActionType.SilentUpdate, false, data, msg_));
+            }
+
+            /**
+             * Closes all activities of this class on stack and out-of-stack.
+             * All activities that shades this one are stopped also.
+             */
+                [[String]],
+            ria.mvc.CloseResult, function CloseView(activityClass) {
+                return ria.mvc.CloseResult.$fromData(activityClass);
+            },
+
+            /**
+             * Shows activity immediatly and pauses viewResultQueue processing
+             * till modal activity is closed. Resulting future is resolved with
+             * return of getModelResult().
+             */
+            [[ImplementerOf(ria.mvc.IActivity)]],
+            ria.async.Future, function ModalView(activityClass, rawData) {
+                return this.view.showModal(activityClass, rawData);
             }
 
         ]);

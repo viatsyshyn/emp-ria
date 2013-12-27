@@ -63,6 +63,9 @@ NAMESPACE('ria.mvc', function () {
 
                 this._stopped = true;
                 this._paused = false;
+
+                this._onClose.clear();
+                this._onRefresh.clear();
             },
 
             Boolean, function isForeground() {
@@ -112,20 +115,44 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.async.Future, String]],
             ria.async.Future, function partialRefreshD(future, msg_) {
-                var msg = msg_;
                 var me = this;
                 return future
-                    .attach(this.getModelEvents_(msg))
+                    .attach(this.getModelEvents_(msg_))
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRender_(model, msg);
+                        me.onPartialRender_(model, msg_);
                         return model;
                     }, this)
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRefresh_(model, msg);
+                        me.onPartialRefresh_(model, msg_);
+                        return model;
+                    }, this)
+            },
+
+            [[ria.async.Future, String]],
+            ria.async.Future, function silentRefreshD(future, msg_) {
+                var me = this;
+                return future
+                    .complete(function () {
+                        me.onModelComplete_(msg_);
+                    })
+                    .then(function (model) {
+                        me.onModelReady_(model, msg_);
+                        return model
+                    })
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onPartialRender_(model, msg_);
+                        return model;
+                    }, this)
+                    .then(function (model) {
+                        if (!this.isStarted()) return ria.async.BREAK;
+
+                        me.onPartialRefresh_(model, msg_);
                         return model;
                     }, this)
             },
@@ -195,6 +222,8 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.ActivityRefreshedEvent]],
             VOID, function addRefreshCallback(callback) {
                 this._onRefresh.on(callback);
-            }
+            },
+
+            Object, function getModalResult() { return null; }
         ]);
 });
