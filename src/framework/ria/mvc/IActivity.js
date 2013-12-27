@@ -74,6 +74,11 @@ NAMESPACE('ria.mvc', function () {
          * Configure Refresh Event
          */
         [[ria.mvc.ActivityRefreshedEvent]],
-        VOID, function addRefreshCallback(callback) {}
+        VOID, function addRefreshCallback(callback) {},
+
+        /**
+         * Used only in modal mode to retrieve modal results
+         */
+        Object, function getModalResult() {}
     ]);
 });
