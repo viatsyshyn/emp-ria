@@ -93,7 +93,7 @@ NAMESPACE('ria.mvc', function () {
                     this._templateClasses.forEach(function (tpl) {
                         rules.push({
                             tpl: tpl,
-                            msg: undefined,
+                            msg: null,
                             selector: null,
                             action: ria.mvc.PartialUpdateRuleActions.Replace
                         })
@@ -150,6 +150,12 @@ NAMESPACE('ria.mvc', function () {
 
                     return false;
                 });
+
+                if (matches.length > 1) {
+                    var matches_ = matches.filter(function (_) { return _.msg === msg_; });
+                    if (matches_.length > 0)
+                        matches = matches_;
+                }
 
                 if (matches.length == 0)
                     throw new ria.mvc.MvcException('Found no template that can render ' + ria.__API.getIdentifierOfValue(model) + ' with message ' + msg_);

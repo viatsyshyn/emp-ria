@@ -66,7 +66,15 @@ NAMESPACE('ria.mvc', function () {
                 this.action = action;
                 this.orUpdate = orUpdate;
                 this.data = data;
-                this.msg = msg_;
+                this.msg = msg_ != null ? msg_ : null;
+            },
+
+            [[SELF]],
+            function chainUpdate(viewResult) {
+                if (this.thenAction)
+                    this.thenAction.chainUpdate(viewResult);
+
+                this.thenAction = viewResult;
             },
 
             /**
@@ -76,9 +84,11 @@ NAMESPACE('ria.mvc', function () {
              */
             [[Object, String]],
             SELF, function ChainUpdateView(data, msg_) {
-                return this.thenAction = SELF.$fromData(this.activityClass,
+                this.chainUpdate(SELF.$fromData(this.activityClass,
                     ria.mvc.ActivityActionType.SilentUpdate,
-                    false, data, msg_);
+                    false, data, msg_));
+
+                return this;
             }
         ]);
 
