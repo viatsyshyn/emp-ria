@@ -343,7 +343,7 @@ NAMESPACE('ria.mvc', function () {
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             ria.mvc.ActionResult, function StaticView(activityClass, data) {
                 return ria.mvc.ActionResult.$fromData(activityClass,
-                    ria.mvc.ActivityActionType.Shade, false, data);
+                    ria.mvc.ActivityActionType.Static, false, data);
             },
 
             /**
@@ -352,7 +352,7 @@ NAMESPACE('ria.mvc', function () {
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             ria.mvc.ActionResult, function StaticOrUpdateView(activityClass, data, msg_) {
                 return ria.mvc.ActionResult.$fromData(activityClass,
-                    ria.mvc.ActivityActionType.Shade, true, data, msg_);
+                    ria.mvc.ActivityActionType.Static, true, data, msg_);
             },
 
             /**
