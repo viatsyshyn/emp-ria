@@ -99,6 +99,33 @@ NAMESPACE('ria.mvc', function () {
              * @param {ria.mvc.Activity} activity
              */
             [[ria.mvc.IActivity]],
+            VOID, function static_(activity) {
+                var popped = this._outOfStack
+                    .filter(function(_) {
+                        return this.isSameActivityGroup_(_, activity);
+                    }.bind(this));
+
+                popped.forEach(function (_) { this.stopActivity_(_); }.bind(this));
+
+                this._outOfStack = this._outOfStack.filter(function (_) { return popped.indexOf(_) < 0 });
+
+                activity.addCloseCallback(this.onActivityClosed_);
+                activity.addRefreshCallback(this.onActivityRefreshed_);
+                activity.show();
+                this._outOfStack.push(activity);
+            },
+
+            [[ria.mvc.IActivity, ria.async.Future]],
+            ria.async.Future, function staticD(activity, data) {
+                this.static_(activity);
+                return activity.refreshD(data);
+            },
+
+            /**
+             * Shade top of stack with activity
+             * @param {ria.mvc.Activity} activity
+             */
+            [[ria.mvc.IActivity]],
             VOID, function shade(activity) {
                 var top = this.getCurrent();
                 if (top) {
