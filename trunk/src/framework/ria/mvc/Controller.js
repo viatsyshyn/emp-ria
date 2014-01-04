@@ -155,8 +155,12 @@ NAMESPACE('ria.mvc', function () {
                             + ria.__API.getIdentifierOfValue(result));
                     }
 
-                    if (result)
-                        this.view.queueViewResult(result);
+                    if (result) {
+                        if (result instanceof ria.async.Future)
+                            result.then(this.view.queueViewResult);
+                        else
+                            this.view.queueViewResult(result);
+                    }
 
                     this.storeSessionBinds_();
                 } catch (e) {
