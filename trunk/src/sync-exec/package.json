@@ -2,7 +2,7 @@
     "name": "emp.ria-exec-sync",
     "title": "EMP RIA Jsbuild3",
     "description": "EMP RIA exec-sync",
-    "version": "0.1.0-beta",
+    "version": "0.1.2",
     "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
     "repository": "http://emp-ria.googlecode.com/svn/trunk/",
     "main": "./index.js",
@@ -15,7 +15,7 @@
         "library"
     ],
     "dependencies": {
-        "ffi": "*"
+        "ffi": "~1.2.5"
     },
     "scripts": {
         "prepublish": "npm prune"
