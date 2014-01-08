@@ -28,6 +28,7 @@ NAMESPACE('ria.templates', function () {
                 if (this._map.hasOwnProperty(hashCode))
                     throw new ria.templates.Exception('Factory ' + ria.__API.getIdentifierOfValue(factory) + ' already registered');
 
+                this._cache = {};
                 this._map[hashCode] = factory;
             },
 
@@ -37,6 +38,7 @@ NAMESPACE('ria.templates', function () {
                 if (!this._map.hasOwnProperty(hashCode))
                     throw new ria.templates.Exception('Factory ' + ria.__API.getIdentifierOfValue(factory) + ' not registered');
 
+                this._cache = {};
                 delete this._map[factory.getHashCode()];
             },
 
