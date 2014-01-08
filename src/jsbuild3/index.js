@@ -1,5 +1,6 @@
 var JsBuild3 = require("./tools/jsbuild"),
-    fs = require('fs');
+    fs = require('fs'),
+    Path = require('path');
 
 module.exports = function (configPath, modules) {
     "use strict";
@@ -10,12 +11,9 @@ module.exports = function (configPath, modules) {
         console.info(plugin.path);
     }
 
-    var MODULES = modules;
+    var MODULES = modules.filter(function (_) { return _ != null; });
     var toBuild = CFG.getModules();
     if (MODULES.length) {
-        MODULES = MODULES.filter(function (_) {
-            return _ != null;
-        });
         toBuild = toBuild.filter(function (module) {
             return MODULES.indexOf(module.getName()) >= 0;
         });
