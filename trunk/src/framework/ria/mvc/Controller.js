@@ -306,6 +306,7 @@ NAMESPACE('ria.mvc', function () {
              */
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future]],
             ria.mvc.ActionResult, function PushView(activityClass, data) {
+                this.pushHistoryState_();
                 return ria.mvc.ActionResult.$fromData(activityClass,
                     ria.mvc.ActivityActionType.Push, false, data);
             },
@@ -316,6 +317,7 @@ NAMESPACE('ria.mvc', function () {
              */
             [[ImplementerOf(ria.mvc.IActivity), ria.async.Future, String]],
             ria.mvc.ActionResult, function PushOrUpdateView(activityClass, data, msg_) {
+                this.pushHistoryState_();
                 return ria.mvc.ActionResult.$fromData(activityClass,
                     ria.mvc.ActivityActionType.Push, true, data, msg_);
             },
@@ -381,7 +383,7 @@ NAMESPACE('ria.mvc', function () {
              * Closes all activities of this class on stack and out-of-stack.
              * All activities that shades this one are stopped also.
              */
-            [[String]],
+            [[ImplementerOf(ria.mvc.IActivity)]],
             ria.mvc.CloseResult, function CloseView(activityClass) {
                 return ria.mvc.CloseResult.$fromData(activityClass);
             },
