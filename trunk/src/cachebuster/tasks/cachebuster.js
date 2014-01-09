@@ -34,8 +34,8 @@ module.exports = function (grunt) {
     return parts.join('.') + '.' + crc + '.' + ext;
   }
 
-  function buster(regex, file) {
-    var contents = grunt.file.read(file);
+  function buster(regex, basePath, file) {
+    var contents = grunt.file.read(basePath + '/' + file);
 
     grunt.log.ok('Searching in "%s" with %s', file, regex);
 
@@ -44,9 +44,9 @@ module.exports = function (grunt) {
       //console.log('Match: "%s"', path);
       path = path.split('?').shift();
 
-      if (grunt.file.exists(path)) {
+      if (grunt.file.exists(basePath + '/' + path)) {
           count++;
-          return match.replace(path, cacheBuster(path, grunt.file.read(path)));
+          return match.replace(path, cacheBuster(path, grunt.file.read(basePath + '/' + path)));
       }
 
       return match;
@@ -69,7 +69,7 @@ module.exports = function (grunt) {
     var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix || '\'') + ']+\\.[a-z0-9]+)' + escape(suffix || '\''), 'gi');
 
     this.files.forEach(function (files) {
-      var output = files.src.map(buster.bind(this, regex)).join();
+      var output = files.src.map(buster.bind(this, regex, files.cwd)).join();
       grunt.file.write(files.dest, output);
     });
   });
