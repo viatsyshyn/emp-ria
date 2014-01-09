@@ -11,7 +11,7 @@ module.exports = function (configPath, modules) {
         console.info(plugin.path);
     }
 
-    var MODULES = modules.filter(function (_) { return _ != null; });
+    var MODULES = modules.filter(function (_) { return _ });
     var toBuild = CFG.getModules();
     if (MODULES.length) {
         toBuild = toBuild.filter(function (module) {
