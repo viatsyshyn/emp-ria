@@ -141,7 +141,7 @@ NAMESPACE('ria.mvc', function () {
             [[ria.mvc.IActivity]],
             VOID, function stopActivity_(activity) {
                 activity.stop();
-                this._activityCache.push(activity);
+                //this._activityCache.push(activity);
             },
 
             /**
