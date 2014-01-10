@@ -8,9 +8,9 @@
 
 'use strict';
 
-var Hash = require("../lib/crc32");
-
 module.exports = function (grunt) {
+
+  var Hash = require("../lib/crc32");
 
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
