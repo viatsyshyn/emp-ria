@@ -1,0 +1,30 @@
+{
+  "name": "emp.ria-grunt-ftp-deploy",
+  "description": "Deployment over FTP",
+  "version": "0.1.0",
+  "author": {
+    "name": "Volodymyr Iatsyshyn",
+    "email": "viatsyshyn@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "prompt": "~0.2.11",
+    "jsftp": "~1.2.x",
+    "async": "~0.2.9"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.2"
+  },
+  "keywords": [
+    "ftp",
+    "deployment",
+    "gruntplugin"
+  ]
+}
