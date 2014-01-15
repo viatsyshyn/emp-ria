@@ -57,6 +57,7 @@ NAMESPACE('ria.ajax', function () {
                 this._params = params_ || {};
                 this._requestHeaders = {};
                 this._requestTimeout = null;
+                this._rawPostData = null;
 
                 this._xhr = new XMLHttpRequest();
 
@@ -101,6 +102,11 @@ NAMESPACE('ria.ajax', function () {
                 for(var key in obj) if (obj.hasOwnProperty(key) && (obj[key] != undefined) && (obj[key] != null)) {
                     p[key] = obj[key];
                 }
+                return this;
+            },
+
+            SELF, function rawPostData(data) {
+                this._rawPostData = data;
                 return this;
             },
 
@@ -153,7 +159,7 @@ NAMESPACE('ria.ajax', function () {
             },
 
             Object, function getBody_() {
-                return this._method != ria.ajax.Method.GET ? this.getParamsAsQueryString_() : '';
+                return this._method != ria.ajax.Method.GET ? (this._rawPostData || this.getParamsAsQueryString_()) : '';
             },
 
             // todo : was final
