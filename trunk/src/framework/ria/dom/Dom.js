@@ -602,12 +602,12 @@ NAMESPACE('ria.dom', function () {
 
             /* text */
             String, function getText() {
-                return firstOrDef(this._dom.map(function (_) { return _.innerText; }), null);
+                return firstOrDef(this._dom.map(function (_) { return _.textContent; }), null);
             },
 
             [[String]],
             SELF, function setText(value) {
-                this._dom.forEach(function (_) {_.innerText = value; });
+                this._dom.forEach(function (_) {_.textContent = value; });
                 return this;
             },
 
