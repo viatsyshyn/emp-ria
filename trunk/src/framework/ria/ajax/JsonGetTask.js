@@ -6,23 +6,16 @@
  * To change this template use File | Settings | File Templates.
  */
 
-REQUIRE('ria.ajax.Task');
+REQUIRE('ria.ajax.JsonTask');
 
 NAMESPACE('ria.ajax', function () {
     "use strict";
 
     /** @class ria.ajax.JsonGetTask */
     CLASS(
-        'JsonGetTask', EXTENDS(ria.ajax.Task), [
+        'JsonGetTask', EXTENDS(ria.ajax.JsonTask), [
             function $(url) {
                 BASE(url, ria.ajax.Method.GET);
-            },
-
-            OVERRIDE, ria.async.Future, function run() {
-                return BASE()
-                    .then(function (data) {
-                        return JSON.parse(data);
-                    })
             }
         ]);
 });

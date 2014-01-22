@@ -183,10 +183,12 @@ NAMESPACE('ria.mvc', function () {
                     if (rule.selector)
                         target = target.find(rule.selector);
 
-                    switch (rule.action) {
-                        case ria.mvc.PartialUpdateRuleActions.Prepend: dom.prependTo(target); break;
-                        case ria.mvc.PartialUpdateRuleActions.Append: dom.appendTo(target); break;
-                        default: dom.appendTo(target.empty());
+                    if (target.count() > 0) {
+                        switch (rule.action) {
+                            case ria.mvc.PartialUpdateRuleActions.Prepend: dom.prependTo(target); break;
+                            case ria.mvc.PartialUpdateRuleActions.Append: dom.appendTo(target); break;
+                            default: dom.appendTo(target.empty());
+                        }
                     }
                 }
             }
