@@ -49,6 +49,22 @@ NAMESPACE('ria.mvc', function () {
                                 }
                             });
                     }));
-            }
+            },
+
+            Object, function prepareAttributes_(attrs) {
+                var id = attrs['id'] = attrs['id'] || ria.dom.Dom.GID();
+                this.queueReanimation_(id);
+                return attrs;
+            },
+
+            [[String]],
+            function queueReanimation_(id) {
+                this.context.getDefaultView().onActivityRefreshed(function (activity) {
+                    this.onActivate_(ria.dom.Dom('#' + id));
+                }.bind(this))
+            },
+
+            [[ria.dom.Dom]],
+            VOID, function onActivate_(dom) {}
         ]);
 });
