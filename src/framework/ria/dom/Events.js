@@ -26,19 +26,23 @@ NAMESPACE('ria.dom', function () {
 
             [[Node]],
             function triggerOn(node) {
-                if (document.createEvent) {
-                    try {
-                        var event = new (window[this.clazz])(this.type, this.data);
-                    } catch (e) {
-                        // this is ms ie 10+ way
-                        event = document.createEvent(this.clazz);
-                        event.initEvent(this.type, !!this.data.bubbles, !!this.data.cancelable);
+                try {
+                    if (document.createEvent) {
+                        try {
+                            var event = new (window[this.clazz])(this.type, this.data);
+                        } catch (e) {
+                            // this is ms ie 10+ way
+                            event = document.createEvent(this.clazz);
+                            event.initEvent(this.type, !!this.data.bubbles, !!this.data.cancelable);
+                        }
+                        node.dispatchEvent(event);
+                    } else {
+                        // this is IE9- way
+                        var evt = document.createEventObject();
+                        node.fireEvent("on" + evt.type, evt);
                     }
-                    node.dispatchEvent(event);
-                } else {
-                    // this is IE9- way
-                    var evt = document.createEventObject();
-                    node.fireEvent("on" + evt.type, evt);
+                } catch (e) {
+                    Assert(true, e.toString());
                 }
             },
 
