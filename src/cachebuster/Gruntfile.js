@@ -31,6 +31,7 @@ module.exports = function(grunt) {
     // Configuration to be run (and then tested).
     cachebuster: {
       html: {
+        options: { exclude: ['*.ico'] },
         files: {
           'tmp/test.html': ['test/fixtures/test.html']
         }

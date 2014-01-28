@@ -34,8 +34,8 @@ module.exports = function (grunt) {
     return parts.join('.') + '.' + crc + '.' + ext;
   }
 
-  function buster(regex, basePath, file) {
-    var contents = grunt.file.read(basePath + '/' + file);
+  function buster(regex, basePath, exclude, file) {
+    var contents = grunt.file.read(basePath ? basePath + '/' + file : file);
 
     grunt.log.ok('Searching in "%s" with %s', file, regex);
 
@@ -44,9 +44,16 @@ module.exports = function (grunt) {
       //console.log('Match: "%s"', path);
       path = path.split('?').shift();
 
-      if (grunt.file.exists(basePath + '/' + path)) {
+      var skip = grunt.file.match({matchBase: true}, exclude, path);
+      if (skip[0]) {
+        grunt.log.debug('Skipping "' + path + '" matches ' + JSON.stringify(exclude));
+        return match;
+      }
+
+      var fullPath = basePath ? basePath + '/' + path : path;
+      if (grunt.file.exists(fullPath)) {
           count++;
-          return match.replace(path, cacheBuster(path, grunt.file.read(basePath + '/' + path)));
+          return match.replace(path, cacheBuster(path, grunt.file.read(fullPath)));
       }
 
       return match;
@@ -60,16 +67,19 @@ module.exports = function (grunt) {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
       prefix: '"',
-      suffix: '"'
+      suffix: '"',
+      exclude: []
     });
 
     var prefix = options.prefix,
-        suffix = options.suffix;
+        suffix = options.suffix,
+        exclude = options.exclude;
 
-    var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix || '\'') + ']+\\.[a-z0-9]+)' + escape(suffix || '\''), 'gi');
+    var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix) + ']+\\.[a-z0-9]+)' + escape(suffix), 'gi');
 
     this.files.forEach(function (files) {
-      var output = files.src.map(buster.bind(this, regex, files.cwd)).join();
+      grunt.log.debug('Processing: ' + files.src);
+      var output = files.src.map(buster.bind(this, regex, files.cwd, exclude)).join();
       grunt.file.write(files.dest, output);
     });
   });
