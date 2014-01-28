@@ -1,6 +1,6 @@
 {
   "name": "emp.ria-grunt-cachebuster",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "adds crc32 to files names in css, js, html files",
   "main": "tasks/cachebuster.js",
   "directories": {
