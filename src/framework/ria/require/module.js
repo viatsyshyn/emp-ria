@@ -46,8 +46,7 @@
     };
 
     ModuleDescriptor.prototype.addReadyCallback = function addReadyCallback(fn) {
-        this.cbs.push(fn);
-        this.isReady() && fn();
+        this.isReady() ? fn() : this.cbs.push(fn);
     };
 
     ModuleDescriptor.prototype.isReady = function isReady() {

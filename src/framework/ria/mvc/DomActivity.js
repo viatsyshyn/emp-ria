@@ -3,6 +3,8 @@ REQUIRE('ria.mvc.Activity');
 REQUIRE('ria.dom.Dom');
 REQUIRE('ria.mvc.DomEventBind');
 
+REQUIRE('ria.async.Timer');
+
 REQUIRE('ria.reflection.ReflectionClass');
 
 NAMESPACE('ria.mvc', function () {
