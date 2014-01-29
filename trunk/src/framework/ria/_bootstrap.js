@@ -148,7 +148,7 @@ var _RELEASE = false;
         REQUIRE(boostraps.shift() + '/_bootstrap.js');
     }
 
-    ria.__CFG['#require'].plugins.forEach(REQUIRE);
+    (ria.__CFG['#require'].plugins || []).forEach(REQUIRE);
 
     ria.__BOOTSTRAP.complete = function () {
         ria.__REQUIRE.init(ria.__CFG['#require'], callbacks);
