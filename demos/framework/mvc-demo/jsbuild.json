@@ -1,0 +1,38 @@
+{
+    "version": "3.0",
+    "appDir": "/",
+    "assetsDir": "assets",
+
+    "libs": {
+        "ria": "../../../src/framework/",
+        "lib": "../../../src/framework/"
+    },
+
+    "options": {
+        "uglifyjs": {
+            "mangle": false,
+            "mangle_options_": {},
+            "squeeze": false,
+            "squeeze_options_": {
+                "make_seqs": true,
+                "dead_code": true,
+                "no_warnings": false,
+                "extra": false
+            },
+            "beautify": true
+        }
+    },
+
+    "modules": [{
+        "name": "App",
+        "app": "app.Application",
+        "out": "app/Application.compiled.js",
+
+        "prepend": [
+            "lib/stacktrace.js",
+            "lib/jade.runtime.js"
+        ],
+
+        "globals": ["jade"]
+    }]
+}
