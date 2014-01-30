@@ -201,8 +201,8 @@
         }
 
         var epmc = ria.__CFG.enablePipelineMethodCall;
-        for(var name_ in instance.prototype) {
-            var f_ = instance.prototype[name_];
+        for(var name_ in instance) {
+            var f_ = instance[name_];
 
             // TODO: skip all ctors
             if (typeof f_ === 'function' && name_[0] != '$' && name_ !== 'constructor') {
