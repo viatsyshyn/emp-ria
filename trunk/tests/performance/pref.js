@@ -32,6 +32,48 @@ NAMESPACE('test', function () {
         ]);
 
     CLASS(
+        'LargeClass', EXTENDS(test.EmptyClass), [
+            function $() {
+                BASE();
+                this._date = new Date();
+            },
+            String, 'prop',
+            String, 'prop1',
+            String, 'prop2',
+            String, 'prop3',
+            String, 'prop4',
+            String, 'prop5',
+            String, 'prop6',
+            String, 'prop7',
+            String, 'prop8',
+            String, 'prop9',
+            String, 'prop0',
+            String, 'propA',
+            String, 'propB',
+            String, 'propC',
+            String, 'propD',
+            String, 'propE',
+            String, 'propF',
+            Number, function method() {},
+            Number, function method1() {},
+            Number, function method2() {},
+            Number, function method3() {},
+            Number, function method4() {},
+            Number, function method5() {},
+            Number, function method6() {},
+            Number, function method7() {},
+            Number, function method8() {},
+            Number, function method9() {},
+            Number, function method0() {},
+            Number, function methodA() {},
+            Number, function methodB() {},
+            Number, function methodC() {},
+            Number, function methodD() {},
+            Number, function methodE() {},
+            Number, function methodF() {}
+        ]);
+
+    CLASS(
         GENERIC('T1', 'T2'),
         'GenericClass', EXTENDS(test.EmptyClass), [
             function $() {
@@ -42,20 +84,25 @@ NAMESPACE('test', function () {
             T2, function method() {}
         ]);
 
-    function PlainClass() {
-        this._date = new Date();
-    }
+    test.PlainClass = function PlainClass() {
+        new Date();
+    };
 
     var TESTS = {
-        testPlainClass: function () { new PlainClass(); },
+        testBind: function () { test.PlainClass.bind(test.PlainClass); },
+        testInstanceOfIf: function () { if (!(test instanceof test.EmptyClass)) ria.__API.getInstanceOf(test.EmptyClass); },
+        testInstanceOf: function () { ria.__API.getInstanceOf(test.EmptyClass); },
+        testNewPlainClass: function () { new test.PlainClass(); },
+        testPlainClass: function () { test.PlainClass(); },
         testClass: function () { Class(); },
         testNewClass: function () { new Class(); },
         testEmptyClass: function () { test.EmptyClass(); },
         testNewEmptyClass: function () { new test.EmptyClass(); },
         testNewTestClass: function () { new test.TestClass(); },
         testNewChildClass: function () { new test.ChildClass(); },
+        testNewLargeClass: function () { new test.LargeClass(); },
         testNewGenericClass: function () { new test.GenericClass(String, Number); },
-        tesGenericClass: function () { test.GenericClass(String, Number); }
+        testGenericClass: function () { test.GenericClass(String, Number); }
     };
 
     var TEST_LOOPS = 10000,

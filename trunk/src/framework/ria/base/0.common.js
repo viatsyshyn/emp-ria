@@ -81,9 +81,6 @@ ria.__API = ria.__API || {};
             this.constructor = ctor;
         };
 
-        if (ria.__CFG.prettyStackTraces)
-            f = new Function('ctor', 'return ' + f.toString().replace('InstanceOfProxy', name_))(ctor);
-
         f.prototype = ctor.prototype;
         return new f();
     };
