@@ -36,6 +36,12 @@ module.exports = function(grunt) {
           'tmp/test.html': ['test/fixtures/test.html']
         }
       },
+      html_uri: {
+        options: { exclude: ['*.ico'], appendUri: '_' },
+        files: {
+            'tmp/test_uri.html': ['test/fixtures/test_uri.html']
+        }
+      },
       css: {
         options: { prefix: 'url(', suffix: ')' },
         files: {

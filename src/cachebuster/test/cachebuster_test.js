@@ -45,6 +45,15 @@ exports.cachebuster = {
 
       test.done();
   },
+  html_uri: function(test) {
+    test.expect(1);
+
+    var actual = grunt.file.read('tmp/test_uri.html');
+    var expected = grunt.file.read('test/expected/test_uri.html');
+    test.equal(actual, expected, 'should describe what the default behavior is.');
+
+    test.done();
+  },
   js: function(test) {
     test.expect(1);
 

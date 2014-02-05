@@ -5,7 +5,7 @@ module.exports = function (grunt) {
       path = require('path'),
       prompt = require('prompt');
 
-  var ftp;
+  var ftp, options;
 
   function doEnsureFolder(inPath, cb) {
     grunt.log.debug('Ensure folder ' + inPath);
@@ -33,8 +33,8 @@ module.exports = function (grunt) {
 
   function doPutFile(inFilename, outFilename, done) {
     ftp.raw.size(outFilename, function (err) {
-      if (!err) {
-        grunt.log.debug('File exists: ' + outFilename)
+      if (!err && !options.override) {
+        grunt.log.debug('File exists: ' + outFilename);
         done();
         return;
       }
@@ -64,6 +64,10 @@ module.exports = function (grunt) {
 
   grunt.registerMultiTask('ftp-deploy', 'Deploy over FTP', function () {
     var done = this.async();
+
+    options = this.options({
+      override: false
+    });
 
     ftp = new Ftp({
       host: this.data.auth.host,
