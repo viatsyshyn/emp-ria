@@ -24,25 +24,29 @@ module.exports = function (grunt) {
       .replace(/\./g, '\\.');
   }
 
-  function cacheBuster(name, content) {
+  function cacheBuster(name, content, appendUri) {
     var crc = Hash.crc32(content, false).toString(CRC_ENCODE);
 
     grunt.log.debug('Match: "%s", CRC32: %s', name, crc);
+
+    if (appendUri) {
+        return name + (name.indexOf('?') >= 0 ? '&' + appendUri + '=': '?') + crc;
+    }
 
     var parts = name.split('.');
     var ext = parts.pop();
     return parts.join('.') + '.' + crc + '.' + ext;
   }
 
-  function buster(regex, basePath, exclude, file) {
+  function buster(regex, basePath, exclude, appendUri, file) {
     var contents = grunt.file.read(basePath ? basePath + '/' + file : file);
 
     grunt.log.ok('Searching in "%s" with %s', file, regex);
 
     var count = 0;
-    contents = contents.replace(regex, function (match, path) {
+    contents = contents.replace(regex, function (match, origPath) {
       //console.log('Match: "%s"', path);
-      path = path.split('?').shift();
+      var path = origPath.split('?').shift();
 
       var skip = grunt.file.match({matchBase: true}, exclude, path);
       if (skip[0]) {
@@ -53,7 +57,7 @@ module.exports = function (grunt) {
       var fullPath = basePath ? basePath + '/' + path : path;
       if (grunt.file.exists(fullPath)) {
           count++;
-          return match.replace(path, cacheBuster(path, grunt.file.read(fullPath)));
+          return match.replace(origPath, cacheBuster(origPath, grunt.file.read(fullPath), appendUri));
       }
 
       return match;
@@ -68,18 +72,20 @@ module.exports = function (grunt) {
     var options = this.options({
       prefix: '"',
       suffix: '"',
-      exclude: []
+      exclude: [],
+      appendUri: false
     });
 
     var prefix = options.prefix,
         suffix = options.suffix,
-        exclude = options.exclude;
+        exclude = options.exclude,
+        appendUri = options.appendUri;
 
-    var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix) + ']+\\.[a-z0-9]+)' + escape(suffix), 'gi');
+    var regex = new RegExp(escape(prefix || '\'') + '([^' + escape(suffix) + ']+\\.[a-z0-9]+(\\?[^' + escape(suffix) + ']*)?)' + escape(suffix), 'gi');
 
     this.files.forEach(function (files) {
       grunt.log.debug('Processing: ' + files.src);
-      var output = files.src.map(buster.bind(this, regex, files.cwd, exclude)).join();
+      var output = files.src.map(buster.bind(this, regex, files.cwd, exclude, appendUri)).join();
       grunt.file.write(files.dest, output);
     });
   });
