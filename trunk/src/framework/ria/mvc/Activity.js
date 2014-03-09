@@ -96,63 +96,60 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.async.Future]],
             ria.async.Future, function refreshD(future) {
-                var me = this;
                 return future
                     .attach(this.getModelEvents_())
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onRender_(model);
+                        this.onRender_(model);
                         return model;
                     }, this)
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onRefresh_(model);
+                        this.onRefresh_(model);
                         return model;
                     }, this)
             },
 
             [[ria.async.Future, String]],
             ria.async.Future, function partialRefreshD(future, msg_) {
-                var me = this;
                 return future
                     .attach(this.getModelEvents_(msg_))
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRender_(model, msg_);
+                        this.onPartialRender_(model, msg_);
                         return model;
                     }, this)
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRefresh_(model, msg_);
+                        this.onPartialRefresh_(model, msg_);
                         return model;
                     }, this)
             },
 
             [[ria.async.Future, String]],
             ria.async.Future, function silentRefreshD(future, msg_) {
-                var me = this;
                 return future
                     .complete(function () {
-                        me.onModelComplete_(msg_);
-                    })
+                        this.onModelComplete_(msg_);
+                    }, this)
                     .then(function (model) {
-                        me.onModelReady_(model, msg_);
+                        this.onModelReady_(model, msg_);
                         return model
-                    })
+                    }, this)
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRender_(model, msg_);
+                        this.onPartialRender_(model, msg_);
                         return model;
                     }, this)
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
-                        me.onPartialRefresh_(model, msg_);
+                        this.onPartialRefresh_(model, msg_);
                         return model;
                     }, this)
             },

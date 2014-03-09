@@ -287,8 +287,11 @@ NAMESPACE('ria.dom', function () {
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
                 VALIDATE_ARG('dom', [Node], dest);
 
+                if (!dest)
+                    return this;
+
                 this._dom.forEach(function(item){
-                    dest.appendChild(item);
+                    dest && dest.appendChild(item);
                 });
                 return this;
             },
@@ -302,12 +305,15 @@ NAMESPACE('ria.dom', function () {
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
                 VALIDATE_ARG('dest', [Node], dest);
 
+                if (!dest)
+                    return this;
+
                 var first = dest.firstChild;
                 if (!first)
                     return this.appendTo(dest);
 
                 this._dom.forEach(function(item){
-                    dest.insertBefore(item, first);
+                    dest && dest.insertBefore(item, first);
                 });
 
                 return this;
@@ -322,6 +328,8 @@ NAMESPACE('ria.dom', function () {
                 var dest = dom instanceof Node ? dom : dom.valueOf().shift();
                 VALIDATE_ARG('dest', [Node], dest);
 
+                if (!dest)
+                    return this;
 
                 this._dom.forEach(function(item){
                     dest.parentNode.insertBefore(item, dest);

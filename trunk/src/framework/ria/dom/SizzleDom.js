@@ -80,7 +80,12 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             OVERRIDE, Boolean, function is(selector) {
                 return this._dom.some(function (el) {
-                    return Sizzle['matchesSelector'](el, selector);
+                    try {
+                        return Sizzle['matchesSelector'](el, selector);
+                    } catch (e) {
+                        _DEBUG && console.error(e.toString());
+                        return false;
+                    }
                 });
             }
         ]);
