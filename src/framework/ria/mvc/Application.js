@@ -175,7 +175,7 @@ NAMESPACE('ria.mvc', function () {
             VOID, function onDispose_() {},
 
             VOID, function onError_(error) {
-                if (!(error instanceof ria.mvc.UncaughtException))
+                if ((!(error instanceof ria.mvc.UncaughtException) || _DEBUG) && console && error)
                     console.error(error.toString());
             },
 

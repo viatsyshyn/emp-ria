@@ -75,8 +75,8 @@ NAMESPACE('ria.ajax', function () {
                 this._xhr.addEventListener("abort", this.transferCanceled_, false);
 
                 //this._xhr.upload.addEventListener("progress", this.updateProgress_, false);
-                this._xhr.upload.addEventListener("error", this.transferFailed_, false);
-                this._xhr.upload.addEventListener("abort", this.transferCanceled_, false);
+                //this._xhr.upload.addEventListener("error", this.transferFailed_, false);
+                //this._xhr.upload.addEventListener("abort", this.transferCanceled_, false);
             },
 
             OVERRIDE, VOID, function cancel() {
@@ -147,18 +147,13 @@ NAMESPACE('ria.ajax', function () {
             },
 
             VOID, function transferComplete_(evt) {
-
-                if (this._xhr.status == 0)   {
-                    this._completer.completeError(ria.ajax.ConnectionException());
-                    return;
+                if (this._xhr.status == 200) {
+                    this._completer.complete(this._xhr.responseText);
+                } else {
+                    this._completer.completeError(this._xhr.status == 0
+                        ? ria.ajax.ConnectionException()
+                        : ria.ajax.AjaxException(this._xhr.status, this._xhr.statusText, this._xhr.response));
                 }
-
-                if (this._xhr.status != 200)   {
-                    this._completer.completeError(ria.ajax.AjaxException(this._xhr.status, this._xhr.statusText, this._xhr.response));
-                    return;
-                }
-
-                this._completer.complete(this._xhr.responseText);
             },
 
             VOID, function transferFailed_(evt) {
