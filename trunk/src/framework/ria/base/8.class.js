@@ -293,7 +293,7 @@
         ClassBase.prototype.getHashCode = function () { return this.__hashCode; };
         ria.__API.method(ClassBase, ClassBase.prototype.getHashCode, 'getHashCode', String, [], [], []);
 
-        ClassBase.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
+        ClassBase.prototype.equals = function (other) { return other && this.getHashCode() === other.getHashCode(); };
         ria.__API.method(ClassBase, ClassBase.prototype.equals, 'equals', Boolean, [ClassBase], ['other'], []);
 
         ClassBase.prototype.getSpecsOf = function (name) { return this.__SPECS[name]; };

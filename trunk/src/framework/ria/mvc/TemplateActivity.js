@@ -170,6 +170,11 @@ NAMESPACE('ria.mvc', function () {
             OVERRIDE, VOID, function onPartialRender_(model, msg_) {
                 BASE(model, msg_);
 
+                if (model == null && msg_ == null) {
+                    Assert(false, 'Model and msg are both null');
+                    return ;
+                }
+
                 var rule = this.doFindTemplateForPartialModel_(model, msg_);
                 var tpl = rule.tpl;
                 tpl && this.onPrepareTemplate_(tpl, model, msg_);
