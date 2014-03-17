@@ -29,7 +29,7 @@ var _RELEASE = false;
 
     var siteRoot = ria.__CFG["#require"].siteRoot;
     if (siteRoot === undefined) {
-        siteRoot = window.location.toString().split(window.location.pathname).shift();
+        siteRoot = window.location.origin;
     }
 
     var serviceRoot = ria.__CFG["#require"].serviceRoot;
