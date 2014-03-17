@@ -206,27 +206,27 @@
 
         var epmc = ria.__CFG.enablePipelineMethodCall;
         /*for(var name_ in instance) {
-         var f_ = instance[name_];
+            var f_ = instance[name_];
 
-         // TODO: skip all ctors
-         if (typeof f_ === 'function' && name_[0] != '$' && name_ !== 'constructor') {
-         instance[name_] = f_.bind(instance);
-         if (epmc && f_.__META) {
-         var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
-         if (_DEBUG) {
-         Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
-         if (f_.__META.isProtected())
-         fn = ProtectedMethodProxy;
-         }
-         publicInstance[name_] = fn;
-         _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
-         }
-         }
+            // TODO: skip all ctors
+            if (typeof f_ === 'function' && name_[0] != '$' && name_ !== 'constructor') {
+                instance[name_] = f_.bind(instance);
+                if (epmc && f_.__META) {
+                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
+                    if (_DEBUG) {
+                        Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
+                        if (f_.__META.isProtected())
+                            fn = ProtectedMethodProxy;
+                    }
+                    publicInstance[name_] = fn;
+                    _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
+                }
+            }
 
-         if (_DEBUG && name_[0] == '$') {
-         instance[name_] = publicInstance[name_] = undefined;
-         }
-         }*/
+            if (_DEBUG && name_[0] == '$') {
+                instance[name_] = publicInstance[name_] = undefined;
+            }
+        }*/
 
         var __pre = __META.__precalc;
         for(var i = 0 ; i < __pre.length;) {
@@ -355,8 +355,9 @@
             return this.__hashCode;
         }, 'getHashCode', String, [], [], []);
 
-        ClassBase.prototype.equals = function (other) { return this.getHashCode() === other.getHashCode(); };
-        ria.__API.method(ClassBase, ClassBase.prototype.equals, 'equals', Boolean, [ClassBase], ['other'], []);
+        ria.__API.method(ClassBase, ClassBase.prototype.equals = function (other) {
+            return other && this.getHashCode() === other.getHashCode();
+        }, 'equals', Boolean, [ClassBase], ['other'], []);
 
         ria.__API.method(ClassBase, ClassBase.prototype.getSpecsOf = function (name) {
             return this.__SPECS[name];
