@@ -17,7 +17,7 @@
         valueOf: function () { return this.ifc; }
     };
 
-    Object.freeze(ImplementerOfDescriptor);
+    _DEBUG && Object.freeze(ImplementerOfDescriptor);
 
     ria.__API.ImplementerOfDescriptor = ImplementerOfDescriptor;
 

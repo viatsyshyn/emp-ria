@@ -17,7 +17,7 @@
         valueOf: function () { return this.clazz; }
     };
 
-    Object.freeze(ArrayOfDescriptor);
+    _DEBUG && Object.freeze(ArrayOfDescriptor);
 
     ria.__API.ArrayOfDescriptor = ArrayOfDescriptor;
 

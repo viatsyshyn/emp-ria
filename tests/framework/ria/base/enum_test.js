@@ -8,7 +8,7 @@
             var Suit = function () {
                 var values = {};
                 function Suit(raw) { return values[raw];}
-                ria.__API.enum(Suit, 'Suit');
+                ria.__API.enumeration(Suit, 'Suit');
                 function SuitImpl(raw) { this.valueOf = function () { return raw; } }
                 ria.__API.extend(SuitImpl, Suit);
                 values[1] = Suit.CLUB = new SuitImpl(1);
@@ -29,7 +29,7 @@
             var Suit = function () {
                 var values = {};
                 function Suit(raw) { return values[raw];}
-                ria.__API.enum(Suit, 'Suit');
+                ria.__API.enumeration(Suit, 'Suit');
                 function SuitImpl(raw) { this.valueOf = function () { return raw; } }
                 ria.__API.extend(SuitImpl, Suit);
                 values[1] = Suit.CLUB = new SuitImpl(1);
