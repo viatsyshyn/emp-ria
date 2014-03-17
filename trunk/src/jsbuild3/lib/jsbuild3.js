@@ -252,10 +252,11 @@ function compile(path, config, appClass) {
                                             });
                                         })
                                 }),
-                                make_node(UglifyJS.AST_Var, topLevel, {
+                                make_node(UglifyJS.AST_Const, topLevel, {
                                     definitions: [
                                         make_node(UglifyJS.AST_VarDef, null, {
-                                            name: make_node(UglifyJS.AST_SymbolVar, topLevel, { name: '_DEBUG' })
+                                            name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_DEBUG'}),
+                                            value: make_node(UglifyJS.AST_False)
                                         })
                                     ]
                                 })
