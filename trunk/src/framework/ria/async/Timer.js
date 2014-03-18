@@ -11,13 +11,16 @@ NAMESPACE('ria.async', function () {
     /** @class ria.async.Timer */
     CLASS(
         'Timer', IMPLEMENTS(ria.async.ICancelable), [
-            [[Number, ria.async.TimerDelegate]],
-            function $(duration, handler, scope_) {
+            [[Number, ria.async.TimerDelegate, Object, Boolean]],
+            function $(duration, handler, scope_, canceled_) {
                 BASE();
 
                 this._interval = Math.max(duration, 1);
                 this._stopOnNext = false;
-                this.start_(handler, scope_);
+                this._handler = handler;
+                this._scope = scope_;
+                this._timer = null;
+                canceled_ || this.start_(handler, scope_);
             },
 
             function start_(handler, scope_) {
@@ -45,6 +48,11 @@ NAMESPACE('ria.async', function () {
             VOID, function cancel() {
                 this._timer && clearTimeout(this._timer);
                 this._timer = null;
+            },
+
+            VOID, function restart() {
+                this.cancel();
+                this.start_(this._handler, this._scope);
             },
 
             [[Number, ria.async.TimerDelegate]],
