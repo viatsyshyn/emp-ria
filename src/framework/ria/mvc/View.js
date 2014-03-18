@@ -350,7 +350,6 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.ViewResult]],
             VOID, function queueViewResult(viewResult) {
-                Assert(viewResult, 'viewResult is required');
                 this._viewResultsQueue.push(viewResult);
                 this.processViewResultsQueue_();
             },
