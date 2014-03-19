@@ -631,9 +631,18 @@ NAMESPACE('ria.dom', function () {
                 return this.toggleClass(clazz, true);
             },
 
-            [[String]],
+            [[Object, Boolean]],
             SELF, function removeClass(clazz) {
-               return this.toggleClass(clazz, false);
+                VALIDATE_ARG('clazz', [String, RegExp], clazz);
+                if (clazz instanceof RegExp) {
+                    this.forEach(function (_) {
+                        _.setAttr('class', _.getAttr('class').split(/\s+/).filter(function(_){ return !clazz.test(_) }).join(' '));
+                    });
+
+                    return this;
+                }
+
+                return this.toggleClass(clazz, false);
             },
 
             [[String, Boolean]],
@@ -644,12 +653,8 @@ NAMESPACE('ria.dom', function () {
 
                     if (tOn && !hasClass) {
                         _.setAttr('class', _.getAttr('class') + " " + clazz);
-                        return this;
-                    }
-
-                    if (!tOn && hasClass) {
-                        _.setAttr('class', _.getAttr('class').split(/\s+/).filter(function(_){ return _ != clazz;}).join(' '));
-                        return this;
+                    } else if (!tOn && hasClass) {
+                        _.setAttr('class', _.getAttr('class').split(/\s+/).filter(function(_){ return _ != clazz }).join(' '));
                     }
                 });
 
