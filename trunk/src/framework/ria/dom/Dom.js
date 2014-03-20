@@ -17,6 +17,12 @@ REQUIRE('ria.dom.Events');
 NAMESPACE('ria.dom', function () {
     "use strict";
 
+    function toCamelCase(str) {
+        return str.replace(/(\-[a-z])/g, function($1){
+            return $1.substring(1).toUpperCase();
+        });
+    }
+
     var addWheelListener = function(window,document) {
 
         var prefix = "", _addEventListener, onwheel, support;
@@ -636,7 +642,8 @@ NAMESPACE('ria.dom', function () {
                 VALIDATE_ARG('clazz', [String, RegExp], clazz);
                 if (clazz instanceof RegExp) {
                     this.forEach(function (_) {
-                        _.setAttr('class', _.getAttr('class').split(/\s+/).filter(function(_){ return !clazz.test(_) }).join(' '));
+                        if (_.hasAttr('class'))
+                            _.setAttr('class', (_.getAttr('class') || '').split(/\s+/).filter(function(_){ return !clazz.test(_) }).join(' '));
                     });
 
                     return this;
@@ -673,7 +680,12 @@ NAMESPACE('ria.dom', function () {
 
             [[String, Object]],
             SELF, function setCss(property, value) {
-                this._dom.forEach(function (_) { _.style[property] = value; });
+                this._dom.forEach(function (_) {
+                    if (property.indexOf('-') > 0) {
+                        _.style[toCamelCase(property)] = value;
+                    }
+                    _.style[property] = value;
+                });
                 return this;
             },
 
