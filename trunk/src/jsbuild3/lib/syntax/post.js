@@ -45,7 +45,7 @@ compilers.push(ValidatorCompiler);
 function TestsEDeclCompiler(ns, node, descend) {
     if (node instanceof UglifyJS.AST_Call) {
         var name = node.expression.print_to_string();
-        if (['CLASS_E', 'INTERFACE_E', 'DELEGATE_E', 'ANNOTATION_E', 'EXCEPTION_E'].indexOf(name) >= 0) {
+        if (['CLASS_E', 'INTERFACE_E', 'DELEGATE_E', 'ANNOTATION_E', 'EXCEPTION_E', 'ENUM_E', 'IDENTIFIER_E'].indexOf(name) >= 0) {
             return make_node(UglifyJS.AST_BlockStatement, node, {body: []})
         }
     }

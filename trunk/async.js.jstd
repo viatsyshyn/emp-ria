@@ -2,7 +2,7 @@ load:
   - tests/framework/ria/_cfg.js
   - src/framework/ria/base/*.js
   - src/framework/ria/syntax/*.js
-  - tests/framework/ria/async/require_stub.js
+  - tests/framework/ria/require_stub.js
   - src/framework/ria/async/ICancelable.js
   - src/framework/ria/async/Future.js
   - src/framework/ria/async/Completer.js
