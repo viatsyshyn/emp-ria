@@ -193,14 +193,23 @@ NAMESPACE('ria.dom', function () {
                     this._dom = ria.__API.clone(dom_);
                 } else if (dom_ instanceof SELF) {
                     this._dom = dom_.valueOf();
+                } else if (Array.isArray(dom_)) {
+                    this._dom = dom_;
                 }
             },
 
             /* Search tree */
 
+            function find_(selector) {
+                return new ria.dom.Dom(__find(selector, this._dom[0]));
+            },
+
             [[String]],
             SELF, function find(selector) {
-                return new ria.dom.Dom(__find(selector, this._dom[0]));
+                if (!this.count())
+                    return new ria.dom.Dom([]);
+
+                return this.find_(selector);
             },
 
             /* Events */
