@@ -350,6 +350,7 @@ NAMESPACE('ria.mvc', function () {
 
             [[ria.mvc.ViewResult]],
             VOID, function queueViewResult(viewResult) {
+                Assert(viewResult, 'viewResult is required');
                 this._viewResultsQueue.push(viewResult);
                 this.processViewResultsQueue_();
             },
@@ -365,6 +366,10 @@ NAMESPACE('ria.mvc', function () {
                     completer.complete(activity.getModalResult());
                 });
 
+                var top = this.getCurrent();
+                if (top)
+                    top.pause();
+
                 this.push_(activity);
                 activity.show();
                 activity.refreshD(ria.async.Future.$fromData(model));
@@ -372,6 +377,10 @@ NAMESPACE('ria.mvc', function () {
                 return completer.getFuture()
                     .then(function (modalResult) {
                         this._modalMode = false;
+
+                        if (top)
+                            top.show();
+
                         this.processViewResultsQueue_();
                         return modalResult;
                     }, this);
