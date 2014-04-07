@@ -12,14 +12,25 @@
         },
 
         testBuildIdentifier: function () {
-            var result;
-            assertNoException(function () {
-                result = ria.__SYNTAX.compileIdentifier('MyIdentifier');
+            var result = IDENTIFIER('MyIdentifier');
+
+            assertNotUndefined(result);
+            assertFunction(result);
+            assertTrue(ria.__API.isIdentifier(result));
+        },
+
+        testPredefinedIdentifier: function () {
+            var result = IDENTIFIER('MyIdentifier', {
+                PRE_DEF: -1
             });
 
             assertNotUndefined(result);
             assertFunction(result);
             assertTrue(ria.__API.isIdentifier(result));
+            assertInstanceOf(result, result.PRE_DEF);
+
+            assertEquals(-1, result.PRE_DEF.valueOf());
+            assertEquals(result.PRE_DEF, result(-1));
         }
     };
 

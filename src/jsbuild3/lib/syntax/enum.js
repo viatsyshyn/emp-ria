@@ -21,7 +21,7 @@ function getEnumImplementation(name, fullName, body) {
         function EnumName(value) {
             return values.hasOwnProperty(value) ? values[value] : undefined;
         }
-        ria.__API.identifier(EnumName, 'EnumFullName');
+        ria.__API.enumeration(EnumName, 'EnumFullName');
 
         function EnumNameImpl(value) {
             this.valueOf = function () { return value; };
@@ -62,13 +62,15 @@ function EnumCompiler(ns, node, descend) {
 
         //console.info('Found enum ' + name + ' in ' + ns);
 
-        return new UglifyJS.AST_Assign({
+        var right = new UglifyJS.AST_Call({
+            expression: getEnumImplementation(name, ns + '.' + name, body),
+            args: []
+        });
+
+        return ria.__SYNTAX.isProtected(name) ? right : new UglifyJS.AST_Assign({
             left: getNameTraversed(ns.split('.'), name),
             operator: '=',
-            right: new UglifyJS.AST_Call({
-                expression: getEnumImplementation(name, ns + '.' + name, body),
-                args: []
-            })
+            right: right
         });
     }
 }

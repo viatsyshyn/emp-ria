@@ -45,6 +45,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         }
         ria.__API.enumeration(Enum, name);
         function EnumImpl(raw) {
+            _DEBUG && (this.__RAW = raw);
             this.valueOf = function () { return raw; };
             this.toString = function () { return name + '#' + raw; };
         }

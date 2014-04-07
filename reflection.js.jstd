@@ -3,7 +3,7 @@ load:
   - src/framework/lib/stacktrace.js
   - src/framework/ria/base/*.js
   - src/framework/ria/syntax/*.js
-  - tests/framework/ria/async/require_stub.js
+  - tests/framework/ria/require_stub.js
   - src/framework/ria/reflection/Exception.js
   - src/framework/ria/reflection/Reflector.js
   - src/framework/ria/reflection/ReflectionCtor.js

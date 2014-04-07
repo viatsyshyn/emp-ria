@@ -148,6 +148,30 @@ function EXCEPTION_E(error, arg) {
     });
 }
 
+function IDENTIFIER(name, predefined_) {
+    ria.__SYNTAX.validateIdentifierDecl(name, predefined_);
+    return ria.__SYNTAX.compileIdentifier('window.' + name, predefined_);
+}
+
+function IDENTIFIER_E(error, name, predefined_) {
+    __WRAPPER_E(ria.__API.clone(arguments), function (args) {
+        ria.__SYNTAX.validateIdentifierDecl(name, predefined_);
+        return ria.__SYNTAX.compileIdentifier('window.' + name, predefined_);
+    });
+}
+
+function ENUM(name, val) {
+    ria.__SYNTAX.validateEnumDecl(name, val);
+    return ria.__SYNTAX.compileEnum('window.' + name, val);
+}
+
+function ENUM_E(error, name, val) {
+    __WRAPPER_E(ria.__API.clone(arguments), function (args) {
+        ria.__SYNTAX.validateEnumDecl(name, val);
+        ria.__SYNTAX.compileEnum('window.' + name, val);
+    });
+}
+
 function getErrorMessage(e) {
     return ria.__API.getIdentifierOfValue(e) + '(' + (e.getMessage ? e.getMessage() : e.message) + ')' + '\n' + e.toString();
 }
