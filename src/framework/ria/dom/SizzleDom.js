@@ -72,8 +72,7 @@ NAMESPACE('ria.dom', function () {
 
             /* Search tree */
 
-            [[String]],
-            OVERRIDE, SELF, function find(selector) {
+            OVERRIDE, function find_(selector) {
                 return new SELF(Sizzle(selector, this._dom[0]));
             },
 
