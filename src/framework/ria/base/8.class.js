@@ -185,7 +185,7 @@
             throw Error('Can NOT instantiate abstract class ' + __META.name);
 
         if (!(instance instanceof clazz))
-            instance = ria.__API.getInstanceOf(clazz, _DEBUG ? __META.name : null);
+            instance = ria.__API.getInstanceOf(clazz);
 
         var genericTypes = __META.genericTypes || [],
             genericTypesLength = genericTypes.length - __META.baseSpecs.length,
@@ -200,7 +200,7 @@
 
         var publicInstance = instance;
         if (_DEBUG) {
-            instance = ria.__API.getInstanceOf(clazz, __META.name);
+            instance = ria.__API.getInstanceOf(clazz);
             publicInstance.__PROTECTED = instance;
         }
 

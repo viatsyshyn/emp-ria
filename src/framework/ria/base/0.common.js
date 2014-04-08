@@ -92,17 +92,16 @@ ria.__API = ria.__API || {};
      * @return {Object}
      */
     ria.__API.getInstanceOf = function (ctor, name_) {
-        var f = function () {
-            this.constructor = ctor;
-        };
+        var f = function () { this.constructor = ctor; };
 
         if (_DEBUG) {
-            name_ = (name_ || '').replace(/[^a-z0-9_$]/gi, '_');
-            f = new Function("ctor", "return function " + name_ + "() { this.constructor = ctor; }")(ctor);
+            f = new Function("ctor", "return function " + (ctor.name || '') + "() { this.constructor = ctor; }")(ctor);
         }
 
         f.prototype = ctor.prototype;
-        return new f();
+        var object = new f();
+        object.__proto__ = ctor.prototype;
+        return object;
     };
 
     /**
