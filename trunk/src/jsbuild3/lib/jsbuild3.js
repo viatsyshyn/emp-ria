@@ -2,9 +2,6 @@
 
 var _DEBUG = false;
 
-var execSync = require('emp.ria-exec-sync');
-
-
 /**
  * @param {String} path
  * @param {CodeBlockDescriptor[]} deps
@@ -321,11 +318,7 @@ function compile(path, config, appClass) {
 
     var gcc = config.getPluginConfiguration("gcc");
     if (gcc.cmd) {
-        fs.writeFileSync('./tmp.in.js', content, "utf-8");
-        execSync(gcc.cmd + " --js tmp.in.js --js_output_file tmp.out.js", __CWD);
-        content = fs.readFileSync('./tmp.out.js', "utf8");
-        fs.unlinkSync('./tmp.in.js');
-        fs.unlinkSync('./tmp.out.js');
+        throw Error('Google Closure Compiler optimizations is not supported since 0.1.6');
     }
 
     fileContents.push(content);
