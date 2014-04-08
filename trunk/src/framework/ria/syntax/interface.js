@@ -129,30 +129,34 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             throw Error('Anonymous classes from interfaces are not supported');
 
             // TODO: update to tokenizer
-            var members = ria.__SYNTAX.parseMembers([].slice.call(arguments));
+            /*var members = ria.__SYNTAX.parseMembers([].slice.call(arguments));
             var flags = {isFinal: true };
             var properties = members.filter(function (_1) { return _1 instanceof ria.__SYNTAX.PropertyDescriptor });
             var methods = members.filter(function (_1) { return _1 instanceof ria.__SYNTAX.MethodDescriptor });
             var def = new ria.__SYNTAX.ClassDescriptor('$AnonymousClass', ria.__API.Class, [InterfaceProxy], flags, [], properties, methods);
             var impl = ria.__SYNTAX.buildClass('$AnonymousClass', def);
-            return impl();
+            return impl();*/
+        }
+
+        if (_DEBUG) {
+            InterfaceProxy = new Function("return " + InterfaceProxy.toString().replace('InterfaceProxy', ria.__SYNTAX.toSingleVarName(name)))();
         }
 
         var methods = def.methods.map(
-            /**
-             * @param {MethodDescriptor} method
-             */
-            function (method) {
-                method.argsTypes = processSelf(method.argsTypes, InterfaceProxy);
-                method.retType = processSelf(method.retType, InterfaceProxy);
+        /**
+         * @param {MethodDescriptor} method
+         */
+        function (method) {
+            method.argsTypes = processSelf(method.argsTypes, InterfaceProxy);
+            method.retType = processSelf(method.retType, InterfaceProxy);
 
-                return [
-                    method.name,
-                    method.retType ? method.retType.value : null,
-                    method.argsTypes.map(function (_) { return _.value; }),
-                    method.argsNames
-                ];
-            });
+            return [
+                method.name,
+                method.retType ? method.retType.value : null,
+                method.argsTypes.map(function (_) { return _.value; }),
+                method.argsNames
+            ];
+        });
 
         def.properties.forEach(
             /**

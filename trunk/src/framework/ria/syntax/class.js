@@ -644,6 +644,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             }
         };
 
+        if (_DEBUG) {
+            ClassProxy = new Function("global, className, Exception, $$",
+                "return " + ClassProxy.toString().replace(/ClassProxy/g, ria.__SYNTAX.toSingleVarName(className))
+            )(global, className, Exception, $$);
+        }
+
         ria.__API.clazz(ClassProxy, name,
             def.base.value,
             def.ifcs.values,//.map(function (_) { return _.value }),

@@ -4,6 +4,10 @@
 (function () {
     "use strict";
 
+    ria.__SYNTAX.toSingleVarName = function (name) {
+        return (name || '').replace(/[^a-z0-9_$]/gi, '_');
+    };
+
     ria.__SYNTAX.isValidIdentifierName = function (name) {
         return /^[$_a-z]([$_a-z0-9])*$/i.test(name);
     };

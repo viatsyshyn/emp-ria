@@ -36,13 +36,22 @@ ria.__API = ria.__API || {};
     /**
      * Inherit from given class
      * @param {Function} superClass
+     * @param {String} [name_]
      * @return {Object}
      */
-    ria.__API.inheritFrom = function (superClass) {
-        function InheritanceProxyClass() {}
+    ria.__API.inheritFrom = function (superClass, name_) {
+        _DEBUG && console.warn('ria.__API.inheritFrom is deprecated');
+
+        var InheritanceProxyClass = function () { };
+
+        if (_DEBUG) {
+            InheritanceProxyClass = new Function ("return function " + (name_ || '') + "() { }")();
+        }
 
         InheritanceProxyClass.prototype = superClass.prototype;
-        return new InheritanceProxyClass();
+        var object = new InheritanceProxyClass();
+        object.__proto__ = superClass.prototype;
+        return object;
     };
 
     /**
@@ -51,9 +60,15 @@ ria.__API = ria.__API || {};
      * @param {Function} superClass
      */
     ria.__API.extend = function (subClass, superClass) {
-        subClass.prototype = ria.__API.inheritFrom(superClass);
-        subClass.prototype.constructor = subClass;
+        var InheritanceProxyClass = function () { this.constructor = subClass };
 
+        if (_DEBUG) {
+            InheritanceProxyClass = new Function ("subClass", "return function " + (subClass.name || '') + "() { this.constructor = subClass }")(subClass);
+        }
+
+        InheritanceProxyClass.prototype = superClass.prototype;
+        subClass.prototype = new InheritanceProxyClass();
+        subClass.prototype.__proto__ = superClass.prototype;
         subClass.super_ = superClass.prototype;
     };
 
@@ -77,9 +92,14 @@ ria.__API = ria.__API || {};
      * @return {Object}
      */
     ria.__API.getInstanceOf = function (ctor, name_) {
-        var f = function InstanceOfProxy() {
+        var f = function () {
             this.constructor = ctor;
         };
+
+        if (_DEBUG) {
+            name_ = (name_ || '').replace(/[^a-z0-9_$]/gi, '_');
+            f = new Function("ctor", "return function " + name_ + "() { this.constructor = ctor; }")(ctor);
+        }
 
         f.prototype = ctor.prototype;
         return new f();

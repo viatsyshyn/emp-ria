@@ -48,6 +48,12 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             _DEBUG && (this.__RAW = raw);
             this.valueOf = function () { return raw; };
             this.toString = function () { return name + '#' + raw; };
+            _DEBUG && Object.freeze(this);
+        }
+
+        if (_DEBUG) {
+            EnumImpl = new Function ("Object, name, _DEBUG",
+                    "return " + EnumImpl.toString().replace('EnumImpl', ria.__SYNTAX.toSingleVarName(name)))(Object, name, _DEBUG);
         }
 
         ria.__API.extend(EnumImpl, Enum);
