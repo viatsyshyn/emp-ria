@@ -29,7 +29,7 @@ NAMESPACE('ria.dom', function () {
                     genericSpecs = [];
 
                 if (!(instance instanceof clazz))
-                    instance = ria.__API.getInstanceOf(clazz, clazz.__META.name.split('.').pop());
+                    instance = ria.__API.getInstanceOf(clazz, clazz.__META.name);
 
                 if (_DEBUG && ria.__CFG.enablePipelineMethodCall) for(var name_ in instance) {
                     //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop

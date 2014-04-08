@@ -49,8 +49,13 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         function IdentifierValueImpl(value) {
             _DEBUG && (this.__VALUE = value);
             this.valueOf = function () { return value; };
-            this.toString = function toString() { return '[' + name + '#' + value + ']'; };
-            Object.freeze(this);
+            this.toString = function () { return '[' + name + '#' + value + ']'; };
+            _DEBUG && Object.freeze(this);
+        }
+
+        if (_DEBUG) {
+            IdentifierValueImpl = new Function ("Object, name, _DEBUG",
+                    "return " + IdentifierValueImpl.toString().replace('IdentifierValueImpl', ria.__SYNTAX.toSingleVarName(name)))(Object, name, _DEBUG);
         }
 
         ria.__API.extend(IdentifierValueImpl, IdentifierValue);

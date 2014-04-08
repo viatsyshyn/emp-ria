@@ -165,9 +165,9 @@
         _DEBUG && Object.freeze(impl);
     };
 
-    function ProtectedMethodProxy() {
+    var ProtectedMethodProxy = function () {
         throw Error('Can NOT call protected methods');
-    }
+    };
 
     var __slice = function (arr, start, end) { return [].slice.call(arr, start, end); };
 
@@ -185,7 +185,7 @@
             throw Error('Can NOT instantiate abstract class ' + __META.name);
 
         if (!(instance instanceof clazz))
-            instance = ria.__API.getInstanceOf(clazz);
+            instance = ria.__API.getInstanceOf(clazz, _DEBUG ? __META.name : null);
 
         var genericTypes = __META.genericTypes || [],
             genericTypesLength = genericTypes.length - __META.baseSpecs.length,
@@ -200,7 +200,7 @@
 
         var publicInstance = instance;
         if (_DEBUG) {
-            instance = ria.__API.getInstanceOf(clazz);
+            instance = ria.__API.getInstanceOf(clazz, __META.name);
             publicInstance.__PROTECTED = instance;
         }
 
@@ -237,12 +237,15 @@
             if (epmc) {
                 var fn = ria.__API.getPipelineMethodCallProxyFor(f_, meta_, instance, genericTypes, genericSpecs);
                 if (_DEBUG) {
-                    Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
+                    Object.defineProperty(instance, name_, { writable : false, configurable: false, enumerable: false, value: fn });
                     if (meta_.isProtected())
                         fn = ProtectedMethodProxy;
                 }
-                publicInstance[name_] = fn;
-                _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
+                if (_DEBUG) {
+                    Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, enumerable: false, value: fn });
+                } else {
+                    publicInstance[name_] = fn;
+                }
             } else {
                 instance[name_] = f_.bind(instance);
             }
@@ -254,7 +257,8 @@
             instance.$ = publicInstance.$ = undefined;
             for(var name in __META.ctors) {
                 if (__META.ctors.hasOwnProperty(name)) {
-                    instance[name] = publicInstance[name] = undefined;
+                    Object.defineProperty(publicInstance, name, { writable : false, configurable: false, enumerable: false, value: undefined });
+                    Object.defineProperty(instance, name, { writable : false, configurable: false, enumerable: false, value: undefined });
                 }
             }
         }
@@ -343,8 +347,14 @@
         ria.__API.clazz(ClassBase, 'Class', null, [], []);
 
         ria.__API.ctor('$', ClassBase, ClassBase.prototype.$ = function () {
-            this.__hashCode = Math.random().toString(36);
-            _DEBUG && Object.defineProperty(this, 'hashCode', {writable: false, configurable: false});
+            if (!this.__hashCode) {
+                var hc = Math.random().toString(36);
+                if (_DEBUG) {
+                    Object.defineProperty(this, '__hashCode', {writable: false, configurable: false, value: hc});
+                } else {
+                    this.__hashCode = hc;
+                }
+            }
         }, [], [], []);
 
         ria.__API.method(ClassBase, ClassBase.prototype.getClass = function () {

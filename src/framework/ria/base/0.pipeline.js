@@ -114,7 +114,7 @@
      * @return {Function}
      */
     ria.__API.getPipelineMethodCallProxyFor = function (body, meta, scope, genericTypes, specs) {
-        var f_ = function PipelineMethodCallProxy() {
+        var f_ = function () {
             return PipelineMethodCall(body, meta, scope, [].slice.call(arguments), genericTypes, specs);
         };
 
