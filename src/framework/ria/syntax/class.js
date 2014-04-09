@@ -232,7 +232,11 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (token instanceof ria.__SYNTAX.Tokenizer.VoidToken)
             return undefined;
 
-        ria.__API.Assert(true, 'This should never assert this');
+        // In case of raw types: Date, Event, RegEx
+        if (token instanceof ria.__SYNTAX.Tokenizer.FunctionToken)
+            return token.value;
+
+        ria.__SYNTAX.Assert(false, 'This should never assert this');
         return undefined;
     }
 
