@@ -28,6 +28,49 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.jQueryDom */
     CLASS(
         'jQueryDom', EXTENDS(ria.dom.Dom), [
+		
+			OVERRIDE, function $$(instance, clazz, ctor, args) {
+                var genericTypes = [],
+                    genericSpecs = [];
+
+                if (!(instance instanceof clazz))
+                    instance = ria.__API.getInstanceOf(clazz);
+
+                if (_DEBUG && ria.__CFG.enablePipelineMethodCall) for(var name_ in instance) {
+                    //noinspection UnnecessaryLocalVariableJS,JSUnfilteredForInLoop
+                    var f_ = instance[name_];
+
+                    // TODO: skip all ctors
+                    if (typeof f_ === 'function' && !(/^\$.*/.test(name_)) && name_ !== 'constructor') {
+                        instance[name_] = f_.bind(instance);
+                        if (f_.__META) {
+                            var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
+                            Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
+                        }
+                    }
+
+                    if (_DEBUG && /^\$.*/.test(name_)) {
+                        instance[name_] = undefined;
+                    }
+                }
+
+                if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
+                    ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
+                }
+
+                if (_DEBUG) for(var name in clazz.__META.properties) {
+                    if (clazz.__META.properties.hasOwnProperty(name)) {
+                        instance[name] = null;
+                    }
+                }
+
+                ctor.apply(instance, args);
+
+                _DEBUG && Object.seal(instance);
+
+                return instance;
+            },
+		
             function $(dom_) {
                 BASE();
                 VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, jQuery], dom_);
@@ -81,6 +124,18 @@ NAMESPACE('ria.dom', function () {
             }, */
 
             [[Number]],
+            SELF, function slideDown(time_){
+                time_ ? this._dom.slideDown(time_) : this.slideDown.show();
+                return this;
+            },
+
+            [[Number]],
+            SELF, function slideUp(time_){
+                time_ ? this._dom.slideUp(time_) : this._dom.slideUp();
+                return this;
+            },
+
+            [[Number]],
             SELF, function show(time_){
                 time_ ? this._dom.show(time_) : this._dom.show();
                 return this;
@@ -89,6 +144,28 @@ NAMESPACE('ria.dom', function () {
             [[Number]],
             SELF, function hide(time_){
                 time_ ? this._dom.hide(time_) : this._dom.hide();
+                return this;
+            },
+
+            [[Function]],
+            SELF, function fadeIn(callback_){
+                callback_ ? this._dom.fadeIn(callback_) : this._dom.fadeIn();
+                return this;
+            },
+
+            [[Function]],
+            SELF, function fadeOut(callback_){
+                callback_ ? this._dom.fadeOut(callback_) : this._dom.fadeOut();
+                return this;
+            },
+
+            SELF, function clone(){
+                return new SELF(this._dom.clone());
+            },
+
+            [[String]],
+            SELF, function wrap(html){
+                this._dom.wrap(html);
                 return this;
             },
 
@@ -147,6 +224,21 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
+            SELF, function insertAfter(dom) {
+                VALIDATE_ARG('dom', [SELF, String, Node], dom);
+
+                if(typeof dom == "string")
+                    dom = new SELF(dom);
+
+                var dest = dom instanceof Node ? dom : dom.valueOf().shift();
+                if(dest){
+                    VALIDATE_ARG('dom', [Node], dest);
+
+                    this._dom.insertAfter(dest);
+                }
+                return this;
+            },
+
             SELF, function appendChild(dom) {
                 VALIDATE_ARG('dom', [SELF, String, Node], dom);
 
@@ -191,7 +283,7 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
-            String, function getHTML() {
+            function getHTML() {
                 return this._dom.html();
             },
 
@@ -305,6 +397,7 @@ NAMESPACE('ria.dom', function () {
             OVERRIDE, SELF, function setAllData(obj) {},
             [[String, Object]],
             OVERRIDE, SELF, function setData(name, value) {
+                this.setAttr('data-' + name, value);
                 this._dom.data(name, value);
                 return this;
             },
@@ -319,8 +412,11 @@ NAMESPACE('ria.dom', function () {
             OVERRIDE, SELF, function addClass(clazz) {
                 return this.toggleClass(clazz, true);
             },
-            [[String]],
+            [[Object]],
             OVERRIDE, SELF, function removeClass(clazz) {
+				if (clazz instanceof RegExp) {
+					throw Error('ria.dom.jQueryDom does not support removeClass(RegExp)');
+				}
                return this.toggleClass(clazz, false);
             },
 
@@ -333,7 +429,7 @@ NAMESPACE('ria.dom', function () {
             /* css */
 
             [[String]],
-            OVERRIDE, Object, function getCss(property) {
+            OVERRIDE, function getCss(property) {
                 return this._dom.css(property);
             },
             [[String, Object]],
@@ -384,6 +480,11 @@ NAMESPACE('ria.dom', function () {
 
             Number, function index() {
                 return this._dom.index();
+            },
+
+            [[Number]],
+            OVERRIDE, function scrollTop(top_) {
+                return top_ ? this._dom.scrollTop(top_) : this._dom.scrollTop();
             },
 
             /* Form */

@@ -437,8 +437,8 @@ NAMESPACE('ria.dom', function () {
                 var body = document.body;
                 var docElem = document.documentElement;
 
-                var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
-                var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+                var scrollTop = window.pageYOffset || docElem.scrollTop;
+                var scrollLeft = window.pageXOffset || docElem.scrollLeft;
 
                 var clientTop = docElem.clientTop || body.clientTop || 0;
                 var clientLeft = docElem.clientLeft || body.clientLeft || 0;
@@ -680,7 +680,7 @@ NAMESPACE('ria.dom', function () {
             /* css */
 
             [[String]],
-            Object, function getCss(property) {
+            function getCss(property) {
                 return this._dom
                     .map(function (_) { return window.getComputedStyle(_); })
                     .map(function (style) { return !style ? null : style.getPropertyValue(property); })
@@ -703,6 +703,11 @@ NAMESPACE('ria.dom', function () {
                 var f = this.setCss, scope = this;
                 Object.getOwnPropertyNames(props).forEach(function (_) { f.call(scope, _, props[_]); });
                 return this;
+            },
+
+            [[Number]],
+            function scrollTop(top_) {
+                return null;
             },
 
             /* iterator */
