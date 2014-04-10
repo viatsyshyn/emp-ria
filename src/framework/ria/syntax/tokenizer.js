@@ -343,4 +343,4 @@
     Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
-})(_BROWSER ? window : this);
+})(_GLOBAL);

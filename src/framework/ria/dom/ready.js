@@ -11,12 +11,14 @@ REQUIRE('ria.dom.Dom');
 NAMESPACE('ria.dom', function () {
     "use strict";
 
-    var isBrowser = !!(typeof window !== "undefined" && navigator && document),
-        isPageReady = !isBrowser,
+    var isPageReady = !_BROWSER,
         onReady = [];
 
     /* THE FOLLOWING CODE BLOCK IS PORTED FROM jQuery 1.5.1 */
-    isBrowser && (function () {
+    _BROWSER && (function () {
+        var window = _GLOBAL,
+            document = window.document;
+
         function onLoaded() {
             isPageReady = true;
             onReady.forEach(function (_) { _(null); });

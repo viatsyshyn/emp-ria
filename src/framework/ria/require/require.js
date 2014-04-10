@@ -62,7 +62,7 @@ ria.__REQUIRE = ria.__REQUIRE || {};
 
     ria.__REQUIRE.requireSymbol = function (symbol) {
         return requireUri(symbol, symbol.indexOf('/') >=0 ? null : function () {
-            var root = window;
+            var root = _GLOBAL;
             symbol.split('.').forEach(function (part) {
                 if (!root.hasOwnProperty(part))
                     throw Error('Symbol "' + symbol + '" not loaded.');

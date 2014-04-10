@@ -66,7 +66,7 @@ NAMESPACE('ria.async', function () {
 
             [[ria.async.TimerDelegate, Array, Object]],
             VOID, function DEFER(handler, args_, scope_) {
-                ria.__API.defer(scope_ || window, handler, args_ || []);
+                ria.__API.defer(scope_ || _GLOBAL, handler, args_ || []);
             }
         ]);
 });

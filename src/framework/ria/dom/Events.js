@@ -9,6 +9,9 @@ NAMESPACE('ria.dom', function () {
         return ria.__API.extendWithDefault(data || {}, def);
     }
 
+	var window = _GLOBAL;
+    var Node = _BROWSER ? _GLOBAL.Node : Object;
+
     /** @class ria.dom.Events */
     CLASS(
         FINAL, 'Events', [
