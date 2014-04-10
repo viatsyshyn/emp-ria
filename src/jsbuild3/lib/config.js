@@ -38,6 +38,7 @@ function ModuleConfiguration(params, config) {
     this.assetsDir = params.assetDir ? PATH.resolve(config.getBasePath() + (params.assetsDir || 'assets')) + '/' : null;
     this.libs = params.libs || {};
     this.globals = [].slice.call(params.globals || []);
+    this.env = params.env;
 }
 
 ModuleConfiguration.prototype = {
@@ -75,7 +76,9 @@ ModuleConfiguration.prototype = {
  */
 function Configuration(config, path) {
     if (config.version != 3)
-        throw Error('Unsupported configuration file. Version: ' + config.version)
+        throw Error('Unsupported configuration file. Version: ' + config.version);
+
+    this.env = config.env || "browser";
 
     this.basePath = PATH.dirname(path) + '/';
 
@@ -118,5 +121,6 @@ Configuration.prototype = {
     /** @param {ModuleConfiguration} config */
     setModuleConfig: function (config) { this.moduleConfig = config; },
     /** @returns Object */
-    getOption: function (name) { return this.moduleConfig.getOption(name) || this.options[name] || null; }
+    getOption: function (name) { return this.moduleConfig.getOption(name) || this.options[name] || null; },
+    getEnv: function () { return this.moduleConfig().getEnv() || this.env; }
 };

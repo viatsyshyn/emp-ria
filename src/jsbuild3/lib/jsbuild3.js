@@ -1,6 +1,12 @@
 "use strict";
 
 var _DEBUG = false;
+var _RELEASE = true;
+
+var _BROWSER = false;
+var _NODE = true;
+
+var _GLOBAL = this;
 
 /**
  * @param {String} path
@@ -195,6 +201,14 @@ function appStart() {
  * @returns string
  */
 function compile(path, config, appClass) {
+
+    switch(config.getEnv()) {
+        case "browser":
+            break;
+
+        default:
+            throw Error('Unsupported environment: ' + config.getEnv());
+    }
 
     //console.log(config.getAssetsDir());
 
