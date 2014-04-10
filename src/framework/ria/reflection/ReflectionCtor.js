@@ -24,7 +24,7 @@ NS('ria.reflection', function () {
                 if (!ria.__API.isClassConstructor(clazz))
                     throw new ria.reflection.Exception('ReflectionFactory works only on CLASS');
 
-                var name = ria.__API.getIdentifierOfType(ria.__API.specify(clazz, specs)) + '#' + ctorName;
+                var name = ria.__API.getIdentifierOfType(ria.__API.specify(clazz, specs)) + '@' + clazz.__REF_ID + '#' + ctorName;
                 if (cache.hasOwnProperty(name))
                     return cache[name];
 

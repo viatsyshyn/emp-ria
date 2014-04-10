@@ -44,7 +44,7 @@ NS('ria.reflection', function () {
 
                 args.splice(0, 1, clazz, specs);
 
-                var name = ria.__API.getIdentifierOfType(ria.__API.specify(clazz, specs));
+                var name = ria.__API.getIdentifierOfType(ria.__API.specify(clazz, specs)) + '@' + clazz.__REF_ID;
                 if (cache.hasOwnProperty(name))
                     return cache[name];
 

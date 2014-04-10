@@ -290,6 +290,8 @@
     var staticScopeInstance = new StaticScope();
     _DEBUG && Object.freeze(staticScopeInstance);
 
+    var refId = Math.floor(Math.random() * 1000)+ 10000;
+
     ria.__API.compile = function(clazz) {
         for(var k in clazz) if (clazz.hasOwnProperty(k)) {
             var name_ = k;
@@ -330,6 +332,8 @@
         }
 
         //console.info(clazz, __pre);
+
+        clazz.__REF_ID = (refId++).toString(36);
 
         _DEBUG && Object.freeze(clazz);
     };
