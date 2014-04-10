@@ -18,11 +18,6 @@ var sys = require("util");
 function _bootstrap(__CFG) {
     "use strict";
 
-    var root = __CFG["#require"].appRoot;
-    var appDir = resolve(__CFG["#require"].appCodeDir || "~/app/");
-    var assetsDir = resolve(__CFG["#require"].assetsDir || "~/assets/");
-    var libs = __CFG["#require"].libs || {};
-
     function resolve(path) {
         if (/^([0-9a-z_$]+(\.[0-9a-z_$]+)*)$/gi.test(path))
             path = path.replace(/\./gi, '/') + '.js';
@@ -34,29 +29,60 @@ function _bootstrap(__CFG) {
             }
         }
 
-        path = path.replace(/^~\//gi, root);
-        path = path.replace(/^\.\//gi, appDir);
+        if (root)
+            path = path.replace(/^~\//gi, root);
+            
+        if (appDir)
+            path = path.replace(/^\.\//gi, appDir);
 
-        if (!path.match(/^\//i))
+        if (!path.match(/^\//i) && !path.match(/^\w:\\/i) && appDir)
             path = appDir + path;
 
         return path.replace(/\/\//gi, '/');
     }
 
+    var root = resolve(__CFG.appRoot || '.');
+    var appDir = resolve(__CFG.appCodeDir || "~/app/");
+    var assetsDir = resolve(__CFG.assetsDir || "~/assets/");
+    var libs = __CFG.libs || {};
+
+    if (libs['ria/']) {
+        libs['ria/'] = path.resolve(path.dirname(module.filename), './');
+    }
+
+    for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
+      libs[prefix] = resolve(libs[prefix]);
+    }
+
     var bootstrapContext = vm.createContext({
         console       : console,
-        ria           : { __CFG: __CFG },
+        ria           : { __CFG: __CFG.__CFG || {
+                            checkedMode: true,
+                            enablePipelineMethodCall: true,
+                            prettyStackTraces: true
+                        } },
+                        
         _DEBUG        : true,
+        _BROWSER      : false,
+        
         REQUIRE       : REQUIRE,
         NAMESPACE     : NS,
-        NS            : NS
+        NS            : NS,
+        ASSET         : function () { return null; }
     });
+
+    var loaded = {};
 
     function load_global(file) {
         file = path.resolve(path.dirname(module.filename), file);
         try {
+            if (loaded[file])
+                return null;
+        
             var code = fs.readFileSync(file, "utf8");
-            return vm.runInContext(code, bootstrapContext, file);
+            vm.runInContext(code, bootstrapContext, file);
+            loaded[file] = true;
+            return null;
         } catch(ex) {
             // XXX: in case of a syntax error, the message is kinda
             // useless. (no location information).
@@ -108,14 +134,17 @@ function _bootstrap(__CFG) {
     REQUIRE('ria/syntax/yyy.symbols.js');
     REQUIRE('ria/syntax/zzz.init.js');
 
-    __CFG['#require'].plugins.forEach(REQUIRE);
+    if (__CFG.plugins)
+        __CFG.plugins.forEach(REQUIRE);
 
-    var appClass = __CFG['#node'].appClass;
-    REQUIRE(appClass);
-
-    var settings = __CFG['#node'].settings || {};
-
-    vm.runInContext(appClass + '.MAIN(' + JSON.stringify(settings) +');', bootstrapContext);
+    return {
+        REQUIRE: REQUIRE,
+        RUN: function (code) {
+            if (typeof code == 'function') code = code.toString();
+            vm.runInContext(code, bootstrapContext);
+        }
+    }
 }
+
 
 exports._bootstrap = _bootstrap;
