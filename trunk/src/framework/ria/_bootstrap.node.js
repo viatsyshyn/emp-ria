@@ -15,6 +15,8 @@ var fs = require("fs");
 var vm = require("vm");
 var sys = require("util");
 
+_GLOBAL = this;
+
 function _bootstrap(__CFG) {
     "use strict";
 
@@ -24,7 +26,7 @@ function _bootstrap(__CFG) {
 
         for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
             if (path.substr(0, prefix.length) == prefix) {
-                path = libs[prefix] + path;
+                path = libs[prefix] + path.substring(prefix.length);
                 break;
             }
         }
@@ -41,13 +43,13 @@ function _bootstrap(__CFG) {
         return path.replace(/\/\//gi, '/');
     }
 
-    var root = resolve(__CFG.appRoot || '.');
+    var root = resolve(__CFG.appRoot || process.cwd()) + '/';
     var appDir = resolve(__CFG.appCodeDir || "~/app/");
     var assetsDir = resolve(__CFG.assetsDir || "~/assets/");
     var libs = __CFG.libs || {};
 
-    if (libs['ria/']) {
-        libs['ria/'] = path.resolve(path.dirname(module.filename), './');
+    if (!libs['ria/']) {
+        libs['ria/'] = path.dirname(module.filename) + '/';
     }
 
     for(var prefix in libs) if (libs.hasOwnProperty(prefix)) {
@@ -63,7 +65,12 @@ function _bootstrap(__CFG) {
                         } },
                         
         _DEBUG        : true,
+        _RELEASE      : false,
+        
         _BROWSER      : false,
+        _NODE         : true,
+        
+        _GLOBAL       : null,
         
         REQUIRE       : REQUIRE,
         NAMESPACE     : NS,

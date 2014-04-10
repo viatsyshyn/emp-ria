@@ -26,7 +26,8 @@ REQUIRE('ria.mvc.Controller');
 NAMESPACE('ria.mvc', function () {
     "use strict";
 
-    var History = window.History;
+    var window = _GLOBAL,
+        History = window.History;
 
     /** @class ria.mvc.UncaughtException */
     EXCEPTION(
@@ -151,7 +152,7 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ria.async.Future, function onInitialize_() {
-                window.addEventListener("hashchange", this.onHashChanged_, false);
+                _BROWSER && window.addEventListener("hashchange", this.onHashChanged_, false);
                 //window.addEventListener("beforeunload", this.onBeforeUnload_, false);
                 //window.addEventListener("pagehide", this.onStop_, false); !?!?!?
                 //window.addEventListener("unload", this.onDispose_, false);
@@ -159,11 +160,11 @@ NAMESPACE('ria.mvc', function () {
                 //window.addEventListener("activate", this.onResume_, false);
                 //window.addEventListener("unload", this.onDispose_, false);
 
-                window.onerror = function (error, src, lineNo) {
+                _BROWSER && (window.onerror = function (error, src, lineNo) {
                     _DEBUG && console.error('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src + ":" + lineNo);
 
                     this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
-                }.bind(this);
+                }.bind(this));
 
                 ria.async.Future.UNCAUGHT_ERROR(this.onError_);
 

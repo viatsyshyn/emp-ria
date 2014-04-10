@@ -237,7 +237,7 @@ NAMESPACE('ria.mvc', function () {
                     return item.valueOf().toString();
                 });
                 var href = '#' + params.join('/');
-                if(href != window.location.hash && history.pushState)
+                if(_BROWSER && href != _GLOBAL.location.hash && history.pushState)
                     history.pushState(null, null, href);
             },
 

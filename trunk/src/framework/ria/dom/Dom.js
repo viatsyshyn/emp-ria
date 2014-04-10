@@ -17,13 +17,19 @@ REQUIRE('ria.dom.Events');
 NAMESPACE('ria.dom', function () {
     "use strict";
 
+	var window = _GLOBAL,
+		global = _BROWSER ? _GLOBAL.document : null;
+
+    var Node = _BROWSER ? window.Node : Object;
+    var Event = _BROWSER ? window.Event : Object;
+
     function toCamelCase(str) {
         return str.replace(/(\-[a-z])/g, function($1){
             return $1.substring(1).toUpperCase();
         });
     }
 
-    var addWheelListener = function(window,document) {
+    var addWheelListener = _BROWSER ? function(window,document) {
 
         var prefix = "", _addEventListener, onwheel, support;
 
@@ -37,8 +43,8 @@ NAMESPACE('ria.dom', function () {
 
         // detect available wheel event
         support = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
-                  document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
-                  "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+                document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+            	"DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
 
         function addWheelListener ( elem, callback, useCapture ) {
             _addWheelListener( elem, support, callback, useCapture );
@@ -85,16 +91,17 @@ NAMESPACE('ria.dom', function () {
         }
 
         return addWheelListener;
-    }(window, document);
+    }(window, global) : null;
 
 
-    var global = ('undefined' !== typeof window ? window.document : null),
-        docElem = global.documentElement,
+    if (_BROWSER) {
+    var docElem = global.documentElement,
         __find = function (s, n) {
             return n.querySelectorAll(s);
         },
         __is = docElem ? (docElem.webkitMatchesSelector || docElem.mozMatchesSelector
             || docElem.oMatchesSelector || docElem.msMatchesSelector) : function () { return false };
+    }
 
     function checkEventHandlerResult(event, result) {
         if (result === false) {
