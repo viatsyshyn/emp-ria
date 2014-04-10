@@ -1821,7 +1821,7 @@
             var BaseTemplate = CLASS(
                 GENERIC('TKey', ClassOf(BaseModel)),
                 'BaseTemplate', [
-                    [TKey],
+                    [[TKey]],
                     function $(a_) { BASE() }
                 ]);
 

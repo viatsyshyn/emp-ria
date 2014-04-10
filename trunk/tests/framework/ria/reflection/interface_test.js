@@ -1,3 +1,5 @@
+REQUIRE('ria.reflection.ReflectionInterface');
+
 (function (ria) {
     "use strict";
 
@@ -12,180 +14,64 @@
     }
 
     TestCase("ReflectionInterfaceTestCase").prototype = {
+
+        setUp: function() {
+            this.BugWarriorIfc = INTERFACE(
+                'BugWarriorIfc', [
+                    READONLY, SELF, 'myProp',
+
+                    SELF, function method1() {},
+
+                    [[SELF, String]],
+                    VOID, function method2(a, b) {},
+
+                    String, function method3() {}
+                ]);
+
+            this.reflectionIfc = new ria.reflection.ReflectionInterface(this.BugWarriorIfc);
+        },
+
+        testSelfEquals: function(){
+            assertEquals(this.BugWarriorIfc, this.BugWarriorIfc);
+        },
+
         testGetName: function () {
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF]],
-                    VOID, function method2(a) {}
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            assertEquals(reflectionIfc.getName(), 'BugWarrior');
+            assertEquals(this.reflectionIfc.getName(), 'window.BugWarriorIfc');
         },
 
         testGetMethodNames: function(){
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF]],
-                    ria.__SYNTAX.Modifiers.VOID, function method2(a) {}
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            var methodNames = reflectionIfc.getMethodsNames();
-
+            var methodNames = this.reflectionIfc.getMethodsNames();
             assertArray(methodNames);
 
-            assertTrue(methodNames.indexOf('method1') > -1);
-            assertTrue(methodNames.indexOf('method2') > -1);
-            assertTrue(methodNames.indexOf('getMyProp') > -1);
-            assertEquals(methodNames.length, 3);
+            var expected = ['method1', 'method2', 'method3', 'getMyProp'].sort();
+            assertEquals(expected, methodNames.sort());
         },
 
-        testGetMethodReturnType: function(){
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF]],
-                    ria.__SYNTAX.Modifiers.VOID, function method2(a) {},
-
-                    String, function method3() {}
-
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            assertEquals(reflectionIfc.getMethodReturnType('method1'), ifc);
-            assertUndefined(reflectionIfc.getMethodReturnType('method2'));
-            assertEquals(reflectionIfc.getMethodReturnType('method3'), String);
-            assertEquals(reflectionIfc.getMethodReturnType('getMyProp'), ifc);
+        testGetMethodReturnType: function() {
+            assertEquals(this.reflectionIfc.getMethodReturnType('method1'), this.BugWarriorIfc);
+            assertUndefined(this.reflectionIfc.getMethodReturnType('method2'));
+            assertEquals(this.reflectionIfc.getMethodReturnType('method3'), String);
+            assertEquals(this.reflectionIfc.getMethodReturnType('getMyProp'), this.BugWarriorIfc);
         },
+        testGetMethodArguments: function() {
 
-        testGetMethodArguments: function(){
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF, String]],
-                    ria.__SYNTAX.Modifiers.VOID, function method2(a, b) {},
-
-                    String, function method3() {}
-
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            var methodArguments = reflectionIfc.getMethodArguments('method1');
-            assertArray(methodArguments);
-            assertEquals(methodArguments.length, 0);
-
-            methodArguments = reflectionIfc.getMethodArguments('method2');
-            assertArray(methodArguments);
-            assertEquals(methodArguments.length, 2);
-            assertTrue(methodArguments.indexOf('a') > -1);
-            assertTrue(methodArguments.indexOf('b') > -1);
-
-            methodArguments = reflectionIfc.getMethodArguments('getMyProp');
-            assertArray(methodArguments);
-            assertEquals(methodArguments.length, 0);
+            assertEquals([], this.reflectionIfc.getMethodArguments('method1'));
+            assertEquals(['a', 'b'], this.reflectionIfc.getMethodArguments('method2'));
+            assertEquals([], this.reflectionIfc.getMethodArguments('getMyProp'));
         },
 
         testGetMethodArgumentsTypes: function(){
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF, String]],
-                    ria.__SYNTAX.Modifiers.VOID, function method2(a, b) {},
-
-                    String, function method3() {}
-
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            var methodArgumentsTypes = reflectionIfc.getMethodArgumentsTypes('method1');
-            assertArray(methodArgumentsTypes);
-            assertEquals(methodArgumentsTypes.length, 0);
-
-            methodArgumentsTypes = reflectionIfc.getMethodArgumentsTypes('method2');
-            assertArray(methodArgumentsTypes);
-            assertEquals(methodArgumentsTypes.length, 2);
-            assertTrue(methodArgumentsTypes.indexOf(String) > -1);
-            assertTrue(methodArgumentsTypes.indexOf(ifc) > -1);
-
-            methodArgumentsTypes = reflectionIfc.getMethodArgumentsTypes('getMyProp');
-            assertArray(methodArgumentsTypes);
-            assertEquals(methodArgumentsTypes.length, 0);
+            assertEquals([], this.reflectionIfc.getMethodArgumentsTypes('method1'));
+            assertEquals('Expected BugWarriorIfc, String', [this.BugWarriorIfc, String], this.reflectionIfc.getMethodArgumentsTypes('method2'));
+            assertEquals([], this.reflectionIfc.getMethodArgumentsTypes('getMyProp'));
         },
 
         testHasMethod: function(){
-            var baseIfcDef = InterfaceDef([
-                'BugWarrior', [
-                    ria.__SYNTAX.Modifiers.READONLY, ria.__SYNTAX.Modifiers.SELF, 'myProp',
-
-                    ria.__SYNTAX.Modifiers.SELF, function method1() {},
-
-                    [[ria.__SYNTAX.Modifiers.SELF, String]],
-                    ria.__SYNTAX.Modifiers.VOID, function method2(a, b) {},
-
-                    String, function method3() {}
-
-            ]]);
-
-            var ifc = MakeInterface('BugWarrior', baseIfcDef);
-            var reflectionIfc;
-
-            assertNoException(function () {
-                reflectionIfc = new ria.reflection.ReflectionInterface(ifc);
-            });
-
-            assertTrue(reflectionIfc.hasMethod('method1'));
-            assertTrue(reflectionIfc.hasMethod('method2'));
-            assertTrue(reflectionIfc.hasMethod('method3'));
-            assertTrue(reflectionIfc.hasMethod('getMyProp'));
-            assertFalse(reflectionIfc.hasMethod('method4'))
+            assertTrue(this.reflectionIfc.hasMethod('method1'));
+            assertTrue(this.reflectionIfc.hasMethod('method2'));
+            assertTrue(this.reflectionIfc.hasMethod('method3'));
+            assertTrue(this.reflectionIfc.hasMethod('getMyProp'));
+            assertFalse(this.reflectionIfc.hasMethod('method4'))
         }
     };
 
