@@ -8,8 +8,13 @@
 
 var ria = {};
 
-var _DEBUG = true;
-var _RELEASE = false;
+var _DEBUG = false;
+var _RELEASE = true;
+
+var _BROWSER = true;
+var _NODE = false;
+
+var _GLOBAL = window;
 
 /** @class ria.__CFG */
 ria.__CFG = {

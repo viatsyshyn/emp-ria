@@ -466,7 +466,27 @@ REQUIRE('ria.reflection.ReflectionClass');
             var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             assertTrue(reflectionCls.isAbstract(), true);
-        }/*,
+        },
+        testProtectedClassesWithSameFullName: function () {
+            var PrivateClassRefA_ = CLASS(
+                'PrivateClass_', []);
+
+            var PrivateClassRefB_ = CLASS(
+                'PrivateClass_', []);
+
+            var reflectionClsA = ria.reflection.ReflectionClass(PrivateClassRefA_),
+                reflectionClsB = ria.reflection.ReflectionClass(PrivateClassRefB_);
+
+            assertTrue(PrivateClassRefA_ != PrivateClassRefB_);
+            assertTrue(reflectionClsA != reflectionClsB);
+
+            assertTrue(PrivateClassRefA_ == reflectionClsA.getClazz());
+            assertTrue(PrivateClassRefB_ != reflectionClsA.getClazz());
+
+            assertTrue(PrivateClassRefB_ == reflectionClsB.getClazz());
+            assertTrue(PrivateClassRefA_ != reflectionClsB.getClazz());
+        }
+        /*,
         testIsFinal: function(){
             var BugWarrior = CLASS(
                 FINAL, 'BugWarrior', []);
