@@ -15,8 +15,6 @@ var fs = require("fs");
 var vm = require("vm");
 var sys = require("util");
 
-_GLOBAL = this;
-
 function _bootstrap(__CFG) {
     "use strict";
 
@@ -77,6 +75,8 @@ function _bootstrap(__CFG) {
         NS            : NS,
         ASSET         : function () { return null; }
     });
+
+    vm.runInContext('_GLOBAL = this;', bootstrapContext);
 
     var loaded = {};
 
