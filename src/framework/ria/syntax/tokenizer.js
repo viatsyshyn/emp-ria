@@ -1,7 +1,7 @@
 /** @namespace ria.__SYNTAX */
 (ria = ria || {}).__SYNTAX = ria.__SYNTAX || {};
 
-(function () {
+(function (global) {
     "use strict";
 
     /**
@@ -217,11 +217,11 @@
     }
 
     GeneralizeDescriptor.prototype.define = function () {
-        this.types.forEach(function (type) { window[type.name] = type; });
+        this.types.forEach(function (type) { global[type.name] = type; });
     };
 
     GeneralizeDescriptor.prototype.undefine = function () {
-        this.types.forEach(function (type) { delete window[type.name]; });
+        this.types.forEach(function (type) { delete global[type.name]; });
     };
 
     ria.__SYNTAX.GENERIC = function GENERIC() {
@@ -343,4 +343,4 @@
     Tokenizer.GenericToken = GenericToken;
 
     ria.__SYNTAX.Tokenizer = Tokenizer;
-})();
+})(_BROWSER ? window : this);
