@@ -65,7 +65,9 @@ ModuleConfiguration.prototype = {
     /** @returns String[] */
     getGlobals: function () { return this.globals; },
     /** @returns Object */
-    getOption: function (name) { return this.options[name] || null; }
+    getOption: function (name) { return this.options[name] || null; },
+    /** @return String */
+    getEnv: function () { return this.env; }
 };
 
 /**
@@ -122,5 +124,5 @@ Configuration.prototype = {
     setModuleConfig: function (config) { this.moduleConfig = config; },
     /** @returns Object */
     getOption: function (name) { return this.moduleConfig.getOption(name) || this.options[name] || null; },
-    getEnv: function () { return this.moduleConfig().getEnv() || this.env; }
+    getEnv: function () { return this.moduleConfig.getEnv() || this.env; }
 };
