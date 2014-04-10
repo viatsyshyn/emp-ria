@@ -165,6 +165,8 @@ NAMESPACE('ria.mvc', function () {
                     this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
                 }.bind(this);
 
+                ria.async.Future.UNCAUGHT_ERROR(this.onError_);
+
                 return ria.async.DeferredAction();
             },
 
