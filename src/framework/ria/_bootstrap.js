@@ -9,6 +9,7 @@
 var ria = {};
 var _DEBUG = true;
 var _RELEASE = false;
+var _BROWSER = true;
 
 (function () {
     "use strict";
