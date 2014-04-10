@@ -14,6 +14,10 @@ NS('ria.reflection', function () {
     CLASS(
         FINAL, 'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
 
+            function DROP_CACHE() {
+                cache = {};
+            },
+
             // $$ - instance factory
             function $$(instance, Clazz, ctor, args) {
                 args = ria.__API.clone(args);

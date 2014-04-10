@@ -36,6 +36,7 @@
             var instance;
             assertNoException(function () { instance = new Clazz(); });
 
+            assertTrue(_DEBUG);
             assertUndefined(instance.$);
             assertUndefined(instance.__PROTECTED.$);
         },
@@ -55,6 +56,7 @@
 
             var instance = new Clazz();
 
+            assertTrue(_DEBUG);
             assertNotUndefined(instance.__PROTECTED.testProp);
             assertUndefined(instance.testProp);
         },
@@ -87,6 +89,7 @@
 
             var instance = new Clazz();
 
+            assertTrue(_DEBUG);
             assertInstanceOf(Clazz, instance.__PROTECTED);
             assertUndefined(instance.testProp);
 

@@ -1,3 +1,5 @@
+REQUIRE('ria.reflection.ReflectionCtor');
+
 (function (ria) {
     "use strict";
 
@@ -13,55 +15,54 @@
     }
 
     TestCase("ReflectionCtorTestCase").prototype = {
-        testCtor: function () {
-            var MyAnnotation = ria.__API.annotation('MyAnnotation', [], []);
-            var MyAnnotation2 = ria.__API.annotation('MyAnnotation2', [], []);
 
-            var baseClassDef = ClassDef([
+        setUp: function () {
+            ria.reflection.ReflectionCtor.DROP_CACHE();
+
+            var WarriorAnnotation = this.WarriorAnnotation = ANNOTATION(
+                [[Number, Boolean]],
+                function WarriorAnnotation(param, optional_) {});
+
+            var MyAnnotation = this.MyAnnotation = ANNOTATION(
+                [[Number, Boolean]],
+                function MyAnnotation(param, optional_) {});
+
+            this.BugWarrior = CLASS(
+                [WarriorAnnotation(42)],
                 'BugWarrior', [
-                    [MyAnnotation], [[Number, String, Number]],
+                    [MyAnnotation],
+                    [[Number, String, Number]],
                     function $(a, b, c_) {
                         BASE();
                         this.a = a;
                         this.b = b;
                     }
-            ]]);
+                ]);
 
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCtor;
+            this.reflectionCtor = new ria.reflection.ReflectionCtor(this.BugWarrior);
+        },
 
-            assertNoException(function () {
-                reflectionCtor = new ria.reflection.ReflectionCtor(cls);
-            });
+        testSelfEquals: function(){
+            assertEquals(this.BugWarrior, this.BugWarrior);
+        },
 
-            var annotation1 = reflectionCtor.getAnnotations();
+        testCtor: function () {
 
-            assertEquals('BugWarrior#ctor', reflectionCtor.getName());
+            assertEquals('window.BugWarrior#ctor', this.reflectionCtor.getName());
 
+            var annotation1 = this.reflectionCtor.getAnnotations();
             assertArray(annotation1);
-            assertEquals(annotation1.length, 1);
-            assertEquals(annotation1[0].__META.name, 'MyAnnotation');
+            assertEquals(1, annotation1.length);
+            assertEquals('window.MyAnnotation', annotation1[0].__META.name);
 
-            assertTrue(reflectionCtor.isAnnotatedWith(MyAnnotation));
-            assertFalse(reflectionCtor.isAnnotatedWith(MyAnnotation2));
+            assertTrue(this.reflectionCtor.isAnnotatedWith(this.MyAnnotation));
+            assertFalse(this.reflectionCtor.isAnnotatedWith(this.WarriorAnnotation));
 
-            var args = reflectionCtor.getArguments();
-            var types = reflectionCtor.getArgumentsTypes();
-            var recArgs = reflectionCtor.getRequiredArguments();
+            assertEquals(['a', 'b', 'c_'], this.reflectionCtor.getArguments());
 
-            assertEquals(3, args.length);
-            assertEquals(args[0], 'a');
-            assertEquals(args[1], 'b');
-            assertEquals(args[2], 'c_');
+            assertEquals([Number, String, Number], this.reflectionCtor.getArgumentsTypes());
 
-            assertEquals(3, types.length);
-            assertEquals(types[0], Number);
-            assertEquals(types[1], String);
-            assertEquals(types[2], Number);
-
-            assertEquals(2, recArgs.length);
-            assertEquals(recArgs[0], 'a');
-            assertEquals(recArgs[1], 'b');
+            assertEquals(['a', 'b'], this.reflectionCtor.getRequiredArguments());
         }
     };
 

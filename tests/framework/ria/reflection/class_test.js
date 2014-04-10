@@ -1,34 +1,29 @@
+REQUIRE('ria.reflection.ReflectionClass');
+
 (function (ria) {
     "use strict";
 
-    function ClassDef(def) {
-        return ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(def)));
-    }
-
-    function MakeClass(name, def) {
-        "use strict";
-        ria.__SYNTAX.precalcClassOptionalsAndBaseRefs(def, ria.__API.Class);
-        ria.__SYNTAX.validateClassDecl(def, 'Class');
-        return ria.__SYNTAX.compileClass(name, def);
-    }
-
-    function InterfaceDef(def) {
-        return ria.__SYNTAX.parseClassDef(new ria.__SYNTAX.Tokenizer([].slice.call(def)));
-    }
-
-    function MakeInterface(name, def) {
-        "use strict";
-        ria.__SYNTAX.validateInterfaceDecl(def);
-        return ria.__SYNTAX.compileInterface(name, def);
-    }
-
     TestCase("ReflectionClassTestCase").prototype = {
+
+        setUp: function () {
+            ria.reflection.ReflectionProperty.DROP_CACHE();
+            ria.reflection.ReflectionMethod.DROP_CACHE();
+            ria.reflection.ReflectionCtor.DROP_CACHE();
+            ria.reflection.ReflectionClass.DROP_CACHE();
+        },
+
         tearDown: function () {
             if (ria.__SYNTAX) {
                 ria.__SYNTAX.Registry.cleanUp();
                 ria.__SYNTAX.registerSymbolsMeta();
                 window.SELF = ria.__SYNTAX.Modifiers.SELF;
             }
+        },
+
+        testSelfEquals: function(){
+            var BugWarrior = CLASS('BugWarrior', []);
+
+            assertEquals(BugWarrior, BugWarrior);
         },
 
         testGetName: function () {
@@ -50,6 +45,7 @@
 
             var reflectionCls = new ria.reflection.ReflectionClass(BugWarriorTaras);
 
+            assertEquals(BugWarrior, BugWarriorTaras.__META.base);
             assertEquals(BugWarrior, reflectionCls.getBaseClass());
         },
         testGetBaseClassReflector: function(){
@@ -63,26 +59,22 @@
 
             var baseViaReflector = reflectionCls.getBaseClassReflector().getClazz();
             assertEquals(BugWarrior, baseViaReflector);
-            var base = reflectionCls.getBaseClass();
-            assertEquals(BugWarriorTaras, baseViaReflector);
 
+            var base = reflectionCls.getBaseClass();
             assertEquals(base, baseViaReflector);
         },
         testGetInterfaces: function(){
             var TestInterface =
                 INTERFACE('TestInterface', [
-                    READONLY, Number, 'Propertya',
-                    VOID, function method1() {}
+                    READONLY, Number, 'answer',
+                    VOID, function askQuestion() {}
                 ]);
 
             var Implementor = CLASS(
                 'Implementor', IMPLEMENTS(TestInterface), [
-                    READONLY, Number, 'Propertya',
-                    Number, function getPropertya() { return 5; },
-                    [[String]],
-                    VOID, function method1() {}
+                    READONLY, Number, 'answer',
+                    VOID, function askQuestion() {}
                 ]);
-
 
             var reflectionCls = new ria.reflection.ReflectionClass(Implementor);
 
@@ -95,16 +87,14 @@
         testGetInterfacesReflector: function(){
             var TestInterface =
                 INTERFACE('TestInterface', [
-                    READONLY, Number, 'Propertya',
-                    VOID, function method1() {}
+                    READONLY, Number, 'answer',
+                    VOID, function askQuestion() {}
                 ]);
 
             var Implementor = CLASS(
                 'Implementor', IMPLEMENTS(TestInterface), [
-                    READONLY, Number, 'Propertya',
-                    Number, function getPropertya() { return 5; },
-                    [[String]],
-                    VOID, function method1() {}
+                    READONLY, Number, 'answer',
+                    VOID, function askQuestion() {}
                 ]);
 
             var reflectionCls = new ria.reflection.ReflectionClass(Implementor);
@@ -123,10 +113,7 @@
 
             var BugWarrior = CLASS(
                 [WarriorAnnotation(42)],
-                'BugWarrior', [
-                    Number, function methodThatReturnsNumber(){ return 4; /*choosed by fair dice roll*/ },
-                    String, function methodThatReturnsString() { return 'example'; }
-                ]);
+                'BugWarrior', []);
 
             var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
@@ -139,234 +126,126 @@
         },
         testIsAnnotatedWith: function() {
 
-            var WarriorAnnotation = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
-            var WarriorAnnotation2 = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
+            var WarriorAnnotation = ANNOTATION(
+                [[Number, Boolean]],
+                function WarriorAnnotation(param, optional_) {});
 
-            var baseClassDef = ClassDef([
+            var WarriorAnnotation2 = ANNOTATION(
+                [[Number, Boolean]],
+                function WarriorAnnotation2(param, optional_) {});
+
+            var BugWarrior = CLASS(
                 [WarriorAnnotation(42)],
-                'BugWarrior', [
+                'BugWarrior', []);
 
-                    [[Number]],
-                    Number, function methodThatReturnsNumber(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function methodThatReturnsString() {
-                        return 'example';
-                    }
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
-            var annotations = reflectionCls.getAnnotations();
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             assertTrue(reflectionCls.isAnnotatedWith(WarriorAnnotation));
             assertFalse(reflectionCls.isAnnotatedWith(WarriorAnnotation2));
         },
         testHasMethod: function(){
-            var baseClassDef = ClassDef([
-                'Cls', [
+            var BugWarrior = CLASS(
+                'BugWarrior', [
+                    VOID, function test(){}
+                ]);
 
-                    ria.__SYNTAX.Modifiers.VOID, function test(){}
-                ]]);
-
-            var cls = MakeClass('Cls', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             assertTrue(reflectionCls.hasMethod('test'));
         },
         testHasProperty: function(){
-            var baseClassDef = ClassDef([
-                'Cls', [
 
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Property',
-                    function getProperty(){
-                        return 42;
-                    }
-                ]]);
+            var BugWarrior = CLASS(
+                'BugWarrior', [
+                    READONLY, Number, 'bugCounter'
+                ]);
 
-            var cls = MakeClass('Cls', baseClassDef);
-            var reflectionCls;
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
-            assertTrue(reflectionCls.hasProperty('Property'));
+            assertTrue(reflectionCls.hasProperty('bugCounter'));
         },
         testImplementsIfc: function(){
 
-            var ifcDef =  InterfaceDef([
-                'TestInterface', [
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Propertya',
-                    ria.__SYNTAX.Modifiers.VOID, function method1() {}
-                ]
-            ]);
+            var Interface1 = INTERFACE(
+                'Interface1', [
+                    READONLY, Number, 'answer',
+                    VOID, function askQuestion() {}
+                ]);
 
-            var ifcDef2 = InterfaceDef([
-                'TestInterface2', [
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Propertya'
-                ]
-            ]);
+            var Interface2 = INTERFACE(
+                'Interface2', [
+                    READONLY, String, 'question'
+                ]);
 
-            var Interface = MakeInterface('TestInterface', ifcDef);
-            var Interface2 = MakeInterface('TestInterface2', ifcDef2);
+            var BugWarrior = CLASS(
+                'BugWarrior', IMPLEMENTS(Interface1), [
+                    READONLY,  Number, 'answer',
+                    VOID, function askQuestion() {}
+                ]);
 
-            var clsDef = ClassDef([
-                'Implementor', ria.__SYNTAX.IMPLEMENTS(Interface), [
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
-                    ria.__SYNTAX.Modifiers.READONLY,  Number, 'Propertya',
-                    [[Number]], function getPropertya(){
-                        return 5;
-                    },
-                    [[String]], function method1() {
-                        return 'test';
-                    }
-                ]]);
-
-            var impl;
-            assertNoException(function () {
-                impl = MakeClass('Implementor', clsDef);
-            });
-
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(impl);
-            });
-
-            assertTrue(reflectionCls.implementsIfc(Interface));
+            assertTrue(reflectionCls.implementsIfc(Interface1));
             assertFalse(reflectionCls.implementsIfc(Interface2));
         },
         testExtendsClass: function(){
-            var baseClassDef = ClassDef([
-                'BugWarrior', [
+            var BugWarrior = CLASS(
+                'BugWarrior', []);
 
-                ]]);
+            var BugWritter = CLASS(
+                'BugWritter', []);
 
-            var BaseClass;
-            assertNoException(function () {
-                BaseClass = MakeClass('BugWarrior', baseClassDef);
-            });
+            var BugWarriorT = CLASS(
+                'BugWarriorT', EXTENDS(BugWarrior), []);
 
-            var notBaseClassDef = ClassDef([
-                'No', [
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarriorT);
 
-                ]]);
-
-            var NotBaseClass;
-            assertNoException(function () {
-                NotBaseClass = MakeClass('No', notBaseClassDef);
-            });
-
-            var secondClassDef = ClassDef([
-                'BugWarriorT', ria.__SYNTAX.EXTENDS(BaseClass), [
-
-                ]]);
-
-            var SecondClass;
-            assertNoException(function () {
-                SecondClass = MakeClass('BugWarriorT', secondClassDef);
-            });
-
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(SecondClass);
-            });
-
-
-            assertTrue(reflectionCls.extendsClass(BaseClass));
-            assertFalse(reflectionCls.extendsClass(NotBaseClass));
+            assertTrue(reflectionCls.extendsClass(BugWarrior));
+            assertFalse(reflectionCls.extendsClass(BugWritter));
         },
         testGetParents: function(){
-            var aDef = ClassDef([
-                'A', [
+            var A = CLASS(
+                'A', []);
 
-                ]]);
+            var B = CLASS(
+                'B', EXTENDS(A), []);
 
-            var A;
-            assertNoException(function () {
-                A = MakeClass('A', aDef);
-            });
+            var C = CLASS(
+                'C', EXTENDS(B), []);
 
-            var bDef = ClassDef([
-                'B', ria.__SYNTAX.EXTENDS(A), [
-
-                ]]);
-
-            var B;
-            assertNoException(function () {
-                B = MakeClass('B', bDef);
-            });
-
-
-            var cDef = ClassDef([
-                'C', ria.__SYNTAX.EXTENDS(B), [
-
-                ]]);
-
-            var C;
-            assertNoException(function () {
-                C = MakeClass('C', cDef);
-            });
-
-
-
-            var cRefl;
-            assertNoException(function () {
-                cRefl = new ria.reflection.ReflectionClass(C);
-            });
+            var cRefl = new ria.reflection.ReflectionClass(C);
 
             var cParents = cRefl.getParents();
             assertNotUndefined(cParents);
             assertEquals(3, cParents.length);
             assertEquals(B, cParents[0]);
             assertEquals(A, cParents[1]);
-            assertEquals(ria.__API.Class, cParents[2]);
+            assertEquals(Class, cParents[2]);
         },
         testFindAnnotation: function(){
-            var WarriorAnnotation = ria.__API.annotation('Annotation', [Number, Boolean], ['param', 'optional_']);
 
-            var WarriorAnnotation2 = ria.__API.annotation('Annotation2', [Number, Boolean], ['param2', 'optional_']);
+            var WarriorAnnotation = ANNOTATION(
+                [[Number, Boolean]],
+                function WarriorAnnotation(param, optional_) {});
 
-            var baseClassDef = ClassDef([
+            var WarriorAnnotation2 = ANNOTATION(
+                [[Number, Boolean]],
+                function WarriorAnnotation2(param, optional_) {});
+
+            var BugWarrior = CLASS(
                 [WarriorAnnotation(42)],
                 'BugWarrior', [
+                    Number, function getAnswer(){},
+                    String, function getQuestion() {}
+                ]);
 
-                    [[Number]],
-                    Number, function methodThatReturnsNumber(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function methodThatReturnsString() {
-                        return 'example';
-                    }
-                ]]);
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
-            var annotation;
-            assertNoException(function () {
-                annotation = reflectionCls.findAnnotation(WarriorAnnotation);
-            });
+            var annotation = reflectionCls.findAnnotation(WarriorAnnotation);
 
             assertNotUndefined(annotation);
             assertEquals(1, annotation.length);
+            assertNotUndefined(annotation[0]);
             assertEquals(42, annotation[0].param);
             assertUndefined(annotation[0].optional_);
 
@@ -374,220 +253,114 @@
             assertEquals(0, annotation2.length);
         },
         testGetMethodsNames: function(){
-            var baseClassDef = ClassDef([
+            var BugWarrior = CLASS(
                 'BugWarrior', [
+                    Number, function getAnswer(){},
+                    String, function getQuestion() {}
+                ]);
 
-                    [[Number]],
-                    Number, function method1(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function method2() {
-                        return 'example';
-                    }
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             var methodNames = reflectionCls.getMethodsNames();
-            assertNotUndefined(methodNames);
-            assertEquals(5, methodNames.length);
-            assertEquals('method1', methodNames[3]);
-            assertEquals('method2', methodNames[4]);
+            assertArray(methodNames);
+            assertTrue('Has method getAnswer', methodNames.indexOf('getAnswer') >= 0);
+            assertTrue('Has method getQuestion', methodNames.indexOf('getQuestion') >= 0);
 
         },
         testGetMethodsReflector: function(){
-            var baseClassDef = ClassDef([
+            var BugWarrior = CLASS(
                 'BugWarrior', [
+                    Number, function getAnswer(){},
+                    String, function getQuestion() {}
+                ]);
 
-                    [[Number]],
-                    Number, function method1(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function method12() {
-                        return 'example';
-                    }
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             var methodReflectors = reflectionCls.getMethodsReflector();
 
-            assertNotUndefined(methodReflectors);
-            assertEquals(5, methodReflectors.length);
-            assertInstanceOf(ria.reflection.ReflectionMethod, methodReflectors[3]);
-            assertInstanceOf(ria.reflection.ReflectionMethod, methodReflectors[4]);
-            assertSame(Number, methodReflectors[3].getReturnType());
-            assertSame(String, methodReflectors[4].getReturnType());
+            assertArray(methodReflectors);
+
+            methodReflectors.forEach(function (ref) {
+                assertInstanceOf(ria.reflection.ReflectionMethod, ref);
+            });
         },
         testGetMethodReflector: function(){
-            var baseClassDef = ClassDef([
+            var BugWarrior = CLASS(
                 'BugWarrior', [
+                    Number, function getAnswer(){},
+                    String, function getQuestion() {}
+                ]);
 
-                    [[Number]],
-                    Number, function method1(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function method12() {
-                        return 'example';
-                    }
-                ]]);
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
-            var methodReflector = reflectionCls.getMethodReflector('method1');
+            var methodReflector = reflectionCls.getMethodReflector('getAnswer');
             assertNotUndefined(methodReflector);
             assertInstanceOf(ria.reflection.ReflectionMethod, methodReflector);
-            var retType = methodReflector.getReturnType();
-            assertSame(Number, retType);
+            assertSame(Number, methodReflector.getReturnType());
+            assertSame('getAnswer', methodReflector.getShortName());
 
         },
         testGetPropertyReflector: function(){
-            var baseClassDef = ClassDef([
-                'Cls', [
+            var GlobalMind = CLASS(
+                'GlobalMind', [
+                    Number, 'answer',
+                    VOID, function askQuestion() {}
+                ]);
 
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Property',
-                    function getProperty(){
-                        return 42;
-                    }
-                ]]);
+            var reflectionCls = new ria.reflection.ReflectionClass(GlobalMind);
 
-            var cls = MakeClass('Cls', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
-            var propertyReflector = reflectionCls.getPropertyReflector('Property');
+            var propertyReflector = reflectionCls.getPropertyReflector('answer');
             assertNotUndefined(propertyReflector);
             assertInstanceOf(ria.reflection.ReflectionProperty, propertyReflector);
-            assertTrue(propertyReflector.isReadonly());
-            assertSame(Number, propertyReflector.getType());
-
         },
         testGetPropertiesNames: function(){
-            var baseClassDef = ClassDef([
-                'Cls', [
+            var GlobalMind = CLASS(
+                'GlobalMind', [
+                    Number, 'answer',
+                    String, 'question'
+                ]);
 
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Property1',
-                    function getProperty1(){
-                        return 42;
-                    },
-                    Number, 'Property2',
-                    function getProperty2(){
-                        return 43;
-                    }
-                ]]);
-
-            var cls = MakeClass('Cls', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(GlobalMind);
 
             var props = reflectionCls.getPropertiesNames();
-            assertNotUndefined(props);
-            assertEquals(2, props.length);
-            assertEquals('Property1', props[0]);
-            assertEquals('Property2', props[1]);
+            assertArray(props);
+            assertTrue('Has property answer', props.indexOf('answer') >= 0);
+            assertTrue('Has property question', props.indexOf('question') >= 0);
         },
         testGetPropertiesReflector: function(){
-            var baseClassDef = ClassDef([
-                'Cls', [
+            var GlobalMind = CLASS(
+                'GlobalMind', [
+                    Number, 'answer',
+                    String, 'question'
+                ]);
 
-                    ria.__SYNTAX.Modifiers.READONLY, Number, 'Property1',
-                    function getProperty1(){
-                        return 42;
-                    },
-                    Number, 'Property2',
-                    function getProperty2(){
-                        return 43;
-                    }
-                ]]);
-
-            var cls = MakeClass('Cls', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(GlobalMind);
 
             var props = reflectionCls.getPropertiesReflector();
-            assertNotUndefined(props);
-            assertEquals(2, props.length);
-            assertInstanceOf(ria.reflection.ReflectionProperty, props[0]);
-            assertInstanceOf(ria.reflection.ReflectionProperty, props[1]);
-            assertSame(Number, props[0].getType());
-            assertSame(Number, props[1].getType());
-            assertTrue(props[0].isReadonly());
-            assertFalse(props[1].isReadonly());
+
+            assertArray(props);
+
+            props.forEach(function (ref) {
+                assertInstanceOf(ria.reflection.ReflectionProperty, ref);
+            });
         },
         testGetChildren: function(){
-            var aDef = ClassDef([
-                'A', [
+            var A = CLASS(
+                'A', []);
 
-                ]]);
+            var B = CLASS(
+                'B', EXTENDS(A), []);
 
-            var A;
-            assertNoException(function () {
-                A = MakeClass('A', aDef);
-            });
+            var C = CLASS(
+                'C', EXTENDS(B), []);
 
-            var bDef = ClassDef([
-                'B', ria.__SYNTAX.EXTENDS(A), [
-
-                ]]);
-
-            var B;
-            assertNoException(function () {
-                B = MakeClass('B', bDef);
-            });
-
-
-            var cDef = ClassDef([
-                'C', ria.__SYNTAX.EXTENDS(B), [
-
-                ]]);
-
-            var C;
-            assertNoException(function () {
-                C = MakeClass('C', cDef);
-            });
-
-
-
-            var cRefl;
-            assertNoException(function () {
-                cRefl = new ria.reflection.ReflectionClass(C);
-            });
+            var cRefl = new ria.reflection.ReflectionClass(C);
 
             var cChildren = cRefl.getChildren();
             assertNotUndefined(cChildren);
             assertEquals(0, cChildren.length);
 
-            var aRefl;
-            assertNoException(function () {
-                aRefl = new ria.reflection.ReflectionClass(A);
-            });
+            var aRefl = new ria.reflection.ReflectionClass(A);
 
             var aChildren = aRefl.getChildren();
             assertNotUndefined(aChildren);
@@ -595,31 +368,13 @@
             assertEquals(B, aChildren[0]);
         },
         testGetChildrenReflector: function(){
-            var aDef = ClassDef([
-                'A', [
+            var A = CLASS(
+                'A', []);
 
-                ]]);
+            var B = CLASS(
+                'B', EXTENDS(A), []);
 
-            var A;
-            assertNoException(function () {
-                A = MakeClass('A', aDef);
-            });
-
-            var bDef = ClassDef([
-                'B', ria.__SYNTAX.EXTENDS(A), [
-
-                ]]);
-
-            var B;
-            assertNoException(function () {
-                B = MakeClass('B', bDef);
-            });
-
-
-            var aRefl;
-            assertNoException(function () {
-                aRefl = new ria.reflection.ReflectionClass(A);
-            });
+            var aRefl = new ria.reflection.ReflectionClass(A);
 
             var aChildrenReflectors = aRefl.getChildrenReflector();
             assertNotUndefined(aChildrenReflectors);
@@ -628,19 +383,10 @@
             assertEquals(B, aChildrenReflectors[0].getClazz());
         },
         testGetCtorReflector: function(){
-            var baseClassDef = ClassDef([
+            var BugWarrior = CLASS(
+                'BugWarrior', []);
 
-                'BugWarrior', [
-
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             var ctorReflector = reflectionCls.getCtorReflector();
             assertNotUndefined(ctorReflector);
@@ -648,32 +394,15 @@
 
         },
         testInstantiate: function(){
-            var baseClassDef = ClassDef([
+            var BugWarrior = CLASS(
+                'BugWarrior', []);
 
-                'BugWarrior', [
-
-                    [[Number]],
-                    Number, function methodThatReturnsNumber(){
-                        return 4; //choosed by fair dice roll}
-                    },
-                    [[String]],
-                    String, function methodThatReturnsString() {
-                        return 'example';
-                    }
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
-
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             assertNotUndefined(reflectionCls);
             var inst = reflectionCls.instantiate();
 
-            assertInstanceOf(cls, inst);
+            assertInstanceOf(BugWarrior, inst);
         },
         testInstantiateGenericChild: function(){
             var BaseClass = CLASS(
@@ -706,88 +435,45 @@
             assertInstanceOf(ChildClass, inst);
         },
         testParentsReflector: function(){
-            var aDef = ClassDef([
-                'A', [
+            var A = CLASS(
+                'A', []);
 
-                ]]);
+            var B = CLASS(
+                'B', EXTENDS(A), []);
 
-            var A;
-            assertNoException(function () {
-                A = MakeClass('A', aDef);
-            });
+            var C = CLASS(
+                'C', EXTENDS(B), []);
 
-            var bDef = ClassDef([
-                'B', ria.__SYNTAX.EXTENDS(A), [
-
-                ]]);
-
-            var B;
-            assertNoException(function () {
-                B = MakeClass('B', bDef);
-            });
-
-
-            var cDef = ClassDef([
-                'C', ria.__SYNTAX.EXTENDS(B), [
-
-                ]]);
-
-            var C;
-            assertNoException(function () {
-                C = MakeClass('C', cDef);
-            });
-
-
-
-            var cRefl;
-            assertNoException(function () {
-                cRefl = new ria.reflection.ReflectionClass(C);
-            });
+            var cRefl = new ria.reflection.ReflectionClass(C);
 
             var cParentsReflectors = cRefl.getParentsReflector();
 
-            assertNotUndefined(cParentsReflectors);
+            assertArray(cParentsReflectors);
 
-            assertInstanceOf(ria.reflection.ReflectionClass, cParentsReflectors[0]);
-            assertInstanceOf(ria.reflection.ReflectionClass, cParentsReflectors[1]);
-            assertInstanceOf(ria.reflection.ReflectionClass, cParentsReflectors[2]);
+            cParentsReflectors.forEach(function (ref) {
+                assertInstanceOf(ria.reflection.ReflectionClass, ref);
+            });
+
             assertEquals(3, cParentsReflectors.length);
             assertEquals(B, cParentsReflectors[0].getClazz());
             assertEquals(A, cParentsReflectors[1].getClazz());
-            assertEquals(ria.__API.Class, cParentsReflectors[2].getClazz());
-        }
-        /*testIsAbstract: function(){
+            assertEquals(Class, cParentsReflectors[2].getClazz());
+        },
+        testIsAbstract: function(){
+            var BugWarrior = CLASS(
+                ABSTRACT, 'BugWarrior', []);
 
-            var baseClassDef = ClassDef([
-                ABSTRACT, 'BugWarrior', [
-
-                ]]);
-
-            var cls = MakeClass('BugWarrior', baseClassDef);
-            var reflectionCls;
-
-            assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-            });
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
             assertTrue(reflectionCls.isAbstract(), true);
-        }*/
+        }/*,
+        testIsFinal: function(){
+            var BugWarrior = CLASS(
+                FINAL, 'BugWarrior', []);
 
-        /*testIsAbstract: function(){
+            var reflectionCls = new ria.reflection.ReflectionClass(BugWarrior);
 
-             var baseClassDef = ClassDef([
-                 FINAL, 'BugWarrior', [
-
-             ]]);
-
-             var cls = MakeClass('BugWarrior', baseClassDef);
-             var reflectionCls;
-
-             assertNoException(function () {
-                reflectionCls = new ria.reflection.ReflectionClass(cls);
-             });
-
-             assertTrue(reflectionCls.isFinal(), true);
+            assertTrue(reflectionCls.isFinal(), true);
         }*/
     };
 

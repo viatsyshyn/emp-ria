@@ -157,7 +157,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                             var argsNames = ctorDef.argsNames,
                                 argsTypes = ctorDef.argsTypes,
                                 body = ctorDef.body.raw,
-                                name = ctorDef.name;
+                                name = ctorDef.name,
+                                annotations = ctorDef.annotations;
                             body.name = '';
                             return [
                                 make_node(UglifyJS.AST_SimpleStatement, node, {
@@ -183,7 +184,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                             }),
                                             make_node(UglifyJS.AST_Array, node, {
                                                 elements: argsNames.map(function (_) { return make_node(UglifyJS.AST_String, node, {value: _}) })
-                                            })
+                                            }),
+                                            make_node(UglifyJS.AST_Array, node, { elements: annotations.map(processAnnotation) })
                                         ]
                                     })
                                 }),
