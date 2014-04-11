@@ -723,7 +723,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     function BaseIsUndefined() { throw Error('BASE is supported only on method with OVERRIDE'); }
 
-    if (ria.__CFG.enablePipelineMethodCall) {
+    if (_DEBUG) {
         ria.__API.addPipelineMethodCallStage('CallInit',
             function (body, meta, scope, callSession, genericTypes, genericSpecs) {
                 callSession.__OLD_SELF = global.SELF;

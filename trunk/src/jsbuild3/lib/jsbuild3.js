@@ -177,7 +177,7 @@ function loadModule(path, config, memoization) {
 }
 
 function prepareRiaConfig() {
-    (ria = ria || this.ria || {}).__CFG = ria.__CFG || [].slice.call(document.getElementsByTagName('script'))
+    (ria = ria || _GLOBAL.ria || {}).__CFG = ria.__CFG || [].slice.call(document.getElementsByTagName('script'))
         .map(function (_) {
             return _.innerText || _.innerHTML;
         })
@@ -202,18 +202,20 @@ function appStart() {
  */
 function compile(path, config, appClass) {
 
-    switch(config.getEnv()) {
+    var gcc = config.getPluginConfiguration("gcc");
+    if (gcc.cmd) {
+        throw Error('Google Closure Compiler optimizations is not supported since 0.1.6');
+    }
+
+    var env = config.getEnv();
+    switch(env) {
         case "browser":
+        case "node":
             break;
 
         default:
             throw Error('Unsupported environment: ' + config.getEnv());
     }
-
-    //console.log(config.getAssetsDir());
-
-    //ria.__SYNTAX.Registry.cleanUp();
-    //ria.__SYNTAX.registerSymbolsMeta();
 
     var code = this.loadModule(resolve(path, config), config, {});
 
@@ -223,16 +225,10 @@ function compile(path, config, appClass) {
         .map(function (_) {
             return loadModule(resolve('ria/base/' + _ + '.js', config), config, {});
         });
-    /*runtime = runtime.concat(['annotations', 'assert', 'class', 'delegate', 'enum', 'exception', 'identifier', 'interface'
-        , 'ns', 'parser2', 'registry', 'type-hints', 'tokenizer', 'zzz.init']
-        .map(function (_) {
-            return loadModule(resolve('ria/syntax/' + _ + '.js', config), config, {});
-        }));*/
 
     code.prependRuntime(runtime);
 
     /**
-     *
      * @type {AST_Toplevel}
      */
     var topLevel = code.getGluedAst();
@@ -244,14 +240,12 @@ function compile(path, config, appClass) {
     var currentBody = [].slice.call(topLevel.body);
     var globals = config.getGlobals();
 
-    //console.info(UglifyJS.parse(prepareRiaConfig.toString()).body[0].body);
-
     topLevel = make_node(UglifyJS.AST_Toplevel, topLevel, {
         body: [
             make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                 body: make_node(UglifyJS.AST_Call, topLevel, {
                     expression: make_node(UglifyJS.AST_Function, topLevel, {
-                        argnames: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolFunarg, topLevel, {name: _}); }),
+                        argnames: ['_GLOBAL'].concat(globals).map(function (_) { return make_node(UglifyJS.AST_SymbolFunarg, topLevel, {name: _}); }),
                         body: [].concat([
                                 make_node(UglifyJS.AST_Var, topLevel, {
                                     definitions: globalNsRoots
@@ -268,11 +262,23 @@ function compile(path, config, appClass) {
                                         make_node(UglifyJS.AST_VarDef, null, {
                                             name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_DEBUG'}),
                                             value: make_node(UglifyJS.AST_False)
+                                        }),
+                                        make_node(UglifyJS.AST_VarDef, null, {
+                                            name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_RELEASE'}),
+                                            value: make_node(UglifyJS.AST_True)
+                                        }),
+                                        make_node(UglifyJS.AST_VarDef, null, {
+                                            name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_NODE'}),
+                                            value: make_node(env == "node" ? UglifyJS.AST_True : UglifyJS.AST_False)
+                                        }),
+                                        make_node(UglifyJS.AST_VarDef, null, {
+                                            name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_BROWSER'}),
+                                            value: make_node(env == "browser" ? UglifyJS.AST_True : UglifyJS.AST_False)
                                         })
                                     ]
                                 })
                             ], [
-                                make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                env == "browser" ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                                     body: make_node(UglifyJS.AST_Call, topLevel, {
                                         expression: make_node(UglifyJS.AST_Function, topLevel, {
                                             argnames: [],
@@ -280,9 +286,9 @@ function compile(path, config, appClass) {
                                         }),
                                         args: []
                                     })
-                                })
+                                }) : null
                             ], globalFunctions, currentBody, [
-                                appClass ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                env == "browser" && appClass ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                                     body: make_node(UglifyJS.AST_Call, topLevel, {
                                         expression: make_node(UglifyJS.AST_Function, topLevel, {
                                             argnames: [],
@@ -293,59 +299,73 @@ function compile(path, config, appClass) {
                                 }) : null
                             ]).filter(function (_) { return _ })
                     }),
-                    args: globals.map(function (_) { return make_node(UglifyJS.AST_SymbolVar, topLevel, {name: _}); })
+                    args: ['window'].concat(globals).map(function (_) { return make_node(UglifyJS.AST_SymbolVar, topLevel, {name: _}); })
                 })
             })
         ]
     });
 
-    var uglifyjsParams = config.getPluginConfiguration('uglifyjs');
-
-    topLevel.figure_out_scope();
-    //topLevel.scope_warnings();
-
-    if (uglifyjsParams.mangle) {
-        topLevel.compute_char_frequency();
-        topLevel.mangle_names(uglifyjsParams.mangle_options);
-    }
-
-    if (uglifyjsParams.squeeze) {
-        topLevel = topLevel.transform(UglifyJS.Compressor(uglifyjsParams.squeeze_options));
-    }
-
     astPostProcessors.forEach(function (processor) { topLevel = topLevel.transform(new UglifyJS.TreeTransformer(processor)); });
 
-    var output = UglifyJS.OutputStream(uglifyjsParams.output || {beautify: uglifyjsParams.beautify});
+    var compiledStream = UglifyJS.OutputStream({});
+    topLevel.print(compiledStream);
 
-    topLevel.print(output);
+    var compiled = compiledStream.get();
 
-    var fileContents = [];
-    config.getPrepend().forEach(function (prepend) {
-        var path = resolve(prepend, config);
-        console.info('Prepending: ' + path);
-        fileContents.push(';\n');
-        //fileContents.push('/** @path ' + prepend + ' */');
-        fileContents.push(fs.readFileSync(path));
+    //prepends
+    topLevel = null;
+    config.getPrepend().forEach(function(file){
+        var code = fs.readFileSync(resolve(file, config), "utf8");
+        topLevel = UglifyJS.parse(code, {
+            filename: file,
+            toplevel: topLevel
+        });
     });
 
-    var content = output.get();
+    //merge prepend with main body
+    topLevel = UglifyJS.parse(compiled, {
+        filename: "?",
+        toplevel: topLevel
+    });
 
-    var gcc = config.getPluginConfiguration("gcc");
-    if (gcc.cmd) {
-        throw Error('Google Closure Compiler optimizations is not supported since 0.1.6');
+    var options = config.getPluginConfiguration('uglifyjs');
+
+    // 2. compress
+    if (options.compress) {
+        var compress = { warnings: options.warnings };
+        UglifyJS.merge(compress, options.compress);
+        topLevel.figure_out_scope();
+        var sq = UglifyJS.Compressor(compress);
+        topLevel = topLevel.transform(sq);
     }
 
-    fileContents.push(content);
+    // 3. mangle
+    if (options.mangle) {
+        topLevel.figure_out_scope();
+        topLevel.compute_char_frequency();
+        topLevel.mangle_names(options.mangle);
+    }
 
-    return fileContents;
+    // 4. output
+    var inMap = options.inSourceMap;
+    var output = {};
+    if (typeof options.inSourceMap == "string") {
+        inMap = fs.readFileSync(options.inSourceMap, "utf8");
+    }
+    if (options.outSourceMap) {
+        output.source_map = UglifyJS.SourceMap({
+            file: options.outSourceMap,
+            orig: inMap,
+            root: options.sourceRoot
+        });
+    }
+    if (options.output) {
+        UglifyJS.merge(output, options.output);
+    }
+
+    var stream = UglifyJS.OutputStream(output);
+    topLevel.print(stream);
+
+    return stream.get();
 }
-
-/*filterFunctionCallStatement: function (ast, fnName, handler) {
-    ast[1] = ast[1].filter(function(ast) {
-        if (ast[0] == 'stat' && ast[1][0] == 'call' && ast[1][1][0] == 'name' && ast[1][1][1] == fnName)
-            return !handler(ast);
-        return true;
-    });
-    return ast;
-}*/
 

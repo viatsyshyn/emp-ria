@@ -61,7 +61,7 @@
         return function (e) {
             return global.printStackTrace({
                 e: e,
-                guess: ria.__CFG.prettyStackTraces
+                guess: !_RELEASE
             });
         }
     }

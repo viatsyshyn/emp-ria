@@ -68,7 +68,7 @@ NS('ria.reflection', function () {
                     instance = instance.__PROTECTED || instance;
                 }
 
-                if (ria.__CFG.enablePipelineMethodCall && impl.__META) {
+                if (!_RELEASE && impl.__META) {
                     var genericTypes = this.clazz.__META.genericTypes;
                     var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
                         if (this.clazz.__META.baseSpecs.length > index)

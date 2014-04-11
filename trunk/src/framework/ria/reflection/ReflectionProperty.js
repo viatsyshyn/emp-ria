@@ -53,7 +53,7 @@ NS('ria.reflection', function () {
                 var getter = this.property.getter;
                 _DEBUG && (instance = instance.__PROTECTED || instance);
 
-                if (ria.__CFG.enablePipelineMethodCall && getter.__META) {
+                if (!_RELEASE && getter.__META) {
                     var genericTypes = this.clazz.__META.genericTypes;
                     var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
                         if (this.clazz.__META.baseSpecs.length > index)
@@ -74,7 +74,7 @@ NS('ria.reflection', function () {
                     instance = instance.__PROTECTED || instance;
                 }
 
-                if (ria.__CFG.enablePipelineMethodCall && setter.__META) {
+                if (!_RELEASE && setter.__META) {
                     var genericTypes = this.clazz.__META.genericTypes;
                     var genericSpecs = this.clazz.__META.genericTypes.map(function (type, index) {
                         if (this.clazz.__META.baseSpecs.length > index)

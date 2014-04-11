@@ -2,7 +2,7 @@
   "name": "emp.ria-jsbuild3",
   "title": "EMP RIA Jsbuild3",
   "description": "EMP RIA build system",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
   "repository": "http://emp-ria.googlecode.com/svn/trunk/",
   "main": "./index.js",

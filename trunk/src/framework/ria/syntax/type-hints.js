@@ -245,7 +245,7 @@
             throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type, genericTypes || [], genericSpecs || []) + ' but got ' + ria.__API.getIdentifierOfValue(value));
     };
 
-    if (ria.__CFG.enablePipelineMethodCall && ria.__CFG.checkedMode) {
+    if (_DEBUG) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
             function (body, meta, scope, args, callSession, genericTypes, specs) {
                 try {

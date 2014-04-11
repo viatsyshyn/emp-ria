@@ -48,7 +48,7 @@ NAMESPACE('ria.async', function () {
                 var fromPool = __futuresPool.pop();
                 if (fromPool) {
                     var ctor = FutureImpl_.prototype.$;
-                    if (ria.__CFG.enablePipelineMethodCall && ctor.__META) {
+                    if (!_RELEASE && ctor.__META) {
                         ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, fromPool, [], []);
                     }
 
