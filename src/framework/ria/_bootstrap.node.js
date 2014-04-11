@@ -56,11 +56,7 @@ function _bootstrap(__CFG) {
 
     var bootstrapContext = vm.createContext({
         console       : console,
-        ria           : { __CFG: __CFG.__CFG || {
-                            checkedMode: true,
-                            enablePipelineMethodCall: true,
-                            prettyStackTraces: true
-                        } },
+        ria           : {},
                         
         _DEBUG        : true,
         _RELEASE      : false,

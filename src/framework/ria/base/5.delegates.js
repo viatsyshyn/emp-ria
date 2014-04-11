@@ -39,7 +39,7 @@
             fn = args[genericTypesCount];
 
             if (typeof fn === 'function')
-                return ria.__CFG.enablePipelineMethodCall
+                return !_RELEASE
                     ? ria.__API.getPipelineMethodCallProxyFor(fn, DelegateProxy.__META, null, genericTypes_, specs)
                     : fn;
 

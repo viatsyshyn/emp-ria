@@ -27,8 +27,7 @@ module.exports = function (configPath, modules) {
         var fileContents = JsBuild3.compile(module.getInFile() || module.getAppClass(), CFG, module.getAppClass());
         var outPath = Path.resolve(CFG.getBasePath() + module.getOutFile());
 
-        var jsbuildParams = CFG.getPluginConfiguration("jsbuild");
-        fs.writeFileSync(outPath, fileContents.join(jsbuildParams.separator || ';'), "utf-8");
+        fs.writeFileSync(outPath, fileContents, "utf-8");
     });
 
     console.info("done");

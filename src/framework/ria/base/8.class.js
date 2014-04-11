@@ -204,44 +204,19 @@
             publicInstance.__PROTECTED = instance;
         }
 
-        var epmc = ria.__CFG.enablePipelineMethodCall;
-        /*for(var name_ in instance) {
-            var f_ = instance[name_];
-
-            // TODO: skip all ctors
-            if (typeof f_ === 'function' && name_[0] != '$' && name_ !== 'constructor') {
-                instance[name_] = f_.bind(instance);
-                if (epmc && f_.__META) {
-                    var fn = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, instance, genericTypes, genericSpecs);
-                    if (_DEBUG) {
-                        Object.defineProperty(instance, name_, { writable : false, configurable: false, value: fn });
-                        if (f_.__META.isProtected())
-                            fn = ProtectedMethodProxy;
-                    }
-                    publicInstance[name_] = fn;
-                    _DEBUG && Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, value: fn });
-                }
-            }
-
-            if (_DEBUG && name_[0] == '$') {
-                instance[name_] = publicInstance[name_] = undefined;
-            }
-        }*/
-
         var __pre = __META.__precalc;
         for(var i = 0 ; i < __pre.length;) {
             var name_ = __pre[i],
                 f_ = __pre[i+1],
                 meta_ = f_.__META;
 
-            if (epmc) {
+            if (!_RELEASE) {
                 var fn = ria.__API.getPipelineMethodCallProxyFor(f_, meta_, instance, genericTypes, genericSpecs);
                 if (_DEBUG) {
                     Object.defineProperty(instance, name_, { writable : false, configurable: false, enumerable: false, value: fn });
                     if (meta_.isProtected())
                         fn = ProtectedMethodProxy;
-                }
-                if (_DEBUG) {
+
                     Object.defineProperty(publicInstance, name_, { writable : false, configurable: false, enumerable: false, value: fn });
                 } else {
                     publicInstance[name_] = fn;
@@ -263,7 +238,7 @@
             }
         }
 
-        if (epmc && ctor.__META) {
+        if (!_RELEASE && ctor.__META) {
             ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
         }
 
@@ -299,7 +274,7 @@
 
             // TODO: skip all ctors
             if (typeof f_ === 'function' && ria.__API.isDelegate(f_)) {
-                if (ria.__CFG.enablePipelineMethodCall && f_.__META) {
+                if (!_RELEASE && f_.__META) {
                     clazz[name_] = ria.__API.getPipelineMethodCallProxyFor(f_, f_.__META, staticScopeInstance);
                 } else {
                     clazz[name_] = f_.bind(staticScopeInstance);

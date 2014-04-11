@@ -1,9 +1,6 @@
 (function (ria) {
     "use strict";
 
-    var _P = ria.__CFG.enablePipelineMethodCall;
-    var _C = ria.__CFG.checkedMode;
-
     TestCase("ClassTestCase").prototype = {
 
         /*setUp: function () {
@@ -769,18 +766,18 @@
 
             var instance = new BaseClass();
 
-            _C && assertUndefined(instance.value);
+            _DEBUG && assertUndefined(instance.value);
             instance.method(5);
-            _C && assertUndefined(instance.value);
+            _DEBUG && assertUndefined(instance.value);
 
-            _C && assertEquals(5, instance.__PROTECTED.value);
-            _C || assertEquals(5, instance.value);
+            _DEBUG && assertEquals(5, instance.__PROTECTED.value);
+            _DEBUG || assertEquals(5, instance.value);
 
             assertEquals(5, instance.getValue());
 
-            _C && assertUndefined(instance.value);
+            _DEBUG && assertUndefined(instance.value);
             assertNoException(function (){ instance.setValue(6); });
-            _C && assertUndefined(instance.value);
+            _DEBUG && assertUndefined(instance.value);
 
             assertEquals(6, instance.getValue());
         },
@@ -1317,11 +1314,11 @@
                 Application.RUN(instance);
             });
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 Application.RUN(1);
             }, Error('Bad argument for RUN'));
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 Application.RUN(instance, 3);
             }, Error('Bad argument for RUN'));
 
@@ -1443,7 +1440,7 @@
 
             assertEquals(ria.__API.OF, MyConverter.OF);
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 instance.convert(5);
             }, Error('Bad argument for convert'));
         },
@@ -1535,7 +1532,7 @@
                 i2.convert("test");
             });
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 i2.convert(5);
             }, Error('Bad argument for convert'));
         },
@@ -1601,15 +1598,15 @@
                 ins.add('b', false);
             });
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 ins.add(1, true);
             }, Error('Bad argument for add'));
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 ins.add('b', 'false');
             }, Error('Bad argument for add'))
 
-            _P && assertException(function () {
+            !_RELEASE && assertException(function () {
                 ins.find(2);
             }, Error('Bad argument for find'))
         },
@@ -1724,11 +1721,11 @@
 
             var instance = GenericClass(BaseClass, MyIfcImpl);
 
-            _P && _C && assertException(function () {
+            !_RELEASE && _DEBUG && assertException(function () {
                 GenericClass(Class, MyIfcImpl);
             }, Error('Error instantiating class window.GenericClass'));
 
-            _P && _C && assertException(function () {
+            !_RELEASE && _DEBUG && assertException(function () {
                 GenericClass(BaseClass, Class);
             }, Error('Error instantiating class window.GenericClass'));
         },

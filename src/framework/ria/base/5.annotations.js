@@ -61,7 +61,7 @@
 
         AnnotationProxy.__META = new AnnotationDescriptor(name, argsTypes_, argsNames_);
         var fn_ = AnnotationProxy;
-        fn_ = ria.__CFG.enablePipelineMethodCall
+        fn_ = !_RELEASE
             ? ria.__API.getPipelineMethodCallProxyFor(fn_, fn_.__META, null)
             : fn_;
 

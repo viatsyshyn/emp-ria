@@ -152,19 +152,19 @@ NAMESPACE('ria.mvc', function () {
             },
 
             ria.async.Future, function onInitialize_() {
-                _BROWSER && window.addEventListener("hashchange", this.onHashChanged_, false);
-                //window.addEventListener("beforeunload", this.onBeforeUnload_, false);
-                //window.addEventListener("pagehide", this.onStop_, false); !?!?!?
-                //window.addEventListener("unload", this.onDispose_, false);
+                if (_BROWSER) window.addEventListener("hashchange", this.onHashChanged_, false);
+                //if (_BROWSER) window.addEventListener("beforeunload", this.onBeforeUnload_, false);
+                //if (_BROWSER) window.addEventListener("pagehide", this.onStop_, false); !?!?!?
+                //if (_BROWSER) window.addEventListener("unload", this.onDispose_, false);
 
-                //window.addEventListener("activate", this.onResume_, false);
-                //window.addEventListener("unload", this.onDispose_, false);
+                //if (_BROWSER) window.addEventListener("activate", this.onResume_, false);
+                //if (_BROWSER) window.addEventListener("unload", this.onDispose_, false);
 
-                _BROWSER && (window.onerror = function (error, src, lineNo) {
+                if (_BROWSER) window.onerror = function (error, src, lineNo) {
                     _DEBUG && console.error('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src + ":" + lineNo);
 
                     this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
-                }.bind(this));
+                }.bind(this);
 
                 ria.async.Future.UNCAUGHT_ERROR(this.onError_);
 

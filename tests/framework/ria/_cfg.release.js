@@ -17,10 +17,6 @@ var _NODE = false;
 var _GLOBAL = window;
 
 /** @class ria.__CFG */
-ria.__CFG = {
-    prettyStackTraces: true,
-    checkedMode: false,
-    enablePipelineMethodCall: false
-};
+ria.__CFG = {};
 
 Object.defineProperty(ria, '__CFG', {writable: false});

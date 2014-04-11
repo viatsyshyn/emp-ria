@@ -4,12 +4,6 @@ var bootstrap = require('../../../src/framework/ria/_bootstrap.node.js')._bootst
     riaRoot = path.resolve(path.dirname(module.filename), '../../../');
 
 bootstrap({
-    "prettyStackTraces": true,
-    "checkedMode": true,
-    "enablePipelineMethodCall": true,
-    "AssertWithExceptions": false,
-    //"stackTraceJs": "lib/stacktrace.js",
-
     "#require": {
         "plugins": [],
         "appRoot": root + '/',

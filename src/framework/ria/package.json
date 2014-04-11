@@ -2,7 +2,7 @@
     "name": "emp.ria-framework",
     "title": "EMP RIA Framework",
     "description": "EMP rich internet application framework",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "main": "_bootstrap.node.js",
     "homepage": "https://code.google.com/p/emp-ria/",
     "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
