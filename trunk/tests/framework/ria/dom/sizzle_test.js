@@ -2,16 +2,17 @@
  * Created by C01t on 4/14/14.
  */
 
+REQUIRE('ria.dom.Dom');
 REQUIRE('ria.dom.SizzleDom');
+REQUIRE('ria.dom.jQueryDom');
 
 (function (ria, stubs) {
     "use strict";
 
-    AsyncTestCase("SizzleTestCase").prototype = {
+    var PROTO = {
         setUp: function () {
-            ria.dom.Dom.SET_IMPL(ria.dom.SizzleDom);
+            ria.dom.Dom.SET_IMPL(this.IMPL);
         },
-
 
         testInstantiate: function() {
             jstestdriver.appendHtml('<div id="testInstantiate"></div>', window.document);
@@ -19,7 +20,7 @@ REQUIRE('ria.dom.SizzleDom');
             var dom = ria.dom.Dom('#testInstantiate');
 
             assertInstanceOf(ria.dom.Dom, dom);
-            assertInstanceOf(ria.dom.SizzleDom, dom);
+            assertInstanceOf(this.IMPL, dom);
 
             assertEquals(1, dom.valueOf().length);
         },
@@ -30,7 +31,7 @@ REQUIRE('ria.dom.SizzleDom');
                 '<div class="to-find other class"></div>' +
                 '<div class="not-to-find"></div>' +
                 '<div class="hidden"></div>' +
-            '</div>', window.document);
+                '</div>', window.document);
 
             var dom = ria.dom.Dom('#testFind');
 
@@ -71,7 +72,7 @@ REQUIRE('ria.dom.SizzleDom');
                 '<div class="to-click expected-click" id="trigger-2"></div>' +
                 '<div class="not-to-click" id="trigger-3"></div>' +
                 '<div class="other expected-click" id="trigger-4"></div>' +
-            '</div>', window.document);
+                '</div>', window.document);
 
             var dom = ria.dom.Dom('#testOnSelector');
 
@@ -114,7 +115,7 @@ REQUIRE('ria.dom.SizzleDom');
                 '<div class="to-click expected-click" id="trigger-2"></div>' +
                 '<div class="not-to-click" id="trigger-3"></div>' +
                 '<div class="other expected-click" id="trigger-4"></div>' +
-            '</div>', window.document);
+                '</div>', window.document);
 
 
             var dom = ria.dom.Dom('#testOff');
@@ -174,7 +175,7 @@ REQUIRE('ria.dom.SizzleDom');
             var dom = ria.dom.Dom('#source');
 
             queue.call('Move dom', function (callbacks) {
-                assertEquals(0, ria.dom.Dom('#target').find('> *').valueOf().length);
+                assertEquals(0, ria.dom.Dom('#target').descendants().count());
 
                 dom.appendTo('#target');
 
@@ -182,7 +183,7 @@ REQUIRE('ria.dom.SizzleDom');
             });
 
             queue.call('Test move', function (callbacks) {
-                assertEquals(1, ria.dom.Dom('#target').find('> *').valueOf().length);
+                assertEquals(1, ria.dom.Dom('#target').descendants().count());
 
                 setTimeout(callbacks.noop(), 50);
             });
@@ -200,7 +201,7 @@ REQUIRE('ria.dom.SizzleDom');
             });
 
             queue.call('Move 2', function (callbacks) {
-                assertEquals(1, ria.dom.Dom('#target').find('> *').valueOf().length);
+                assertEquals(1, ria.dom.Dom('#target').descendants().count());
 
                 ria.dom.Dom('#source2').appendTo('#target');
 
@@ -208,7 +209,63 @@ REQUIRE('ria.dom.SizzleDom');
             });
 
             queue.call('Test move 2', function (callbacks) {
-                var children = ria.dom.Dom('#target').find('> *');
+                var children = ria.dom.Dom('#target').descendants();
+
+                assertEquals(2, children.count());
+
+                var index = 0;
+                children.forEach(function ($node) {
+                    assertTrue('Has class "pos' + index + '"', $node.hasClass('pos' + index));
+                    index++;
+                });
+
+                setTimeout(callbacks.noop(), 50);
+            });
+        },
+
+        testPrependTo: function (queue) {
+            jstestdriver.appendHtml('<div id="source" class="pos1"></div>' +
+                '<div id="source2" class="pos0"></div>' +
+                '<div id="target"></div>', window.document);
+
+            var dom = ria.dom.Dom('#source');
+
+            queue.call('Move dom', function (callbacks) {
+                assertEquals(0, ria.dom.Dom('#target').descendants().count());
+
+                dom.prependTo('#target');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Test move', function (callbacks) {
+                assertEquals(1, ria.dom.Dom('#target').descendants().count());
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Attach to non-existent target', function (callbacks) {
+                _RELEASE && dom.prependTo('#non-existent');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Attach non existent to target', function (callbacks) {
+                ria.dom.Dom('#non-existent').prependTo('#target');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Move 2', function (callbacks) {
+                assertEquals(1, ria.dom.Dom('#target').descendants().count());
+
+                ria.dom.Dom('#source2').prependTo('#target');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Test move 2', function (callbacks) {
+                var children = ria.dom.Dom('#target').descendants();
 
                 assertEquals(2, children.valueOf().length);
 
@@ -220,6 +277,138 @@ REQUIRE('ria.dom.SizzleDom');
 
                 setTimeout(callbacks.noop(), 50);
             });
+        },
+
+        testInsertBefore: function (queue) {
+            jstestdriver.appendHtml('<div id="source" class="pos1"></div>' +
+                '<div id="source2" class="pos2"></div>' +
+                '<div id="target">' +
+                '<div class="pos0"></div>' +
+                '<div id="before-this" class="pos3"></div>' +
+                '</div>', window.document);
+
+            var dom = ria.dom.Dom('#source');
+
+            queue.call('Move dom', function (callbacks) {
+                assertEquals(2, ria.dom.Dom('#target').descendants().count());
+
+                dom.insertBefore('#before-this');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Test move', function (callbacks) {
+                assertEquals(3, ria.dom.Dom('#target').descendants().count());
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Attach to non-existent target', function (callbacks) {
+                _RELEASE && dom.prependTo('#non-existent');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Attach non existent to target', function (callbacks) {
+                ria.dom.Dom('#non-existent').prependTo('#target');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Move 2', function (callbacks) {
+                assertEquals(3, ria.dom.Dom('#target').descendants().count());
+
+                ria.dom.Dom('#source2').insertBefore('#before-this');
+
+                setTimeout(callbacks.noop(), 50);
+            });
+
+            queue.call('Test move 2', function (callbacks) {
+                var children = ria.dom.Dom('#target').descendants();
+
+                assertEquals(4, children.valueOf().length);
+
+                var index = 0;
+                children.forEach(function ($node) {
+                    assertTrue('Has class "pos' + index + '"', $node.hasClass('pos' + index));
+                    index++;
+                });
+
+                setTimeout(callbacks.noop(), 50);
+            });
+        },
+
+        testDescendants: function () {
+            jstestdriver.appendHtml('<div id="target">' +
+                '<div class="pos0"></div>' +
+                '<div id="before-this" class="pos1">' +
+                '<div class="pos3"></div>' +
+                '</div>' +
+                '</div>', window.document);
+
+            var dom = ria.dom.Dom('#target');
+
+            var result = dom.descendants();
+            var index = 0;
+            result.forEach(function ($node) {
+                assertTrue('Has class "pos' + index + '"', $node.hasClass('pos' + index));
+                index++;
+            });
+
+            var result2 = dom.descendants('.pos1');
+            assertEquals(1, result2.count());
+
+            var result3 = dom.descendants('.pos3');
+            assertEquals(0, result3.count());
+        },
+
+        testParent: function () {
+            jstestdriver.appendHtml(
+                '<div id="target" class="p0">' +
+                    '<div class="pos0"></div>' +
+                    '<div id="before-this" class="pos1 p1">' +
+                        '<div class="pos3 p2">' +
+                            '<div id="child"></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>', window.document);
+
+            var dom = ria.dom.Dom('#child');
+
+            var result = dom.parent();
+            assertTrue('Has class "p2"', result.hasClass('p2'));
+
+            var result2 = dom.parent('.p2');
+            assertEquals(1, result2.count());
+
+            var result3 = dom.parent('.p1');
+            assertEquals(1, result3.count());
+
+            var result4 = dom.parent('.p0');
+            assertEquals(1, result4.count());
+
+            var result5 = dom.parent('.p123');
+            assertEquals(0, result5.count());
         }
     };
+
+    function MAKE(obj) {
+        for(var k in PROTO) if (PROTO.hasOwnProperty(k)) {
+            obj[k] = PROTO[k];
+        }
+
+        return obj;
+    }
+
+    AsyncTestCase("SimpleTestCase").prototype = MAKE({
+        IMPL: ria.dom.SimpleDom
+    });
+
+    AsyncTestCase("SizzleTestCase").prototype = MAKE({
+        IMPL: ria.dom.SizzleDom
+    });
+
+    AsyncTestCase("JQueryTestCase").prototype = MAKE({
+        IMPL: ria.dom.jQueryDom
+    });
 })(ria);

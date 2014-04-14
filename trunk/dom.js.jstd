@@ -4,9 +4,11 @@ load:
   - src/framework/ria/syntax/*.js
   - tests/framework/ria/require_stub.js
   - src/framework/lib/sizzle.js
+  - src/framework/lib/jquery-1.11.0.min.js
   - src/framework/ria/dom/Events.js
   - src/framework/ria/dom/Dom.js
   - src/framework/ria/dom/SizzleDom.js
+  - src/framework/ria/dom/jQueryDom.js
 
 test:
   - tests/framework/ria/dom/*_test.js

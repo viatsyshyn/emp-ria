@@ -33,28 +33,26 @@ NAMESPACE('ria.dom', function () {
                 if (!(instance instanceof clazz))
                     instance = ria.__API.getInstanceOf(clazz);
 
-                var __pre = __META.__precalc;
-                for(var i = 0 ; i < __pre.length;) {
-                    var name_ = __pre[i],
-                        f_ = __pre[i+1],
-                        meta_ = f_.__META;
+                if (!_RELEASE) {
+                    var __pre = __META.__precalc;
+                    for(var i = 0 ; i < __pre.length;) {
+                        var name_ = __pre[i],
+                            f_ = __pre[i+1],
+                            meta_ = f_.__META;
 
-                    if (!_RELEASE) {
                         var fn = ria.__API.getPipelineMethodCallProxyFor(f_, meta_, instance, genericTypes, genericSpecs);
                         if (_DEBUG) {
                             Object.defineProperty(instance, name_, { writable : false, configurable: false, enumerable: false, value: fn });
                         } else {
                             instance[name_] = fn;
                         }
-                    } else {
-                        instance[name_] = f_.bind(instance);
+
+                        i+=2;
                     }
 
-                    i+=2;
-                }
-
-                if (!_RELEASE && ctor.__META) {
-                    ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
+                    if (ctor.__META) {
+                        ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
+                    }
                 }
 
                 if (_DEBUG) for(var name in clazz.__META.properties) {
