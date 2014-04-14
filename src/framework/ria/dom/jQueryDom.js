@@ -28,7 +28,8 @@ NAMESPACE('ria.dom', function () {
     /** @class ria.dom.jQueryDom */
     CLASS(
         'jQueryDom', EXTENDS(ria.dom.Dom), [
-		
+
+            /* UNSAFE CLASS INITIALIZER */
 			OVERRIDE, function $$(instance, clazz, ctor, args) {
                 var genericTypes = [],
                     genericSpecs = [];
