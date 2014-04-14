@@ -10,16 +10,9 @@
 
     "options": {
         "uglifyjs": {
-            "mangle": false,
-            "mangle_options_": {},
-            "squeeze": false,
-            "squeeze_options_": {
-                "make_seqs": true,
-                "dead_code": true,
-                "no_warnings": false,
-                "extra": false
-            },
-            "beautify": true
+            "output": {
+                "beautify": true
+            }
         }
     },
 

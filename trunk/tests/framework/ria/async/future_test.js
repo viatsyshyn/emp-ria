@@ -1,3 +1,5 @@
+REQUIRE('ria.async.Completer');
+
 (function (ria) {
     "use strict";
 

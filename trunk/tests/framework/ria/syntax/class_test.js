@@ -1,6 +1,17 @@
 (function (ria) {
     "use strict";
 
+    function isDescendantOf(clazz, constructor){
+        var o = clazz;
+        while (o.__META != null) {
+            if (o === constructor)
+                break;
+
+            o = o.__META.base;
+        }
+        return o === constructor;
+    }
+
     TestCase("ClassTestCase").prototype = {
 
         /*setUp: function () {
@@ -100,9 +111,9 @@
                     }
                 ]);
 
-            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, ria.__API.Class));
-            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, BaseClass));
-            assertTrue(ria.__SYNTAX.isDescendantOf(ChildClass, ChildClass));
+            assertTrue(isDescendantOf(ChildClass, ria.__API.Class));
+            assertTrue(isDescendantOf(ChildClass, BaseClass));
+            assertTrue(isDescendantOf(ChildClass, ChildClass));
         },
 
         testFinalClassExtending: function () {
@@ -726,23 +737,23 @@
 
                     function $() {
                         BASE();
-                        assertEquals(BaseClass, SELF);
+                        _DEBUG && assertEquals(BaseClass, _GLOBAL.SELF);
                     },
 
                     VOID, function method() {
-                        assertEquals(BaseClass, SELF);
+                        _DEBUG && assertEquals(BaseClass, _GLOBAL.SELF);
                     }
                 ]);
 
-            assertNotEquals(BaseClass, SELF);
+            _DEBUG && assertNotEquals(BaseClass, _GLOBAL.SELF);
 
             var instance = new BaseClass();
 
-            assertNotEquals(BaseClass, SELF);
+            _DEBUG && assertNotEquals(BaseClass, _GLOBAL.SELF);
 
             instance.method();
 
-            assertNotEquals(BaseClass, SELF);
+            _DEBUG && assertNotEquals(BaseClass, _GLOBAL.SELF);
         },
 
         testPropertyInheritance: function () {
