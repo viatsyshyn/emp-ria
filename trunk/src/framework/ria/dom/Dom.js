@@ -170,7 +170,8 @@ NAMESPACE('ria.dom', function () {
     };
 
     var GID_ = new Date().getTime(),
-        DomImpl_ = null;
+        DomImpl_ = null,
+        HandlerId = Math.floor(Math.random() * 1000) + 10000;
 
     /** @class ria.dom.Dom */
     CLASS(
@@ -229,16 +230,17 @@ NAMESPACE('ria.dom', function () {
                     selector = undefined;
                 }
 
-                var hid = handler_.__domEventHandlerId = handler_.__domEventHandlerId || (Math.random().toString(36).slice(2));
+                var hid = handler_.__domEventHandlerId = handler_.__domEventHandlerId || (++HandlerId).toString(36);
 
                 this._dom.forEach(function(element){
                     events.forEach(function(evt){
 
                         element.__domEvents = element.__domEvents || {};
-                        if (element.__domEvents[evt + hid])
+                        var eventId = evt + ':' + hid + '@' + (selector || '');
+                        if (element.__domEvents[eventId])
                             return ;
 
-                        var h = element.__domEvents[evt + hid] = function (e) {
+                        var h = element.__domEvents[eventId] = function (e) {
                             var target = new ria.dom.Dom(e.target);
                             if(selector === undefined)
                                 return checkEventHandlerResult(e, handler_(target, e));
@@ -288,11 +290,12 @@ NAMESPACE('ria.dom', function () {
                             return ;
                         }
 
+                        var eventId = evt + ':' + hid + '@' + (selector || '');
                         var h;
-                        if (h = element.__domEvents[evt + hid])
+                        if (h = element.__domEvents[eventId])
                             element.removeEventListener(evt, h, 'change select focus blur'.search(evt) >= 0);
 
-                        delete element.__domEvents[evt + hid];
+                        delete element.__domEvents[eventId];
                     })
                 });
                 return this;
@@ -787,7 +790,7 @@ NAMESPACE('ria.dom', function () {
     ria.dom.Dom.SET_IMPL(ria.dom.SimpleDom);
 
     ria.dom.setDomImpl = function (impl) {
-        console.warn('ria.dom.setDomImpl is deprecated. User ria.dom.Dom.SET_IMPL() instead');
+        _DEBUG && console.warn('ria.dom.setDomImpl is deprecated. User ria.dom.Dom.SET_IMPL() instead');
         ria.dom.Dom.SET_IMPL(impl);
     };
 });
