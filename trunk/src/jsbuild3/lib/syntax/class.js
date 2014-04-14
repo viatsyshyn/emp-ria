@@ -115,8 +115,6 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
         var parts = ns.split('.');
         parts.push(def.name);
 
-        console.info('UNSAFE: ', def.flags.isUnSafe);
-
         var defAstTree = make_node(UglifyJS.AST_Call, node, {
             args: [],
             expression: make_node(UglifyJS.AST_Lambda, node, {
