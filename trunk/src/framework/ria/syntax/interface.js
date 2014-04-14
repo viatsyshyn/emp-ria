@@ -58,6 +58,9 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (def.flags.isReadonly)
             throw Error('Interface can NOT be marked with READONLY');
 
+        if (def.flags.isUnSafe)
+            throw Error('Interface can NOT be marked with UNSAFE');
+
         // throw Error if any annotations;
         if (def.annotations.length != 0)
             throw Error('Annotation are not supported on interfaces');
@@ -99,7 +102,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
                 if(isStaticMethod(method.name))
                     throw Error('Interface static methods are not supported');
 
-                if (method.flags.isAbstract || method.flags.isOverride || method.flags.isReadonly || method.flags.isFinal )
+                if (method.flags.isAbstract || method.flags.isOverride || method.flags.isReadonly || method.flags.isFinal || method.flags.isUnSafe)
                     throw Error('Interface method can NOT be marked with ABSTRACT, OVERRIDE, READONLY or FINAL');
 
                 if (method.annotations.length)
@@ -111,7 +114,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
              * @param {PropertyDescriptor} property
              */
             function (property) {
-                if (property.flags.isAbstract || property.flags.isOverride || property.flags.isFinal )
+                if (property.flags.isAbstract || property.flags.isOverride || property.flags.isFinal || property.flags.isUnSafe )
                     throw Error('Interface property can NOT be marked with ABSTRACT, OVERRIDE or FINAL');
 
                 if (property.annotations.length)

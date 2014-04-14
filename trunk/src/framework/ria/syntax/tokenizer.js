@@ -79,6 +79,7 @@
         Modifiers.SELF = new ModifiersImpl('SELF');
         Modifiers.FINAL = new ModifiersImpl('FINAL');
         Modifiers.READONLY = new ModifiersImpl('READONLY');
+        Modifiers.UNSAFE = new ModifiersImpl('UNSAFE');
         //Object.freeze(Modifiers);
         return Modifiers;
     }();

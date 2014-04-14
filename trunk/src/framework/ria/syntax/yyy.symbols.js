@@ -7,6 +7,7 @@ var VOID = ria.__SYNTAX.Modifiers.VOID;
 var SELF = ria.__SYNTAX.Modifiers.SELF;
 var FINAL = ria.__SYNTAX.Modifiers.FINAL;
 var READONLY = ria.__SYNTAX.Modifiers.READONLY;
+var UNSAFE = ria.__SYNTAX.Modifiers.UNSAFE;
 
 var Class = ria.__API.Class;
 var Interface = ria.__API.Interface;

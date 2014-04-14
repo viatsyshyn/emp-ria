@@ -1856,6 +1856,25 @@
 
             CLASS_E(Error('Can NOT create default constructor, base requires more then 0 args'),
                 'ChildClass', EXTENDS(BaseClass), [])
+        },
+
+        testUnSafeClass: function () {
+            var BaseClass = CLASS(UNSAFE,
+                'BaseClass', [
+                    [[Boolean]],
+                    function method(trueScope) {
+                        assertEquals(trueScope, this instanceof SELF);
+                    }
+                ]);
+
+            var instance = BaseClass();
+
+            instance.method(_DEBUG || true);
+
+            var method = instance.method;
+
+            method(_DEBUG || false);
+
         }
     };
 

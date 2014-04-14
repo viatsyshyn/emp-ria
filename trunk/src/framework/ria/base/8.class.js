@@ -261,6 +261,94 @@
         return publicInstance;
     };
 
+    /**
+     * @param {Object} instance
+     * @param {Function} clazz
+     * @param {Function} ctor
+     * @param {Arguments} args
+     * @return {Object}
+     */
+    ria.__API.initUnSafe = function (instance, clazz, ctor, args) {
+        var __META = clazz.__META;
+
+        if (__META.isAbstract)
+            throw Error('Can NOT instantiate abstract class ' + __META.name);
+
+        if (!(instance instanceof clazz))
+            instance = ria.__API.getInstanceOf(clazz);
+
+        var genericTypes = __META.genericTypes || [],
+            genericTypesLength = genericTypes.length - __META.baseSpecs.length,
+            ownGenericSpecs = __slice(args, 0, genericTypesLength),
+            genericSpecs = __META.baseSpecs.concat(ownGenericSpecs);
+
+        args = __slice(args, genericTypesLength);
+
+        if (_DEBUG) {
+            ria.__API.OF.apply(clazz, ownGenericSpecs);
+        }
+
+        var publicInstance = instance;
+        if (_DEBUG) {
+            instance = ria.__API.getInstanceOf(clazz);
+            publicInstance.__PROTECTED = instance;
+        }
+
+        if (!_RELEASE) {
+            var __pre = __META.__precalc;
+            for(var i = 0 ; i < __pre.length;) {
+                var name_ = __pre[i],
+                    f_ = __pre[i + 1],
+                    meta_ = f_.__META;
+
+                var fn = ria.__API.getPipelineMethodCallProxyFor(f_, meta_, instance, genericTypes, genericSpecs);
+                if (_DEBUG) {
+                    Object.defineProperty(instance, name_, { writable: false, configurable: false, enumerable: false, value: fn });
+                    if (meta_.isProtected())
+                        fn = ProtectedMethodProxy;
+
+                    Object.defineProperty(publicInstance, name_, { writable: false, configurable: false, enumerable: false, value: fn });
+                } else {
+                    publicInstance[name_] = fn;
+                }
+
+                i += 2;
+            }
+
+            if (ctor.__META) {
+                ctor = ria.__API.getPipelineMethodCallProxyFor(ctor, ctor.__META, instance, genericTypes, genericSpecs);
+            }
+        }
+
+        if (_DEBUG) {
+            instance.$ = publicInstance.$ = undefined;
+            for(var name in __META.ctors) {
+                if (__META.ctors.hasOwnProperty(name)) {
+                    Object.defineProperty(publicInstance, name, { writable : false, configurable: false, enumerable: false, value: undefined });
+                    Object.defineProperty(instance, name, { writable : false, configurable: false, enumerable: false, value: undefined });
+                }
+            }
+        }
+
+        var specs = instance.__SPECS = {};
+        genericTypes.forEach(function (_, index) {
+            specs[_.name] = genericSpecs[index];
+        });
+
+        if (_DEBUG) for(var name in __META.properties) {
+            if (__META.properties.hasOwnProperty(name)) {
+                instance[name] = null;
+            }
+        }
+
+        ctor.apply(instance, args);
+
+        _DEBUG && Object.seal(instance);
+        _DEBUG && Object.freeze(publicInstance);
+
+        return publicInstance;
+    };
+
     function StaticScope() {}
     var staticScopeInstance = new StaticScope();
     _DEBUG && Object.freeze(staticScopeInstance);
