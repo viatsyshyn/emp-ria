@@ -13,7 +13,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if(def.annotations.length)
             throw Error('Annotations are not supported in annotations');
 
-        if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal)
+        if(def.flags.isAbstract || def.flags.isOverride || def.flags.isFinal || def.flags.isUnSafe)
             throw Error('Modifiers are not supported in annotations');
 
         if(def.retType !== null)

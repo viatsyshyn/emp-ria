@@ -17,6 +17,7 @@
         values['ABSTRACT'] = Modifiers.ABSTRACT = new ModifiersImpl('ABSTRACT');
         values['FINAL'] = Modifiers.FINAL = new ModifiersImpl('FINAL');
         values['READONLY'] = Modifiers.READONLY = new ModifiersImpl('READONLY');
+        values['UNSAFE'] = Modifiers.UNSAFE = new ModifiersImpl('UNSAFE');
         Modifiers.fromValue = function (raw) {
             return values.hasOwnProperty(raw) ? values[raw] : undefined;
         };

@@ -289,6 +289,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
     function validateMethodDeclaration(def, method, FakeSelf, parentGenericTypes, parentGenericSpecs) {
         var parentMethod = method.__BASE_META;
 
+        if (method.flags.isUnSafe) {
+            throw Error('Mathod cannot be marked with UNSAFE. Method: "' + method.name + '"');
+        }
+
         if (method.flags.isOverride && isStaticMethod(method.name)) {
             throw Error('Override on static method are not supported. Method: "' + method.name + '"');
         }
@@ -346,6 +350,10 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             if (setterDef) throw Error('There is no ability to add setter to READONLY property ' + property.name + ' in ' + def.name + ' class');
         } else if (!isSameFlags(property, setterDef)) {
             throw Error('The flags of setter ' + setterName + ' should be the same with property flags');
+        }
+
+        if (property.flags.isUnSafe) {
+            throw Error('Property cannot be marked with UNSAFE. Property: "' + property.name + '"');
         }
 
         processedMethods.push(getterName);
@@ -633,7 +641,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         var processedMethods = [];
 
         var $$Def = def.methods.filter(function (_1) { return _1.name == '$$'}).pop();
-        var $$ = $$Def ? $$Def.body.value : ria.__API.init;
+        var $$ = $$Def ? $$Def.body.value : def.flags.isUnSafe ? ria.__API.initUnSafe : ria.__API.init;
         processedMethods.push('$$');
 
         var ClassProxy = function ClassProxy() {
