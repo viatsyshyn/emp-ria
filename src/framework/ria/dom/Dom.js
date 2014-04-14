@@ -401,7 +401,7 @@ NAMESPACE('ria.dom', function () {
                 return this;
             },
 
-            Boolean, function equals(other) {
+            OVERRIDE, Boolean, function equals(other) {
                 if (!(other instanceof ria.dom.Dom))
                     return false;
 

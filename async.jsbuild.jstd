@@ -1,0 +1,5 @@
+load:
+  - tests/framework/ria/_cfg.release.js
+
+test:
+  - tests/framework/ria/async/*_test.compiled.js
