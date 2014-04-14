@@ -24,6 +24,7 @@ NAMESPACE('ria.dom', function () {
     CLASS(
         'SizzleDom', EXTENDS(ria.dom.Dom), [
 
+            /* UNSAFE CLASS INITIALIZER */
             OVERRIDE, function $$(instance, clazz, ctor, args) {
                 var genericTypes = [],
                     genericSpecs = [];
