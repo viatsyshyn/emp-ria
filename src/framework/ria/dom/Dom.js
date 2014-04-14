@@ -397,46 +397,50 @@ NAMESPACE('ria.dom', function () {
 
             [[SELF]],
             SELF, function removeSelf() {
-                this._dom.forEach(function(element){ element.parentNode.removeChild(element); });
+                this._dom.forEach(function(element){ element.parentNode && element.parentNode.removeChild(element); });
                 return this;
             },
 
-            [[SELF]],
-            Boolean, function areEquals(el){
-                var val1 = this.valueOf(), val2 = el.valueOf(), len = val1.length;
-                if(len != val2.valueOf().length)
+            Boolean, function equals(other) {
+                if (!(other instanceof ria.dom.Dom))
                     return false;
-                for(var i = 0; i < len; i++){
-                    if(val1[i] != val2[i])
-                        return false;
-                }
-                return true;
+
+                if (this.count() != other.count())
+                    return false;
+
+                var others = other.valueOf();
+                return this._dom.every(function(el) { return others.indexOf(el) >= 0; });
+            },
+
+            [[SELF]],
+            Boolean, function areEquals(el) {
+                _DEBUG && console.info('Method areEquals is deprecated. Consider using equals() instead');
+                return this.equals(el);
             },
 
             // reference https://github.com/julienw/dollardom
 
             [[String]],
-            SELF, function descendants(selector__) {},
+            SELF, function descendants(selector_) {
+                var dom = this._dom;
+                try {
+                    this._dom = [].concat.apply([], dom.map(function (element) {
+                        return [].slice.call(element.childNodes);
+                    }));
+                    return this.filter(function ($node) {
+                        return selector_ ? $node.is(selector_) : true;
+                    });
+                } finally {
+                    this._dom = dom;
+                }
+            },
 
             [[String]],
             SELF, function parent(selector_) {
-                if(selector_){
-                    var parents = new ria.dom.Dom(selector_);
-                    if(parents.count() == 0)
-                        return null;
-                    if(parents.count() == 1)
-                        if(parents.contains(this)){
-                            return parents;
-                        }else{
-                            return null;
-                        }
-
-                    return parents.filter(function(parent) {
-                        return parent.contains(this);
-                    }.bind(this));
-                }
-
-                return new ria.dom.Dom(this._dom.map(function (_) { return _.parentNode }));
+                var me = this;
+                return selector_
+                    ? ria.dom.Dom(selector_).filter(function ($node) { return $node.contains(me); })
+                    : ria.dom.Dom(this._dom.map(function (_) { return _.parentNode }));
             },
 
             Object, function offset() {
@@ -476,7 +480,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function first(selector_) {
                 if (!selector_)
-                    return new ria.dom.Dom(this.valueOf().shift());
+                    return new ria.dom.Dom([this.valueOf().shift()]);
 
                 throw new Exception('not implemented');
             },
@@ -484,7 +488,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function last(selector_) {
                 if (!selector_)
-                    return new ria.dom.Dom(this.valueOf().pop());
+                    return new ria.dom.Dom([this.valueOf().pop()]);
 
                 throw new Exception('not implemented');
             },
@@ -736,27 +740,27 @@ NAMESPACE('ria.dom', function () {
             [[ria.dom.DomIterator]],
             SELF, function filter(iterator) {
                 var old = this._dom, scope = this;
-
-                var filtered = this._dom.filter(function (_) {
-                    scope._dom = [_];
-                    return iterator(scope);
-                });
-
-                this._dom = old;
-                return new ria.dom.Dom(filtered);
+                try {
+                    return new ria.dom.Dom(this._dom.filter(function (_) {
+                        scope._dom = [_];
+                        return iterator(scope);
+                    }));
+                } finally {
+                    this._dom = old;
+                }
             },
 
             [[ria.dom.DomIterator]],
             Array, function map(iterator) {
                 var old = this._dom, scope = this;
-
-                var mapped = this._dom.map(function (_) {
-                    scope._dom = [_];
-                    return iterator(scope);
-                });
-
-                this._dom = old;
-                return mapped;
+                try {
+                    return this._dom.map(function (_) {
+                        scope._dom = [_];
+                        return iterator(scope);
+                    });
+                } finally {
+                    this._dom = old;
+                }
             },
 
             Number, function count() {
