@@ -1,0 +1,12 @@
+load:
+  - tests/framework/ria/_cfg.js
+  - src/framework/ria/base/*.js
+  - src/framework/ria/syntax/*.js
+  - tests/framework/ria/require_stub.js
+  - src/framework/lib/sizzle.js
+  - src/framework/ria/dom/Events.js
+  - src/framework/ria/dom/Dom.js
+  - src/framework/ria/dom/SizzleDom.js
+
+test:
+  - tests/framework/ria/dom/*_test.js

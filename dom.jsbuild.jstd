@@ -2,4 +2,4 @@ load:
   - tests/framework/ria/_cfg.release.js
 
 test:
-  - tests/framework/ria/reflection/*_test.compiled.js
+  - tests/framework/ria/dom/*_test.compiled.js
