@@ -59,7 +59,7 @@ NAMESPACE('ria.async', function () {
                 }
 
                 if (ctorCalled == SELF.prototype.$fromData) {
-                    ria.__API.defer(null, instance.finish, [delayArgs[0]], delayArgs[1]|0);
+                    ria.__API.defer(instance, instance.finish, [delayArgs[0]], delayArgs[1]|0);
                 }
 
                 return instance.getWrapper();
