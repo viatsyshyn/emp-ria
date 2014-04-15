@@ -2,7 +2,7 @@
   "name": "emp.ria-jsbuild3",
   "title": "EMP RIA Jsbuild3",
   "description": "EMP RIA build system",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "author": "Volodymyr Iatsyshyn <viatsyshyn@gmail.com>",
   "repository": "http://emp-ria.googlecode.com/svn/trunk/",
   "main": "./index.js",
@@ -21,7 +21,7 @@
     "optimist": "*",
     "uglify-js": "*",
     "emp.ria-jade": "*",
-    "emp.ria-framework": "0.1.9"
+    "emp.ria-framework": "0.1.10"
   },
   "scripts": {
     "prepublish": "npm prune"
