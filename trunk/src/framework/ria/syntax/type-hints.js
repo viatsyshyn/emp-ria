@@ -251,7 +251,7 @@
                 try {
                     ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args, genericTypes || [], specs || []);
                 } catch (e) {
-                    throw new ria.__API.Exception('Bad argument for ' + meta.name, e);
+                    throw new ria.__API.Exception('Bad argument for ' + meta.name + ' class ' + ria.__API.getIdentifierOfValue(scope), e);
                 }
             });
 
@@ -260,7 +260,7 @@
                 try {
                     ria.__SYNTAX.checkReturn(meta.ret, result, genericTypes || [], specs || []);
                 } catch (e) {
-                    throw new ria.__API.Exception('Bad return of ' + meta.name, e);
+                    throw new ria.__API.Exception('Bad return of ' + meta.name + ' class ' + ria.__API.getIdentifierOfValue(scope), e);
                 }
                 return result;
             });

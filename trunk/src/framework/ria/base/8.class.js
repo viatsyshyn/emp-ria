@@ -126,10 +126,10 @@
      */
     ria.__API.property = function (clazz, name, propType_, anns_, getter, setter) {
         //noinspection JSUndefinedPropertyAssignment
-        getter.__META = new ria.__API.MethodDescriptor('', propType_, [], []);
+        getter.__META = new ria.__API.MethodDescriptor(_DEBUG ? 'getter of ' + name : '', propType_, [], []);
         if (setter)
         { //noinspection JSUndefinedPropertyAssignment
-            setter.__META = new ria.__API.MethodDescriptor('', undefined, [propType_], ['value']);
+            setter.__META = new ria.__API.MethodDescriptor(_DEBUG ? 'setter of ' + name : '', undefined, [propType_], ['value']);
         }
         clazz.__META.addProperty(name, propType_, anns_, getter, setter);
     };
