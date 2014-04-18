@@ -1,7 +1,7 @@
 {
   "name": "emp.ria-grunt-jsbuild3",
   "description": "EMP RIA Jsbuild3 Gruntjs plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://code.google.com/p/emp-ria/",
   "author": {
     "name": "Volodymyt Iatsyshyn",
@@ -28,7 +28,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "emp.ria-jsbuild3": "*"
+    "emp.ria-jsbuild3": "0.1.14"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.6.0",
