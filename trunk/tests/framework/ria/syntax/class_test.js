@@ -1327,11 +1327,11 @@
 
             !_RELEASE && assertException(function () {
                 Application.RUN(1);
-            }, Error('Bad argument for RUN'));
+            }, Error('Bad argument for window.Application.RUN'));
 
             !_RELEASE && assertException(function () {
                 Application.RUN(instance, 3);
-            }, Error('Bad argument for RUN'));
+            }, Error('Bad argument for window.Application.RUN'));
 
             CLASS_E(Error('Base call are forbidden for non overriden methods. Method: "RUN_"'),
                 'Application', [
@@ -1453,7 +1453,7 @@
 
             !_RELEASE && assertException(function () {
                 instance.convert(5);
-            }, Error('Bad argument for convert'));
+            }, Error('Bad argument for convert class window.Converter.OF(String,String)'));
         },
 
         testUseOfGenericDelegate: function () {
@@ -1545,7 +1545,7 @@
 
             !_RELEASE && assertException(function () {
                 i2.convert(5);
-            }, Error('Bad argument for convert'));
+            }, Error('Bad argument for convert class window.Impl2'));
         },
 
         testExtendGenericClass: function () {
@@ -1611,15 +1611,15 @@
 
             !_RELEASE && assertException(function () {
                 ins.add(1, true);
-            }, Error('Bad argument for add'));
+            }, Error('Bad argument for add class window.ChildClass.OF(Boolean)'));
 
             !_RELEASE && assertException(function () {
                 ins.add('b', 'false');
-            }, Error('Bad argument for add'))
+            }, Error('Bad argument for add class window.ChildClass.OF(Boolean)'))
 
             !_RELEASE && assertException(function () {
                 ins.find(2);
-            }, Error('Bad argument for find'))
+            }, Error('Bad argument for find class window.ChildClass.OF(Boolean)'))
         },
 
         testGenericTypeDelegationToIfc: function () {

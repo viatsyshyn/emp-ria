@@ -557,7 +557,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
         if (isStaticMethod(method.name)) {
             impl = ClassProxy[method.name] = addSelfAndBaseBody(method.body.value, ClassProxy);
             impl.__META = new ria.__API.MethodDescriptor(
-                method.name,
+                ClassProxy.__META.name + '.' + method.name,
                 method.retType ? method.retType.value : null,
                 method.argsTypes.map(function (_) { return _.value }),
                 method.argsNames);

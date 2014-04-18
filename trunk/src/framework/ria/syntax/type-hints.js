@@ -246,12 +246,23 @@
     };
 
     if (_DEBUG) {
+        var guessScopeName = function (scope) {
+            if (!scope)
+                return '';
+
+            var name = ria.__API.getIdentifierOfValue(scope);
+            if (name == 'StaticScope')
+                return '';
+
+            return ' class ' + name;
+        };
+
         ria.__API.addPipelineMethodCallStage('BeforeCall',
             function (body, meta, scope, args, callSession, genericTypes, specs) {
                 try {
                     ria.__SYNTAX.checkArgs(meta.argsNames, meta.argsTypes, args, genericTypes || [], specs || []);
                 } catch (e) {
-                    throw new ria.__API.Exception('Bad argument for ' + meta.name + ' class ' + ria.__API.getIdentifierOfValue(scope), e);
+                    throw new ria.__API.Exception('Bad argument for ' + meta.name + guessScopeName(scope), e);
                 }
             });
 
@@ -260,7 +271,7 @@
                 try {
                     ria.__SYNTAX.checkReturn(meta.ret, result, genericTypes || [], specs || []);
                 } catch (e) {
-                    throw new ria.__API.Exception('Bad return of ' + meta.name + ' class ' + ria.__API.getIdentifierOfValue(scope), e);
+                    throw new ria.__API.Exception('Bad return of ' + meta.name + guessScopeName(scope), e);
                 }
                 return result;
             });

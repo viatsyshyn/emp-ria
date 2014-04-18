@@ -194,8 +194,8 @@ function appStart() {
     ria.mvc.Application.RUN(AppClass, ria.__CFG['#mvc'].settings);
 }
 
-const ENV_BROWSER = "browser",
-      ENV_NODE = "node";
+var ENV_BROWSER = "browser",
+    ENV_NODE = "node";
 
 /**
  *
