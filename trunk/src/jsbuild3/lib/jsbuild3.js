@@ -194,6 +194,9 @@ function appStart() {
     ria.mvc.Application.RUN(AppClass, ria.__CFG['#mvc'].settings);
 }
 
+const ENV_BROWSER = "browser",
+      ENV_NODE = "node";
+
 /**
  *
  * @param {String} path
@@ -209,8 +212,8 @@ function compile(path, config, appClass) {
 
     var env = config.getEnv();
     switch(env) {
-        case "browser":
-        case "node":
+        case ENV_BROWSER:
+        case ENV_NODE:
             break;
 
         default:
@@ -269,16 +272,16 @@ function compile(path, config, appClass) {
                                         }),
                                         make_node(UglifyJS.AST_VarDef, null, {
                                             name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_NODE'}),
-                                            value: make_node(env == "node" ? UglifyJS.AST_True : UglifyJS.AST_False)
+                                            value: make_node(env == ENV_NODE ? UglifyJS.AST_True : UglifyJS.AST_False)
                                         }),
                                         make_node(UglifyJS.AST_VarDef, null, {
                                             name: make_node(UglifyJS.AST_SymbolConst, topLevel, { name: '_BROWSER'}),
-                                            value: make_node(env == "browser" ? UglifyJS.AST_True : UglifyJS.AST_False)
+                                            value: make_node(env == ENV_BROWSER ? UglifyJS.AST_True : UglifyJS.AST_False)
                                         })
                                     ]
                                 })
                             ], [
-                                env == "browser" ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                env == ENV_BROWSER ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                                     body: make_node(UglifyJS.AST_Call, topLevel, {
                                         expression: make_node(UglifyJS.AST_Function, topLevel, {
                                             argnames: [],
@@ -288,7 +291,7 @@ function compile(path, config, appClass) {
                                     })
                                 }) : null
                             ], globalFunctions, currentBody, [
-                                env == "browser" && appClass ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
+                                env == ENV_BROWSER && appClass ? make_node(UglifyJS.AST_SimpleStatement, topLevel, {
                                     body: make_node(UglifyJS.AST_Call, topLevel, {
                                         expression: make_node(UglifyJS.AST_Function, topLevel, {
                                             argnames: [],
@@ -337,7 +340,19 @@ function compile(path, config, appClass) {
         topLevel.figure_out_scope();
         var sq = UglifyJS.Compressor(compress);
         topLevel = topLevel.transform(sq);
+
+        // now change const -> var
+        if (env == ENV_BROWSER)
+            topLevel = topLevel.transform(new UglifyJS.TreeTransformer(ConstToVarPostProcessor));
+
+        // second pass
+        topLevel.figure_out_scope();
+        topLevel = topLevel.transform(sq);
     }
+
+    // now change const -> var
+    if (env == ENV_BROWSER)
+        topLevel = topLevel.transform(new UglifyJS.TreeTransformer(ConstToVarPostProcessor));
 
     // 3. mangle
     if (options.mangle) {
