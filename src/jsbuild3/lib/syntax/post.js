@@ -63,3 +63,11 @@ function AssertCompiler(ns, node, descend) {
 }
 
 compilers.push(AssertCompiler);
+
+function ConstToVarPostProcessor(node, descend) {
+    if (node instanceof UglifyJS.AST_Const) {
+        return make_node(UglifyJS.AST_Var, node, {
+            definitions: node.definitions
+        });
+    }
+}
