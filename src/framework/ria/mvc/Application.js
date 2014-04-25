@@ -35,17 +35,13 @@ NAMESPACE('ria.mvc', function () {
             READONLY, 'srcUrl',
             READONLY, 'lineNo',
 
-            function $(msg, srcUrl, lineNo) {
-                BASE(msg);
+            function $(msg, srcUrl, lineNo, colNo, e_) {
+                BASE('Uncaught error: ' + msg + '\nAt ' + srcUrl + '@' + lineNo + ':' + colNo, e_);
 
                 this.srcUrl = srcUrl;
                 this.lineNo = lineNo;
-            },
-
-            OVERRIDE, String, function toString() {
-                return 'Uncaught error: ' + this.message + '\nAt ' + this.srcUrl + ':' + this.lineNo;
             }
-        ])
+        ]);
 
     /**@namespace ria.mvc.Application */
     CLASS(
@@ -160,10 +156,10 @@ NAMESPACE('ria.mvc', function () {
                 //if (_BROWSER) window.addEventListener("activate", this.onResume_, false);
                 //if (_BROWSER) window.addEventListener("unload", this.onDispose_, false);
 
-                if (_BROWSER) window.onerror = function (error, src, lineNo) {
-                    _DEBUG && console.error('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src + ":" + lineNo);
+                if (_BROWSER) window.onerror = function (error, src, lineNo, colNo, ex) {
+                    //_DEBUG && console.error('Uncaught error', ria.__API.clone(arguments), '\n', 'Source:', src + "@" + lineNo + ':' + colNo);
 
-                    this.onError_(ria.mvc.UncaughtException(error, src, lineNo));
+                    this.onError_(ria.mvc.UncaughtException(error, src, lineNo, colNo, ex));
                 }.bind(this);
 
                 ria.async.Future.UNCAUGHT_ERROR(this.onError_);

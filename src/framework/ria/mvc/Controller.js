@@ -189,7 +189,14 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     return params.map(function (_, index) {
                         try {
-                            return (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof types[index])) ? _ : this._serializer.deserialize(_, types[index]);
+                            var Type = types[index];
+                            if (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof Type))
+                                return _;
+
+                            if (Array.isArray(_) && ria.__API.isArrayOfDescriptor(Type) && _.every(function (_) { return _ instanceof Type.valueOf()}))
+                                return _;
+
+                            return this._serializer.deserialize(_, Type);
                         } catch (e) {
                             throw new ria.mvc.MvcException('Error deserializing action param ' + names[index], e);
                         }
