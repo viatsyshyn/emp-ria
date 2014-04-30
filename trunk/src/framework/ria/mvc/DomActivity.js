@@ -120,6 +120,12 @@ NAMESPACE('ria.mvc', function () {
                 this.dom.appendTo(this._domAppendTo);
             },
 
+            [[Object, String]],
+            OVERRIDE, VOID, function onPartialRender_(data, msg_) {
+                BASE(data, msg_);
+                this.dom.removeClass('loading');
+            },
+
             OVERRIDE, VOID, function onStop_(){
                 BASE();
                 this._domAppendTo.remove(this.dom.empty());
