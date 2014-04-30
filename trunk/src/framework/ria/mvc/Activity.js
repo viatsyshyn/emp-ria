@@ -90,14 +90,18 @@ NAMESPACE('ria.mvc', function () {
                         throw error;
                     })
                     .then(function (model) { me.onModelReady_(model, msg_); return model })
+                    ;
 
                 return head;
             },
 
             [[ria.async.Future]],
             ria.async.Future, function refreshD(future) {
+                var forceClose = true, me = this;
                 return future
+                    .then(function (data) { forceClose = false; return data; })
                     .attach(this.getModelEvents_())
+                    .complete(function () { if (forceClose) me.close(); })
                     .then(function (model) {
                         if (!this.isStarted()) return ria.async.BREAK;
 
