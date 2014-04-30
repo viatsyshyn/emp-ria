@@ -78,11 +78,38 @@ ria.__API = ria.__API || {};
      * @param {Object} second
      */
     ria.__API.extendWithDefault = function (first, second){
+        !_RELEASE && console.warn('Function ria.__API.extendWithDefault is deprecated. Use ria.__API.merge instead');
+
         for(var prop in second){
             if(!first.hasOwnProperty(prop))
                 first[prop] = second[prop];
         }
         return first;
+    };
+
+
+    /**
+     * Merges the content of all passed objects. Properties of first obj have grater priority
+     * @param {Object} first
+     * @param {Object} second...
+     */
+    ria.__API.merge = function me(first, second) {
+        var al = arguments.length;
+        if (al < 2) {
+            return first || {};
+        }
+
+        first = first || {};
+        second = second || {};
+
+        var result = {};
+        Object.keys(second).forEach(function (_) { result[_] = second[_]; });
+        Object.keys(first).forEach(function (_) { result[_] = first[_]; });
+
+        if (al == 2)
+            return result;
+
+        return me.apply(this, [result].concat([].slice.call(arguments, 2)));
     };
 
     /**

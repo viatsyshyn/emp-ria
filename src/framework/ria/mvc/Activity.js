@@ -189,9 +189,7 @@ NAMESPACE('ria.mvc', function () {
             [[Object]],
             VOID, function onRender_(data) {},
             [[Object, String]],
-            VOID, function onPartialRender_(data, msg_) {
-                this.dom.removeClass('loading');
-            },
+            VOID, function onPartialRender_(data, msg_) {},
             [[Object]],
             VOID, function onRefresh_(data) {
                 this._onRefresh.notify([this, data]);

@@ -3,6 +3,27 @@ load:
   - src/framework/ria/base/*.js
   - src/framework/ria/syntax/*.js
   - tests/framework/ria/require_stub.js
+  - src/framework/ria/reflection/Exception.js
+  - src/framework/ria/reflection/Reflector.js
+  - src/framework/ria/reflection/ReflectionCtor.js
+  - src/framework/ria/reflection/ReflectionMethod.js
+  - src/framework/ria/reflection/ReflectionProperty.js
+  - src/framework/ria/reflection/ReflectionInterface.js
+  - src/framework/ria/reflection/ReflectionClass.js
+  - src/framework/ria/async/ICancelable.js
+  - src/framework/ria/async/Future.js
+  - src/framework/ria/async/Completer.js
+  - src/framework/ria/async/IObservable.js
+  - src/framework/ria/async/Observable.js
+  - src/framework/ria/mvc/IActivity.js
+  - src/framework/ria/mvc/IView.js
+  - src/framework/ria/mvc/ISession.js
+  - src/framework/ria/mvc/State.js
+  - src/framework/ria/mvc/IContext.js
+  - src/framework/ria/mvc/IContextable.js
+  - src/framework/ria/mvc/MvcException.js
+  - src/framework/ria/mvc/View.js
+  - src/framework/ria/mvc/Activity.js
   - tests/framework/ria/mvc/*_stubs.js
 test:
   - tests/framework/ria/mvc/*_test.js
