@@ -6,7 +6,7 @@
   * ~~#2. Syntax, Dependencies, Reflection~~
   * ~~#3. Compilation and GCC optimizations~~
   * #4. ~~Futures~~, ~~AJAX~~, ~~MVC~~, ~~DOM~~, ~~Compiled Templates~~, ~~Data Serialization~~
-  * #5. XMPP,...
+  * #5. Compile-time annotations, unified compile-time and debug-time plugins system
 
 = Milestone #1. Low-level API =
 
@@ -40,7 +40,8 @@
     * ~~IMPLEMENTS~~
     * ~~ABSTRACT class~~
     * ~~FINAL class~~
-    * Private Classes
+    * ~~Private Classes~~
+    * UnSafe Classes
     * ~~ctor~~
       * ~~BASE~~
       * ~~SELF in ctor body~~
@@ -59,8 +60,8 @@
       * ~~SELF~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
-  * Proxy interface impls in DEBUG (to protect implementation)
-  * Proxy class impl in DEBUG (cast to parent)
+  * Proxy interface impls in __DEBUG_ (to protect implementation)
+  * Proxy class impl in __DEBUG_ (cast to parent ifc)
 
 == Dependencies ==
 
