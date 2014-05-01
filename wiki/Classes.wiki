@@ -87,6 +87,18 @@ CLASS(
 
 Class, its constructor, properties and public methods can be annotated.  All [Annotations] and their parameters can be reflected, as well as properties, constructor and public members.
 
+= UnSafe classes =
+
+Class declaration may be marked with *UNSAFE*. This option makes class more like structure, means no scope binding, hidden fields and protected methods (protected methods are public, but can not be reflected). Instantiation of such class is much cheaper in terms of CPU. 
+
+{{{
+CLASS(UNSAFE
+  'MyUnSafeClass', [
+  ]);
+}}}
+
+Unsafe flag is not inherited. But If you extends from unsafe class you may make child also unsafe.
+
 = Usage =
 
 {{{
