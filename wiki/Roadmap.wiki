@@ -60,8 +60,8 @@
       * ~~SELF~~
   * ~~[Enumerations]~~
   * ~~[Identifiers]~~
-  * Proxy interface impls in __DEBUG_ (to protect implementation)
-  * Proxy class impl in __DEBUG_ (cast to parent ifc)
+  * Proxy interface impls in _DEBUG_ (to protect implementation)
+  * Proxy class impl in _DEBUG_ (cast to parent ifc)
 
 == Dependencies ==
 
