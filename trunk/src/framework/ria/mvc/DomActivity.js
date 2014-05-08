@@ -126,6 +126,12 @@ NAMESPACE('ria.mvc', function () {
                 this.dom.removeClass('loading');
             },
 
+            OVERRIDE, VOID, function onPartialRefresh_(model, msg_) {
+                BASE(model, msg_);
+
+                this.dom.find('FORM.working').removeClass('working');
+            },
+
             OVERRIDE, VOID, function onStop_(){
                 BASE();
                 this._domAppendTo.remove(this.dom.empty());
