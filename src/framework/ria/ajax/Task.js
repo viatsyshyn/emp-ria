@@ -94,7 +94,7 @@ NAMESPACE('ria.ajax', function () {
              */
             [[Object]],
             SELF, function requestHeaders(headers) {
-                this._requestHeaders = ria.__API.extendWithDefault(headers, this._requestHeaders);
+                this._requestHeaders = ria.__API.merge(headers, this._requestHeaders);
                 return this;
             },
 

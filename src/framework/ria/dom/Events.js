@@ -6,7 +6,7 @@ NAMESPACE('ria.dom', function () {
     "use strict";
 
     function def(data, def) {
-        return ria.__API.extendWithDefault(data || {}, def);
+        return ria.__API.merge(data || {}, def);
     }
 
 	var window = _GLOBAL;
