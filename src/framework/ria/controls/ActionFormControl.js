@@ -132,7 +132,7 @@ NAMESPACE('ria.controls', function () {
             [ria.mvc.DomEventBind('submit', 'FORM')],
             [[ria.dom.Dom, ria.dom.Event]],
             Boolean, function submit($target, event) {
-                if ($target.hasClass('disabled'))
+                if ($target.hasClass('disabled') || $target.hasClass('working'))
                     return false;
 
                 var controller = $target.getData('controller');
@@ -152,6 +152,8 @@ NAMESPACE('ria.controls', function () {
 
                     $target.setData('submit-name', null);
                     $target.setData('submit-value', null);
+
+                    $target.addClass('working');
 
                     this.updateState_(controller, action, [params]);
 
