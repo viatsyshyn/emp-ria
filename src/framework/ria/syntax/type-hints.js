@@ -245,6 +245,61 @@
             throw Error('Expected return of ' + ria.__API.getIdentifierOfType(type, genericTypes || [], genericSpecs || []) + ' but got ' + ria.__API.getIdentifierOfValue(value));
     };
 
+    var ProtectedMethodProxy = function () {
+        throw Error('Can NOT call protected methods');
+    };
+
+    function toBaseProxy(value, type) {
+        if (value.getClass().__META.flags)
+
+        if (value.getClass() == type && value.__PROTECTED)
+            return value;
+
+        value = value.__PROTECTED || value;
+        var proxy = ria.__API.getInstanceOf(type);
+
+        proxy.__PROTECTED = value;
+
+        var __pre = type.__META.__precalc;
+        for(var i = 0 ; i < __pre.length;i += 2) {
+            var name_ = __pre[i];
+            proxy[name_] = __pre[i + 1].__META.isProtected() ? ProtectedMethodProxy : value[name_];
+        }
+
+        Object.freeze(proxy);
+
+        return proxy;
+    }
+
+    function toInterfaceProxy(value, type) {
+        return value;
+        var proxy = ria.__API.getInstanceOf(type);
+
+        proxy.__PROXIED = value;
+
+        var __pre = type.__META.methods;
+        for(var name_ in __pre) if (__pre.hasOwnProperty(name_)) {
+            proxy[name_] = value[name_];
+        }
+
+        Object.freeze(proxy);
+
+        return proxy;
+    }
+
+    function proxyBaseInterface(value, type) {
+        if (value === null)
+            return value;
+        else if (ria.__API.isClassConstructor(type))
+            return toBaseProxy(value, type);
+        else if (ria.__API.isInterface(type))
+            return toInterfaceProxy(value, type);
+        else
+            return value;
+    }
+
+    ria.__SYNTAX.proxyBaseInterface = proxyBaseInterface;
+
     if (_DEBUG) {
         var guessScopeName = function (scope) {
             if (!scope)

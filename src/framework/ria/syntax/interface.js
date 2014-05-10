@@ -208,7 +208,7 @@ ria.__SYNTAX = ria.__SYNTAX || {};
 
     ria.__SYNTAX.INTERFACE = INTERFACE;
 
-    if (_DEBUG) {
+    if (false) {
         ria.__API.addPipelineMethodCallStage('BeforeCall',
             function (body, meta, scope, args, result, callSession) {
                 // TODO: wrap args into proxy if it's ifc
