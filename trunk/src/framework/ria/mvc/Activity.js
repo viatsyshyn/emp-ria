@@ -114,6 +114,9 @@ NAMESPACE('ria.mvc', function () {
                         this.onRefresh_(model);
                         return model;
                     }, this)
+                    .catchError(function (e) {
+                        throw Exception('Error full refreshing activity ' + ria.__API.getIdentifierOfValue(this), e);
+                    }, this);
             },
 
             [[ria.async.Future, String]],
@@ -132,6 +135,9 @@ NAMESPACE('ria.mvc', function () {
                         this.onPartialRefresh_(model, msg_);
                         return model;
                     }, this)
+                    .catchError(function (e) {
+                        throw Exception('Error partial refreshing activity ' + ria.__API.getIdentifierOfValue(this), e);
+                    }, this);
             },
 
             [[ria.async.Future, String]],
