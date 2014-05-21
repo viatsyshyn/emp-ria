@@ -480,7 +480,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function first(selector_) {
                 if (!selector_)
-                    return new ria.dom.Dom([this.valueOf().shift()]);
+                    return new ria.dom.Dom(this.valueOf().slice(0,1));
 
                 throw new Exception('not implemented');
             },
@@ -488,7 +488,7 @@ NAMESPACE('ria.dom', function () {
             [[String]],
             SELF, function last(selector_) {
                 if (!selector_)
-                    return new ria.dom.Dom([this.valueOf().pop()]);
+                    return new ria.dom.Dom(this.valueOf().reverse().slice(0,1));
 
                 throw new Exception('not implemented');
             },
