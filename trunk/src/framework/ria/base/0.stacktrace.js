@@ -38,7 +38,7 @@
         }
 
         //IE and Safari
-        try {
+        try { // just in case IE crashes on .callee
             if (arguments.callee) {
                 var currentFunction = arguments.callee.caller;
                 while (currentFunction) {
