@@ -288,7 +288,7 @@ NAMESPACE('ria.async', function () {
             VOID, function completeError(error) {
                 Assert(!this._disposed, 'Can not completeError disposed future');
                 if (!this._next)
-                    __uncaughtErrorHandler(new Exception('Uncaught error', error));
+                    __uncaughtErrorHandler(error);
 
                 ria.__API.defer(this, function () {
                     Assert(!this._disposed, 'Can not completeError disposed future');

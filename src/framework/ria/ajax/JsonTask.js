@@ -14,9 +14,11 @@ NAMESPACE('ria.ajax', function () {
     /** @class ria.ajax.JsonParseException */
     EXCEPTION(
         'JsonParseException', [
+            Object, 'json',
             [[String]],
             function $(json, e_) {
-                BASE('Invalid JSON: ' + JSON.stringify(json), e_);
+                this.json = json;
+                BASE('Invalid JSON' + (_DEBUG ? ': ' + JSON.stringify(json) : ''), e_);
             }
         ]);
 

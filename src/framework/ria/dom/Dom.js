@@ -188,7 +188,7 @@ NAMESPACE('ria.dom', function () {
 
             function $(dom_) {
                 BASE();
-                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, NodeList], dom_);
+                VALIDATE_ARG('dom_', [Node, String, ArrayOf(Node), SELF, NodeList, Array], dom_);
                 this._dom = [global];
 
                 if ('string' === typeof dom_) {
