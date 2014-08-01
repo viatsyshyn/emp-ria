@@ -8,7 +8,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionProperty */
     CLASS(
-        FINAL, 'ReflectionProperty', EXTENDS(ria.reflection.Reflector), [
+        UNSAFE, FINAL, 'ReflectionProperty', EXTENDS(ria.reflection.Reflector), [
 
             function DROP_CACHE() {
                 cache = {};
@@ -28,7 +28,7 @@ NS('ria.reflection', function () {
                 if (cache.hasOwnProperty(name))
                     return cache[name];
 
-                return cache[name] = new ria.__API.init(instance, Clazz, ctor, args);
+                return cache[name] = new ria.__API.initUnSafe(instance, Clazz, ctor, args);
             },
 
             READONLY, ClassOf(Class), 'clazz',

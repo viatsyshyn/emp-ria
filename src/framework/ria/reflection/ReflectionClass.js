@@ -12,7 +12,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionClass */
     CLASS(
-        FINAL, 'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
+        UNSAFE, FINAL, 'ReflectionClass', EXTENDS(ria.reflection.Reflector), [
 
             function DROP_CACHE() {
                 cache = {};
@@ -48,7 +48,7 @@ NS('ria.reflection', function () {
                 if (cache.hasOwnProperty(name))
                     return cache[name];
 
-                return cache[name] = new ria.__API.init(instance, Clazz, ctor, args);
+                return cache[name] = new ria.__API.initUnSafe(instance, Clazz, ctor, args);
             },
 
             READONLY, ClassOf(Class), 'clazz',
@@ -58,6 +58,10 @@ NS('ria.reflection', function () {
                 BASE();
                 this.clazz = clazz;
                 this._specs = specs_ || [];
+                this._base = null;
+                this._props = null;
+                this._methods = null;
+                this._ifcs = null;
             },
 
             String, function getName() { return this.clazz.__META.name; },
@@ -71,14 +75,14 @@ NS('ria.reflection', function () {
 
             SELF, function getBaseClassReflector() {
                 var base = this.getBaseClass();
-                return base ? new SELF(base) : null;
+                return base ? (this._base || (this._base = new SELF(base))) : null;
             },
 
             ArrayOf(Interface), function getInterfaces() { return this.clazz.__META.ifcs.slice(); },
 
             ArrayOf(ria.reflection.ReflectionInterface), function getInterfacesReflector() {
-                return this.getInterfaces()
-                    .map(function (_) { return new ria.reflection.ReflectionInterface(_); }.bind(this));
+                return this._ifcs || ( this._ifcs = this.getInterfaces()
+                    .map(function (_) { return new ria.reflection.ReflectionInterface(_); }.bind(this)));
             },
 
             ArrayOf(String), function getMethodsNames() { return Object.keys(this.clazz.__META.methods); },
@@ -90,8 +94,8 @@ NS('ria.reflection', function () {
             },
 
             ArrayOf(ria.reflection.ReflectionMethod), function getMethodsReflector() {
-                return this.getMethodsNames()
-                    .map(function (_) { return this.getMethodReflector(_); }.bind(this));
+                return this._methods || (this._methods = this.getMethodsNames()
+                    .map(function (_) { return this.getMethodReflector(_); }.bind(this)));
             },
 
             ArrayOf(String), function getPropertiesNames() { return Object.keys(this.clazz.__META.properties); },
@@ -103,8 +107,8 @@ NS('ria.reflection', function () {
             },
 
             ArrayOf(ria.reflection.ReflectionProperty), function getPropertiesReflector() {
-                return this.getPropertiesNames()
-                    .map(function (_) { return this.getPropertyReflector(_); }.bind(this));
+                return this._props || (this._props = this.getPropertiesNames()
+                    .map(function (_) { return this.getPropertyReflector(_); }.bind(this)));
             },
 
             // TODO: fast way to get children
@@ -161,7 +165,8 @@ NS('ria.reflection', function () {
 
             [[Array]],
             Class, function instantiate(args_) {
-                return ria.__API.init(null, this.clazz, this.clazz.__META.defCtor.impl, args_ ? args_ : []);
+                var meta = this.clazz.__META;
+                return (meta.isUnSafe ? ria.__API.initUnSafe : ria.__API.init)(null, this.clazz, meta.defCtor.impl, args_ ? args_ : []);
             }
         ]);
 });

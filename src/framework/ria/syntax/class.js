@@ -668,7 +668,8 @@ ria.__SYNTAX = ria.__SYNTAX || {};
             def.annotations.map(function (_) { return _.value }),
             def.flags.isAbstract,
             def.genericTypes,
-            def.base.specs || []);
+            def.base.specs || [],
+            def.flags.isUnSafe);
 
         def.properties.forEach(
             /**
