@@ -109,6 +109,9 @@ NAMESPACE('ria.mvc', function () {
                                 var serviceRef = ria.reflection.ReflectionClass(service);
                                 var prop = serviceRef.getPropertyReflector(eventName);
 
+                                if (prop == null)
+                                    throw Exception('Event "' + eventName + '" is not found in ' + ria.__API.getIdentifierOfType(a.service));
+
                                 prop.invokeGetterOn(service).on(function () {
                                     this.loadSessionBinds_();
                                     _.invokeOn(this, ria.__API.clone(arguments));
@@ -189,7 +192,7 @@ NAMESPACE('ria.mvc', function () {
                 try {
                     return params.map(function (_, index) {
                         try {
-                            var Type = types[index];
+                            var Type = types[index] || Object;
                             if (_ === null || _ === undefined || (!Array.isArray(_) && _ instanceof Type))
                                 return _;
 

@@ -7,7 +7,7 @@ NS('ria.reflection', function () {
 
     /** @class ria.reflection.ReflectionInterface */
     CLASS(
-        FINAL, 'ReflectionInterface', EXTENDS(ria.reflection.Reflector), [
+        UNSAFE, FINAL, 'ReflectionInterface', EXTENDS(ria.reflection.Reflector), [
             READONLY, Interface, 'ifc',
 
             [[Interface]],

@@ -12,8 +12,9 @@
      * @param {Array} isAbstract
      * @param {Array} genericTypes
      * @param {Array} baseSpecs
+     * @param {Boolean} isUnSafe
      */
-    function ClassDescriptor(name, base, ifcs, anns, isAbstract, genericTypes, baseSpecs) {
+    function ClassDescriptor(name, base, ifcs, anns, isAbstract, genericTypes, baseSpecs, isUnSafe) {
         this.name = name;
         this.base = base;
         //noinspection JSUnusedGlobalSymbols
@@ -26,6 +27,7 @@
         this.defCtor = null;
         this.ctors = {};
         this.children = [];
+        this.isUnSafe = isUnSafe;
 
         var gt = [];
         var bs = [];
@@ -105,11 +107,12 @@
      * @param {Boolean} [isAbstract_]
      * @param {Array} genericTypes_
      * @param {Array} baseSpecs_
+     * @param {Boolean} isUnSafe_
      */
-    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_, genericTypes_, baseSpecs_) {
+    ria.__API.clazz = function (clazz, name, base_, ifcs_, anns_, isAbstract_, genericTypes_, baseSpecs_, isUnSafe_) {
         clazzRegister[name] = clazz;
 
-        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false, genericTypes_ || [], baseSpecs_ || []);
+        clazz.__META = new ClassDescriptor(name, base_, ifcs_, anns_, isAbstract_ || false, genericTypes_ || [], baseSpecs_ || [], isUnSafe_ || false);
         if (base_) {
             ria.__API.extend(clazz, base_);
             base_.__META.addChild(clazz);
