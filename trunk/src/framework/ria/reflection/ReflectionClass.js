@@ -165,8 +165,7 @@ NS('ria.reflection', function () {
 
             [[Array]],
             Class, function instantiate(args_) {
-                var meta = this.clazz.__META;
-                return (meta.isUnSafe ? ria.__API.initUnSafe : ria.__API.init)(null, this.clazz, meta.defCtor.impl, args_ ? args_ : []);
+                return this.clazz.apply(null, args_ ? args_ : []);
             }
         ]);
 });
