@@ -144,7 +144,8 @@ function ClassCompilerBase(ns, node, descend, baseClass, KEYWORD) {
                                 make_node(UglifyJS.AST_Array, node, {elements: def.annotations.map(processAnnotation) }),
                                 make_node(def.flags.isAbstract ? UglifyJS.AST_True : UglifyJS.AST_False, node),
                                 make_node(UglifyJS.AST_Array, null, {elements: genericTypesNames.map(function (_) { return new UglifyJS.AST_SymbolVar({ name: _ })})}),
-                                make_node(UglifyJS.AST_Array, null, {elements: def.base.specs ? def.base.specs : []})
+                                make_node(UglifyJS.AST_Array, null, {elements: def.base.specs ? def.base.specs : []}),
+                                make_node(def.flags.isUnSafe ? UglifyJS.AST_True : UglifyJS.AST_False, node)
                             ]
                         })
                     })],
