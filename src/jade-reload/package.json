@@ -1,0 +1,25 @@
+{
+    "name": "emp.ria-jade-reload",
+    "version": "0.0.1",
+    "description": "EMP.RIA Jade Reload - Chrome extension",
+    "main": "''",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "grover tests/unit/*.html"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/viatsyshyn/jade-reload.git"
+    },
+    "author": {
+        "name": "Volodymyr Iatsyshyn",
+        "email": "viatsyshyn@gmail.com"
+    },
+    "license": "MIT",
+    "readmeFilename": "README.md",
+    "bugs": {
+        "url": "https://github.com/viatsyshyn/jade-reload/issues"
+    }
+}

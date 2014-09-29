@@ -1,0 +1,13 @@
+{
+  "appName": {
+    "message": "EMP.Ria Jade Reload",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "EMP.Ria Jade Reload utility",
+    "description": "The description of the application"
+  },
+  "pageActionTitle" : {
+    "message" : "Reload Jade"
+  }
+}

@@ -129,6 +129,17 @@ ria.__REQUIRE = ria.__REQUIRE || {};
         root.addDependency(plugin);
     };
 
+		ria.__REQUIRE.reloadJade = function () {
+        !function walkModule(root) {
+            if (/\.jade$/.test(root.id)) {
+                ria.__REQUIRE.load(root.id)
+                    .done(function (content) { this.content = content; }.bind(root));
+            } else {
+                root.deps.forEach(walkModule);
+            }
+        }(root);
+    }
+
 
     var root = ria.__REQUIRE.ModuleDescriptor.getCurrentModule();
 
